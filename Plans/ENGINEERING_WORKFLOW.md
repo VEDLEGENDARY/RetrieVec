@@ -6,7 +6,7 @@ This policy governs every plan and implementation milestone. Read it before chan
 
 Work on one commit-sized task at a time.
 
-1. Read the complete applicable plan, prerequisite plans, repository instructions, and implementation status.
+1. Read the complete applicable plan, prerequisite plans, repository instructions, and implementation status when present. The first implementation task creates the status file if it does not exist.
 2. Inspect the current branch, working tree, recent history, and relevant code. Preserve unrelated work.
 3. Propose a branch name, scope, acceptance checks, and intended commit message. Obtain owner approval before creating or switching to the branch.
 4. Implement only the approved task. Include its tests and directly necessary documentation.
