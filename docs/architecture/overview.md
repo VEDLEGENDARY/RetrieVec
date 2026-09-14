@@ -1,6 +1,6 @@
 # Architecture overview
 
-RetrieVec implements the RetrievalLab plan: a versioned retrieval engine and an
+Retrieval Lab implements the Retrieval Lab plan: a versioned retrieval engine and an
 experiment workbench for research papers. Published findings and measurements
 produced by the workbench must remain distinguishable.
 

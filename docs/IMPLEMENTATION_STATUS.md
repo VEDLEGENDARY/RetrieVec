@@ -5,8 +5,8 @@ been implemented for review. No later capability is implemented by this scaffold
 
 ## Step 1: workspace scaffold
 
-State: implementation and local checks complete; owner approval and CI pending.
-Commit ID: pending owner-approved commit.
+State: committed; local checks pass; hosted CI pending.
+Commit ID: `e0a5e7e`.
 Proposed branch: `chore/workspace-scaffold`.
 Proposed commit: `chore: scaffold Go and Python workspace with CI`.
 
