@@ -3,12 +3,18 @@
 A local retrieval engine and reproducible experiment workbench for research papers.
 The project name is Retrieval Lab. Package and file names use `retrievallab`.
 
-The workspace supports validated corpus snapshots, Go tokenization, local
-text/PDF import with deterministic chunking, and an immutable in-memory positional
-index. Ranking, HTTP serving, and evaluation arrive in later steps. See
+The workspace supports validated corpus snapshots, deterministic text/PDF import,
+positional indexing, BM25, Boolean/phrase search, local HTTP and Python run capture.
+Reviewed evaluation arrives in later steps. See
 [implementation status](docs/IMPLEMENTATION_STATUS.md).
 
 ## Setup
+
+After setup, start `artifacts/bin/retrievald.exe --corpus <snapshot-directory>`.
+In another terminal run `.venv/Scripts/python.exe -m retrievallab run --queries datasets/fixtures/queries-v1.jsonl --output artifacts/runs/example`.
+Use a new output directory each time. The query fixture includes one intentional
+syntax error. On Linux omit .exe and use .venv/bin/python.
+See [HTTP](docs/contracts/http-v1.md) and [run capture](docs/contracts/run-capture-v1.md).
 
 Install [Go 1.26.8](https://go.dev/dl/) and
 [Python 3.13.15](https://www.python.org/downloads/).
