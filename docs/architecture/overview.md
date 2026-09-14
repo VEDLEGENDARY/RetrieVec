@@ -21,8 +21,9 @@ Go package boundaries:
 - `search`: candidate evaluation and deterministic ranked results.
 - `httpapi`: bounded requests, errors, health, and readiness.
 
-Python packages are `corpus`, `client`, and `evaluation`. In step 1 these packages
-only document their boundaries. No retrieval behavior is claimed by this scaffold.
+Python packages are `corpus`, `client`, and `evaluation`. Corpus preparation now
+provides deterministic snapshots and local text/PDF import using the Go analyzer.
+Client and evaluation implementations remain later work.
 
 Data flow planned for the milestone:
 local sources → validated corpus snapshot → Go index/service → Python client
