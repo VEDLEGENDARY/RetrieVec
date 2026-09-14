@@ -96,9 +96,10 @@ See docs/reports/seed-import-v1.md for source pins, inspection, and limitations.
 
 ## Step 5: positional inverted index
 
-State: implementation and focused tests present locally; pending owner-approved commit.
+State: committed; local focused tests are present but Go validation was unavailable in this shell.
 Branch: feat/positional-index.
-Proposed commit: `feat: build positional inverted index`.
+Commit ID: 9670222.
+Commit: `feat: build positional inverted index`.
 
 The immutable Go index assigns internal IDs by external chunk ID, stores sorted
 term postings with zero-based positions, preserves chunk metadata, computes
