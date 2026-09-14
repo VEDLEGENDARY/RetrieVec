@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"retrievallab/engine/internal/analysis"
 	"retrievallab/engine/internal/index"
+	"retrievallab/engine/internal/query"
 	"retrievallab/engine/internal/scoring"
 	"unicode/utf8"
 )
@@ -35,26 +36,37 @@ func Execute(ctx context.Context, idx *index.Index, request Request, config scor
 	if !utf8.ValidString(request.Query) || utf8.RuneCountInString(request.Query) > 4096 || request.TopK < 1 || request.TopK > 100 {
 		return Result{}, fmt.Errorf("invalid query length or top_k")
 	}
-	if request.Mode != "free_text" {
-		return Result{}, fmt.Errorf("unsupported mode")
-	}
-	tokens, err := analysis.Analyze(request.Query)
-	if err != nil {
-		return Result{}, err
-	}
-	if len(tokens) == 0 {
-		return Result{}, fmt.Errorf("empty analyzed query")
-	}
 	terms := []string{}
 	candidates := map[int]bool{}
-	for _, token := range tokens {
-		if err := ctx.Err(); err != nil {
+	if request.Mode == "structured" {
+		node, err := query.Parse(request.Query)
+		if err != nil {
 			return Result{}, err
 		}
-		terms = append(terms, token.Term)
-		for _, p := range idx.Postings(token.Term) {
-			candidates[p.InternalChunkID] = true
+		terms = query.PositiveTerms(node)
+		candidates, err = evaluate(ctx, idx, node)
+		if err != nil {
+			return Result{}, err
 		}
+	} else if request.Mode == "free_text" {
+		tokens, err := analysis.Analyze(request.Query)
+		if err != nil {
+			return Result{}, err
+		}
+		if len(tokens) == 0 {
+			return Result{}, fmt.Errorf("empty analyzed query")
+		}
+		for _, token := range tokens {
+			if err := ctx.Err(); err != nil {
+				return Result{}, err
+			}
+			terms = append(terms, token.Term)
+			for _, p := range idx.Postings(token.Term) {
+				candidates[p.InternalChunkID] = true
+			}
+		}
+	} else {
+		return Result{}, fmt.Errorf("unsupported mode")
 	}
 	ranked, err := scoring.Rank(idx, terms, candidates, config)
 	if err != nil {
