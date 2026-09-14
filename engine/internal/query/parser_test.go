@@ -14,9 +14,6 @@ func TestPrecedenceAndPositiveTerms(t *testing.T) {
 	if n.Kind != "OR" || n.Right.Kind != "AND" || n.Right.Right.Kind != "NOT" {
 		t.Fatalf("bad AST: %+v", n)
 	}
-	n, err = Parse(`NOT NOT alpha AND "a \\"b\\""`)
-	_ = n
-	_ = err
 	n, err = Parse(`NOT NOT alpha AND "red red"`)
 	if err != nil {
 		t.Fatal(err)
