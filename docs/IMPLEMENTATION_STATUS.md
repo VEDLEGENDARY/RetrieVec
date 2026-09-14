@@ -86,10 +86,23 @@ normalization is applied. Behavior and the Unicode table version identify the an
 
 ## Step 4: local import and chunking
 
-Branch: feat/paper-import. Commit ID recorded in the next status update.
+Branch: feat/paper-import. Commit ID: a899953.
 Pinned PDF extraction and UTF-8 imports validate source hashes and publish only
 complete snapshots. Paragraph packing uses Go token counts and original offsets.
 The shared checks pass with 19 Python tests and Go tests/vet/build. Five real
 papers produce 193 chunks across 68 pages; repeated runs produce the same ID.
 Every page reconstructs exactly, with no omitted pages and no chunk over 256 tokens.
 See docs/reports/seed-import-v1.md for source pins, inspection, and limitations.
+
+## Step 5: positional inverted index
+
+State: implementation and focused tests present locally; pending owner-approved commit.
+Branch: feat/positional-index.
+Proposed commit: `feat: build positional inverted index`.
+
+The immutable Go index assigns internal IDs by external chunk ID, stores sorted
+term postings with zero-based positions, preserves chunk metadata, computes
+collection statistics, and returns defensive copies for concurrent readers.
+Focused tests cover posting invariants, deterministic ordering, rejected input,
+defensive copies, and concurrent read access. Persistent index files and ranking
+are deferred to later milestones.
