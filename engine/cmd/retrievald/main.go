@@ -29,9 +29,11 @@ func run(args []string, stdout, stderr io.Writer) int {
 	flags := flag.NewFlagSet("retrievald", flag.ContinueOnError)
 	flags.SetOutput(stderr)
 	showVersion := flags.Bool("version", false, "print the version and exit")
+	directory := flags.String("corpus", "", "validated corpus snapshot directory")
+	address := flags.String("listen", "127.0.0.1:8091", "loopback address and port")
 	flags.Usage = func() {
 		fmt.Fprintln(stderr, "Usage: retrievald [--version] | analyze | inspect --corpus <directory>")
-		fmt.Fprintln(stderr, "Workspace scaffold; HTTP serving is planned for step 9.")
+		fmt.Fprintln(stderr, "Serve with --corpus <directory> [--listen 127.0.0.1:8091].")
 		flags.PrintDefaults()
 	}
 	if err := flags.Parse(args); err != nil {
@@ -48,6 +50,9 @@ func run(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stdout, "retrievald "+version)
 		return 0
 	}
-	fmt.Fprintln(stderr, "retrievald: HTTP serving is not implemented yet; use --help")
-	return 2
+	if *directory == "" {
+		fmt.Fprintln(stderr, "retrievald: --corpus is required; use --help")
+		return 2
+	}
+	return serve(*directory, *address, stdout, stderr)
 }

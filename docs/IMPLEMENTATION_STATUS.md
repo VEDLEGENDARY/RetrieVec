@@ -2,6 +2,9 @@
 
 ## Recovery batch, 2026-09-14
 
+Step 9: loopback HTTP service, startup validation, bounded requests, health/stats,
+graceful shutdown and structured error responses implemented. Live HTTP tests added.
+
 Step 8: collection-scoped Boolean sets and positional phrases implemented.
 Reference predicates cover repeated phrases, nested NOT and zero-score matches.
 

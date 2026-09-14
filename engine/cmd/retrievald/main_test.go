@@ -15,7 +15,7 @@ func TestRun(t *testing.T) {
 	}{
 		{"version", []string{"--version"}, 0, "retrievald 0.1.0"},
 		{"help", []string{"--help"}, 0, "Usage: retrievald"},
-		{"no service yet", nil, 2, "HTTP serving is not implemented yet"},
+		{"missing corpus", nil, 2, "--corpus is required"},
 		{"unknown flag", []string{"--unknown"}, 2, "flag provided but not defined"},
 		{"positional argument", []string{"unexpected"}, 2, "unexpected positional arguments"},
 		{"version with argument", []string{"--version", "unexpected"}, 2, "unexpected positional arguments"},
