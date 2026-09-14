@@ -1,8 +1,7 @@
-# RetrieVec
+# Retrieval Lab
 
 A local retrieval engine and reproducible experiment workbench for research papers.
-The project specification calls this architecture **RetrievalLab**; this repository
-is RetrieVec, and the Python package keeps the name `retrievallab`.
+The project name is Retrieval Lab. Package and file names use `retrievallab`.
 
 **Current scope: step 1, workspace scaffold.** The entry points support help and
 version output. Corpus processing, search, HTTP serving, and evaluation are not

@@ -1,4 +1,4 @@
-# RetrievalLab: Project Specification and Weeks 1–2 Plan
+# Retrieval Lab: Project Specification and Weeks 1–2 Plan
 
 ## Required engineering workflow
 
@@ -15,7 +15,7 @@ Read and follow [ENGINEERING_WORKFLOW.md](ENGINEERING_WORKFLOW.md) in full befor
 
 Build a versioned retrieval engine and experiment platform, demonstrated through a research workbench for RAG and ML papers.
 
-Users will select a paper collection, compare retrieval methods, inspect supporting passages, generate cited research comparisons, and save reproducible experiments. Published findings and results measured by RetrievalLab must remain distinguishable.
+Users will select a paper collection, compare retrieval methods, inspect supporting passages, generate cited research comparisons, and save reproducible experiments. Published findings and results measured by Retrieval Lab must remain distinguishable.
 
 The technical focus is custom retrieval infrastructure, reproducibility, evaluation, and reliability. AskUTD is a separate club project; a future integration must not become a delivery dependency.
 
@@ -25,7 +25,7 @@ The technical focus is custom retrieval infrastructure, reproducibility, evaluat
 - Hardware: Core Ultra 7 155H, integrated Arc graphics, 16 GB shared system RAM, 1 TB SSD.
 - Core development must run locally. Colab and student cloud credits are available for later experiments.
 - Private repository during development; public release after owner approval.
-- Use this dedicated RetrieVec repository, not an unrelated portfolio workspace.
+- Use this dedicated Retrieval Lab repository, not an unrelated portfolio workspace.
 - Follow issues → feature branches → PRs → CI → reviewed merge. Record major architecture decisions and actual benchmark results.
 
 ## Architecture and roadmap
