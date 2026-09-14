@@ -1,6 +1,6 @@
 # Implementation status
 
-The weeks 1–2 plan contains 14 sequential commit-sized steps. Steps 1–2 are
+The weeks 1–2 plan contains 14 sequential commit-sized steps. Steps 1–3 are
 implemented locally; hosted CI remains pending. Steps 2–5 are an owner-authorized
 batch of separate commits on stacked feature branches. Main changes only through PRs.
 
@@ -44,7 +44,7 @@ HTTP. Empty internal packages intentionally contain only package documentation.
 | Step | Capability | State |
 | --- | --- | --- |
 | 2 | Validated deterministic corpus snapshots | Implemented; local checks pass |
-| 3 | Versioned analyzer and token fixtures | Not started |
+| 3 | Versioned analyzer and token fixtures | Implemented; local checks pass |
 | 4 | Local paper import and paragraph chunking | Not started |
 | 5 | Positional inverted index | Not started |
 | 6 | BM25 free-text ranking | Not started |
@@ -68,9 +68,18 @@ or RPC implementation are claimed.
 
 ## Step 2: deterministic corpus snapshots
 
-Branch: feat/corpus-snapshots. Commit ID recorded in the next status update.
+Branch: feat/corpus-snapshots. Commit ID: c3d62b1.
 Strict record fields, content IDs, manifest provenance, canonical hashes, UTF-8
 validation, staged publication, and twelve synthetic fixtures are implemented.
 The shared check script passed with 13 Python tests, Go tests/vet/build, and Ruff.
 Snapshot size is bounded to 64 MiB per file. Publication is validated but does not
 claim crash durability. CLI: retrievallab validate-snapshot <snapshot-directory>.
+
+## Step 3: versioned analyzer
+
+Branch: feat/versioned-analyzer. Commit ID recorded in the next status update.
+Go implements letter/decimal-digit runs, simple Unicode lowercase, zero-based
+positions, and original UTF-8 byte offsets. Python uses the same executable.
+Fifteen shared Unicode fixtures and malformed/oversized-input checks pass, along
+with all shared checks (15 Python tests and Go tests/vet/build). No stemming or
+normalization is applied. Behavior and the Unicode table version identify the analyzer.
