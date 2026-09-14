@@ -1,4 +1,4 @@
-# Retrieval Lab: Weeks 5–6 Handoff
+# RetrieVec: Weeks 5–6 Handoff
 
 ## Required engineering workflow
 
@@ -15,7 +15,7 @@ Read and follow [ENGINEERING_WORKFLOW.md](ENGINEERING_WORKFLOW.md) in full befor
 
 Build an authenticated research workspace over the persistent hybrid engine: private collections, uploads with progress, retrieval comparisons, source inspection, cited synthesis, saved conversations/experiments, and exports.
 
-Read both earlier plans, repository instructions, and `docs/IMPLEMENTATION_STATUS.md`. Retrieval Lab is the earlier name; use Retrieval Lab in the product while preserving existing package/format identifiers. Verify snapshot consistency, ingestion recovery, gRPC, and sparse/dense/hybrid evaluation before depending on them. Repair prerequisite gaps rather than replacing working subsystems.
+Read both earlier plans, repository instructions, and `docs/IMPLEMENTATION_STATUS.md`. RetrievalLab is the earlier name; use RetrieVec in the product while preserving existing package/format identifiers. Verify snapshot consistency, ingestion recovery, gRPC, and sparse/dense/hybrid evaluation before depending on them. Repair prerequisite gaps rather than replacing working subsystems.
 
 Development remains local on 16 GB shared RAM, approximately 2–3 hours/day. The schedule is a guide; complete acceptance gates before declaring the milestone done. Use established identity/model libraries, retain existing conventions, and keep the repository private.
 
@@ -28,7 +28,7 @@ Sign in → select private/shared collection → upload text PDFs
         → generate supported claims/comparison → save and export
 ```
 
-Keep “Paper evidence” and “Retrieval Lab measurements” visibly separate. The application may summarize reported results, but cannot claim to reproduce a paper merely because it measured a related retrieval method.
+Keep “Paper evidence” and “RetrieVec measurements” visibly separate. The application may summarize reported results, but cannot claim to reproduce a paper merely because it measured a related retrieval method.
 
 Required: authentication, collection isolation, functional upload/search/source UI, grounded generation with abstention, persisted history/runs, and export. Defer OCR/tables/equation/chart understanding, collaborative teams, public sharing, scheduled monitoring, training, ANN, arbitrary repository execution, and deployment. Show unsupported document types/statuses honestly.
 
@@ -160,7 +160,7 @@ comparisons[]: {
 limitations[]
 ```
 
-Use “not reported in retrieved evidence” for missing conditions/values. Distinguish a paper-reported number from a number in a Retrieval Lab run. Do not rank incomparable methods as a universal winner. Evidence-ID validity and exact-quote matching do not prove semantic support; show them as structural checks, and measure support through human review.
+Use “not reported in retrieved evidence” for missing conditions/values. Distinguish a paper-reported number from a number in a RetrieVec run. Do not rank incomparable methods as a universal winner. Evidence-ID validity and exact-quote matching do not prove semantic support; show them as structural checks, and measure support through human review.
 
 Retrieved papers are untrusted data. Delimit them as evidence, never as instructions; generation has no shell, filesystem, network, or account-action tools. Escape model output when rendering and reject unsafe links/HTML. A malicious passage must not alter provider settings, expose another collection, or trigger tool calls.
 

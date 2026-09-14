@@ -1,4 +1,4 @@
-# Retrieval Lab: Advanced Document Evidence Handoff (Weeks 9–10)
+# RetrieVec: Advanced Document Evidence Handoff (Weeks 9–10)
 
 ## Required engineering workflow
 
