@@ -12,3 +12,8 @@ Parentheses and phrases support at most 32 nested levels, 256 lexer tokens and
 inside phrases. Bare operands must analyze to one token. Error positions are
 zero-based Unicode character offsets. At least one term must be below an even
 number of NOT nodes; those unique terms supply ranking weight.
+
+Boolean evaluation uses set union, intersection and complement relative to the
+loaded collection. Phrase matches require consecutive positions in one chunk,
+including repeated terms. Surviving zero-score documents remain results. Search
+checks cancellation while traversing the expression and candidate documents.

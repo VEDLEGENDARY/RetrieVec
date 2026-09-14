@@ -2,6 +2,9 @@
 
 ## Recovery batch, 2026-09-14
 
+Step 8: collection-scoped Boolean sets and positional phrases implemented.
+Reference predicates cover repeated phrases, nested NOT and zero-score matches.
+
 Step 7: bounded lexer, AST, precedence, escapes and positive-term extraction
 implemented with syntax/limit fixtures. End-of-batch checks pending.
 
