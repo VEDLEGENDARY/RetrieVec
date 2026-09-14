@@ -10,12 +10,12 @@ import (
 
 func document(id, text string) corpus.Document {
 	return corpus.Document{Chunk: corpus.Chunk{
-		ChunkID:         id,
-		PaperID:         "paper-" + id,
-		PaperVersionID:  "version-" + id,
-		CollectionID:    "research",
-		Text:            text,
-		PageRange:       []int{1, 1},
+		ChunkID:        id,
+		PaperID:        "paper-" + id,
+		PaperVersionID: "version-" + id,
+		CollectionID:   "research",
+		Text:           text,
+		PageRange:      []int{1, 1},
 	}, Title: "Title " + id}
 }
 
@@ -55,7 +55,11 @@ func TestBuildRejectsInvalidCollections(t *testing.T) {
 		{"missing collection", []corpus.Document{{Chunk: corpus.Chunk{ChunkID: "chunk-a", PaperID: "paper", PaperVersionID: "version", Text: "text"}}}},
 		{"zero-token chunk", []corpus.Document{{Chunk: corpus.Chunk{ChunkID: "chunk-a", PaperID: "paper", PaperVersionID: "version", CollectionID: "research", Text: "---"}}}},
 		{"duplicate ID", []corpus.Document{document("chunk-a", "one"), document("chunk-a", "two")}},
-		{"mixed collection", []corpus.Document{document("chunk-a", "one"), func() corpus.Document { value := document("chunk-b", "two"); value.CollectionID = "other"; return value }()}},
+		{"mixed collection", []corpus.Document{document("chunk-a", "one"), func() corpus.Document {
+			value := document("chunk-b", "two")
+			value.CollectionID = "other"
+			return value
+		}()}},
 	}
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
