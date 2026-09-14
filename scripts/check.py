@@ -46,6 +46,7 @@ def main() -> int:
     binary = output / ("retrievald.exe" if os.name == "nt" else "retrievald")
     run("go", "build", "-o", str(binary), "./cmd/retrievald", cwd=engine)
     run(str(binary), "--version")
+    os.environ["RETRIEVALLAB_ENGINE"] = str(binary)
     run(sys.executable, "-m", "pip", "check")
     run(
         sys.executable,
