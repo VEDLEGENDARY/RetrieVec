@@ -1,5 +1,14 @@
 # Implementation status
 
+## Recovery batch, 2026-09-14
+
+The owner authorized restoration after PR #4, steps 6–10, checks at the end,
+and PR merges. Shared history is preserved. Ten recovery milestone commits
+restore steps 1–5 and add steps 6–10; naming is included in step 1.
+Recovered steps: 1 e84f4d8, 2 a3c0917, 3 36f653a, 4 d2a1a31.
+Step 5 restores the loader/index and adds corruption coverage. Batch checks pending.
+The entries below describe the original implementation history.
+
 The weeks 1–2 plan contains 14 sequential commit-sized steps. Steps 1–4 are
 implemented locally; hosted CI remains pending. Steps 2–5 are an owner-authorized
 batch of separate commits on stacked feature branches. Main changes only through PRs.
@@ -86,10 +95,24 @@ normalization is applied. Behavior and the Unicode table version identify the an
 
 ## Step 4: local import and chunking
 
-Branch: feat/paper-import. Commit ID recorded in the next status update.
+Branch: feat/paper-import. Commit ID: a899953.
 Pinned PDF extraction and UTF-8 imports validate source hashes and publish only
 complete snapshots. Paragraph packing uses Go token counts and original offsets.
 The shared checks pass with 19 Python tests and Go tests/vet/build. Five real
 papers produce 193 chunks across 68 pages; repeated runs produce the same ID.
 Every page reconstructs exactly, with no omitted pages and no chunk over 256 tokens.
 See docs/reports/seed-import-v1.md for source pins, inspection, and limitations.
+
+## Step 5: positional inverted index
+
+State: committed; local focused tests are present but Go validation was unavailable in this shell.
+Branch: feat/positional-index.
+Commit ID: 9670222.
+Commit: `feat: build positional inverted index`.
+
+The immutable Go index assigns internal IDs by external chunk ID, stores sorted
+term postings with zero-based positions, preserves chunk metadata, computes
+collection statistics, and returns defensive copies for concurrent readers.
+Focused tests cover posting invariants, deterministic ordering, rejected input,
+defensive copies, and concurrent read access. Persistent index files and ranking
+are deferred to later milestones.

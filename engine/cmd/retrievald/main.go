@@ -16,6 +16,9 @@ func main() {
 }
 
 func run(args []string, stdout, stderr io.Writer) int {
+	if len(args) > 0 && args[0] == "inspect" {
+		return inspectCommand(args[1:], stdout, stderr)
+	}
 	if len(args) > 0 && args[0] == "analyze" {
 		if len(args) != 1 {
 			fmt.Fprintln(stderr, "analyze: no arguments expected")
@@ -27,7 +30,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	flags.SetOutput(stderr)
 	showVersion := flags.Bool("version", false, "print the version and exit")
 	flags.Usage = func() {
-		fmt.Fprintln(stderr, "Usage: retrievald [--version] | analyze")
+		fmt.Fprintln(stderr, "Usage: retrievald [--version] | analyze | inspect --corpus <directory>")
 		fmt.Fprintln(stderr, "Workspace scaffold; HTTP serving is planned for step 9.")
 		flags.PrintDefaults()
 	}
