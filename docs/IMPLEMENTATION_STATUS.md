@@ -1,6 +1,6 @@
 # Implementation status
 
-The weeks 1–2 plan contains 14 sequential commit-sized steps. Steps 1–3 are
+The weeks 1–2 plan contains 14 sequential commit-sized steps. Steps 1–4 are
 implemented locally; hosted CI remains pending. Steps 2–5 are an owner-authorized
 batch of separate commits on stacked feature branches. Main changes only through PRs.
 
@@ -45,7 +45,7 @@ HTTP. Empty internal packages intentionally contain only package documentation.
 | --- | --- | --- |
 | 2 | Validated deterministic corpus snapshots | Implemented; local checks pass |
 | 3 | Versioned analyzer and token fixtures | Implemented; local checks pass |
-| 4 | Local paper import and paragraph chunking | Not started |
+| 4 | Local paper import and paragraph chunking | Implemented; synthetic tests and real seed audit pass |
 | 5 | Positional inverted index | Not started |
 | 6 | BM25 free-text ranking | Not started |
 | 7 | Structured query parser | Not started |
@@ -77,9 +77,19 @@ claim crash durability. CLI: retrievallab validate-snapshot <snapshot-directory>
 
 ## Step 3: versioned analyzer
 
-Branch: feat/versioned-analyzer. Commit ID recorded in the next status update.
+Branch: feat/versioned-analyzer. Commit ID: ed936a7.
 Go implements letter/decimal-digit runs, simple Unicode lowercase, zero-based
 positions, and original UTF-8 byte offsets. Python uses the same executable.
 Fifteen shared Unicode fixtures and malformed/oversized-input checks pass, along
 with all shared checks (15 Python tests and Go tests/vet/build). No stemming or
 normalization is applied. Behavior and the Unicode table version identify the analyzer.
+
+## Step 4: local import and chunking
+
+Branch: feat/paper-import. Commit ID recorded in the next status update.
+Pinned PDF extraction and UTF-8 imports validate source hashes and publish only
+complete snapshots. Paragraph packing uses Go token counts and original offsets.
+The shared checks pass with 19 Python tests and Go tests/vet/build. Five real
+papers produce 193 chunks across 68 pages; repeated runs produce the same ID.
+Every page reconstructs exactly, with no omitted pages and no chunk over 256 tokens.
+See docs/reports/seed-import-v1.md for source pins, inspection, and limitations.

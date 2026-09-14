@@ -3,9 +3,9 @@
 A local retrieval engine and reproducible experiment workbench for research papers.
 The project name is Retrieval Lab. Package and file names use `retrievallab`.
 
-**Current scope: step 1, workspace scaffold.** The entry points support help and
-version output. Corpus processing, search, HTTP serving, and evaluation are not
-implemented yet. See [implementation status](docs/IMPLEMENTATION_STATUS.md).
+The workspace supports validated corpus snapshots, Go tokenization, and local
+text/PDF import with deterministic chunking. Ranking, HTTP serving, and evaluation
+arrive in later steps. See [implementation status](docs/IMPLEMENTATION_STATUS.md).
 
 ## Setup
 
@@ -60,9 +60,25 @@ Fix formatting with `gofmt -w <file>` and
 | `scripts/` | Cross-platform developer checks |
 | `artifacts/` | Ignored generated binaries, snapshots, and experiment outputs |
 
-Runtime dependencies are currently empty. Development and build dependencies
-are pinned in `python/requirements-dev.txt` and `python/pyproject.toml`.
+The PDF extractor is the only Python runtime dependency; Go uses its standard library.
+Dependencies are pinned in `python/requirements-dev.txt` and `python/pyproject.toml`.
 Update the pins together and validate on both CI platforms.
 
 Read the [architecture overview](docs/architecture/overview.md) and
 [contribution workflow](CONTRIBUTING.md) before implementing the next step.
+
+## Local corpus workflow
+
+Build the engine through scripts/check.py, then set its path in PowerShell:
+
+```powershell
+$env:RETRIEVALLAB_ENGINE = (Resolve-Path artifacts/bin/retrievald.exe).Path
+.\.venv\Scripts\python.exe -m retrievallab import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/snapshots
+.\.venv\Scripts\python.exe -m retrievallab validate-snapshot artifacts/snapshots/<snapshot-id>
+```
+
+On Linux use .venv/bin/python and set RETRIEVALLAB_ENGINE to the absolute path of
+artifacts/bin/retrievald. Download the five PDFs identified by the seed manifest
+to artifacts/papers first, or supply your own local source manifest. Import is
+offline and verifies pinned source hashes. See the [import contract](docs/contracts/import-v1.md)
+and [seed inspection report](docs/reports/seed-import-v1.md) for reproduction details.
