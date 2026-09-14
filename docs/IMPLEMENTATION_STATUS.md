@@ -1,7 +1,8 @@
 # Implementation status
 
-The weeks 1–2 plan contains 14 sequential commit-sized steps. Only step 1 has
-been implemented for review. No later capability is implemented by this scaffold.
+The weeks 1–2 plan contains 14 sequential commit-sized steps. Steps 1–2 are
+implemented locally; hosted CI remains pending. Steps 2–5 are an owner-authorized
+batch of separate commits on stacked feature branches. Main changes only through PRs.
 
 ## Step 1: workspace scaffold
 
@@ -42,7 +43,7 @@ HTTP. Empty internal packages intentionally contain only package documentation.
 
 | Step | Capability | State |
 | --- | --- | --- |
-| 2 | Validated deterministic corpus snapshots | Not started |
+| 2 | Validated deterministic corpus snapshots | Implemented; local checks pass |
 | 3 | Versioned analyzer and token fixtures | Not started |
 | 4 | Local paper import and paragraph chunking | Not started |
 | 5 | Positional inverted index | Not started |
@@ -58,11 +59,18 @@ HTTP. Empty internal packages intentionally contain only package documentation.
 
 ## Open gates and next action
 
-Obtain approval for the step 1 branch and commit, link the work to an issue, apply
-the reviewed scaffold to the approved branch, and open a focused PR. Record the
-real commit ID in the next status update and CI evidence after an actual run.
-Main changes only through a reviewed PR; repository protection settings remain
-unverified. Begin step 2 after the owner-approved step 1 workflow is complete.
+Step 1 is recorded as e0a5e7e and naming migration as fcaf4be. Complete the authorized
+steps 2–5 in order, then present the local branch stack for PR approval. No hosted CI
+or independent review has been performed for the implementation branches.
 
 No retrieval benchmarks, quality metrics, reviewed labels, persistent segments,
 or RPC implementation are claimed.
+
+## Step 2: deterministic corpus snapshots
+
+Branch: feat/corpus-snapshots. Commit ID recorded in the next status update.
+Strict record fields, content IDs, manifest provenance, canonical hashes, UTF-8
+validation, staged publication, and twelve synthetic fixtures are implemented.
+The shared check script passed with 13 Python tests, Go tests/vet/build, and Ruff.
+Snapshot size is bounded to 64 MiB per file. Publication is validated but does not
+claim crash durability. CLI: retrievallab validate-snapshot <snapshot-directory>.
