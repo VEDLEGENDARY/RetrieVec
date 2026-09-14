@@ -1,0 +1,14 @@
+[
+  {"paper_id":"fixture-01","title":"Lexical retrieval","text":"Sparse retrieval indexes words. BM25 ranks passages using term frequency and document length."},
+  {"paper_id":"fixture-02","title":"Dense retrieval","text":"Dense retrieval embeds queries and passages. Semantic similarity can bridge a vocabulary mismatch."},
+  {"paper_id":"fixture-03","title":"Rank fusion","text":"Reciprocal rank fusion combines lexical and dense rankings. Fusion does not require equal score scales."},
+  {"paper_id":"fixture-04","title":"Reranking","text":"A cross encoder reranks candidate passages. A reranker cannot recover evidence excluded by retrieval."},
+  {"paper_id":"fixture-05","title":"Chunk boundaries","text":"Paragraph boundaries preserve context. Oversized paragraphs require deterministic splitting without overlap."},
+  {"paper_id":"fixture-06","title":"Evaluation","text":"Recall measures known relevant results. Judgment coverage describes how many returned passages were assessed."},
+  {"paper_id":"fixture-07","title":"Repeated positions","text":"red red blue red. red blue blue. A phrase needs consecutive positions in one chunk."},
+  {"paper_id":"fixture-08","title":"Case and punctuation","text":"RAG-based BM25: don't discard stopwords! AND and Or or NOT not."},
+  {"paper_id":"fixture-09","title":"Unicode text","text":"CAFÉ café café Straße İSTANBUL ΣΟΣ 中文１２３ ² Ⅳ. Unicode distinctions stay visible."},
+  {"paper_id":"fixture-10","title":"Collection scope","text":"Private collections require authorization. Negation is relative to the currently loaded collection."},
+  {"paper_id":"fixture-11","title":"Reproducibility","text":"Stable hashes identify source versions. Snapshot identities exclude timestamps and input ordering."},
+  {"paper_id":"fixture-12","title":"Unrelated astronomy","text":"Stars form inside cold molecular clouds. Orbital periods and telescope optics concern astronomy."}
+]
