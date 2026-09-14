@@ -1,4 +1,4 @@
-# Retrieval Lab: ML and Index Experiments Handoff (Weeks 11–12)
+# RetrieVec: ML and Index Experiments Handoff (Weeks 11–12)
 
 ## Required engineering workflow
 
