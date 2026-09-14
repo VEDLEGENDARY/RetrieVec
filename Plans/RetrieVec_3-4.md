@@ -1,4 +1,4 @@
-# Retrieval Lab: Weeks 3–4 Handoff
+# RetrieVec: Weeks 3–4 Handoff
 
 ## Required engineering workflow
 
@@ -15,9 +15,9 @@ Read and follow [ENGINEERING_WORKFLOW.md](ENGINEERING_WORKFLOW.md) in full befor
 
 Turn the correct sparse-search baseline into a persistent, recoverable hybrid-retrieval platform. Deliver disk-backed Go segments, consistent snapshots, durable ingestion, Python–Go gRPC, exact dense retrieval, and reproducible sparse/dense/hybrid comparisons.
 
-Read `Plans/retrievallab_1-2.md`, repository instructions, and `docs/IMPLEMENTATION_STATUS.md` first. The earlier plan calls the project Retrieval Lab; Retrieval Lab is the current project/repository name. Preserve existing package names, Protobuf namespaces, and `RLSEG001` file magic unless an explicit migration is necessary. Renaming the product does not require breaking stored formats.
+Read `Plans/RetrieVec_1-2.md`, repository instructions, and `docs/IMPLEMENTATION_STATUS.md` first. The earlier plan calls the project RetrievalLab; RetrieVec is the current project/repository name. Preserve existing package names, Protobuf namespaces, and `RLSEG001` file magic unless an explicit migration is necessary. Renaming the product does not require breaking stored formats.
 
-Work in the existing Retrieval Lab repository. Verify earlier acceptance gates against actual code; fix prerequisite defects before dependent work. Do not assume planned features or reviewed judgments exist.
+Work in the existing RetrieVec repository. Verify earlier acceptance gates against actual code; fix prerequisite defects before dependent work. Do not assume planned features or reviewed judgments exist.
 
 Constraints: 2–3 hours/day, 16 GB shared system RAM, local CPU operation, optional student cloud resources, private repository. This is an ambitious milestone: preserve correctness and extend the schedule if necessary. It does not include user-facing authentication, frontend, generation, OCR, ANN, or model training.
 
