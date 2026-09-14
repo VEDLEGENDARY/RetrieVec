@@ -25,7 +25,7 @@ The technical focus is custom retrieval infrastructure, reproducibility, evaluat
 - Hardware: Core Ultra 7 155H, integrated Arc graphics, 16 GB shared system RAM, 1 TB SSD.
 - Core development must run locally. Colab and student cloud credits are available for later experiments.
 - Private repository during development; public release after owner approval.
-- Use a dedicated RetrievalLab repository, not the portfolio workspace containing this document.
+- Use this dedicated RetrieVec repository, not an unrelated portfolio workspace.
 - Follow issues → feature branches → PRs → CI → reviewed merge. Record major architecture decisions and actual benchmark results.
 
 ## Architecture and roadmap
