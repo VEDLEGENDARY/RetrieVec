@@ -1,0 +1,4 @@
+# Exact tool pins; runtime dependencies are empty.
+pip==26.2.1
+setuptools==84.0.0
+ruff==0.16.7
