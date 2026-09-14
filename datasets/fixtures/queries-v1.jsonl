@@ -1,0 +1,3 @@
+{"query_id":"q1","query":"retrieval","mode":"free_text","top_k":5,"explain":true}
+{"query_id":"q2","query":"\"dense retrieval\" OR sparse","mode":"structured","top_k":5}
+{"query_id":"invalid-syntax","query":"retrieval AND","mode":"structured","top_k":5}

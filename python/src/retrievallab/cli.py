@@ -5,6 +5,8 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from retrievallab import __version__
+from retrievallab.client.capture import capture
+from retrievallab.client.http import Client, RetrievalError
 from retrievallab.corpus.analyzer import GoAnalyzer
 from retrievallab.corpus.importer import import_manifest
 from retrievallab.corpus.snapshot import CorpusError, load_snapshot
@@ -26,7 +28,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     ingest.add_argument("--collection", default="research")
     ingest.add_argument("--token-budget", type=int, default=256)
     ingest.add_argument("--engine", type=Path)
+    runner = subparsers.add_parser("run", help="capture query JSONL against the service")
+    runner.add_argument("--url", default="http://127.0.0.1:8091")
+    runner.add_argument("--queries", type=Path, required=True)
+    runner.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
+    if args.command == "run":
+        try:
+            manifest = capture(Client(args.url), args.queries, args.output)
+        except (ValueError, OSError, CorpusError, RetrievalError) as error:
+            parser.error(str(error))
+        print(manifest["ranking_sha256"])
+        return 0
     if args.command == "import":
         try:
             target = import_manifest(
