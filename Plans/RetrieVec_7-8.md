@@ -1,4 +1,4 @@
-# Retrieval Lab: Weeks 7–8 Handoff
+# RetrieVec: Weeks 7–8 Handoff
 
 ## Required engineering workflow
 
