@@ -3,9 +3,10 @@
 A local retrieval engine and reproducible experiment workbench for research papers.
 The project name is Retrieval Lab. Package and file names use `retrievallab`.
 
-The workspace supports validated corpus snapshots, Go tokenization, and local
-text/PDF import with deterministic chunking. Ranking, HTTP serving, and evaluation
-arrive in later steps. See [implementation status](docs/IMPLEMENTATION_STATUS.md).
+The workspace supports validated corpus snapshots, Go tokenization, local
+text/PDF import with deterministic chunking, and an immutable in-memory positional
+index. Ranking, HTTP serving, and evaluation arrive in later steps. See
+[implementation status](docs/IMPLEMENTATION_STATUS.md).
 
 ## Setup
 
@@ -82,3 +83,13 @@ artifacts/bin/retrievald. Download the five PDFs identified by the seed manifest
 to artifacts/papers first, or supply your own local source manifest. Import is
 offline and verifies pinned source hashes. See the [import contract](docs/contracts/import-v1.md)
 and [seed inspection report](docs/reports/seed-import-v1.md) for reproduction details.
+
+To inspect a validated corpus after building the engine:
+
+```powershell
+artifacts\bin\retrievald.exe inspect --corpus artifacts\snapshots\<snapshot-id>
+```
+
+The command rebuilds the deterministic positional index and reports its snapshot,
+collection, term, chunk, token, and average-length statistics. The index is rebuilt
+at startup and is not yet persisted to disk.
