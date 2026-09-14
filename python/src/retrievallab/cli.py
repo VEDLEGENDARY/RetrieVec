@@ -1,0 +1,52 @@
+"""Command-line entry point; corpus and evaluation commands arrive in later steps."""
+
+import argparse
+from collections.abc import Sequence
+from pathlib import Path
+
+from retrievallab import __version__
+from retrievallab.corpus.analyzer import GoAnalyzer
+from retrievallab.corpus.importer import import_manifest
+from retrievallab.corpus.snapshot import CorpusError, load_snapshot
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="retrievallab",
+        description="Corpus and evaluation workspace. Workflow commands arrive in later steps.",
+    )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    subparsers = parser.add_subparsers(dest="command")
+    validate = subparsers.add_parser("validate-snapshot", help="validate an on-disk corpus")
+    validate.add_argument("directory", type=Path)
+    ingest = subparsers.add_parser("import", help="import local text files and text-based PDFs")
+    ingest.add_argument("--manifest", required=True, type=Path)
+    ingest.add_argument("--source-root", required=True, type=Path)
+    ingest.add_argument("--output", required=True, type=Path)
+    ingest.add_argument("--collection", default="research")
+    ingest.add_argument("--token-budget", type=int, default=256)
+    ingest.add_argument("--engine", type=Path)
+    args = parser.parse_args(argv)
+    if args.command == "import":
+        try:
+            target = import_manifest(
+                args.manifest,
+                args.source_root,
+                args.output,
+                args.collection,
+                args.token_budget,
+                GoAnalyzer(args.engine),
+            )
+        except (CorpusError, OSError) as error:
+            parser.error(str(error))
+        print(target)
+        return 0
+    if args.command == "validate-snapshot":
+        try:
+            manifest, _, _ = load_snapshot(args.directory)
+        except (CorpusError, OSError) as error:
+            parser.error(str(error))
+        print(manifest["snapshot_id"])
+        return 0
+    parser.print_help()
+    return 0
