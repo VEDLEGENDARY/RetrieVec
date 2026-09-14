@@ -2,6 +2,9 @@
 
 ## Recovery batch, 2026-09-14
 
+Step 6: BM25, free-text OR candidates, stable ties and term explanations implemented.
+Independent score fixtures included; validation scheduled at batch end.
+
 The owner authorized restoration after PR #4, steps 6–10, checks at the end,
 and PR merges. Shared history is preserved. Ten recovery milestone commits
 restore steps 1–5 and add steps 6–10; naming is included in step 1.
