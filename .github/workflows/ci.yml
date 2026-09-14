@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: checks (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version-file: engine/go.mod
+          cache: false # No external Go modules yet.
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13.15'
+          cache: pip
+          cache-dependency-path: python/requirements-dev.txt
+      - name: Install development tools
+        run: python -m pip install -r python/requirements-dev.txt
+      - name: Install Python package
+        run: python -m pip install --no-build-isolation --no-deps -e ./python
+      - name: Check workspace on Linux with race detector
+        if: runner.os == 'Linux'
+        run: python scripts/check.py --race
+      - name: Check workspace on Windows
+        if: runner.os == 'Windows'
+        run: python scripts/check.py
