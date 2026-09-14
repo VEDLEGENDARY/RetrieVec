@@ -15,7 +15,7 @@ Read and follow [ENGINEERING_WORKFLOW.md](ENGINEERING_WORKFLOW.md) in full befor
 
 Turn the correct sparse-search baseline into a persistent, recoverable hybrid-retrieval platform. Deliver disk-backed Go segments, consistent snapshots, durable ingestion, Python–Go gRPC, exact dense retrieval, and reproducible sparse/dense/hybrid comparisons.
 
-Read `Plans/RetrieVec_Weeks_1-2.md`, repository instructions, and `docs/IMPLEMENTATION_STATUS.md` first. The earlier plan calls the project RetrievalLab; RetrieVec is the current project/repository name. Preserve existing package names, Protobuf namespaces, and `RLSEG001` file magic unless an explicit migration is necessary. Renaming the product does not require breaking stored formats.
+Read `Plans/RetrieVec_1-2.md`, repository instructions, and `docs/IMPLEMENTATION_STATUS.md` first. The earlier plan calls the project RetrievalLab; RetrieVec is the current project/repository name. Preserve existing package names, Protobuf namespaces, and `RLSEG001` file magic unless an explicit migration is necessary. Renaming the product does not require breaking stored formats.
 
 Work in the existing RetrieVec repository. Verify earlier acceptance gates against actual code; fix prerequisite defects before dependent work. Do not assume planned features or reviewed judgments exist.
 
