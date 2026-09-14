@@ -1,130 +1,46 @@
 # Implementation status
 
-## Recovery batch, 2026-09-14
+Recovery and steps 1–10 are implemented. The owner authorized restoration after
+PR #4, checks at the end, and PR integration. Existing shared history is preserved.
+Ten new milestone commits restore steps 1–5 and add steps 6–10. The naming migration
+is included in the workspace restoration.
 
-Step 9: loopback HTTP service, startup validation, bounded requests, health/stats,
-graceful shutdown and structured error responses implemented. Live HTTP tests added.
-
-Step 8: collection-scoped Boolean sets and positional phrases implemented.
-Reference predicates cover repeated phrases, nested NOT and zero-score matches.
-
-Step 7: bounded lexer, AST, precedence, escapes and positive-term extraction
-implemented with syntax/limit fixtures. End-of-batch checks pending.
-
-Step 6: BM25, free-text OR candidates, stable ties and term explanations implemented.
-Independent score fixtures included; validation scheduled at batch end.
-
-The owner authorized restoration after PR #4, steps 6–10, checks at the end,
-and PR merges. Shared history is preserved. Ten recovery milestone commits
-restore steps 1–5 and add steps 6–10; naming is included in step 1.
-Recovered steps: 1 e84f4d8, 2 a3c0917, 3 36f653a, 4 d2a1a31.
-Step 5 restores the loader/index and adds corruption coverage. Batch checks pending.
-The entries below describe the original implementation history.
-
-The weeks 1–2 plan contains 14 sequential commit-sized steps. Steps 1–4 are
-implemented locally; hosted CI remains pending. Steps 2–5 are an owner-authorized
-batch of separate commits on stacked feature branches. Main changes only through PRs.
-
-## Step 1: workspace scaffold
-
-State: committed; local checks pass; hosted CI pending.
-Commit ID: `e0a5e7e`.
-Proposed branch: `chore/workspace-scaffold`.
-Proposed commit: `chore: scaffold Go and Python workspace with CI`.
-
-Delivered:
-
-- Go module, service CLI scaffold, and seven documented internal package boundaries.
-- Installable Python package with corpus/client/evaluation boundaries and CLI.
-- Exact development/build tool pins, ignore rules, and LF line-ending policy.
-- Windows/Linux setup commands and a shared cross-platform check script.
-- CI matrix with pinned actions, read-only permissions, and Linux race checks.
-- Architecture overview, initial ADR, contribution workflow, and dataset/doc locations.
-
-Validation on 2026-09-13:
-
-| Check | Evidence |
-| --- | --- |
-| Environment | Windows 10.0.26200, amd64; Go 1.26.8; Python 3.13.15 |
-| Python setup | Fresh isolated environment; pinned tools and editable package installed |
-| Shared check command | `python scripts/check.py` exited 0 |
-| Go formatting and static analysis | `gofmt -l` returned no files; `go vet ./...` passed |
-| Go tests | CLI table passed all six cases via `go test -count=1 ./...` |
-| Go executable | Built successfully; `retrievald --version` returned `retrievald 0.1.0` |
-| Python dependency consistency | `pip check` found no broken requirements |
-| Python lint and formatting | Ruff checks passed; eight files formatted |
-| Python tests | Four unittest tests passed, including installed console/module entry points from a temporary directory |
-| Hosted CI and Linux race checks | Configured, not run; await approved branch/PR |
-
-Checks ran in an isolated staging workspace to preserve main while branch and
-commit approval is pending. The entry points do not yet process a corpus or serve
-HTTP. Empty internal packages intentionally contain only package documentation.
-
-## Remaining sequence
-
-| Step | Capability | State |
+| Step | Capability | Commit / branch |
 | --- | --- | --- |
-| 2 | Validated deterministic corpus snapshots | Implemented; local checks pass |
-| 3 | Versioned analyzer and token fixtures | Implemented; local checks pass |
-| 4 | Local paper import and paragraph chunking | Implemented; synthetic tests and real seed audit pass |
-| 5 | Positional inverted index | Not started |
-| 6 | BM25 free-text ranking | Not started |
-| 7 | Structured query parser | Not started |
-| 8 | Boolean and phrase execution | Not started |
-| 9 | Local HTTP service | Not started |
-| 10 | Python client and run capture | Not started |
-| 11 | Owner-reviewed evaluation dataset | Not started; actual owner review required |
-| 12 | Metrics and baseline reports | Not started |
-| 13 | Fuzz, concurrency, and performance harnesses | Not started |
-| 14 | Reproducible demo and milestone handoff | Not started |
+| 1 | Workspace, CI, Retrieval Lab naming | e84f4d8 / chore/restore-workspace |
+| 2 | Deterministic corpus snapshots | a3c0917 / feat/restore-corpus-snapshots |
+| 3 | Versioned Go analyzer | 36f653a / feat/restore-versioned-analyzer |
+| 4 | Text/PDF import and paragraph chunking | d2a1a31 / feat/restore-paper-import |
+| 5 | Validated loader and immutable positional index | f07f71e / feat/restore-positional-index |
+| 6 | BM25 ranking and explanations | 1e00be6 / feat/bm25-ranking |
+| 7 | Bounded structured query parser | 7165bfa / feat/structured-query-parser |
+| 8 | Boolean and positional phrase execution | 812dd8b / feat/boolean-phrase-search |
+| 9 | Local HTTP service and graceful shutdown | fe37767 / feat/sparse-http-api |
+| 10 | Python client and reproducible run capture | feat/python-run-capture; SHA recorded in PR |
 
-## Open gates and next action
+## Validation on 2026-09-14
 
-Step 1 is recorded as e0a5e7e and naming migration as fcaf4be. Complete the authorized
-steps 2–5 in order, then present the local branch stack for PR approval. No hosted CI
-or independent review has been performed for the implementation branches.
+The shared check script passed on Windows with Go 1.26.8 and Python 3.13.15:
+Go formatting, vet, all eight package test suites, executable build, Python
+dependency consistency, Ruff lint/format and all 21 Python tests.
+Live integration starts the actual Go service, searches the synthetic corpus,
+captures syntax errors, and verifies repeated ranking hashes. Go tests cover
+independent BM25 scores, deterministic ties, parsing limits, reference Boolean
+predicates, repeated phrases, scoped negation, zero-score matches, HTTP limits,
+and concurrent index/API reads.
 
-No retrieval benchmarks, quality metrics, reviewed labels, persistent segments,
-or RPC implementation are claimed.
+Hosted Windows/Linux CI and Linux race checks are pending publication; their
+actual conclusions will be recorded in PRs before integration. No independent
+review is claimed. Main is updated only through PRs.
 
-## Step 2: deterministic corpus snapshots
+Step 4's five-paper audit produced 193 chunks over 68 pages, with exact extracted
+page reconstruction and a maximum of 256 tokens per chunk. Source pins and
+visual inspection limitations are in [the seed report](reports/seed-import-v1.md).
+Downloaded papers and generated artifacts remain ignored.
 
-Branch: feat/corpus-snapshots. Commit ID: c3d62b1.
-Strict record fields, content IDs, manifest provenance, canonical hashes, UTF-8
-validation, staged publication, and twelve synthetic fixtures are implemented.
-The shared check script passed with 13 Python tests, Go tests/vet/build, and Ruff.
-Snapshot size is bounded to 64 MiB per file. Publication is validated but does not
-claim crash durability. CLI: retrievallab validate-snapshot <snapshot-directory>.
+## Remaining scope
 
-## Step 3: versioned analyzer
-
-Branch: feat/versioned-analyzer. Commit ID: ed936a7.
-Go implements letter/decimal-digit runs, simple Unicode lowercase, zero-based
-positions, and original UTF-8 byte offsets. Python uses the same executable.
-Fifteen shared Unicode fixtures and malformed/oversized-input checks pass, along
-with all shared checks (15 Python tests and Go tests/vet/build). No stemming or
-normalization is applied. Behavior and the Unicode table version identify the analyzer.
-
-## Step 4: local import and chunking
-
-Branch: feat/paper-import. Commit ID: a899953.
-Pinned PDF extraction and UTF-8 imports validate source hashes and publish only
-complete snapshots. Paragraph packing uses Go token counts and original offsets.
-The shared checks pass with 19 Python tests and Go tests/vet/build. Five real
-papers produce 193 chunks across 68 pages; repeated runs produce the same ID.
-Every page reconstructs exactly, with no omitted pages and no chunk over 256 tokens.
-See docs/reports/seed-import-v1.md for source pins, inspection, and limitations.
-
-## Step 5: positional inverted index
-
-State: committed; local focused tests are present but Go validation was unavailable in this shell.
-Branch: feat/positional-index.
-Commit ID: 9670222.
-Commit: `feat: build positional inverted index`.
-
-The immutable Go index assigns internal IDs by external chunk ID, stores sorted
-term postings with zero-based positions, preserves chunk metadata, computes
-collection statistics, and returns defensive copies for concurrent readers.
-Focused tests cover posting invariants, deterministic ordering, rejected input,
-defensive copies, and concurrent read access. Persistent index files and ranking
-are deferred to later milestones.
+Steps 11–14 (owner-reviewed judgments, retrieval metrics, performance/fuzz
+harnesses, final demonstration/handoff) remain incomplete and outside this batch.
+No retrieval-quality or latency benchmark claims are made. Index persistence,
+dense retrieval, authentication, OCR and synthesis are later milestones.
