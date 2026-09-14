@@ -170,18 +170,17 @@ The six existing handoffs and this workflow form one roadmap documentation set. 
 2. Ask the owner to approve branch `docs/project-roadmap` and proposed commit `docs: add RetrieVec implementation roadmap`.
 3. After approval, create the branch from the current integration branch. Do not edit implementation code on this branch.
 4. Ensure `Plans/` contains:
-   - `README.md`
    - `ENGINEERING_WORKFLOW.md`
-   - `RetrieVec_Weeks_1-2.md`
-   - `RetrieVec_Weeks_3-4.md`
-   - `RetrieVec_Weeks_5-6.md`
-   - `RetrieVec_Weeks_7-8.md`
-   - `RetrieVec_Weeks_9-10.md`
-   - `RetrieVec_Weeks_11-12.md`
+   - `RetrieVec_1-2.md`
+   - `RetrieVec_3-4.md`
+   - `RetrieVec_5-6.md`
+   - `RetrieVec_7-8.md`
+   - `RetrieVec_9-10.md`
+   - `RetrieVec_11-12.md`
 5. Normalize Markdown formatting and line endings according to `.editorconfig`/`.gitattributes`; do not rewrite technical meaning during normalization.
 6. Check internal paths, milestone order, step counts, terminology, and that every handoff references this workflow.
 7. Scan for credentials, private document contents, personal contact information, unsupported claims, temporary files, and local-only paths that should not be published.
-8. Stage only the eight approved plan files using explicit paths. Review the complete staged diff, whitespace check, and staged file list.
+8. Stage only the seven approved plan files using explicit paths. Review the complete staged diff, whitespace check, and staged file list.
 9. Present the staged summary and exact commit message. Commit only after explicit owner approval.
 10. After separate approval, push the documentation branch and open a docs-only pull request. Merge through the normal protected-branch process after checks and approval.
 
@@ -191,10 +190,8 @@ Do not split the initial roadmap into one commit per Markdown file; the files co
 - Use a separate `docs/...` branch for roadmap changes affecting multiple future milestones or policy.
 - Never rewrite a completed milestone to make history look cleaner. Add a dated decision/status note describing what changed and why.
 - Keep filenames stable so old issues and PRs retain valid links. Rename only through an explicit docs migration.
-- Add every future handoff to `Plans/README.md` and require this workflow near the top of the file.
+- Require this workflow near the top of every future handoff.
 
-## Plans folder index requirements
+## Plan file requirements
 
-`Plans/README.md` is the entry point. It lists handoffs in execution order, their status, prerequisites, and the rule: open the current milestone, read it completely, and execute only the first incomplete approved step. Status values are `planned`, `active`, `complete`, or `superseded`; update them only from actual project state.
-
-Future plan filenames follow `RetrieVec_Weeks_<start>-<end>.md` for time-boxed milestones or `RetrieVec_<Topic>.md` for conditional tracks. Use stable title case and ordinary project language. Every plan includes objective, prerequisites, scope/deferred work, contracts, commit-sized steps, acceptance gates, and a neutral implementation-task prompt.
+Future plan filenames follow `RetrieVec_<start>-<end>.md` for time-boxed milestones or `RetrieVec_<Topic>.md` for conditional tracks. Use stable title case and ordinary project language. Every plan includes objective, prerequisites, scope/deferred work, contracts, commit-sized steps, acceptance gates, and a neutral implementation-task prompt.
