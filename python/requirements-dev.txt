@@ -1,4 +1,5 @@
-# Exact tool pins; runtime dependencies are empty.
+# Exact tools and complete runtime dependency set for Python 3.13.
 pip==26.2.1
 setuptools==84.0.0
 ruff==0.16.7
+pypdf==6.18.1

@@ -7,7 +7,7 @@ name = "retrievallab"
 version = "0.1.0"
 description = "Corpus preparation and evaluation tooling for Retrieval Lab"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = ["pypdf==6.18.1"]
 
 [project.scripts]
 retrievallab = "retrievallab.cli:main"
