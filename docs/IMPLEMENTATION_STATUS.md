@@ -2,6 +2,9 @@
 
 ## Recovery batch, 2026-09-14
 
+Step 7: bounded lexer, AST, precedence, escapes and positive-term extraction
+implemented with syntax/limit fixtures. End-of-batch checks pending.
+
 Step 6: BM25, free-text OR candidates, stable ties and term explanations implemented.
 Independent score fixtures included; validation scheduled at batch end.
 
