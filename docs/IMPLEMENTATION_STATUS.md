@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 12: snapshot-pinned sparse/dense/hybrid client, complete-pool RRF,
+separate score fields, explicit structured-mode rejection and fail-closed branches
+implemented. Duplicate/overlap/empty/tie fusion fixtures included.
+
 Weeks 3–4 step 11: bounded-block exhaustive cosine search, stable ID ties and
 independent numeric fixtures implemented. Invalid dimensions/norms/nonfinite
 values fail explicitly; cached normalized vectors preserve their original bytes.
