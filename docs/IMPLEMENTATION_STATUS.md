@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 1–2 step 14: one-command sparse demonstration, repeated capture, draft metric
+replay and latency artifacts implemented. Clean-start execution is scheduled for
+the final validation batch. Reviewed quality acceptance remains explicitly open.
+
 Weeks 1–2 step 13: bounded parser fuzz seeds, repeatable 1,000-document Go search
 benchmark, and serial/concurrent HTTP latency capture implemented. Performance
 numbers will be recorded only from actual runs; no timing thresholds gate CI.
