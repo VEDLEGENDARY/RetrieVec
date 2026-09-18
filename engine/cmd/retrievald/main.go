@@ -16,6 +16,7 @@ func main() {
 }
 
 func run(args []string, stdout, stderr io.Writer) int {
+	if len(args)>0 && args[0]=="rpc" {return rpcCommand(args[1:],stdout,stderr)}
 	if len(args)>0 && args[0]=="build" {return buildCommand(args[1:],stdout,stderr)}
 	if len(args) > 0 && args[0] == "inspect" {
 		return inspectCommand(args[1:], stdout, stderr)

@@ -2,6 +2,11 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 7: Protobuf search/info/prepare contract, generated bindings, separate
+reader/worker credentials, PostgreSQL ownership checks, bounded RPC and explicit
+snapshot reads implemented. Go plugins are pinned to protobuf v1.36.12 and
+protoc-gen-go-grpc v1.6.2; compiler comes from grpcio-tools 1.84.0.
+
 Weeks 3–4 step 6: artifact-store identity resolution and register/prepare/ready/CAS
 publication implemented. Registration is idempotent; lost activation responses
 reconcile against the active ID. PostgreSQL ownership/readiness/CAS tests included.
