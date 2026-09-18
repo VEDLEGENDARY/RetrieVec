@@ -10,6 +10,7 @@ from retrievallab.client.http import Client, RetrievalError
 from retrievallab.corpus.analyzer import GoAnalyzer
 from retrievallab.corpus.importer import import_manifest
 from retrievallab.corpus.snapshot import CorpusError, load_snapshot
+from retrievallab.evaluation.report import evaluate
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -32,7 +33,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     runner.add_argument("--url", default="http://127.0.0.1:8091")
     runner.add_argument("--queries", type=Path, required=True)
     runner.add_argument("--output", type=Path, required=True)
+    evaluation = subparsers.add_parser("evaluate", help="recompute metrics from saved results")
+    evaluation.add_argument("--run", type=Path, required=True)
+    evaluation.add_argument("--dataset", type=Path, required=True)
+    evaluation.add_argument("--corpus", type=Path, required=True)
+    evaluation.add_argument("--split", choices=("development", "held_out"), default="development")
+    evaluation.add_argument("--include-drafts", action="store_true")
     args = parser.parse_args(argv)
+    if args.command == "evaluate":
+        try:
+            evaluate(args.run, args.dataset, args.corpus, include_drafts=args.include_drafts, split=args.split)
+        except (ValueError, OSError, CorpusError) as error:
+            parser.error(str(error))
+        print(args.run / "report.md")
+        return 0
     if args.command == "run":
         try:
             manifest = capture(Client(args.url), args.queries, args.output)
