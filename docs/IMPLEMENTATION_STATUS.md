@@ -1,5 +1,14 @@
 # Implementation status
 
+## Weeks 1–4 continuation
+
+The owner authorized completing both plans, batching implementation before final
+validation, and the existing feature-branch/PR workflow. A pre-existing README
+naming edit is preserved outside these implementation commits.
+Weeks 1–2 step 11: versioned synthetic draft pool, frozen splits and review
+provenance validation implemented. Human review and real-corpus expansion remain
+evidence gates; no generated labels are described as reviewed.
+
 Recovery and steps 1–10 are implemented. The owner authorized restoration after
 PR #4, checks at the end, and PR integration. Existing shared history is preserved.
 Ten new milestone commits restore steps 1–5 and add steps 6–10. The naming migration
