@@ -2,6 +2,9 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 1: authoritative segment contract and snapshot/registry/RPC ADR
+added. Prior implementation gates are audited; reviewed relevance remains open.
+
 Weeks 1–2 step 14: one-command sparse demonstration, repeated capture, draft metric
 replay and latency artifacts implemented. Clean-start execution is scheduled for
 the final validation batch. Reviewed quality acceptance remains explicitly open.
