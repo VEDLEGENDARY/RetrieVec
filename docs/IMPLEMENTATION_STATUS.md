@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 4: shared reader abstraction, immutable multi-segment manifests,
+aggregate statistics, content identities and memory/disk search parity tests added.
+The build CLI publishes artifacts; database activation remains a separate operation.
+
 Weeks 3–4 step 3: bounded canonical decoder, checksummed admission, per-term disk
 reads, immutable publication, corruption/fuzz fixtures implemented. No eager index
 rebuild is used by the segment reader; validation discards decoded postings.

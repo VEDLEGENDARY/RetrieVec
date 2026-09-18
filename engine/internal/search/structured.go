@@ -7,7 +7,7 @@ import (
 	"sort"
 )
 
-func evaluate(ctx context.Context, idx *index.Index, node *query.Node) (map[int]bool, error) {
+func evaluate(ctx context.Context, idx index.Reader, node *query.Node) (map[int]bool, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
@@ -16,7 +16,8 @@ func evaluate(ctx context.Context, idx *index.Index, node *query.Node) (map[int]
 		lists := make([]map[int][]int, len(node.Terms))
 		for i, term := range node.Terms {
 			lists[i] = map[int][]int{}
-			for _, p := range idx.Postings(term) {
+			postings, err := idx.ReadPostings(term); if err != nil {return nil,err}
+			for _, p := range postings {
 				lists[i][p.InternalChunkID] = p.Positions
 			}
 		}

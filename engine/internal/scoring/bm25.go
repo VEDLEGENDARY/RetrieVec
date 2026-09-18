@@ -35,7 +35,7 @@ type Score struct {
 }
 
 // Rank scores the supplied candidates, including zero-score matches, in stable order.
-func Rank(idx *index.Index, terms []string, candidates map[int]bool, config Config) ([]Score, error) {
+func Rank(idx index.Reader, terms []string, candidates map[int]bool, config Config) ([]Score, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func Rank(idx *index.Index, terms []string, candidates map[int]bool, config Conf
 	}
 	stats := idx.Stats()
 	for _, term := range ordered {
-		postings := idx.Postings(term)
+		postings, err := idx.ReadPostings(term); if err != nil {return nil,err}
 		df := len(postings)
 		idf := math.Log1p((float64(stats.ChunkCount-df) + 0.5) / (float64(df) + 0.5))
 		for _, p := range postings {
