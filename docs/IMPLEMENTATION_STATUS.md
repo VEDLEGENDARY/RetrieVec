@@ -2,6 +2,9 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 2: deterministic compressed segment encoder and independently
+constructed one-token golden bytes implemented. Reader validation follows next.
+
 Weeks 3–4 step 1: authoritative segment contract and snapshot/registry/RPC ADR
 added. Prior implementation gates are audited; reviewed relevance remains open.
 
