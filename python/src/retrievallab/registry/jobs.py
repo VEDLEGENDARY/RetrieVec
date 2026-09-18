@@ -61,7 +61,7 @@ class Jobs:
             if row is None:
                 raise LeaseLost("job lease is no longer current")
 
-    def complete(self, job: dict, snapshot_id: str) -> None:
+    def complete(self, job: dict, snapshot_id: str, *, papers: list[dict] | None = None) -> None:
         with self.registry.connect() as connection:
             current = connection.execute("SELECT * FROM ingestion_jobs WHERE job_id=%s AND fencing_token=%s AND state='running' AND lease_until>clock_timestamp() FOR UPDATE", (job["job_id"], job["fencing_token"])).fetchone()
             if current is None:
@@ -70,6 +70,11 @@ class Jobs:
             snapshot = connection.execute("SELECT snapshot_id FROM retrieval_snapshots WHERE snapshot_id=%s AND collection_id=%s AND state='ready'", (snapshot_id, current["collection_id"])).fetchone()
             if snapshot is None or collection["active_snapshot"] not in (current["expected_parent"], snapshot_id):
                 raise Conflict("snapshot not ready or parent changed")
+            if papers is not None:
+                connection.execute("DELETE FROM collection_papers WHERE collection_id=%s", (current["collection_id"],))
+                for paper in papers:
+                    connection.execute("INSERT INTO paper_versions(paper_version_id,paper_id,source_sha256,provenance) VALUES(%s,%s,%s,%s) ON CONFLICT DO NOTHING", (paper["paper_version_id"], paper["paper_id"], paper["source_sha256"], Jsonb(paper)))
+                    connection.execute("INSERT INTO collection_papers(collection_id,paper_id,paper_version_id) VALUES(%s,%s,%s)", (current["collection_id"], paper["paper_id"], paper["paper_version_id"]))
             connection.execute("UPDATE collections SET active_snapshot=%s WHERE collection_id=%s", (snapshot_id, current["collection_id"]))
             connection.execute("UPDATE ingestion_jobs SET state='succeeded',stage='activate',output_snapshot=%s,lease_until=NULL WHERE job_id=%s", (snapshot_id, current["job_id"]))
 
