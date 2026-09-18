@@ -3,3 +3,4 @@ pip==26.2.1
 setuptools==84.0.0
 ruff==0.16.7
 pypdf==6.18.1
+psycopg[binary]==3.3.5
