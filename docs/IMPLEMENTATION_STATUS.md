@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 11: bounded-block exhaustive cosine search, stable ID ties and
+independent numeric fixtures implemented. Invalid dimensions/norms/nonfinite
+values fail explicitly; cached normalized vectors preserve their original bytes.
+
 Weeks 3–4 step 10: pinned MiniLM ONNX CPU adapter, explicit model-token rejection,
 content/configuration cache and verified float32 embedding artifacts implemented.
 Fixture embeddings are labeled as plumbing-only; real-model smoke is pending.
