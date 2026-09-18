@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 10: pinned MiniLM ONNX CPU adapter, explicit model-token rejection,
+content/configuration cache and verified float32 embedding artifacts implemented.
+Fixture embeddings are labeled as plumbing-only; real-model smoke is pending.
+
 Weeks 3–4 step 9: staged local inputs, leased worker, import/build/prepare/activate
 pipeline, heartbeat recovery and atomic collection-membership update implemented.
 CLI commands expose migration, collection creation, enqueue and work-once.
