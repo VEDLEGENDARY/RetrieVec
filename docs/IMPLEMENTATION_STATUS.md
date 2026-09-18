@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 6: artifact-store identity resolution and register/prepare/ready/CAS
+publication implemented. Registration is idempotent; lost activation responses
+reconcile against the active ID. PostgreSQL ownership/readiness/CAS tests included.
+
 Weeks 3–4 step 5: PostgreSQL 18 migration, ownership checks, immutable registry,
 ready-state resolution and active-parent CAS implemented; local Compose provided.
 
