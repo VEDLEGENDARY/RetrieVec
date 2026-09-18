@@ -2,6 +2,9 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 5: PostgreSQL 18 migration, ownership checks, immutable registry,
+ready-state resolution and active-parent CAS implemented; local Compose provided.
+
 Weeks 3–4 step 4: shared reader abstraction, immutable multi-segment manifests,
 aggregate statistics, content identities and memory/disk search parity tests added.
 The build CLI publishes artifacts; database activation remains a separate operation.
