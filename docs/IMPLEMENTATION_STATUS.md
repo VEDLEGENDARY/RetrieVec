@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 9: staged local inputs, leased worker, import/build/prepare/activate
+pipeline, heartbeat recovery and atomic collection-membership update implemented.
+CLI commands expose migration, collection creation, enqueue and work-once.
+
 Weeks 3–4 step 8: idempotency conflicts, database-time leases, skip-locked claims,
 fenced progress/heartbeats/activation, bounded retries and cancellation implemented.
 Tests cover expired-worker rejection and replacement claim tokens.

@@ -1,6 +1,7 @@
 """Command-line entry point; corpus and evaluation commands arrive in later steps."""
 
 import argparse
+import sys
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -14,6 +15,10 @@ from retrievallab.evaluation.report import evaluate
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    command_args = list(sys.argv[1:] if argv is None else argv)
+    if command_args and command_args[0] == "registry":
+        from retrievallab.registry.cli import main as registry_main
+        return registry_main(command_args[1:])
     parser = argparse.ArgumentParser(
         prog="retrievallab",
         description="Corpus and evaluation workspace. Workflow commands arrive in later steps.",
