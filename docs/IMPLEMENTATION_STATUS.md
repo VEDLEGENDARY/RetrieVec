@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 3: bounded canonical decoder, checksummed admission, per-term disk
+reads, immutable publication, corruption/fuzz fixtures implemented. No eager index
+rebuild is used by the segment reader; validation discards decoded postings.
+
 Weeks 3–4 step 2: deterministic compressed segment encoder and independently
 constructed one-token golden bytes implemented. Reader validation follows next.
 
