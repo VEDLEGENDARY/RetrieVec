@@ -1,0 +1,3 @@
+package main
+import("flag";"fmt";"io";"retrievallab/engine/internal/snapshot")
+func buildCommand(args []string,stdout,stderr io.Writer)int{flags:=flag.NewFlagSet("build",flag.ContinueOnError);flags.SetOutput(stderr);root:=flags.String("store","","artifact root");corpus:=flags.String("corpus","","source snapshot");batch:=flags.Int("segment-size",1000,"chunks per segment");embedding:=flags.String("embedding","","optional embedding identity");if flags.Parse(args)!=nil||flags.NArg()!=0||*root==""||*corpus==""{return 2};var embeddingID *string;if *embedding!=""{embeddingID=embedding};id,err:=snapshot.Build(*root,*corpus,*batch,embeddingID);if err!=nil{fmt.Fprintln(stderr,err);return 1};fmt.Fprintln(stdout,id);return 0}

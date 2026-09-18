@@ -9,6 +9,8 @@ import (
 )
 
 // canonical matches the ASCII-escaped, sorted JSON used by corpus snapshot v1.
+func Canonical(value any) ([]byte,error) {return canonical(value)}
+
 func canonical(value any) ([]byte, error) {
 	encoded, err := json.Marshal(value)
 	if err != nil {
