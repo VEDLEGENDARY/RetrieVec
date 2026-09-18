@@ -1,101 +1,217 @@
-# Retrieval Lab
+# 🔬 Retrieval Lab
 
-A local retrieval engine and reproducible experiment workbench for research papers.
-The project name is Retrieval Lab. Package and file names use `retrievallab`.
+> A local retrieval engine and reproducible experiment workbench for research papers.
 
-The workspace supports validated corpus snapshots, deterministic text/PDF import,
-positional indexing, BM25, Boolean/phrase search, local HTTP and Python run capture.
-Reviewed evaluation arrives in later steps. See
-[implementation status](docs/IMPLEMENTATION_STATUS.md).
+[![Go Version](https://img.shields.io/badge/Go-1.26.8-00ADD8?style=flat&logo=go)](https://go.dev/dl/)
+[![Python Version](https://img.shields.io/badge/Python-3.13.15-3776AB?style=flat&logo=python)](https://www.python.org/downloads/)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey)](#setup)
+[![Status](https://img.shields.io/badge/Status-In%20Development-orange)](docs/IMPLEMENTATION_STATUS.md)
 
-## Setup
+**Retrieval Lab** (`retrievallab`) is a zero-cloud, fully offline workbench designed for deterministic paper processing, positional indexing, full-text BM25 search, Boolean/phrase search, and reproducible experiment evaluation.
 
-After setup, start `artifacts/bin/retrievald.exe --corpus <snapshot-directory>`.
-In another terminal run `.venv/Scripts/python.exe -m retrievallab run --queries datasets/fixtures/queries-v1.jsonl --output artifacts/runs/example`.
-Use a new output directory each time. The query fixture includes one intentional
-syntax error. On Linux omit .exe and use .venv/bin/python.
-See [HTTP](docs/contracts/http-v1.md) and [run capture](docs/contracts/run-capture-v1.md).
+---
 
-Install [Go 1.26.8](https://go.dev/dl/) and
-[Python 3.13.15](https://www.python.org/downloads/).
-CI pins these versions and runs on Windows and Linux. Add Go's `bin` directory to PATH.
-No cloud account, database, GPU, or corpus download is needed.
+## ✨ Key Features
 
-From the repository root in PowerShell:
+* **🔒 Deterministic Ingestion:** Offline text and PDF extraction with hash-verified snapshot manifests.
+* **⚡ Pure Go Search Engine:** Custom positional indexing, BM25 scoring, and Boolean/phrase query engine.
+* **🧪 Experiment Workbench:** Built-in run capture via HTTP endpoints and Python CLI for reproducible evaluations.
+* **📦 Fully Self-Contained:** Zero cloud accounts, databases, GPUs, or external search dependencies required.
+
+---
+
+## 🛠️ Technical Stack & Dependencies
+
+| Component | Stack | Version / Notes |
+| :--- | :--- | :--- |
+| **Search Engine** | [Go](https://go.dev/dl/) | **`1.26.8`** (Uses Go standard library only) |
+| **Tooling & CLI** | [Python](https://www.python.org/downloads/) | **`3.13.15`** (PDF extractor is sole runtime dep) |
+| **Platforms** | Windows & Linux | CI pins dependencies and runs cross-platform |
+
+> [!IMPORTANT]
+> Dependencies are strictly pinned in `python/requirements-dev.txt` and `python/pyproject.toml`. Updates must be committed together and validated across both Windows and Linux CI platforms.
+
+---
+
+## 🚀 Setup & Installation
+
+Ensure [Go 1.26.8](https://go.dev/dl/) and [Python 3.13.15](https://www.python.org/downloads/) are installed and Go's `bin` directory is added to your system `PATH`.
+
+Select your platform below to set up the environment and run developer checks:
+
+### PowerShell (Windows)
 
 ```powershell
+# Create and activate virtual environment
 py -3.13 -m venv .venv
+
+# Install dependencies in editable mode
 .\.venv\Scripts\python.exe -m pip install -r python/requirements-dev.txt
 .\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps -e ./python
+
+# Run developer verification suite
 .\.venv\Scripts\python.exe scripts/check.py
 .\.venv\Scripts\retrievallab.exe --version
+
+# Verify Go engine build
 Push-Location engine
 go run ./cmd/retrievald --version
 Pop-Location
 ```
 
-From the repository root on Linux:
+### Bash (Linux)
 
-```sh
+```bash
+# Create virtual environment
 python3.13 -m venv .venv
+
+# Install dependencies in editable mode
 .venv/bin/python -m pip install -r python/requirements-dev.txt
 .venv/bin/python -m pip install --no-build-isolation --no-deps -e ./python
+
+# Run developer verification suite with race detector (requires GCC/C compiler)
 .venv/bin/python scripts/check.py --race
 .venv/bin/retrievallab --version
+
+# Verify Go engine build
 (cd engine && go run ./cmd/retrievald --version)
 ```
 
-Linux race checks require a C compiler such as GCC. Windows local checks omit the
-race detector by default; Linux CI always enables it. Neither shell requires
-virtual-environment activation. Installations need network access; the checks
-use local code and synthetic fixtures only.
+> [!NOTE]
+> * Neither shell requires activating the virtual environment; direct executable paths are used.
+> * Package installation requires network access; all subsequent checks and workflows use local synthetic fixtures completely offline.
 
-The shared check script enforces Go formatting, vet, tests, and executable build,
-then Python dependency consistency, Ruff lint/format, and installed CLI tests.
-Fix formatting with `gofmt -w <file>` and
-`.venv\Scripts\python.exe -m ruff format --config python/pyproject.toml python scripts`
-(use `.venv/bin/python` on Linux).
+---
 
-## Layout
+## ⚡ Quick Start: Engine Daemon & Run Capture
 
-| Directory | Responsibility |
-| --- | --- |
-| `engine/` | Go service entry point and retrieval packages |
-| `python/` | Installable corpus, client, and evaluation tooling |
-| `datasets/` | Committed synthetic fixtures, manifests, and evaluation records |
-| `docs/` | Architecture decisions, contracts, reports, and implementation status |
-| `scripts/` | Cross-platform developer checks |
-| `artifacts/` | Ignored generated binaries, snapshots, and experiment outputs |
+### 1. Launch the Engine Daemon
 
-The PDF extractor is the only Python runtime dependency; Go uses its standard library.
-Dependencies are pinned in `python/requirements-dev.txt` and `python/pyproject.toml`.
-Update the pins together and validate on both CI platforms.
+Once built, start the retrieval server targeting a snapshot directory:
 
-Read the [architecture overview](docs/architecture/overview.md) and
-[contribution workflow](CONTRIBUTING.md) before implementing the next step.
+```bash
+# Windows
+artifacts/bin/retrievald.exe --corpus <snapshot-directory>
 
-## Local corpus workflow
-
-Build the engine through scripts/check.py, then set its path in PowerShell:
-
-```powershell
-$env:RETRIEVALLAB_ENGINE = (Resolve-Path artifacts/bin/retrievald.exe).Path
-.\.venv\Scripts\python.exe -m retrievallab import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/snapshots
-.\.venv\Scripts\python.exe -m retrievallab validate-snapshot artifacts/snapshots/<snapshot-id>
+# Linux
+artifacts/bin/retrievald --corpus <snapshot-directory>
 ```
 
-On Linux use .venv/bin/python and set RETRIEVALLAB_ENGINE to the absolute path of
-artifacts/bin/retrievald. Download the five PDFs identified by the seed manifest
-to artifacts/papers first, or supply your own local source manifest. Import is
-offline and verifies pinned source hashes. See the [import contract](docs/contracts/import-v1.md)
-and [seed inspection report](docs/reports/seed-import-v1.md) for reproduction details.
+### 2. Execute Query Benchmark
 
-To inspect a validated corpus after building the engine:
+In a separate terminal, trigger a query run and capture results:
 
-```powershell
+```bash
+# Windows
+.\.venv\Scripts\python.exe -m retrievallab run --queries datasets/fixtures/queries-v1.jsonl --output artifacts/runs/example_01
+
+# Linux
+.venv/bin/python -m retrievallab run --queries datasets/fixtures/queries-v1.jsonl --output artifacts/runs/example_01
+```
+
+> [!TIP]
+> Always supply a new output directory path for every run. Note that `datasets/fixtures/queries-v1.jsonl` contains one intentional syntax error to test parser resilience.
+
+---
+
+## 🧪 Local Corpus Workflow
+
+Follow these steps to import local research papers and inspect the generated positional index.
+
+### Step 1: Set Engine Location
+
+Build the engine via `scripts/check.py`, then export its executable path:
+
+* **PowerShell:**
+  ```powershell
+  $env:RETRIEVALLAB_ENGINE = (Resolve-Path artifacts/bin/retrievald.exe).Path
+  ```
+* **Linux:**
+  ```bash
+  export RETRIEVALLAB_ENGINE=$(realpath artifacts/bin/retrievald)
+  ```
+
+### Step 2: Import & Validate Corpus Snapshot
+
+1. Download the **five seed PDFs** defined in `datasets/manifests/seed-papers-v1.json` to `artifacts/papers/` (or supply a custom local manifest).
+2. Execute the offline import pipeline and validate the corpus snapshot:
+
+* **PowerShell:**
+  ```powershell
+  .\.venv\Scripts\python.exe -m retrievallab import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/snapshots
+  .\.venv\Scripts\python.exe -m retrievallab validate-snapshot artifacts/snapshots/<snapshot-id>
+  ```
+* **Linux:**
+  ```bash
+  .venv/bin/python -m retrievallab import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/snapshots
+  .venv/bin/python -m retrievallab validate-snapshot artifacts/snapshots/<snapshot-id>
+  ```
+
+### Step 3: Inspect Index & Collection Metrics
+
+To rebuild and inspect the deterministic positional index for a snapshot:
+
+```bash
+# Windows
 artifacts\bin\retrievald.exe inspect --corpus artifacts\snapshots\<snapshot-id>
+
+# Linux
+artifacts/bin/retrievald inspect --corpus artifacts/snapshots/<snapshot-id>
 ```
 
-The command rebuilds the deterministic positional index and reports its snapshot,
-collection, term, chunk, token, and average-length statistics. The index is rebuilt
-at startup and is not yet persisted to disk.
+The inspect tool reports key corpus metrics:
+* Snapshot & Collection metadata
+* Term & Vocabulary counts
+* Chunking & Tokenization totals
+* Average document length ($DL_{avg}$)
+
+*(Note: The positional index is rebuilt in memory at engine startup and is not currently persisted to disk).*
+
+---
+
+## 📁 Repository Structure
+
+```
+retrievallab/
+├── 📁 engine/        # Go retrieval service, search logic, and cmd/retrievald entry point
+├── 📁 python/        # Installable corpus, client CLI, and evaluation tooling
+├── 📁 datasets/      # Committed synthetic fixtures, manifests, and golden records
+├── 📁 docs/          # Architecture decisions, contract specs, and progress status
+├── 📁 scripts/       # Cross-platform developer check and validation scripts
+└── 📁 artifacts/     # Ignored build binaries, corpus snapshots, and experiment runs
+```
+
+---
+
+## 🧹 Code Quality & Formatting Guidelines
+
+The shared `scripts/check.py` script automatically enforces:
+* **Go:** `gofmt`, `go vet`, unit tests, and executable builds.
+* **Python:** Dependency consistency, `ruff` linting and formatting, and CLI integration tests.
+
+To fix formatting issues prior to submitting changes:
+
+```bash
+# Fix Go formatting
+gofmt -w engine/
+
+# Fix Python formatting (Windows)
+.\.venv\Scripts\python.exe -m ruff format --config python/pyproject.toml python scripts
+
+# Fix Python formatting (Linux)
+.venv/bin/python -m ruff format --config python/pyproject.toml python scripts
+```
+
+---
+
+## 📚 Documentation & Specifications
+
+Before implementing new features, review the design documents and specifications:
+
+* 📐 **[Architecture Overview](docs/architecture/overview.md)** — High-level system design and design choices.
+* 📋 **[Implementation Status](docs/IMPLEMENTATION_STATUS.md)** — Feature roadmap and step completion status.
+* 🌐 **[HTTP API Contract](docs/contracts/http-v1.md)** — Go engine REST endpoint specifications.
+* 📥 **[Import Contract](docs/contracts/import-v1.md)** — Snapshot generation and hash validation protocol.
+* 📊 **[Run Capture Contract](docs/contracts/run-capture-v1.md)** — Format for benchmark run artifacts.
+* 🔬 **[Seed Import Report](docs/reports/seed-import-v1.md)** — Baseline reproduction metrics and verification logs.
+* 🤝 **[Contribution Workflow](CONTRIBUTING.md)** — Development standards and pull request guidelines.
