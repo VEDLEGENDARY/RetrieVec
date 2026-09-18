@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 13: live PostgreSQL/generated-RPC integration, pinned activation,
+restart ranking equality, capability rejection and corrupted vectors covered.
+Three-mode capture emits an explicitly unreviewed candidate pool for later labeling.
+
 Weeks 3–4 step 12: snapshot-pinned sparse/dense/hybrid client, complete-pool RRF,
 separate score fields, explicit structured-mode rejection and fail-closed branches
 implemented. Duplicate/overlap/empty/tie fusion fixtures included.

@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+import grpc
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -81,6 +82,8 @@ def capture(client: Client, query_file: Path, output: Path) -> dict:
             row["response"] = response
         except RetrievalError as error:
             row["error"] = {"code": error.code, "message": str(error), "status": error.status}
+        except (ValueError, grpc.RpcError) as error:
+            row["error"] = {"code": error.code().name if isinstance(error, grpc.RpcError) else "invalid_input", "message": "retrieval request failed", "status": None}
         row["round_trip_ms"] = (time.perf_counter() - started) * 1000
         results.append(row)
         stable.append(
