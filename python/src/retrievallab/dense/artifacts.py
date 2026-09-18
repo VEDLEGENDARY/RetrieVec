@@ -36,7 +36,10 @@ def build_embeddings(store: Store, corpus_path, model) -> str:
                         checksum_path = path.with_suffix(".sha256")
                         if len(raw) != dimension * 4 or checksum_path.read_text() != digest(raw):
                             raise ValueError("embedding cache corruption")
-                        vectors[i] = normalize(np.frombuffer(raw, dtype="<f4").reshape(1, dimension))[0]
+                        cached = np.frombuffer(raw, dtype="<f4")
+                        if not np.isfinite(cached).all() or not np.isclose(np.linalg.norm(cached.astype(np.float64)), 1, atol=1e-5, rtol=0):
+                            raise ValueError("invalid cached vector")
+                        vectors[i] = cached
                     else:
                         missing.append(i)
                         texts.append(model.config["document_prefix"] + chunk["text"])
