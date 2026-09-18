@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 1–2 step 12: saved-run metric replay, per-query/aggregate reports and explicit
+undefined/unjudged conventions implemented. Independent numeric tests included;
+validation and baseline capture follow the implementation batch.
+
 The owner authorized completing both plans, batching implementation before final
 validation, and the existing feature-branch/PR workflow. A pre-existing README
 naming edit is preserved outside these implementation commits.
