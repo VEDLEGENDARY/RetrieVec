@@ -158,6 +158,7 @@ func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	if request.TopK>100 {fail(w,400,"invalid_input","top_k exceeds HTTP limit");return}
 	defer cancel()
 	started := time.Now()
 	result, err := search.Execute(ctx, a.idx, request, scoring.Default())

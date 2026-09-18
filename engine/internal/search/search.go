@@ -33,7 +33,7 @@ type Result struct {
 }
 
 func Execute(ctx context.Context, idx index.Reader, request Request, config scoring.Config) (Result, error) {
-	if !utf8.ValidString(request.Query) || utf8.RuneCountInString(request.Query) > 4096 || request.TopK < 1 || request.TopK > 100 {
+	if !utf8.ValidString(request.Query) || utf8.RuneCountInString(request.Query) > 4096 || request.TopK < 1 || request.TopK > 1000 {
 		return Result{}, fmt.Errorf("invalid query length or top_k")
 	}
 	terms := []string{}
