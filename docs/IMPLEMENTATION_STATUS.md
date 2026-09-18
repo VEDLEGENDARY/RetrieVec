@@ -2,6 +2,10 @@
 
 ## Weeks 1–4 continuation
 
+Weeks 3–4 step 8: idempotency conflicts, database-time leases, skip-locked claims,
+fenced progress/heartbeats/activation, bounded retries and cancellation implemented.
+Tests cover expired-worker rejection and replacement claim tokens.
+
 Weeks 3–4 step 7: Protobuf search/info/prepare contract, generated bindings, separate
 reader/worker credentials, PostgreSQL ownership checks, bounded RPC and explicit
 snapshot reads implemented. Go plugins are pinned to protobuf v1.36.12 and
