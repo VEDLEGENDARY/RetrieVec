@@ -23,7 +23,28 @@ Go package boundaries:
 
 Python packages are `corpus`, `client`, and `evaluation`. Corpus preparation now
 provides deterministic snapshots and local text/PDF import using the Go analyzer.
-Client and evaluation implementations remain later work.
+The client calls the live service and captures versioned runs; evaluation replays
+saved results with explicit draft/reviewed judgment handling.
+
+## Weeks 3–4 implementation
+
+The shared Go index.Reader boundary supports the memory reference and immutable
+multi-segment disk readers. The segment reader validates once, then decodes
+requested posting lists with bounded reads. Global statistics and external-ID
+ordering preserve ranking and phrase semantics across segment boundaries.
+
+PostgreSQL owns collection authorization, ready snapshots, the active-pointer CAS,
+and fenced ingestion leases. The worker publishes immutable artifacts, registers
+and prepares them, validates declared capabilities, then activates transactionally.
+Go's authenticated generated RPC independently checks collection ownership.
+Python pins one retrieval snapshot across RPC, embedding vectors and passages.
+Exact cosine search and RRF preserve separate sparse/dense/fused score fields.
+
+Relevant contracts: [segments](../contracts/segment-format-v1.md),
+[ingestion](../contracts/ingestion-v1.md), [hybrid](../contracts/hybrid-v1.md),
+and [evaluation](../contracts/evaluation-v1.md).
+Setup and reproduction: [week 4 handoff](../reports/week-04-baseline.md).
+Human-reviewed relevance and broader real-corpus evidence remain explicit gates.
 
 Data flow planned for the milestone:
 local sources → validated corpus snapshot → Go index/service → Python client

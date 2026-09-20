@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
           go-version-file: engine/go.mod
-          cache: false # No external Go modules yet.
+          cache: false
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.13.15'
@@ -46,3 +46,44 @@ jobs:
       - name: Check workspace on Windows
         if: runner.os == 'Windows'
         run: python scripts/check.py
+
+  integration:
+    name: PostgreSQL and RPC integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18.3
+        env:
+          POSTGRES_USER: retrievallab
+          POSTGRES_DB: retrievallab
+          POSTGRES_PASSWORD: integration-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U retrievallab -d retrievallab"
+          --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      RETRIEVALLAB_TEST_DSN: postgresql://retrievallab:integration-only@127.0.0.1:5432/retrievallab
+      RETRIEVALLAB_DSN: postgresql://retrievallab:integration-only@127.0.0.1:5432/retrievallab
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version-file: engine/go.mod
+          cache: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13.15'
+      - run: python -m pip install -r python/requirements-dev.txt
+      - run: python -m pip install --no-build-isolation --no-deps -e ./python
+      - run: python scripts/check.py --race
+      - run: go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
+      - run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
+      - run: python scripts/generate_rpc.py
+      - run: git diff --exit-code -- engine/gen python/src/retrievallab/retrieval
+      - run: python scripts/demo_hybrid.py --output artifacts/ci-hybrid
+      - run: go test ./internal/query -fuzz=FuzzParse -fuzztime=3s
+        working-directory: engine
+      - run: go test ./internal/segment -fuzz=FuzzOpen -fuzztime=3s
+        working-directory: engine

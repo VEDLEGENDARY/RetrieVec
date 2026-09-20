@@ -142,6 +142,9 @@ func decode(data []byte, value any) error {
 }
 
 func records[T any](data []byte) ([]T, error) {
+	if len(data) == 0 {
+		return []T{}, nil
+	}
 	if len(data) == 0 || data[len(data)-1] != '\n' {
 		return nil, fmt.Errorf("JSONL requires final newline and nonempty records")
 	}

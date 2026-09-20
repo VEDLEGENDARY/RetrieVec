@@ -1,46 +1,50 @@
 # Implementation status
 
-Recovery and steps 1–10 are implemented. The owner authorized restoration after
-PR #4, checks at the end, and PR integration. Existing shared history is preserved.
-Ten new milestone commits restore steps 1–5 and add steps 6–10. The naming migration
-is included in the workspace restoration.
+Weeks 1–2 steps 1–10 remain merged. This continuation implements the remaining
+software for weeks 1–2 steps 11–14 and all fourteen weeks 3–4 implementation steps.
+The historical feature commits are preserved. The owner's README redesign is
+retained; no package or stored-format rename was inferred from that edit.
 
-| Step | Capability | Commit / branch |
-| --- | --- | --- |
-| 1 | Workspace, CI, Retrieval Lab naming | e84f4d8 / chore/restore-workspace |
-| 2 | Deterministic corpus snapshots | a3c0917 / feat/restore-corpus-snapshots |
-| 3 | Versioned Go analyzer | 36f653a / feat/restore-versioned-analyzer |
-| 4 | Text/PDF import and paragraph chunking | d2a1a31 / feat/restore-paper-import |
-| 5 | Validated loader and immutable positional index | f07f71e / feat/restore-positional-index |
-| 6 | BM25 ranking and explanations | 1e00be6 / feat/bm25-ranking |
-| 7 | Bounded structured query parser | 7165bfa / feat/structured-query-parser |
-| 8 | Boolean and positional phrase execution | 812dd8b / feat/boolean-phrase-search |
-| 9 | Local HTTP service and graceful shutdown | fe37767 / feat/sparse-http-api |
-| 10 | Python client and reproducible run capture | feat/python-run-capture; SHA recorded in PR |
+## Delivered software
 
-## Validation on 2026-09-14
+- Versioned evaluation questions, frozen development/held-out splits, draft/reviewed
+  provenance validation, replayable metrics and sparse demonstration.
+- Compressed RLSEG001 writer/reader, bounded decoding, corruption checks, on-demand
+  disk postings, empty collections and global multi-segment ranking.
+- PostgreSQL ownership/registry migrations, prepared/ready states, active-parent CAS,
+  idempotent leased jobs, fencing, retries and recoverable local ingestion.
+- Generated authenticated Python/Go RPC with explicit snapshot identity, ownership
+  checks, separate control credentials, limits and cancellation.
+- Pinned real MiniLM CPU adapter, checked embedding artifacts, exact block cosine
+  search and snapshot-pinned RRF with separate sparse/dense/fused scores.
+- Three-mode capture, restart demonstration, recovery fixtures and PostgreSQL CI.
 
-The shared check script passed on Windows with Go 1.26.8 and Python 3.13.15:
-Go formatting, vet, all eight package test suites, executable build, Python
-dependency consistency, Ruff lint/format and all 21 Python tests.
-Live integration starts the actual Go service, searches the synthetic corpus,
-captures syntax errors, and verifies repeated ranking hashes. Go tests cover
-independent BM25 scores, deterministic ties, parsing limits, reference Boolean
-predicates, repeated phrases, scoped negation, zero-score matches, HTTP limits,
-and concurrent index/API reads.
+## Validation, 2026-09-19
 
-Hosted Windows/Linux CI and Linux race checks are pending publication; their
-actual conclusions will be recorded in PRs before integration. No independent
-review is claimed. Main is updated only through PRs.
+The preserved final worktree passes Go formatting, vet, all Go package tests and
+build; Python dependency consistency, Ruff lint/format and 27 Python tests pass.
+Three PostgreSQL/RPC tests require the database integration environment. Local
+Docker did not start; hosted PostgreSQL 18 CI is the remaining integration gate.
+Its actual outcome will be recorded in the PR before merge.
 
-Step 4's five-paper audit produced 193 chunks over 68 pages, with exact extracted
-page reconstruction and a maximum of 256 tokens per chunk. Source pins and
-visual inspection limitations are in [the seed report](reports/seed-import-v1.md).
-Downloaded papers and generated artifacts remain ignored.
+Real-model smoke passed using MiniLM revision
+1110a243fdf4706b3f48f1d95db1a4f5529b4d41 with CPU ONNX inference, a 2-by-384 output
+and explicit rejection of input exceeding 256 model tokens. Reproduce with
+python scripts/smoke_model.py --output artifacts/runs/minilm-smoke.json.
+The artifact records model/tokenizer checksums and software configuration.
 
-## Remaining scope
+The sparse and hybrid demos, Go race/fuzz checks, generated-binding consistency,
+and live registry/worker/RPC integration are included in the final CI workflow.
+See [week 2](reports/week-02-baseline.md) and
+[week 4](reports/week-04-baseline.md) for commands and evidence limitations.
 
-Steps 11–14 (owner-reviewed judgments, retrieval metrics, performance/fuzz
-harnesses, final demonstration/handoff) remain incomplete and outside this batch.
-No retrieval-quality or latency benchmark claims are made. Index persistence,
-dense retrieval, authentication, OCR and synthesis are later milestones.
+## Open acceptance gates
+
+The 20-question synthetic pool is draft, not owner-reviewed. Real-paper judgment
+review, corpus expansion beyond the original five-paper seed, and a reviewed
+sparse/dense/hybrid quality comparison remain open. No quality superiority,
+power-loss durability or broad performance claim is made. These evidence gates
+prevent claiming unconditional completion of both plans despite the implemented
+software. Generated candidate pools do not satisfy human review.
+
+Weeks 5–6 application work is outside this batch. Main changes only through PRs.
