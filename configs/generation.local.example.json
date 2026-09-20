@@ -2,11 +2,12 @@
   {
     "name": "local",
     "endpoint": "http://127.0.0.1:8095",
-    "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
-    "revision": "replace-with-downloaded-gguf-sha256",
+    "model": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+    "revision": "sha256:6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
     "cloud": false,
     "context_tokens": 4096,
-    "output_tokens": 1024,
-    "timeout_seconds": 120
+    "output_tokens": 1536,
+    "timeout_seconds": 120,
+    "api_key_env": "RETRIEVEC_GENERATION_KEY"
   }
 ]
