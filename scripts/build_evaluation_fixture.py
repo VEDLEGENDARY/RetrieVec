@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from retrievallab.corpus.snapshot import canonical, digest, load_snapshot
+from retrievec.corpus.snapshot import canonical, digest, load_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / (

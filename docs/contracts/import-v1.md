@@ -1,8 +1,8 @@
 # Local import and paragraph chunking v1
 
-Use `retrievallab import --manifest <json> --source-root <directory> --output <directory>`.
+Use `retrievec import --manifest <json> --source-root <directory> --output <directory>`.
 Options: --collection (research), --token-budget (256; range 1–4096), and --engine
-(retrievald path, otherwise RETRIEVALLAB_ENGINE or PATH).
+(retrievald path, otherwise RETRIEVEC_ENGINE or PATH).
 
 The source manifest is {"schema_version":1,"sources":[...]} with each source
 containing paper_id, title, authors, path, source_url, source_sha256, and

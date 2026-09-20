@@ -2,8 +2,8 @@ package search
 
 import (
 	"context"
-	"retrievallab/engine/internal/index"
-	"retrievallab/engine/internal/query"
+	"retrievec/engine/internal/index"
+	"retrievec/engine/internal/query"
 	"sort"
 )
 

@@ -7,17 +7,17 @@ import sys
 import tempfile
 import unittest
 
-from retrievallab import __version__
+from retrievec import __version__
 
 
 class EntryPointTests(unittest.TestCase):
     def run_cli(self, *args: str, console: bool = False) -> subprocess.CompletedProcess[str]:
         if console:
-            executable = shutil.which("retrievallab")
+            executable = shutil.which("retrievec")
             self.assertIsNotNone(executable, "Install the package and add the venv to PATH")
             command = [str(executable)]
         else:
-            command = [sys.executable, "-m", "retrievallab"]
+            command = [sys.executable, "-m", "retrievec"]
         with tempfile.TemporaryDirectory() as directory:
             return subprocess.run(
                 [*command, *args],
@@ -29,22 +29,22 @@ class EntryPointTests(unittest.TestCase):
             )
 
     def test_installed_version(self) -> None:
-        self.assertEqual(importlib.metadata.version("retrievallab"), __version__)
+        self.assertEqual(importlib.metadata.version("retrievec"), __version__)
         for console in (False, True):
             with self.subTest(console=console):
                 result = self.run_cli("--version", console=console)
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertEqual(result.stdout.strip(), f"retrievallab {__version__}")
+                self.assertEqual(result.stdout.strip(), f"retrievec {__version__}")
 
     def test_help(self) -> None:
         result = self.run_cli("--help")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("usage: retrievallab", result.stdout)
+        self.assertIn("usage: retrievec", result.stdout)
 
     def test_default_displays_help(self) -> None:
         result = self.run_cli()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("usage: retrievallab", result.stdout)
+        self.assertIn("usage: retrievec", result.stdout)
 
     def test_invalid_argument_fails(self) -> None:
         result = self.run_cli("--unknown")

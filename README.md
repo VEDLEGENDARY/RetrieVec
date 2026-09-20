@@ -1,4 +1,4 @@
-# 🔬 Retrieval Lab
+# 🔬 RetrieVec
 
 > A local retrieval engine and reproducible experiment workbench for research papers.
 
@@ -7,7 +7,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey)](#setup)
 [![Status](https://img.shields.io/badge/Status-In%20Development-orange)](docs/IMPLEMENTATION_STATUS.md)
 
-**Retrieval Lab** (`retrievallab`) is a zero-cloud, fully offline workbench designed for deterministic paper processing, positional indexing, full-text BM25 search, Boolean/phrase search, and reproducible experiment evaluation.
+**RetrieVec** (`retrievec`) is a zero-cloud, fully offline workbench designed for deterministic paper processing, positional indexing, full-text BM25 search, Boolean/phrase search, and reproducible experiment evaluation.
 
 ---
 
@@ -51,7 +51,7 @@ py -3.13 -m venv .venv
 
 # Run developer verification suite
 .\.venv\Scripts\python.exe scripts/check.py
-.\.venv\Scripts\retrievallab.exe --version
+.\.venv\Scripts\retrievec.exe --version
 
 # Verify Go engine build
 Push-Location engine
@@ -71,7 +71,7 @@ python3.13 -m venv .venv
 
 # Run developer verification suite with race detector (requires GCC/C compiler)
 .venv/bin/python scripts/check.py --race
-.venv/bin/retrievallab --version
+.venv/bin/retrievec --version
 
 # Verify Go engine build
 (cd engine && go run ./cmd/retrievald --version)
@@ -103,10 +103,10 @@ In a separate terminal, trigger a query run and capture results:
 
 ```bash
 # Windows
-.\.venv\Scripts\python.exe -m retrievallab run --queries datasets/fixtures/queries-v1.jsonl --output artifacts/runs/example_01
+.\.venv\Scripts\python.exe -m retrievec run --queries datasets/fixtures/queries-v1.jsonl --output artifacts/runs/example_01
 
 # Linux
-.venv/bin/python -m retrievallab run --queries datasets/fixtures/queries-v1.jsonl --output artifacts/runs/example_01
+.venv/bin/python -m retrievec run --queries datasets/fixtures/queries-v1.jsonl --output artifacts/runs/example_01
 ```
 
 > [!TIP]
@@ -124,11 +124,11 @@ Build the engine via `scripts/check.py`, then export its executable path:
 
 * **PowerShell:**
   ```powershell
-  $env:RETRIEVALLAB_ENGINE = (Resolve-Path artifacts/bin/retrievald.exe).Path
+  $env:RETRIEVEC_ENGINE = (Resolve-Path artifacts/bin/retrievald.exe).Path
   ```
 * **Linux:**
   ```bash
-  export RETRIEVALLAB_ENGINE=$(realpath artifacts/bin/retrievald)
+  export RETRIEVEC_ENGINE=$(realpath artifacts/bin/retrievald)
   ```
 
 ### Step 2: Import & Validate Corpus Snapshot
@@ -138,13 +138,13 @@ Build the engine via `scripts/check.py`, then export its executable path:
 
 * **PowerShell:**
   ```powershell
-  .\.venv\Scripts\python.exe -m retrievallab import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/snapshots
-  .\.venv\Scripts\python.exe -m retrievallab validate-snapshot artifacts/snapshots/<snapshot-id>
+  .\.venv\Scripts\python.exe -m retrievec import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/snapshots
+  .\.venv\Scripts\python.exe -m retrievec validate-snapshot artifacts/snapshots/<snapshot-id>
   ```
 * **Linux:**
   ```bash
-  .venv/bin/python -m retrievallab import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/snapshots
-  .venv/bin/python -m retrievallab validate-snapshot artifacts/snapshots/<snapshot-id>
+  .venv/bin/python -m retrievec import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/snapshots
+  .venv/bin/python -m retrievec validate-snapshot artifacts/snapshots/<snapshot-id>
   ```
 
 ### Step 3: Inspect Index & Collection Metrics
@@ -172,7 +172,7 @@ The inspect tool reports key corpus metrics:
 ## 📁 Repository Structure
 
 ```
-retrievallab/
+retrievec/
 ├── 📁 engine/        # Go retrieval service, search logic, and cmd/retrievald entry point
 ├── 📁 python/        # Installable corpus, client CLI, and evaluation tooling
 ├── 📁 datasets/      # Committed synthetic fixtures, manifests, and golden records

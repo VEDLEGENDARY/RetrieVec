@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"retrievallab/engine/internal/corpus"
-	"retrievallab/engine/internal/httpapi"
+	"retrievec/engine/internal/corpus"
+	"retrievec/engine/internal/httpapi"
 	"syscall"
 	"time"
 )

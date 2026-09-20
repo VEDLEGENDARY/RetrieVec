@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"retrievallab/engine/internal/snapshot"
+	"retrievec/engine/internal/snapshot"
 )
 
 func buildCommand(args []string, stdout, stderr io.Writer) int {

@@ -8,32 +8,32 @@ import uuid
 from pathlib import Path
 
 import grpc
-from retrievallab.client.rpc import RPCClient
-from retrievallab.corpus.snapshot import load_snapshot, publish_snapshot
-from retrievallab.dense.artifacts import build_embeddings, load_embeddings
-from retrievallab.dense.hybrid import PinnedClient
-from retrievallab.dense.model import FixtureModel
-from retrievallab.registry.artifacts import Store, prepare
-from retrievallab.registry.database import Conflict, Registry
+from retrievec.client.rpc import RPCClient
+from retrievec.corpus.snapshot import load_snapshot, publish_snapshot
+from retrievec.dense.artifacts import build_embeddings, load_embeddings
+from retrievec.dense.hybrid import PinnedClient
+from retrievec.dense.model import FixtureModel
+from retrievec.registry.artifacts import Store, prepare
+from retrievec.registry.database import Conflict, Registry
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-@unittest.skipUnless(os.environ.get("RETRIEVALLAB_TEST_DSN"), "requires isolated PostgreSQL 18")
+@unittest.skipUnless(os.environ.get("RETRIEVEC_TEST_DSN"), "requires isolated PostgreSQL 18")
 class RPCIntegrationTests(unittest.TestCase):
     def test_live_rpc_hybrid_activation_restart_and_failure(self):
-        engine = Path(os.environ["RETRIEVALLAB_ENGINE"])
-        registry = Registry(os.environ["RETRIEVALLAB_TEST_DSN"])
+        engine = Path(os.environ["RETRIEVEC_ENGINE"])
+        registry = Registry(os.environ["RETRIEVEC_TEST_DSN"])
         registry.migrate()
         principal, collection = "owner-" + uuid.uuid4().hex, "collection-" + uuid.uuid4().hex
         registry.create_collection(principal, collection)
         read_token, worker_token = uuid.uuid4().hex, uuid.uuid4().hex
         environment = {
             **os.environ,
-            "RETRIEVALLAB_DSN": registry.dsn,
-            "RETRIEVALLAB_PRINCIPAL": principal,
-            "RETRIEVALLAB_READ_TOKEN": read_token,
-            "RETRIEVALLAB_WORKER_TOKEN": worker_token,
+            "RETRIEVEC_DSN": registry.dsn,
+            "RETRIEVEC_PRINCIPAL": principal,
+            "RETRIEVEC_READ_TOKEN": read_token,
+            "RETRIEVEC_WORKER_TOKEN": worker_token,
         }
 
         def start(root):

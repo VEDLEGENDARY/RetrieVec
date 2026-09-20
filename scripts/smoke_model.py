@@ -4,8 +4,8 @@ import argparse
 import time
 from pathlib import Path
 
-from retrievallab.corpus.snapshot import canonical
-from retrievallab.dense.model import MiniLM
+from retrievec.corpus.snapshot import canonical
+from retrievec.dense.model import MiniLM
 
 
 def main():

@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	pb "retrievallab/engine/gen/retrieval/v1"
+	pb "retrievec/engine/gen/retrieval/v1"
 	"testing"
 )
 

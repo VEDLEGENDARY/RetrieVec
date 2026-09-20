@@ -8,7 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"retrievallab/engine/internal/index"
+	"retrievec/engine/internal/index"
 	"sort"
 	"unicode/utf8"
 )

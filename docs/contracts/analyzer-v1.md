@@ -16,5 +16,5 @@ Run retrievald analyze with one JSON object on stdin: {"texts":["RAG-based"]}.
 The response has analyzer_version and one token array per input text. Limits:
 256 texts, 1 MiB of UTF-8 per text, 8 MiB total serialized request. Python's
 GoAnalyzer invokes this command with a deadline and validates the response.
-Set RETRIEVALLAB_ENGINE to the built executable, or place retrievald on PATH.
+Set RETRIEVEC_ENGINE to the built executable, or place retrievald on PATH.
 scripts/check.py builds it and sets the environment for integration tests.

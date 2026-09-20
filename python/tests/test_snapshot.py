@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from retrievallab.corpus.snapshot import (
+from retrievec.corpus.snapshot import (
     CorpusError,
     canonical,
     encode_snapshot,
@@ -100,9 +100,7 @@ class SnapshotTests(unittest.TestCase):
     def test_validation_failure_does_not_publish(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            with patch(
-                "retrievallab.corpus.snapshot.load_snapshot", side_effect=CorpusError("bad")
-            ):
+            with patch("retrievec.corpus.snapshot.load_snapshot", side_effect=CorpusError("bad")):
                 with self.assertRaises(CorpusError):
                     publish_snapshot(root, [self.paper], [self.chunk], "c", {})
             self.assertEqual(list(root.iterdir()), [])

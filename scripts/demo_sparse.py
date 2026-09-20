@@ -8,11 +8,11 @@ import threading
 from pathlib import Path
 
 from benchmark_http import measure
-from retrievallab.client.capture import capture
-from retrievallab.client.http import Client
-from retrievallab.corpus.snapshot import canonical
-from retrievallab.evaluation.dataset import load_dataset
-from retrievallab.evaluation.report import evaluate
+from retrievec.client.capture import capture
+from retrievec.client.http import Client
+from retrievec.corpus.snapshot import canonical
+from retrievec.evaluation.dataset import load_dataset
+from retrievec.evaluation.report import evaluate
 
 ROOT = Path(__file__).resolve().parents[1]
 

@@ -4,13 +4,13 @@ import argparse
 import os
 from pathlib import Path
 
-from retrievallab.client.capture import capture
-from retrievallab.client.rpc import RPCClient
-from retrievallab.corpus.snapshot import canonical, parse_json
-from retrievallab.dense.hybrid import PinnedClient
-from retrievallab.dense.model import adapter
-from retrievallab.registry.artifacts import Store
-from retrievallab.registry.database import Registry
+from retrievec.client.capture import capture
+from retrievec.client.rpc import RPCClient
+from retrievec.corpus.snapshot import canonical, parse_json
+from retrievec.dense.hybrid import PinnedClient
+from retrievec.dense.model import adapter
+from retrievec.registry.artifacts import Store
+from retrievec.registry.database import Registry
 
 
 def main():
@@ -24,10 +24,10 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         parser.error("output must be new")
-    registry, store = Registry(os.environ["RETRIEVALLAB_DSN"]), Store(args.store)
-    principal = os.environ["RETRIEVALLAB_PRINCIPAL"]
+    registry, store = Registry(os.environ["RETRIEVEC_DSN"]), Store(args.store)
+    principal = os.environ["RETRIEVEC_PRINCIPAL"]
     snapshot_id = registry.resolve(principal, args.collection)["snapshot_id"]
-    node = RPCClient(args.rpc, os.environ["RETRIEVALLAB_READ_TOKEN"])
+    node = RPCClient(args.rpc, os.environ["RETRIEVEC_READ_TOKEN"])
     try:
         model = adapter(args.embedding)
         pool = {}

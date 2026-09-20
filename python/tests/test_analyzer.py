@@ -2,8 +2,8 @@ import json
 import unittest
 from pathlib import Path
 
-from retrievallab.corpus.analyzer import GoAnalyzer
-from retrievallab.corpus.snapshot import CorpusError
+from retrievec.corpus.analyzer import GoAnalyzer
+from retrievec.corpus.snapshot import CorpusError
 
 ROOT = Path(__file__).resolve().parents[2]
 

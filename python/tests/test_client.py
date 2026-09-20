@@ -8,15 +8,15 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from retrievallab.client.capture import capture
-from retrievallab.client.http import Client, RetrievalError
+from retrievec.client.capture import capture
+from retrievec.client.http import Client, RetrievalError
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 class ClientTests(unittest.TestCase):
     def test_live_service_and_repeated_capture(self):
-        engine = os.environ.get("RETRIEVALLAB_ENGINE")
+        engine = os.environ.get("RETRIEVEC_ENGINE")
         self.assertIsNotNone(engine, "shared checks must build the real service")
         snapshot = next((ROOT / "datasets/fixtures/snapshots").iterdir())
         process = subprocess.Popen(
@@ -57,7 +57,7 @@ class ClientTests(unittest.TestCase):
         with patch.object(client, "_request", return_value={}), self.assertRaises(RetrievalError):
             client.search("red")
         with (
-            patch("retrievallab.client.http.urlopen", side_effect=TimeoutError),
+            patch("retrievec.client.http.urlopen", side_effect=TimeoutError),
             self.assertRaises(RetrievalError) as caught,
         ):
             client.search("red")
