@@ -116,6 +116,11 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .focus();
   await page.keyboard.press("Enter");
   await expect(
+    page
+      .getByRole("navigation", { name: "Saved research runs" })
+      .getByRole("button", { name: /What does dense retrieval match/ }),
+  ).toHaveCount(2);
+  await expect(
     page.getByText("Research run: completed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
   await page
@@ -124,6 +129,12 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await page
     .getByRole("button", { name: "Generate cited answer", exact: true })
     .click();
+  await expect(
+    page.getByRole("heading", {
+      name: "cancel this retrieval answer",
+      exact: true,
+    }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Cancel run", exact: true }).click();
   await expect(
     page.getByText("Research run: cancelled", { exact: true }),
