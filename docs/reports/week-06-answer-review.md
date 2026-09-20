@@ -122,7 +122,7 @@ Support: pending · Completeness: pending · Unsupported numbers: pending · App
 
 **Cited passage:** Synthetic study B evaluates dense retrieval on Dataset Birch\. The paper reports Recall@20 of 61 percent with 200 candidates\. These conditions differ from study A\. The authors report that dense retrieval matches semantic similarity\.
 
-**Model limitations:** 
+**Model limitations:**
 
 Support: pending · Completeness: pending · Unsupported numbers: pending · Appropriate abstention: pending · Task completion: pending
 
@@ -178,7 +178,7 @@ Support: pending · Completeness: pending · Unsupported numbers: pending · App
 
 **Cited passage:** Synthetic study A evaluates lexical retrieval on Dataset Cedar\. The paper reports Recall@10 of 42 percent with 100 candidates\. The experiment uses a fixed corpus of 1000 passages\. Latency is not reported\.
 
-**Model limitations:** 
+**Model limitations:**
 
 Support: pending · Completeness: pending · Unsupported numbers: pending · Appropriate abstention: pending · Task completion: pending
 
