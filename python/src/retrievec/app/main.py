@@ -70,6 +70,14 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
     def health():
         return {"status": "ok"}
 
+    from pathlib import Path
+
+    from starlette.staticfiles import StaticFiles
+
+    frontend = Path(__file__).resolve().parents[4] / "web" / "dist"
+    if frontend.is_dir():
+        app.mount("/", StaticFiles(directory=frontend, html=True), name="workspace")
+
     return app
 
 

@@ -68,3 +68,5 @@ Each implementation step remains a separate commit; merge commits preserve them.
   handoff, retained successful inputs, authorized polling and archive cancellation.
   Private extraction uses a 120-second subprocess and a 100-page PDF limit;
   one workspace worker holds a PostgreSQL advisory lock across heavy tasks.
+- Step 5: React/TypeScript authenticated collection workspace, responsive layout,
+  collection creation/archive, session expiry, accessible forms and focus states.
