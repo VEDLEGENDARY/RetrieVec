@@ -23,3 +23,8 @@ Failed originals still count toward storage usage. Archive hides retained conten
 and cancels work; it is not physical erasure. An operator must perform any purge.
 Legacy CLI snapshots without upload provenance cannot be appended in the browser;
 import those originals into a new private collection. No silent replacement.
+
+If PostgreSQL disconnects during handoff, the API reports an uncertain outcome
+and retains staged originals: the commit might already be durable. Inspect jobs
+before retrying. Operators may remove unreferenced originals only after resolving
+all uncertain submissions; no automatic purge runs in this milestone.

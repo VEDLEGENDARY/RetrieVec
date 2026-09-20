@@ -91,3 +91,5 @@ The regression test exercises that actual entry point. Cross-user search is also
 asserted to fail before creating an RPC client or reading a source artifact.
 Extraction limits now cover Windows committed memory as well as Linux address
 space/CPU; a subprocess test verifies limit installation on both CI platforms.
+Upload handoff retains originals when database commit acknowledgement is uncertain,
+preventing a durable queued job from losing its source files. Recovery is explicit.
