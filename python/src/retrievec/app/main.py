@@ -28,6 +28,9 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
     from retrievec.app.auth import install_auth
 
     install_auth(app, sessions)
+    from retrievec.app.resources import install_resources
+
+    install_resources(app)
 
     @app.exception_handler(APIError)
     async def api_error(request: Request, error: APIError):

@@ -20,7 +20,7 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(
             client.get("/api/v1/openapi.json").json()["info"]["title"], "RetrieVec workspace"
         )
-        self.assertEqual(client.get("/api/v1/collections").status_code, 404)
+        self.assertEqual(client.get("/api/v1/collections").status_code, 401)
 
     def test_search_modes_are_explicit(self):
         with self.assertRaises(ValidationError):

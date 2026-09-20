@@ -67,7 +67,7 @@ class Jobs:
             return connection.execute(
                 """WITH candidate AS (
               SELECT j.job_id FROM ingestion_jobs j JOIN collections c USING(collection_id)
-              WHERE c.owner_id=%s AND j.attempts<j.max_attempts
+              WHERE c.owner_id=%s AND NOT c.archived AND j.attempts<j.max_attempts
               AND ((j.state IN ('queued','retry_wait') AND j.available_at<=clock_timestamp())
                    OR (j.state='running' AND j.lease_until<clock_timestamp()))
               ORDER BY j.available_at,j.job_id FOR UPDATE OF j SKIP LOCKED LIMIT 1

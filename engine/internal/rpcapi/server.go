@@ -39,7 +39,7 @@ func New(ctx context.Context, dsn, root, principal, readToken, workerToken strin
 		pool.Close()
 		return nil, err
 	}
-	rows, err := pool.Query(ctx, "SELECT collection_id,active_snapshot FROM collections WHERE owner_id=$1 AND active_snapshot IS NOT NULL", principal)
+	rows, err := pool.Query(ctx, "SELECT collection_id,active_snapshot FROM collections WHERE (owner_id=$1 OR $1='*') AND NOT archived AND active_snapshot IS NOT NULL", principal)
 	if err != nil {
 		s.Close()
 		return nil, err
@@ -118,13 +118,21 @@ func (s *Server) reader(ctx context.Context, collection, id string, prepare bool
 	if collection == "" || !snapshot.ValidID(id, "rs_") {
 		return nil, status.Error(codes.InvalidArgument, "explicit collection and snapshot required")
 	}
-	var owner, state string
-	err := s.pool.QueryRow(ctx, "SELECT c.owner_id,s.state FROM retrieval_snapshots s JOIN collections c USING(collection_id) WHERE s.snapshot_id=$1 AND s.collection_id=$2", id, collection).Scan(&owner, &state)
+	actor := s.principal
+	if actor == "*" {
+		values := metadata.ValueFromIncomingContext(ctx, "x-retrievec-principal")
+		if len(values) != 1 || values[0] == "" || len(values[0]) > 256 {
+			return nil, status.Error(codes.Unauthenticated, "principal assertion required")
+		}
+		actor = values[0]
+	}
+	var owner, state, visibility string
+	err := s.pool.QueryRow(ctx, "SELECT c.owner_id,s.state,c.visibility FROM retrieval_snapshots s JOIN collections c USING(collection_id) WHERE s.snapshot_id=$1 AND s.collection_id=$2 AND NOT c.archived AND EXISTS(SELECT 1 FROM principals WHERE principal_id=$3)", id, collection, actor).Scan(&owner, &state, &visibility)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "registered snapshot unavailable")
 	}
-	if owner != s.principal {
-		return nil, status.Error(codes.PermissionDenied, "collection scope denied")
+	if owner != actor && (prepare || visibility != "curated") {
+		return nil, status.Error(codes.NotFound, "registered snapshot unavailable")
 	}
 	if !prepare && state != "ready" {
 		return nil, status.Error(codes.FailedPrecondition, "snapshot not ready")

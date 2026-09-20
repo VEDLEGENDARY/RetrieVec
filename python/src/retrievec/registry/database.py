@@ -31,11 +31,14 @@ class Registry:
                     connection.execute(migration.read_text())
 
     @staticmethod
-    def authorize(connection, principal: str, collection: str, *, lock: bool = False) -> dict:
+    def authorize(
+        connection, principal: str, collection: str, *, lock: bool = False, read: bool = False
+    ) -> dict:
         row = connection.execute(
-            "SELECT * FROM collections WHERE collection_id=%s AND owner_id=%s"
-            + (" FOR UPDATE" if lock else ""),
-            (collection, principal),
+            "SELECT * FROM collections WHERE collection_id=%s AND NOT archived "
+            "AND (owner_id=%s OR (%s AND visibility='curated' AND EXISTS "
+            "(SELECT 1 FROM principals WHERE principal_id=%s)))" + (" FOR UPDATE" if lock else ""),
+            (collection, principal, read, principal),
         ).fetchone()
         if row is None:
             raise PermissionError("collection is unavailable to this principal")
@@ -103,7 +106,7 @@ class Registry:
 
     def resolve(self, principal: str, collection: str, snapshot_id: str | None = None) -> dict:
         with self.connect() as connection:
-            owner = self.authorize(connection, principal, collection)
+            owner = self.authorize(connection, principal, collection, read=True)
             pinned = snapshot_id or owner["active_snapshot"]
             row = connection.execute(
                 (
