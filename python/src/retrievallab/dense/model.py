@@ -20,7 +20,20 @@ def normalize(vectors: np.ndarray) -> np.ndarray:
 
 
 class FixtureModel:
-    config = {"model": "fixture-hashed-words", "revision": "1", "dimension": 32, "dtype": "float32", "normalization": "l2", "pooling": "word-bucket-sum", "query_prefix": "", "document_prefix": "", "max_tokens": 4096, "truncation": "reject-v1", "software": {"numpy": version("numpy")}, "quality_evidence": False}
+    config = {
+        "model": "fixture-hashed-words",
+        "revision": "1",
+        "dimension": 32,
+        "dtype": "float32",
+        "normalization": "l2",
+        "pooling": "word-bucket-sum",
+        "query_prefix": "",
+        "document_prefix": "",
+        "max_tokens": 4096,
+        "truncation": "reject-v1",
+        "software": {"numpy": version("numpy")},
+        "quality_evidence": False,
+    }
 
     def encode(self, texts: list[str]) -> np.ndarray:
         output = np.zeros((len(texts), 32), dtype=np.float32)
@@ -29,7 +42,9 @@ class FixtureModel:
             if not words or len(words) > 4096:
                 raise ValueError("fixture model input length")
             for word in words:
-                output[row, int.from_bytes(hashlib.sha256(word.encode()).digest()[:4], "little") % 32] += 1
+                output[
+                    row, int.from_bytes(hashlib.sha256(word.encode()).digest()[:4], "little") % 32
+                ] += 1
         return normalize(output)
 
 
@@ -38,6 +53,7 @@ class MiniLM:
         import onnxruntime as ort
         from huggingface_hub import hf_hub_download
         from tokenizers import Tokenizer
+
         tokenizer_path = hf_hub_download(MODEL, "tokenizer.json", revision=REVISION)
         model_path = hf_hub_download(MODEL, "onnx/model.onnx", revision=REVISION)
         self.tokenizer = Tokenizer.from_file(tokenizer_path)
@@ -46,28 +62,55 @@ class MiniLM:
         options = ort.SessionOptions()
         options.intra_op_num_threads = 2
         options.inter_op_num_threads = 1
-        self.session = ort.InferenceSession(model_path, sess_options=options, providers=["CPUExecutionProvider"])
+        self.session = ort.InferenceSession(
+            model_path, sess_options=options, providers=["CPUExecutionProvider"]
+        )
+
         def file_hash(path):
             with open(path, "rb") as file:
                 return hashlib.file_digest(file, "sha256").hexdigest()
-        self.config = {"model": MODEL, "revision": REVISION, "dimension": 384, "dtype": "float32", "normalization": "l2", "pooling": "attention-mask-mean-v1", "query_prefix": "", "document_prefix": "", "max_tokens": 256, "truncation": "reject-v1", "model_sha256": file_hash(model_path), "tokenizer_sha256": file_hash(tokenizer_path), "provider": "CPUExecutionProvider", "software": {name: version(name) for name in ("onnxruntime", "tokenizers", "numpy", "huggingface-hub")}, "quality_evidence": True}
+
+        self.config = {
+            "model": MODEL,
+            "revision": REVISION,
+            "dimension": 384,
+            "dtype": "float32",
+            "normalization": "l2",
+            "pooling": "attention-mask-mean-v1",
+            "query_prefix": "",
+            "document_prefix": "",
+            "max_tokens": 256,
+            "truncation": "reject-v1",
+            "model_sha256": file_hash(model_path),
+            "tokenizer_sha256": file_hash(tokenizer_path),
+            "provider": "CPUExecutionProvider",
+            "software": {
+                name: version(name)
+                for name in ("onnxruntime", "tokenizers", "numpy", "huggingface-hub")
+            },
+            "quality_evidence": True,
+        }
 
     def encode(self, texts: list[str]) -> np.ndarray:
         if not texts or len(texts) > 16 or any(not text.strip() for text in texts):
             raise ValueError("embedding batch requires 1–16 nonempty texts")
         encoded = self.tokenizer.encode_batch(texts)
         if any(len(item.ids) > 256 for item in encoded):
-            raise ValueError("model input exceeds 256 wordpieces; rebuild with a smaller explicit chunk budget")
+            raise ValueError(
+                "model input exceeds 256 wordpieces; rebuild with a smaller explicit chunk budget"
+            )
         width = max(len(item.ids) for item in encoded)
         ids = np.zeros((len(texts), width), dtype=np.int64)
         mask = np.zeros_like(ids)
         types = np.zeros_like(ids)
         for row, item in enumerate(encoded):
-            ids[row, :len(item.ids)] = item.ids
-            mask[row, :len(item.ids)] = item.attention_mask
-            types[row, :len(item.ids)] = item.type_ids
+            ids[row, : len(item.ids)] = item.ids
+            mask[row, : len(item.ids)] = item.attention_mask
+            types[row, : len(item.ids)] = item.type_ids
         inputs = {"input_ids": ids, "attention_mask": mask, "token_type_ids": types}
-        result = self.session.run(None, {item.name: inputs[item.name] for item in self.session.get_inputs()})[0]
+        result = self.session.run(
+            None, {item.name: inputs[item.name] for item in self.session.get_inputs()}
+        )[0]
         if result.shape != (len(texts), width, 384):
             raise ValueError("unexpected model output shape")
         pooled = (result * mask[:, :, None]).sum(axis=1) / mask.sum(axis=1)[:, None]

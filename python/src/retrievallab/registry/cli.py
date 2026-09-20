@@ -19,12 +19,15 @@ def main(argv=None):
     sub.add_parser("migrate")
     create = sub.add_parser("create-collection")
     create.add_argument("collection")
-    enqueue = sub.add_parser("enqueue", help="replace collection with the complete supplied source set")
+    enqueue = sub.add_parser(
+        "enqueue", help="replace collection with the complete supplied source set"
+    )
     enqueue.add_argument("--collection", required=True)
     enqueue.add_argument("--key", required=True)
     enqueue.add_argument("--manifest", required=True, type=Path)
     enqueue.add_argument("--source-root", required=True, type=Path)
     enqueue.add_argument("--embedding", choices=("fixture", "minilm"))
+    enqueue.add_argument("--token-budget", type=int, default=96)
     worker = sub.add_parser("work-once")
     worker.add_argument("--engine", type=Path, required=True)
     worker.add_argument("--rpc", default="127.0.0.1:8092")
@@ -45,15 +48,33 @@ def main(argv=None):
         registry.create_collection(principal, args.collection)
     elif args.action == "enqueue":
         payload = stage_inputs(store, args.manifest, args.source_root)
-        job = Jobs(registry, principal).enqueue(args.collection, args.key, payload, {"token_budget": 256, "embedding": args.embedding})
+        job = Jobs(registry, principal).enqueue(
+            args.collection,
+            args.key,
+            payload,
+            {"token_budget": args.token_budget, "embedding": args.embedding},
+        )
         print(job["job_id"])
     elif args.action == "search":
         from retrievallab.dense.hybrid import PinnedClient
         from retrievallab.dense.model import adapter
+
         node = RPCClient(args.rpc, os.environ["RETRIEVALLAB_READ_TOKEN"])
         try:
-            client = PinnedClient(registry, store, node, principal, args.collection, args.retrieval, adapter(args.embedding) if args.retrieval != "sparse" else None)
-            print(json.dumps(client.search(args.query, args.mode), ensure_ascii=False, allow_nan=False))
+            client = PinnedClient(
+                registry,
+                store,
+                node,
+                principal,
+                args.collection,
+                args.retrieval,
+                adapter(args.embedding) if args.retrieval != "sparse" else None,
+            )
+            print(
+                json.dumps(
+                    client.search(args.query, args.mode), ensure_ascii=False, allow_nan=False
+                )
+            )
         finally:
             node.close()
     else:

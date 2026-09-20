@@ -1,4 +1,62 @@
 package segment
-import("os";"path/filepath";"reflect";"testing";"retrievallab/engine/internal/corpus";"retrievallab/engine/internal/index")
-func TestRoundTripAndCorruption(t *testing.T){idx,err:=index.Build([]corpus.Document{{Chunk:corpus.Chunk{ChunkID:"a",PaperID:"p",PaperVersionID:"v",CollectionID:"c",Text:"red red blue"}},{Chunk:corpus.Chunk{ChunkID:"b",PaperID:"p",PaperVersionID:"v",CollectionID:"c",Text:"blue red"}}});if err!=nil{t.Fatal(err)};dir:=t.TempDir();hash,err:=Publish(dir,idx);if err!=nil{t.Fatal(err)};r,err:=Open(filepath.Join(dir,hash+".seg"));if err!=nil{t.Fatal(err)};defer r.Close();for _,term:=range idx.Terms(){got,err:=r.Postings(term);if err!=nil||!reflect.DeepEqual(got,idx.Postings(term)){t.Fatalf("postings differ %v %v",got,err)}};data,err:=Encode(idx);if err!=nil{t.Fatal(err)};for _,cut:=range []int{0,95,len(data)-1}{path:=filepath.Join(dir,"bad.seg");if err:=os.WriteFile(path,data[:cut],0600);err!=nil{t.Fatal(err)};if bad,err:=Open(path);err==nil{bad.Close();t.Fatal("accepted truncation")}}}
-func FuzzOpen(f *testing.F){f.Add([]byte("RLSEG001"));f.Fuzz(func(t *testing.T,data []byte){if len(data)>1<<20{t.Skip()};path:=filepath.Join(t.TempDir(),"input.seg");if err:=os.WriteFile(path,data,0600);err!=nil{t.Fatal(err)};if reader,err:=Open(path);err==nil{reader.Close()}})}
+
+import (
+	"os"
+	"path/filepath"
+	"reflect"
+	"retrievallab/engine/internal/corpus"
+	"retrievallab/engine/internal/index"
+	"testing"
+)
+
+func TestRoundTripAndCorruption(t *testing.T) {
+	idx, err := index.Build([]corpus.Document{{Chunk: corpus.Chunk{ChunkID: "a", PaperID: "p", PaperVersionID: "v", CollectionID: "c", Text: "red red blue"}}, {Chunk: corpus.Chunk{ChunkID: "b", PaperID: "p", PaperVersionID: "v", CollectionID: "c", Text: "blue red"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	hash, err := Publish(dir, idx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := Open(filepath.Join(dir, hash+".seg"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	for _, term := range idx.Terms() {
+		got, err := r.Postings(term)
+		if err != nil || !reflect.DeepEqual(got, idx.Postings(term)) {
+			t.Fatalf("postings differ %v %v", got, err)
+		}
+	}
+	data, err := Encode(idx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, cut := range []int{0, 95, len(data) - 1} {
+		path := filepath.Join(dir, "bad.seg")
+		if err := os.WriteFile(path, data[:cut], 0600); err != nil {
+			t.Fatal(err)
+		}
+		if bad, err := Open(path); err == nil {
+			bad.Close()
+			t.Fatal("accepted truncation")
+		}
+	}
+}
+func FuzzOpen(f *testing.F) {
+	f.Add([]byte("RLSEG001"))
+	f.Fuzz(func(t *testing.T, data []byte) {
+		if len(data) > 1<<20 {
+			t.Skip()
+		}
+		path := filepath.Join(t.TempDir(), "input.seg")
+		if err := os.WriteFile(path, data, 0600); err != nil {
+			t.Fatal(err)
+		}
+		if reader, err := Open(path); err == nil {
+			reader.Close()
+		}
+	})
+}

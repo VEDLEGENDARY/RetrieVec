@@ -149,8 +149,8 @@ def make_chunk(
 
 def validate_records(papers: list[dict], chunks: list[dict], collection_id: str) -> None:
     _text(collection_id, "collection_id")
-    if not papers or not chunks:
-        raise CorpusError("snapshot must contain papers and chunks")
+    if bool(papers) != bool(chunks):
+        raise CorpusError("papers and chunks must both be empty or both populated")
     versions: dict[str, dict] = {}
     for paper in papers:
         _fields(paper, PAPER_FIELDS, "paper")

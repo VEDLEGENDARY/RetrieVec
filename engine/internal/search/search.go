@@ -61,7 +61,10 @@ func Execute(ctx context.Context, idx index.Reader, request Request, config scor
 				return Result{}, err
 			}
 			terms = append(terms, token.Term)
-			postings, err := idx.ReadPostings(token.Term); if err != nil {return Result{},err}
+			postings, err := idx.ReadPostings(token.Term)
+			if err != nil {
+				return Result{}, err
+			}
 			for _, p := range postings {
 				candidates[p.InternalChunkID] = true
 			}
@@ -69,7 +72,7 @@ func Execute(ctx context.Context, idx index.Reader, request Request, config scor
 	} else {
 		return Result{}, fmt.Errorf("unsupported mode")
 	}
-	ranked, err := scoring.Rank(idx, terms, candidates, config)
+	ranked, err := scoring.RankContext(ctx, idx, terms, candidates, config)
 	if err != nil {
 		return Result{}, err
 	}

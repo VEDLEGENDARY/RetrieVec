@@ -8,7 +8,6 @@ import uuid
 from pathlib import Path
 
 import grpc
-
 from retrievallab.client.rpc import RPCClient
 from retrievallab.corpus.snapshot import load_snapshot, publish_snapshot
 from retrievallab.dense.artifacts import build_embeddings, load_embeddings
@@ -29,11 +28,26 @@ class RPCIntegrationTests(unittest.TestCase):
         principal, collection = "owner-" + uuid.uuid4().hex, "collection-" + uuid.uuid4().hex
         registry.create_collection(principal, collection)
         read_token, worker_token = uuid.uuid4().hex, uuid.uuid4().hex
-        environment = {**os.environ, "RETRIEVALLAB_DSN": registry.dsn, "RETRIEVALLAB_PRINCIPAL": principal, "RETRIEVALLAB_READ_TOKEN": read_token, "RETRIEVALLAB_WORKER_TOKEN": worker_token}
+        environment = {
+            **os.environ,
+            "RETRIEVALLAB_DSN": registry.dsn,
+            "RETRIEVALLAB_PRINCIPAL": principal,
+            "RETRIEVALLAB_READ_TOKEN": read_token,
+            "RETRIEVALLAB_WORKER_TOKEN": worker_token,
+        }
+
         def start(root):
-            process = subprocess.Popen([str(engine), "rpc", "--store", str(root), "--listen", "127.0.0.1:0"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=environment)
+            process = subprocess.Popen(
+                [str(engine), "rpc", "--store", str(root), "--listen", "127.0.0.1:0"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                env=environment,
+            )
             lines = queue.Queue()
-            threading.Thread(target=lambda: lines.put(process.stdout.readline()), daemon=True).start()
+            threading.Thread(
+                target=lambda: lines.put(process.stdout.readline()), daemon=True
+            ).start()
             try:
                 line = lines.get(timeout=25).strip()
                 self.assertTrue(line.startswith("listening grpc://"), line)
@@ -42,9 +56,12 @@ class RPCIntegrationTests(unittest.TestCase):
                 process.terminate()
                 process.communicate(timeout=10)
                 raise
+
         with tempfile.TemporaryDirectory() as directory:
             store = Store(Path(directory))
-            _, papers, chunks = load_snapshot(next((ROOT / "datasets/fixtures/snapshots").iterdir()))
+            _, papers, chunks = load_snapshot(
+                next((ROOT / "datasets/fixtures/snapshots").iterdir())
+            )
             for chunk in chunks:
                 chunk["collection_id"] = collection
             corpus = publish_snapshot(store.root / "corpora", papers, chunks, collection, {})
@@ -68,7 +85,9 @@ class RPCIntegrationTests(unittest.TestCase):
                 registry.activate(principal, collection, hybrid_id, sparse_id)
                 self.assertEqual(before, pinned.search("retrieval")["hits"])
                 self.assertEqual(pinned.snapshot_id, sparse_id)
-                hybrid = PinnedClient(registry, store, reader, principal, collection, "hybrid", model)
+                hybrid = PinnedClient(
+                    registry, store, reader, principal, collection, "hybrid", model
+                )
                 first = hybrid.search("retrieval")["hits"]
                 self.assertTrue(first)
                 with self.assertRaises(ValueError):
@@ -92,7 +111,9 @@ class RPCIntegrationTests(unittest.TestCase):
             process, address = start(store.root)
             reader = RPCClient(address, read_token)
             try:
-                repeated = PinnedClient(registry, store, reader, principal, collection, "hybrid", model).search("retrieval")["hits"]
+                repeated = PinnedClient(
+                    registry, store, reader, principal, collection, "hybrid", model
+                ).search("retrieval")["hits"]
                 self.assertEqual(first, repeated)
             finally:
                 reader.close()

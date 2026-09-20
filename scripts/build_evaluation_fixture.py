@@ -5,7 +5,10 @@ from pathlib import Path
 from retrievallab.corpus.snapshot import canonical, digest, load_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
-CORPUS = ROOT / "datasets/fixtures/snapshots/ss_4415a7c573a87a239ee65b0581664ea667b3988e4be43cb7f3bd069380ee0811"
+CORPUS = ROOT / (
+    "datasets/fixtures/snapshots/ss_4415a7c573a87a239ee65b0581664ea667b3988e4"
+    "be43cb7f3bd069380ee0811"
+)
 QUESTIONS = [
     ("How does BM25 use document length?", "fixture-01"),
     ("How can semantic retrieval bridge vocabulary mismatch?", "fixture-02"),
@@ -32,12 +35,36 @@ QUESTIONS = [
 
 def main() -> None:
     manifest, _, chunks = load_snapshot(CORPUS)
-    data = {"schema_version": 1, "kind": "synthetic-draft", "corpus_snapshot_id": manifest["snapshot_id"], "queries": [], "judgments": []}
+    data = {
+        "schema_version": 1,
+        "kind": "synthetic-draft",
+        "corpus_snapshot_id": manifest["snapshot_id"],
+        "queries": [],
+        "judgments": [],
+    }
     for i, (question, relevant) in enumerate(QUESTIONS):
         query_id = f"q{i + 1:02}"
-        data["queries"].append({"query_id": query_id, "query": question, "mode": "structured" if i in (6, 18) else "free_text", "split": "development" if i < 12 else "held_out"})
+        data["queries"].append(
+            {
+                "query_id": query_id,
+                "query": question,
+                "mode": "structured" if i in (6, 18) else "free_text",
+                "split": "development" if i < 12 else "held_out",
+            }
+        )
         for chunk in chunks:
-            data["judgments"].append({"query_id": query_id, "chunk_id": chunk["chunk_id"], "grade": 3 if chunk["paper_id"] == relevant else 0, "review_status": "draft", "reviewer": None, "rationale": "Synthetic expected-topic proposal; inspect passage before approving."})
+            data["judgments"].append(
+                {
+                    "query_id": query_id,
+                    "chunk_id": chunk["chunk_id"],
+                    "grade": 3 if chunk["paper_id"] == relevant else 0,
+                    "review_status": "draft",
+                    "reviewer": None,
+                    "rationale": (
+                        "Synthetic expected-topic proposal; inspect passage before approving."
+                    ),
+                }
+            )
     data["dataset_id"] = "ev_" + digest(canonical(data))
     (ROOT / "datasets/evaluation/synthetic-draft-v1.json").write_bytes(canonical(data) + b"\n")
 
