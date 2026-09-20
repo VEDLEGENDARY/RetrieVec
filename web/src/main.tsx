@@ -4,6 +4,7 @@ import { api, APIError, type Collection, type Session } from "./api";
 import "./style.css";
 import { Uploads } from "./Uploads";
 import { Search } from "./Search";
+import { Research } from "./Research";
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -231,6 +232,14 @@ function App() {
             </p>
           </section>
         ) : null}
+        {active && (
+          <Research
+            key={`research-${active.collection_id}`}
+            collection={active}
+            session={session}
+            fail={fail}
+          />
+        )}
         <footer>
           Paper evidence and RetrieVec measurements are distinct. Retrieval
           scores measure ranking, not scientific validity.
