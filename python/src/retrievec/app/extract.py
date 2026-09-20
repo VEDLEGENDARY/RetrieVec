@@ -1,19 +1,15 @@
 """Run private-upload extraction in a disposable, time-bounded subprocess."""
 
-import os
 import sys
 from pathlib import Path
 
+from retrievec.app.process_limits import limit_extraction
 from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.importer import import_manifest
 
 
 def main():
-    if os.name != "nt":
-        import resource
-
-        resource.setrlimit(resource.RLIMIT_AS, (3 * 1024**3, 3 * 1024**3))
-        resource.setrlimit(resource.RLIMIT_CPU, (90, 90))
+    limit_extraction()
     manifest, store, collection, engine = sys.argv[1:]
     root = Path(store)
     try:

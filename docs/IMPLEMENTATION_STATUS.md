@@ -89,3 +89,5 @@ Final review found and fixed an executable-module error-class mismatch: running
 the API with `python -m` now uses the same safe errors as an imported factory.
 The regression test exercises that actual entry point. Cross-user search is also
 asserted to fail before creating an RPC client or reading a source artifact.
+Extraction limits now cover Windows committed memory as well as Linux address
+space/CPU; a subprocess test verifies limit installation on both CI platforms.
