@@ -502,3 +502,72 @@ summary {
     max-width: 120px;
   }
 }
+/* Saved answers retain the same reading width and focus behavior as search. */
+.saved-research {
+  margin-top: 3rem;
+  border-top: 1px solid #cbd5ce;
+  padding-top: 2rem;
+}
+.saved-research form {
+  display: grid;
+  gap: 0.7rem;
+  margin-block: 1rem;
+}
+.saved-research textarea,
+.saved-research select {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.75rem;
+  font: inherit;
+  border: 1px solid #819b8e;
+  border-radius: 0.35rem;
+  background: white;
+  color: #172f25;
+}
+.saved-research textarea:focus-visible,
+.saved-research select:focus-visible {
+  outline: 3px solid #398661;
+  outline-offset: 3px;
+}
+.run-history,
+.export-actions,
+.replay-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 1rem;
+}
+.run-history button {
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.answer,
+.citation-inspector,
+.consent {
+  margin-block: 1.5rem;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid #cbd5ce;
+  border-radius: 0.5rem;
+  overflow-wrap: anywhere;
+}
+.claim {
+  border-left: 3px solid #398661;
+  padding-left: 1rem;
+  margin-block: 1.3rem;
+}
+.citation {
+  margin: 0.2rem;
+  font-size: 0.85rem;
+}
+.saved-research dd {
+  margin-left: 0;
+  margin-bottom: 0.7rem;
+}
+.saved-research dt {
+  font-weight: 600;
+}
+.citation-inspector blockquote {
+  margin-inline: 0;
+  white-space: pre-wrap;
+}
