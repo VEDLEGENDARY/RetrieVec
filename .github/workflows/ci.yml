@@ -87,3 +87,26 @@ jobs:
         working-directory: engine
       - run: go test ./internal/segment -fuzz=FuzzOpen -fuzztime=3s
         working-directory: engine
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '26.1.0'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm run build
+        working-directory: web
+      - run: npx prettier --check src tests playwright.config.ts vite.config.ts
+        working-directory: web
+      - run: npx playwright install --with-deps chromium
+        working-directory: web
+      - run: npm test
+        working-directory: web
+        env:
+          RETRIEVEC_ENGINE: ${{ github.workspace }}/artifacts/bin/retrievald
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: workspace-browser-evidence
+          path: web/test-results/
+          retention-days: 7

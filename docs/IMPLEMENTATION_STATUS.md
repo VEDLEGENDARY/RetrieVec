@@ -73,3 +73,14 @@ Each implementation step remains a separate commit; merge commits preserve them.
 - Step 6: real multipart uploads and authorized polling; stage labels, automatic
   retry states and searchable confirmation reflect persisted job state, not
   fabricated processing percentages. Failed submission retains file selection.
+- Step 7: authenticated three-mode comparisons pin one retrieval snapshot; result
+  scores retain their separate meanings. The source inspector resolves originals
+  through ownership plus snapshot membership, verifies hashes, and supports PDF
+  range requests through the authenticated API. No raw artifact URLs are exposed.
+
+Local checks for this batch pass: Go vet/tests/build, Python lint/format and 37
+tests, plus TypeScript/Vite production build. Six database-dependent tests and
+the real Python/Go/PostgreSQL browser flow run in CI because local Docker is
+unavailable. Browser evidence uses a test-only signed OIDC issuer and deterministic
+embeddings; it does not establish real-corpus retrieval quality. Final CI status
+is recorded in the PRs. Steps 8–14 remain untouched.

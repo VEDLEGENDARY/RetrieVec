@@ -34,6 +34,9 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
     from retrievec.app.uploads import install_uploads
 
     install_uploads(app)
+    from retrievec.app.search import install_search
+
+    install_search(app)
 
     @app.exception_handler(APIError)
     async def api_error(request: Request, error: APIError):
@@ -64,6 +67,14 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
         return JSONResponse(
             {"code": "request_error", "message": "Request could not be accepted"},
             status_code=error.status_code,
+        )
+
+    @app.exception_handler(Exception)
+    async def unexpected(request: Request, error: Exception):
+        return JSONResponse(
+            {"code": "service_unavailable", "message": "Service unavailable; try again shortly"},
+            status_code=503,
+            headers={"Cache-Control": "no-store"},
         )
 
     @app.get("/healthz")

@@ -191,7 +191,15 @@ class Jobs:
             )
 
     def fail(self, job: dict, code: str, *, retry: bool) -> None:
-        if code not in ("invalid_input", "unavailable", "stale_parent", "embedding_failed"):
+        if code not in (
+            "invalid_input",
+            "unavailable",
+            "stale_parent",
+            "embedding_failed",
+            "extraction_timeout",
+            "encrypted_pdf",
+            "ocr_required",
+        ):
             raise ValueError("unsafe or unknown failure code")
         with self.registry.connect() as connection:
             self.registry.authorize(connection, self.principal, job["collection_id"])
