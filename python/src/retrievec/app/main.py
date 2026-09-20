@@ -13,7 +13,7 @@ class APIError(Exception):
         self.status, self.code, self.message = status, code, message
 
 
-def create_app(settings: Settings | None = None, *, registry=None) -> FastAPI:
+def create_app(settings: Settings | None = None, *, registry=None, sessions=None) -> FastAPI:
     settings = settings or Settings.from_env()
     app = FastAPI(
         title="RetrieVec workspace",
@@ -25,6 +25,9 @@ def create_app(settings: Settings | None = None, *, registry=None) -> FastAPI:
     )
     app.state.settings = settings
     app.state.registry = registry or Registry(settings.dsn)
+    from retrievec.app.auth import install_auth
+
+    install_auth(app, sessions)
 
     @app.exception_handler(APIError)
     async def api_error(request: Request, error: APIError):

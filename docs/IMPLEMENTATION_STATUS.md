@@ -59,3 +59,5 @@ Each implementation step remains a separate commit; merge commits preserve them.
 - Step 1: application factory, bounded request schemas, safe error envelopes,
   versioned OpenAPI and additive workspace migrations. Resource routes remain
   closed until authentication and authorization are installed.
+- Step 2: Authlib OIDC, PKCE, pinned issuer, PostgreSQL browser sessions, rotation,
+  expiration, logout and CSRF. Local Keycloak setup generates two private users.
