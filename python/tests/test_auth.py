@@ -23,6 +23,9 @@ class MemorySessions:
     def identity(self, issuer, subject):
         return "user-" + subject
 
+    def consume(self, token):
+        return self.rows.pop(token, {})
+
 
 class AuthenticationTests(unittest.TestCase):
     def setUp(self):
@@ -52,13 +55,14 @@ class AuthenticationTests(unittest.TestCase):
         self.assertNotIn("valid", self.sessions.rows)
 
     def test_success_rotates_cookie_and_requires_verified_claims(self):
+        self.sessions.rows["valid"]["_state_identity_state"] = {"data": {"nonce": "nonce"}}
         self.app.state.oidc.authorize_access_token = AsyncMock(
             return_value={
                 "userinfo": {"sub": "b", "iss": self.app.state.settings.issuer, "nonce": "nonce"}
             }
         )
         self.client.cookies.set(COOKIE, "valid")
-        response = self.client.get("/auth/callback", follow_redirects=False)
+        response = self.client.get("/auth/callback?state=state", follow_redirects=False)
         self.assertEqual(response.status_code, 303)
         self.assertNotIn("valid", self.sessions.rows)
         cookie = response.headers["set-cookie"]
