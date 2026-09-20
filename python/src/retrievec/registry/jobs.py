@@ -1,6 +1,7 @@
 """Leased, fenced, at-least-once ingestion backed by database time."""
 
 import uuid
+from contextlib import nullcontext
 
 from psycopg.types.json import Jsonb
 
@@ -17,12 +18,21 @@ class Jobs:
         self.registry, self.principal = registry, principal
 
     def enqueue(
-        self, collection: str, key: str, payload: dict, configuration: dict, max_attempts: int = 3
+        self,
+        collection: str,
+        key: str,
+        payload: dict,
+        configuration: dict,
+        max_attempts: int = 3,
+        *,
+        connection=None,
     ) -> dict:
         if not key or not 1 <= max_attempts <= 10:
             raise ValueError("invalid idempotency key or attempt limit")
         input_hash, config_hash = digest(canonical(payload)), digest(canonical(configuration))
-        with self.registry.connect() as connection:
+        with (
+            nullcontext(connection) if connection is not None else self.registry.connect()
+        ) as connection:
             owner = self.registry.authorize(connection, self.principal, collection, lock=True)
             connection.execute(
                 (
