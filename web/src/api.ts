@@ -1,4 +1,8 @@
 export type Session = { principal_id: string; csrf_token: string };
+export type Job = {
+  job_id: string; collection_id: string; state: string; stage: string;
+  progress: Record<string, unknown>; error_code: string | null; output_snapshot: string | null;
+};
 export type Collection = {
   collection_id: string; title: string; visibility: "private" | "curated";
   active_snapshot: string | null; can_manage: boolean;
