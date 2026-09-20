@@ -5,17 +5,50 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import nullcontext
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
+import psycopg
+from fastapi.testclient import TestClient
+from retrievec.app.auth import COOKIE
 from retrievec.app.config import Settings
-from retrievec.app.main import APIError
+from retrievec.app.main import APIError, create_app
 from retrievec.app.uploads import display_name, stage_file
 from retrievec.corpus.importer import CorpusError, extract_pages
 from retrievec.corpus.snapshot import canonical, digest, load_snapshot
 from starlette.datastructures import UploadFile
+from test_auth import MemorySessions
 
 
 class UploadTests(unittest.TestCase):
+    def test_uncertain_database_commit_retains_original_for_recovery(self):
+        with tempfile.TemporaryDirectory() as directory:
+            settings = Settings(dsn="unused", local_http=True, store=Path(directory))
+            registry = SimpleNamespace(
+                connect=lambda: nullcontext(None), authorize=lambda *args, **kwargs: {}
+            )
+            client = TestClient(create_app(settings, registry=registry, sessions=MemorySessions()))
+            client.cookies.set(COOKIE, "valid")
+            with patch(
+                "retrievec.app.uploads.enqueue_uploads", side_effect=psycopg.OperationalError
+            ):
+                response = client.post(
+                    "/api/v1/collections/owned/uploads",
+                    files={"files": ("paper.txt", b"Private original")},
+                    headers={
+                        "Origin": settings.origin,
+                        "X-CSRF-Token": "csrf-a",
+                        "Idempotency-Key": "once",
+                    },
+                )
+            self.assertEqual(response.status_code, 503)
+            self.assertEqual(response.json()["code"], "upload_unconfirmed")
+            originals = list((settings.store / "sources").iterdir())
+            self.assertEqual(len(originals), 1)
+            self.assertEqual(originals[0].read_bytes(), b"Private original")
+
     @unittest.skipUnless(os.getenv("RETRIEVEC_ENGINE"), "requires the built analyzer")
     def test_private_extraction_runs_with_real_analyzer_and_limits(self):
         with tempfile.TemporaryDirectory() as directory:
