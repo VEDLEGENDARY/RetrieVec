@@ -1,6 +1,8 @@
 """Local full-collection ingestion with immutable outputs and fenced activation."""
 
 import os
+import subprocess
+import sys
 import tempfile
 import threading
 from pathlib import Path
@@ -93,14 +95,32 @@ class Worker:
             if digest(source_manifest.read_bytes()) != key:
                 raise ValueError("source manifest changed")
             self.jobs.checkpoint(job, "extract", {"manifest_hash": key})
-            corpus = import_manifest(
-                source_manifest,
-                self.store.root / "sources",
-                self.store.root / "corpora",
-                job["collection_id"],
-                configuration.get("token_budget", 256),
-                GoAnalyzer(self.engine),
-            )
+            if configuration.get("private_upload"):
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "retrievec.app.extract",
+                        str(source_manifest),
+                        str(self.store.root),
+                        job["collection_id"],
+                        str(self.engine),
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                    check=True,
+                )
+                corpus = self.store.path("corpora", result.stdout.strip(), "ss_")
+            else:
+                corpus = import_manifest(
+                    source_manifest,
+                    self.store.root / "sources",
+                    self.store.root / "corpora",
+                    job["collection_id"],
+                    configuration.get("token_budget", 256),
+                    GoAnalyzer(self.engine),
+                )
             self.jobs.checkpoint(job, "chunk", {"corpus_snapshot_id": corpus.name})
             embedding_id = None
             if configuration.get("embedding"):
