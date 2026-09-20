@@ -64,8 +64,14 @@ def install_research(app):
         RunState(registry).cancel(principal(request), run_id)
 
     @app.get("/api/v1/runs/{run_id}/events")
-    def events(run_id: uuid.UUID, request: Request, after: int = Query(default=0, ge=0)):
+    def events(
+        run_id: uuid.UUID,
+        request: Request,
+        after: int = Query(default=0, ge=0),
+        last_event_id: str | None = Header(default=None, pattern=r"^[0-9]{1,18}$"),
+    ):
         # Finite resumable SSE batches: each reconnect rechecks the live session and resource.
+        after = max(after, int(last_event_id or "0"))
         with registry.connect() as db:
             policy.owned(db, principal(request), "run", run_id)
             rows = db.execute(
