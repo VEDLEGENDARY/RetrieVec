@@ -21,10 +21,20 @@ def load_dataset(path: Path, corpus: Path, *, require_reviewed: bool = False) ->
         raise ValueError("empty evaluation queries")
     ids = set()
     for query in queries:
-        if not isinstance(query, dict) or not isinstance(query.get("query_id"), str) or not query["query_id"] or query["query_id"] in ids:
+        if (
+            not isinstance(query, dict)
+            or not isinstance(query.get("query_id"), str)
+            or not query["query_id"]
+            or query["query_id"] in ids
+        ):
             raise ValueError("invalid or duplicate query identity")
         ids.add(query["query_id"])
-        if query.get("split") not in ("development", "held_out") or query.get("mode") not in ("free_text", "structured") or not isinstance(query.get("query"), str) or not query["query"].strip():
+        if (
+            query.get("split") not in ("development", "held_out")
+            or query.get("mode") not in ("free_text", "structured")
+            or not isinstance(query.get("query"), str)
+            or not query["query"].strip()
+        ):
             raise ValueError("invalid query or split")
     pairs = set()
     judgments = data.get("judgments")
@@ -35,15 +45,26 @@ def load_dataset(path: Path, corpus: Path, *, require_reviewed: bool = False) ->
         if pair in pairs or pair[0] not in ids or pair[1] not in valid_chunks:
             raise ValueError("duplicate or unresolved judgment")
         pairs.add(pair)
-        if type(judgment.get("grade")) is not int or not 0 <= judgment["grade"] <= 3 or not isinstance(judgment.get("rationale"), str) or not judgment["rationale"].strip():
+        if (
+            type(judgment.get("grade")) is not int
+            or not 0 <= judgment["grade"] <= 3
+            or not isinstance(judgment.get("rationale"), str)
+            or not judgment["rationale"].strip()
+        ):
             raise ValueError("invalid judgment grade or rationale")
         state = judgment.get("review_status")
         if state not in ("draft", "reviewed"):
             raise ValueError("invalid review state")
-        if state == "reviewed" and (not isinstance(judgment.get("reviewer"), str) or not judgment["reviewer"].strip()):
+        if state == "reviewed" and (
+            not isinstance(judgment.get("reviewer"), str) or not judgment["reviewer"].strip()
+        ):
             raise ValueError("reviewed judgment requires reviewer")
         if state == "draft" and judgment.get("reviewer") is not None:
             raise ValueError("draft cannot claim a reviewer")
-    if require_reviewed and (not judgments or any(j["review_status"] != "reviewed" for j in judgments) or {j["query_id"] for j in judgments} != ids):
+    if require_reviewed and (
+        not judgments
+        or any(j["review_status"] != "reviewed" for j in judgments)
+        or {j["query_id"] for j in judgments} != ids
+    ):
         raise ValueError("owner review incomplete")
     return data

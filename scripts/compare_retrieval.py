@@ -33,16 +33,39 @@ def main():
         pool = {}
         summaries = {}
         for mode in ("sparse", "dense", "hybrid"):
-            client = PinnedClient(registry, store, node, principal, args.collection, mode, model, snapshot_id)
+            client = PinnedClient(
+                registry, store, node, principal, args.collection, mode, model, snapshot_id
+            )
             summaries[mode] = capture(client, args.queries, args.output / mode)
             for line in (args.output / mode / "results.jsonl").read_bytes().splitlines():
                 result = parse_json(line)
                 for hit in result.get("response", {}).get("hits", []):
                     key = (result["query_id"], hit["chunk_id"])
                     pool.setdefault(key, set()).add(mode)
-        rows = [{"query_id": query, "chunk_id": chunk, "retrievers": sorted(modes), "grade": None, "reviewer": None, "review_status": "draft"} for (query, chunk), modes in sorted(pool.items())]
-        (args.output / "review-pool.jsonl").write_bytes(b"".join(canonical(row) + b"\n" for row in rows))
-        (args.output / "comparison.json").write_bytes(canonical({"snapshot_id": snapshot_id, "modes": summaries, "reviewed_quality_available": False}) + b"\n")
+        rows = [
+            {
+                "query_id": query,
+                "chunk_id": chunk,
+                "retrievers": sorted(modes),
+                "grade": None,
+                "reviewer": None,
+                "review_status": "draft",
+            }
+            for (query, chunk), modes in sorted(pool.items())
+        ]
+        (args.output / "review-pool.jsonl").write_bytes(
+            b"".join(canonical(row) + b"\n" for row in rows)
+        )
+        (args.output / "comparison.json").write_bytes(
+            canonical(
+                {
+                    "snapshot_id": snapshot_id,
+                    "modes": summaries,
+                    "reviewed_quality_available": False,
+                }
+            )
+            + b"\n"
+        )
     finally:
         node.close()
 

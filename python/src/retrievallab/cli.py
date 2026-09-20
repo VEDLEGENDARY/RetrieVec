@@ -18,6 +18,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     command_args = list(sys.argv[1:] if argv is None else argv)
     if command_args and command_args[0] == "registry":
         from retrievallab.registry.cli import main as registry_main
+
         return registry_main(command_args[1:])
     parser = argparse.ArgumentParser(
         prog="retrievallab",
@@ -47,7 +48,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "evaluate":
         try:
-            evaluate(args.run, args.dataset, args.corpus, include_drafts=args.include_drafts, split=args.split)
+            evaluate(
+                args.run,
+                args.dataset,
+                args.corpus,
+                include_drafts=args.include_drafts,
+                split=args.split,
+            )
         except (ValueError, OSError, CorpusError) as error:
             parser.error(str(error))
         print(args.run / "report.md")

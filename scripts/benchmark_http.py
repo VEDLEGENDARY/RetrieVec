@@ -13,20 +13,44 @@ from retrievallab.corpus.snapshot import canonical
 
 def measure(client: Client, count: int, concurrency: int) -> dict:
     stats = client.stats()
+
     def request(_: int) -> tuple[float, float]:
         start = time.perf_counter()
         response = client.search("retrieval")
         if response["snapshot_id"] != stats["snapshot_id"]:
             raise ValueError("snapshot changed during benchmark")
         return (time.perf_counter() - start) * 1000, response["timings"]["search_ms"]
+
     for i in range(5):
         request(i)
     with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as executor:
         pairs = list(executor.map(request, range(count)))
+
     def percentiles(values: list[float]) -> dict:
         values.sort()
-        return {"p50_ms": statistics.median(values), "p95_ms": values[max(0, (95 * len(values) + 99) // 100 - 1)]}
-    return {"schema_version": 1, "service": stats, "warmups": 5, "request_count": count, "concurrency": concurrency, "query": "retrieval", "condition": "warm", "round_trip": percentiles([p[0] for p in pairs]), "server": percentiles([p[1] for p in pairs]), "environment": {"os": platform.platform(), "cpu": platform.processor(), "python": platform.python_version()}, "peak_memory": None, "memory_note": "Not measured by this transport-only harness."}
+        return {
+            "p50_ms": statistics.median(values),
+            "p95_ms": values[max(0, (95 * len(values) + 99) // 100 - 1)],
+        }
+
+    return {
+        "schema_version": 1,
+        "service": stats,
+        "warmups": 5,
+        "request_count": count,
+        "concurrency": concurrency,
+        "query": "retrieval",
+        "condition": "warm",
+        "round_trip": percentiles([p[0] for p in pairs]),
+        "server": percentiles([p[1] for p in pairs]),
+        "environment": {
+            "os": platform.platform(),
+            "cpu": platform.processor(),
+            "python": platform.python_version(),
+        },
+        "peak_memory": None,
+        "memory_note": "Not measured by this transport-only harness.",
+    }
 
 
 if __name__ == "__main__":
