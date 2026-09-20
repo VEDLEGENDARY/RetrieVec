@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS retrieval_snapshots (
  UNIQUE(collection_id,snapshot_id)
 );
 DO $$ BEGIN
- IF NOT EXISTS(SELECT 1 FROM pg_constraint WHERE conname='collection_active_snapshot_fk') THEN
+ IF NOT EXISTS(SELECT 1 FROM pg_constraint WHERE conname='collection_active_snapshot_fk'
+               AND conrelid='collections'::regclass) THEN
  ALTER TABLE collections ADD CONSTRAINT collection_active_snapshot_fk
  FOREIGN KEY(collection_id,active_snapshot) REFERENCES retrieval_snapshots(collection_id,snapshot_id);
  END IF;

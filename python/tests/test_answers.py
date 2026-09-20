@@ -45,3 +45,9 @@ class AnswerTests(unittest.TestCase):
             validate_answer(json.dumps(self.answer()), [])
         with self.assertRaises(ValueError):
             validate_answer(json.dumps({**self.answer(), "tool_call": "read files"}), self.evidence)
+
+    def test_paper_number_cannot_be_attributed_to_project_measurements(self):
+        answer = self.answer()
+        answer["claims"][0]["text"] = "RetrieVec measured 42 percent."
+        with self.assertRaisesRegex(ValueError, "RetrieVec measurement"):
+            validate_answer(json.dumps(answer), self.evidence)

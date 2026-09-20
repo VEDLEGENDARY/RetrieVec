@@ -45,6 +45,19 @@ class Answer(Strict):
     limitations: list[Text] = Field(max_length=12)
 
 
+def answer_schema(evidence: list[dict]) -> dict:
+    """Constrain generation to supplied IDs/whole quotes without weakening validation."""
+    schema = Answer.model_json_schema()
+    identities = [item["evidence_id"] for item in evidence]
+    if identities:
+        for kind in ("Claim", "Comparison"):
+            schema["$defs"][kind]["properties"]["evidence_ids"]["items"]["enum"] = identities
+        quote = schema["$defs"]["Quote"]["properties"]
+        quote["evidence_id"]["enum"] = identities
+        quote["text"]["enum"] = [item["text"] for item in evidence]
+    return schema
+
+
 def abstention(reason="No relevant evidence was retrieved"):
     return {
         "status": "insufficient_evidence",
@@ -77,6 +90,9 @@ def validate_answer(raw: str, evidence: list[dict]) -> dict:
             raise ValueError("unknown evidence identity")
         supplied = " ".join(sources[identity]["text"] for identity in item.evidence_ids)
         text = item.text if isinstance(item, Claim) else item.reported_value
+        if re.search(r"\bretrievec\b", text, re.I) and re.search(r"\d", text):
+            # This provider contract contains paper passages, never measured run artifacts.
+            raise ValueError("paper evidence cannot establish a RetrieVec measurement")
         # Reject invented numerical literals; matching numbers are not semantic proof.
         if set(re.findall(r"\d+(?:\.\d+)?", text)) - set(re.findall(r"\d+(?:\.\d+)?", supplied)):
             raise ValueError("unsupported numerical literal")
