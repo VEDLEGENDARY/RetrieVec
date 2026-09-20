@@ -24,6 +24,10 @@ class Resources:
     def owned(self, db, user, kind, identity):
         # Fixed queries prevent resource kinds from becoming arbitrary SQL identifiers.
         queries = {
+            "conversation": "SELECT r.* FROM conversations r "
+            "JOIN collections c USING(collection_id) "
+            "WHERE r.conversation_id=%s AND r.owner_id=%s AND NOT c.archived "
+            "AND (c.owner_id=r.owner_id OR c.visibility='curated')",
             "job": "SELECT j.* FROM ingestion_jobs j JOIN collections c USING(collection_id) "
             "WHERE j.job_id=%s AND c.owner_id=%s AND NOT c.archived",
             "source": "SELECT s.* FROM upload_sources s JOIN collections c USING(collection_id) "
