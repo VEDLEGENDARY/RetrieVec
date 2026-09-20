@@ -64,3 +64,7 @@ Each implementation step remains a separate commit; merge commits preserve them.
 - Step 3: live owner/curated policy, collection create/rename/archive and
   resource-specific ownership queries. Internal RPC independently checks the
   trusted service's principal assertion and blocks archived scopes.
+- Step 4: bounded multipart originals, owner storage/job quotas, durable ingestion
+  handoff, retained successful inputs, authorized polling and archive cancellation.
+  Private extraction uses a 120-second subprocess and a 100-page PDF limit;
+  one workspace worker holds a PostgreSQL advisory lock across heavy tasks.

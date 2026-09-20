@@ -1,6 +1,8 @@
 import os
+import tempfile
 import unittest
 import uuid
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 from retrievec.app.auth import COOKIE, Sessions
@@ -20,7 +22,16 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.b = self.sessions.identity("test-issuer", "b" + suffix)
         self.sessions.save("", "a" + suffix, {"principal": self.a, "csrf": "csrf"})
         self.sessions.save("", "b" + suffix, {"principal": self.b, "csrf": "csrf"})
-        self.app = create_app(Settings(dsn=self.registry.dsn, local_http=True))
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.app = create_app(
+            Settings(
+                dsn=self.registry.dsn,
+                local_http=True,
+                store=Path(self.directory.name),
+                embedding="fixture",
+            )
+        )
         self.client = TestClient(self.app, base_url="http://127.0.0.1:8000")
         self.tokens = {self.a: "a" + suffix, self.b: "b" + suffix}
         self.headers = {"Origin": "http://127.0.0.1:8000", "X-CSRF-Token": "csrf"}
@@ -73,3 +84,36 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.sessions.save(token, token, {"principal": self.a})
         self.assertEqual(self.sessions.load(token), {})
         self.assertEqual(self.sessions.identity("test-issuer", "a" + token[1:]), self.a)
+
+    def test_upload_job_isolation_and_archive_cancellation(self):
+        self.user(self.a)
+        collection = self.client.post(
+            "/api/v1/collections", json={"title": "Upload"}, headers=self.headers
+        ).json()["collection_id"]
+        url = "/api/v1/collections/" + collection + "/uploads"
+        response = self.client.post(
+            url,
+            files={"files": ("paper.txt", b"Dense retrieval evidence")},
+            headers={**self.headers, "Idempotency-Key": "upload-1"},
+        )
+        self.assertEqual(response.status_code, 202, response.text)
+        job_id = response.json()["job_id"]
+        self.assertEqual(self.client.get("/api/v1/jobs/" + job_id).json()["state"], "queued")
+        self.user(self.b)
+        self.assertEqual(self.client.get("/api/v1/jobs/" + job_id).status_code, 404)
+        self.assertEqual(
+            self.client.post(
+                url,
+                files={"files": ("paper.txt", b"stolen")},
+                headers={**self.headers, "Idempotency-Key": "upload-2"},
+            ).status_code,
+            404,
+        )
+        self.user(self.a)
+        self.client.delete("/api/v1/collections/" + collection, headers=self.headers)
+        self.assertEqual(self.client.get("/api/v1/jobs/" + job_id).status_code, 404)
+        with self.registry.connect() as db:
+            row = db.execute(
+                "SELECT state FROM ingestion_jobs WHERE job_id=%s", (job_id,)
+            ).fetchone()
+            self.assertEqual(row["state"], "cancelled")
