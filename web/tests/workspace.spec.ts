@@ -48,6 +48,109 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   });
   expect(authorized.status()).toBe(206);
   expect(await authorized.text()).toBe("Dense");
+  await page
+    .getByLabel("Question for cited answer")
+    .fill("What does dense retrieval match?");
+  await page
+    .getByRole("button", { name: "Generate cited answer", exact: true })
+    .click();
+  await expect(
+    page.getByText("Research run: completed", { exact: true }),
+  ).toBeVisible({ timeout: 30000 });
+  await page
+    .getByRole("button", { name: /Inspect citation/ })
+    .first()
+    .click();
+  await expect(
+    page.getByRole("complementary", { name: "Citation evidence" }),
+  ).toContainText("Dense retrieval");
+  const saved = await page.evaluate(async () => {
+    const session = await (await fetch("/api/v1/me")).json();
+    const collections = await (await fetch("/api/v1/collections")).json();
+    const collection = collections.find(
+      (item: { title: string }) => item.title === "Retrieval experiments",
+    );
+    const conversations = await (
+      await fetch(
+        `/api/v1/collections/${collection.collection_id}/conversations`,
+      )
+    ).json();
+    const runs = await (
+      await fetch(
+        `/api/v1/conversations/${conversations[0].conversation_id}/runs`,
+      )
+    ).json();
+    const run = runs[0];
+    const exported = await (
+      await fetch(`/api/v1/runs/${run.run_id}/exports`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": session.csrf_token,
+        },
+        body: JSON.stringify({ format: "json" }),
+      })
+    ).json();
+    return { run, exported, csrf: session.csrf_token };
+  });
+  expect((await page.request.get(saved.exported.download_url)).status()).toBe(
+    200,
+  );
+  const events = await page.request.get(
+    `/api/v1/runs/${saved.run.run_id}/events`,
+  );
+  expect(await events.text()).toContain("event: completed");
+  expect(
+    (
+      await page.request.get(`/api/v1/runs/${saved.run.run_id}/events?after=5`)
+    ).status(),
+  ).toBe(200);
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export csv", exact: true }).click();
+  expect((await downloadPromise).suggestedFilename()).toMatch(/\.csv$/);
+  await page
+    .getByRole("button", { name: "Close citation", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Replay pinned snapshot", exact: true })
+    .focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByText("Research run: completed", { exact: true }),
+  ).toBeVisible({ timeout: 30000 });
+  await page
+    .getByLabel("Question for cited answer")
+    .fill("cancel this retrieval answer");
+  await page
+    .getByRole("button", { name: "Generate cited answer", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Cancel run", exact: true }).click();
+  await expect(
+    page.getByText("Research run: cancelled", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByLabel("Question for cited answer")
+    .fill("no-evidence for quantum banana engines");
+  await page
+    .getByRole("button", { name: "Generate cited answer", exact: true })
+    .click();
+  await expect(
+    page.getByText("insufficient evidence", { exact: true }),
+  ).toBeVisible({ timeout: 30000 });
+  await page
+    .getByLabel("Question for cited answer")
+    .fill("provider-failure retrieval");
+  await page
+    .getByRole("button", { name: "Generate cited answer", exact: true })
+    .click();
+  await expect(
+    page.getByText("Research run: failed", { exact: true }),
+  ).toBeVisible({ timeout: 30000 });
+  await page
+    .getByRole("navigation", { name: "Saved research runs" })
+    .getByRole("button", { name: /What does dense retrieval match/ })
+    .last()
+    .click();
   await page.setViewportSize({ width: 390, height: 844 });
   expect(
     await page.evaluate(
@@ -70,6 +173,14 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     page.getByRole("heading", { name: "Start with a collection" }),
   ).toBeVisible();
   expect((await page.request.get(source!)).status()).toBe(404);
+  for (const path of [
+    `/api/v1/runs/${saved.run.run_id}`,
+    `/api/v1/runs/${saved.run.run_id}/events`,
+    `/api/v1/citations/${saved.run.result.evidence[0].citation_id}`,
+    saved.exported.download_url,
+  ]) {
+    expect((await page.request.get(path)).status()).toBe(404);
+  }
   await expect(
     page.getByRole("button", { name: /Retrieval experiments/ }),
   ).toHaveCount(0);

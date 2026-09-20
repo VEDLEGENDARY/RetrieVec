@@ -311,7 +311,7 @@ export function Research({
           void submit();
         }}
       >
-        <label htmlFor="research-question">Research question</label>
+        <label htmlFor="research-question">Question for cited answer</label>
         <textarea
           id="research-question"
           value={question}

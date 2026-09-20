@@ -45,6 +45,19 @@ class Answer(Strict):
     limitations: list[Text] = Field(max_length=12)
 
 
+def answer_schema(evidence: list[dict]) -> dict:
+    """Constrain generation to supplied IDs/whole quotes without weakening validation."""
+    schema = Answer.model_json_schema()
+    identities = [item["evidence_id"] for item in evidence]
+    if identities:
+        for kind in ("Claim", "Comparison"):
+            schema["$defs"][kind]["properties"]["evidence_ids"]["items"]["enum"] = identities
+        quote = schema["$defs"]["Quote"]["properties"]
+        quote["evidence_id"]["enum"] = identities
+        quote["text"]["enum"] = [item["text"] for item in evidence]
+    return schema
+
+
 def abstention(reason="No relevant evidence was retrieved"):
     return {
         "status": "insufficient_evidence",

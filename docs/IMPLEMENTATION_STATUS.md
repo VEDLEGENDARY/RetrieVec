@@ -123,3 +123,13 @@ preventing a durable queued job from losing its source files. Recovery is explic
   Markdown/BibTeX/JSON/CSV downloads. Exports come from stored runs, expire after
   20 minutes, require live ownership, and escape text/formulas. Unknown metadata
   is omitted. The UI uses escaped text and periodically revalidates viewed runs.
+- Step 13: real Python/Go/PostgreSQL browser coverage now includes cited answers,
+  saved replay, keyboard activation, cancellation, abstention, provider failure,
+  downloads and second-user run/event/citation/export denial. Database tests add
+  cloud consent, revocation fencing and export expiry. A 12-case synthetic review
+  set and real-provider runner record structural results separately from human
+  judgments. The first 0.5B model run rejected all 11 generated answers, plus one
+  correct no-evidence path; no invalid answer was accepted. A larger model smoke
+  follows with explicit set reuse after prompt/schema changes. Human reviews: 0.
+  Local Go/Python checks and production frontend build passed; hosted database
+  and browser results will be recorded in the handoff after execution.

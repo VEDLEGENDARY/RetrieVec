@@ -10,7 +10,7 @@ import uuid
 import grpc
 import httpx
 
-from retrievec.app.answers import Answer, abstention, validate_answer
+from retrievec.app.answers import abstention, answer_schema, validate_answer
 from retrievec.app.config import Settings
 from retrievec.app.generation import (
     LlamaProvider,
@@ -160,7 +160,7 @@ class ResearchWorker:
                 packet = await pack_evidence(provider, run["effective_query"], retrieved["hits"])
                 if not packet["evidence"]:
                     return packet, None
-                raw = await provider.generate(packet["prompt"], Answer.model_json_schema())
+                raw = await provider.generate(packet["prompt"], answer_schema(packet["evidence"]))
                 return packet, raw
 
             packet, raw = asyncio.run(

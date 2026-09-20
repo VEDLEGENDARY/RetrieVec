@@ -146,6 +146,22 @@ def main():
     identity = ThreadingHTTPServer(("127.0.0.1", 8101), IdentityHandler)
     threading.Thread(target=identity.serve_forever, daemon=True).start()
     stop = threading.Event()
+    from generation_fixture import FixtureProvider
+    from retrievec.app.generation import ProviderConfig
+    from retrievec.app.research_worker import ResearchWorker
+
+    settings = Settings(
+        dsn=scoped_dsn,
+        local_http=True,
+        issuer=ISSUER,
+        store=store.root,
+        read_token=token,
+        embedding="fixture",
+    )
+    providers = {"local": ProviderConfig("local", "http://127.0.0.1:8095", "fixture", "test-only")}
+    research = ResearchWorker(
+        registry, settings, providers=providers, provider_factory=FixtureProvider
+    )
 
     def work():
         while not stop.wait(0.25):
@@ -159,20 +175,13 @@ def main():
                     Worker(registry, store, row["owner_id"], engine, node).run_once()
                 finally:
                     node.close()
+            research.run_once()
 
     thread = threading.Thread(target=work, daemon=True)
     thread.start()
     try:
-        app = create_app(
-            Settings(
-                dsn=scoped_dsn,
-                local_http=True,
-                issuer=ISSUER,
-                store=store.root,
-                read_token=token,
-                embedding="fixture",
-            )
-        )
+        app = create_app(settings)
+        app.state.providers = providers
         uvicorn.run(app, host="127.0.0.1", port=8000, log_level="warning")
     finally:
         stop.set()

@@ -5,7 +5,10 @@ import uuid
 from pathlib import Path
 from unittest.mock import patch
 
+import psycopg
 from fastapi.testclient import TestClient
+from psycopg import sql
+from psycopg.conninfo import make_conninfo
 from retrievec.app.auth import COOKIE, Sessions
 from retrievec.app.config import Settings
 from retrievec.app.main import create_app
@@ -15,7 +18,17 @@ from retrievec.registry.database import Registry
 @unittest.skipUnless(os.getenv("RETRIEVEC_TEST_DSN"), "requires isolated PostgreSQL 18")
 class WorkspaceDatabaseTests(unittest.TestCase):
     def setUp(self):
-        self.registry = Registry(os.environ["RETRIEVEC_TEST_DSN"])
+        root_dsn = os.environ["RETRIEVEC_TEST_DSN"]
+        schema = "workspace_" + uuid.uuid4().hex
+        with psycopg.connect(root_dsn) as db:
+            db.execute(sql.SQL("CREATE SCHEMA {}").format(sql.Identifier(schema)))
+
+        def cleanup_schema():
+            with psycopg.connect(root_dsn) as db:
+                db.execute(sql.SQL("DROP SCHEMA {} CASCADE").format(sql.Identifier(schema)))
+
+        self.addCleanup(cleanup_schema)
+        self.registry = Registry(make_conninfo(root_dsn, options="-c search_path=" + schema))
         self.registry.migrate()
         self.sessions = Sessions(self.registry)
         suffix = uuid.uuid4().hex
@@ -143,6 +156,18 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         state = RunState(self.registry)
         claimed = state.claim()
         self.assertEqual(str(claimed["run_id"]), first["run_id"])
+        replacement = {**manifest, "corpus_snapshot_id": "ss_" + "b" * 64}
+        next_snapshot = self.registry.register(self.a, replacement)
+        next_folder = self.app.state.settings.store / "snapshots" / next_snapshot
+        next_folder.mkdir(parents=True)
+        (next_folder / "manifest.json").write_bytes(canonical(replacement) + b"\n")
+        self.registry.ready(self.a, collection, next_snapshot)
+        self.registry.activate(self.a, collection, next_snapshot, pinned)
+        self.assertEqual(
+            self.client.get("/api/v1/runs/" + first["run_id"]).json()["snapshot_id"], pinned
+        )
+        # Restore the current pointer for the later missing-artifact assertion.
+        self.registry.activate(self.a, collection, pinned, next_snapshot)
         events = self.client.get(f"/api/v1/runs/{first['run_id']}/events").text
         self.assertIn("event: queued", events)
         self.assertIn("event: retrieving", events)
@@ -161,6 +186,72 @@ class WorkspaceDatabaseTests(unittest.TestCase):
             path, json=payload, headers={**self.headers, "Idempotency-Key": "missing"}
         )
         self.assertEqual(response.json()["code"], "artifact_unavailable")
+        (folder / "manifest.json").write_bytes(canonical(manifest) + b"\n")
+        cloud = ProviderConfig(
+            "cloud", "https://example.invalid", "fixture", "test-only", cloud=True
+        )
+        self.app.state.providers["cloud"] = cloud
+        cloud_payload = {**payload, "provider": "cloud"}
+        cloud_headers = {**self.headers, "Idempotency-Key": "cloud"}
+        self.assertEqual(
+            self.client.post(path, json=cloud_payload, headers=cloud_headers).status_code, 403
+        )
+        consent = f"/api/v1/collections/{collection}/providers/cloud/consent"
+        self.user(self.b)
+        self.assertEqual(self.client.put(consent, headers=self.headers).status_code, 404)
+        self.user(self.a)
+        self.assertEqual(self.client.put(consent, headers=self.headers).status_code, 204)
+        cloud_run = self.client.post(path, json=cloud_payload, headers=cloud_headers)
+        self.assertEqual(cloud_run.status_code, 202, cloud_run.text)
+        state.cancel(self.a, replay.json()["run_id"])
+        cloud_claim = state.claim()
+        self.assertEqual(str(cloud_claim["run_id"]), cloud_run.json()["run_id"])
+        self.assertTrue(state.transition(cloud_claim, "generating"))
+        self.client.delete(consent, headers=self.headers)
+        with self.assertRaises(PermissionError):
+            state.transition(cloud_claim, "validating")
+        self.assertEqual(
+            self.client.get("/api/v1/runs/" + cloud_run.json()["run_id"]).json()["state"],
+            "cancelled",
+        )
+
+        # Materialized exports remain private and expire independently of saved runs.
+        from psycopg.types.json import Jsonb
+
+        with self.registry.connect() as db:
+            db.execute(
+                "UPDATE research_runs SET state='completed',result=%s WHERE run_id=%s",
+                (
+                    Jsonb(
+                        {
+                            "answer": {
+                                "status": "insufficient_evidence",
+                                "claims": [],
+                                "comparisons": [],
+                                "limitations": [],
+                            },
+                            "evidence": [],
+                        }
+                    ),
+                    first["run_id"],
+                ),
+            )
+        exported = self.client.post(
+            f"/api/v1/runs/{first['run_id']}/exports", json={"format": "json"}, headers=self.headers
+        )
+        self.assertEqual(exported.status_code, 201, exported.text)
+        download = exported.json()["download_url"]
+        self.assertEqual(self.client.get(download).status_code, 200)
+        self.user(self.b)
+        self.assertEqual(self.client.get(download).status_code, 404)
+        self.user(self.a)
+        with self.registry.connect() as db:
+            db.execute(
+                "UPDATE exports SET expires_at=clock_timestamp()-interval '1 second' "
+                "WHERE export_id=%s",
+                (exported.json()["export_id"],),
+            )
+        self.assertEqual(self.client.get(download).status_code, 410)
         self.client.delete("/api/v1/collections/" + collection, headers=self.headers)
         self.assertEqual(self.client.get(f"/api/v1/runs/{first['run_id']}/events").status_code, 404)
         with self.registry.connect() as db:
