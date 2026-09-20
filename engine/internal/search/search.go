@@ -32,8 +32,8 @@ type Result struct {
 	Hits         []Hit `json:"hits"`
 }
 
-func Execute(ctx context.Context, idx *index.Index, request Request, config scoring.Config) (Result, error) {
-	if !utf8.ValidString(request.Query) || utf8.RuneCountInString(request.Query) > 4096 || request.TopK < 1 || request.TopK > 100 {
+func Execute(ctx context.Context, idx index.Reader, request Request, config scoring.Config) (Result, error) {
+	if !utf8.ValidString(request.Query) || utf8.RuneCountInString(request.Query) > 4096 || request.TopK < 1 || request.TopK > 1000 {
 		return Result{}, fmt.Errorf("invalid query length or top_k")
 	}
 	terms := []string{}
@@ -61,14 +61,18 @@ func Execute(ctx context.Context, idx *index.Index, request Request, config scor
 				return Result{}, err
 			}
 			terms = append(terms, token.Term)
-			for _, p := range idx.Postings(token.Term) {
+			postings, err := idx.ReadPostings(token.Term)
+			if err != nil {
+				return Result{}, err
+			}
+			for _, p := range postings {
 				candidates[p.InternalChunkID] = true
 			}
 		}
 	} else {
 		return Result{}, fmt.Errorf("unsupported mode")
 	}
-	ranked, err := scoring.Rank(idx, terms, candidates, config)
+	ranked, err := scoring.RankContext(ctx, idx, terms, candidates, config)
 	if err != nil {
 		return Result{}, err
 	}

@@ -7,7 +7,10 @@ name = "retrievallab"
 version = "0.1.0"
 description = "Corpus preparation and evaluation tooling for Retrieval Lab"
 requires-python = ">=3.13"
-dependencies = ["pypdf==6.18.1"]
+dependencies = ["pypdf==6.18.1", "psycopg[binary]==3.3.5", "grpcio==1.84.0", "protobuf==7.36.2", "numpy==2.5.3", "onnxruntime==1.30.0", "tokenizers==0.23.2", "huggingface-hub==1.32.0"]
+
+[tool.setuptools.package-data]
+"retrievallab.registry" = ["migrations/*.sql"]
 
 [project.scripts]
 retrievallab = "retrievallab.cli:main"
@@ -16,6 +19,7 @@ retrievallab = "retrievallab.cli:main"
 where = ["src"]
 
 [tool.ruff]
+extend-exclude = ["python/src/retrievallab/retrieval"]
 target-version = "py313"
 line-length = 100
 

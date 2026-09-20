@@ -76,7 +76,7 @@ class SnapshotTests(unittest.TestCase):
         for papers, chunks in (
             ([self.paper] * 2, [self.chunk]),
             ([self.paper], [self.chunk] * 2),
-            ([], []),
+            ([self.paper], []),
         ):
             with self.assertRaises(CorpusError):
                 validate_records(papers, chunks, "c")
