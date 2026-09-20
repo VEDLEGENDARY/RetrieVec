@@ -215,3 +215,5 @@ Before implementing new features, review the design documents and specifications
 * 📊 **[Run Capture Contract](docs/contracts/run-capture-v1.md)** — Format for benchmark run artifacts.
 * 🔬 **[Seed Import Report](docs/reports/seed-import-v1.md)** — Baseline reproduction metrics and verification logs.
 * 🤝 **[Contribution Workflow](CONTRIBUTING.md)** — Development standards and pull request guidelines.
+* 🧪 **[Research Workspace Setup](docs/workspace-setup.md)** — OIDC, uploads, saved cited answers, model configuration, and exports.
+* 📝 **[Week 6 Handoff](docs/reports/week-06-workspace.md)** — Actual checks, model results, pending human review, and follow-up work.
