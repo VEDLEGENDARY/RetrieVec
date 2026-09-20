@@ -30,7 +30,9 @@ SOURCE_FIELDS = {
 }
 
 
-def extract_pages(path: Path, source: bytes) -> tuple[str, list[tuple[int | None, str]]]:
+def extract_pages(
+    path: Path, source: bytes, max_pages: int = 500
+) -> tuple[str, list[tuple[int | None, str]]]:
     if path.suffix.lower() in (".txt", ".md"):
         try:
             return "utf8-text-v1", [(None, source.decode("utf-8", errors="strict"))]
@@ -42,12 +44,14 @@ def extract_pages(path: Path, source: bytes) -> tuple[str, list[tuple[int | None
         reader = pypdf.PdfReader(io.BytesIO(source), strict=True)
         if reader.is_encrypted:
             raise CorpusError(f"{path.name}: encrypted PDF is unsupported")
-        if len(reader.pages) > 500:
-            raise CorpusError(f"{path.name}: PDF exceeds 500 pages")
+        if len(reader.pages) > max_pages:
+            raise CorpusError(f"{path.name}: PDF exceeds {max_pages} pages")
         pages = [
             (number, page.extract_text(extraction_mode="plain") or "")
             for number, page in enumerate(reader.pages, 1)
         ]
+        if sum(len(text.encode("utf-8")) for _, text in pages) > 10 * 1024 * 1024:
+            raise CorpusError("PDF extracted text exceeds 10 MiB")
         return f"pypdf-{pypdf.__version__}-plain-v1", pages
     except CorpusError:
         raise
@@ -94,6 +98,8 @@ def import_manifest(
     collection_id: str = "research",
     token_budget: int = 256,
     analyzer: GoAnalyzer | None = None,
+    *,
+    max_pages: int = 500,
 ) -> Path:
     if type(token_budget) is not int or not 1 <= token_budget <= 4096:
         raise CorpusError("token budget must be between 1 and 4096")
@@ -127,7 +133,7 @@ def import_manifest(
         source = path.read_bytes()
         if digest(source) != record["source_sha256"]:
             raise CorpusError(f"{path.name}: source hash mismatch")
-        extraction_version, pages = extract_pages(path, source)
+        extraction_version, pages = extract_pages(path, source, max_pages)
         paper = make_paper(
             paper_id=record["paper_id"],
             title=record["title"],
