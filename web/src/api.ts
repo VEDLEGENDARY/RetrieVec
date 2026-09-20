@@ -65,12 +65,10 @@ export async function api<T>(
     cache: "no-store",
   });
   if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({
-        code: "unavailable",
-        message: "Service unavailable. Try again.",
-      }));
+    const error = await response.json().catch(() => ({
+      code: "unavailable",
+      message: "Service unavailable. Try again.",
+    }));
     throw new APIError(response.status, error.code, error.message);
   }
   return response.status === 204 ? (undefined as T) : response.json();
