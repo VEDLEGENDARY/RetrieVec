@@ -18,6 +18,10 @@ htmlcov/
 /python/dist/
 *.test
 coverage.out
+node_modules/
+/web/dist/
+/web/test-results/
+/web/playwright-report/
 
 # Private sources and credentials
 /private/

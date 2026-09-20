@@ -68,3 +68,28 @@ Each implementation step remains a separate commit; merge commits preserve them.
   handoff, retained successful inputs, authorized polling and archive cancellation.
   Private extraction uses a 120-second subprocess and a 100-page PDF limit;
   one workspace worker holds a PostgreSQL advisory lock across heavy tasks.
+- Step 5: React/TypeScript authenticated collection workspace, responsive layout,
+  collection creation/archive, session expiry, accessible forms and focus states.
+- Step 6: real multipart uploads and authorized polling; stage labels, automatic
+  retry states and searchable confirmation reflect persisted job state, not
+  fabricated processing percentages. Failed submission retains file selection.
+- Step 7: authenticated three-mode comparisons pin one retrieval snapshot; result
+  scores retain their separate meanings. The source inspector resolves originals
+  through ownership plus snapshot membership, verifies hashes, and supports PDF
+  range requests through the authenticated API. No raw artifact URLs are exposed.
+
+Local checks for this batch pass: Go vet/tests/build, Python lint/format and 37
+tests, plus TypeScript/Vite production build. Six database-dependent tests and
+the real Python/Go/PostgreSQL browser flow run in CI because local Docker is
+unavailable. Browser evidence uses a test-only signed OIDC issuer and deterministic
+embeddings; it does not establish real-corpus retrieval quality. Final CI status
+is recorded in the PRs. Steps 8–14 remain untouched.
+
+Final review found and fixed an executable-module error-class mismatch: running
+the API with `python -m` now uses the same safe errors as an imported factory.
+The regression test exercises that actual entry point. Cross-user search is also
+asserted to fail before creating an RPC client or reading a source artifact.
+Extraction limits now cover Windows committed memory as well as Linux address
+space/CPU; a subprocess test verifies limit installation on both CI platforms.
+Upload handoff retains originals when database commit acknowledgement is uncertain,
+preventing a durable queued job from losing its source files. Recovery is explicit.

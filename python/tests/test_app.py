@@ -1,4 +1,6 @@
+import runpy
 import unittest
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
@@ -8,6 +10,17 @@ from retrievec.app.schemas import SearchInput
 
 
 class ApplicationTests(unittest.TestCase):
+    def test_module_entry_point_uses_the_same_error_contract(self):
+        created = []
+        with (
+            patch.dict("os.environ", {"RETRIEVEC_DSN": "unused", "RETRIEVEC_LOCAL_HTTP": "1"}),
+            patch("uvicorn.run", side_effect=lambda app, **kwargs: created.append(app)),
+        ):
+            runpy.run_module("retrievec.app.main", run_name="__main__")
+        response = TestClient(created[0]).get("/api/v1/me")
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["code"], "unauthenticated")
+
     def test_http_exception_is_local_only(self):
         with self.assertRaises(ValueError):
             Settings(dsn="unused")

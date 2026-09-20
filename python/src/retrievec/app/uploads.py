@@ -5,12 +5,13 @@ import os
 import re
 import uuid
 
+import psycopg
 from fastapi import Request
 from starlette.concurrency import run_in_threadpool
 from starlette.datastructures import UploadFile
 
 from retrievec.app.auth import principal
-from retrievec.app.main import APIError
+from retrievec.app.errors import APIError
 from retrievec.app.schemas import Job
 from retrievec.corpus.snapshot import canonical, digest
 from retrievec.registry.jobs import Jobs
@@ -205,6 +206,15 @@ def install_uploads(app):
             result = await run_in_threadpool(enqueue_uploads, app, user, collection_id, key, staged)
             accepted = True
             return result
+        except (psycopg.OperationalError, psycopg.InterfaceError):
+            # COMMIT may have succeeded before its acknowledgement was lost. Keep
+            # originals so a durable queued job never loses its source files.
+            accepted = True
+            raise APIError(
+                503,
+                "upload_unconfirmed",
+                "Upload outcome is uncertain; refresh job status before retrying",
+            ) from None
         finally:
             if not accepted:
                 for row in staged:
