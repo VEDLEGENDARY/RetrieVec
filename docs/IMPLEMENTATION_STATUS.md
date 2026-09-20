@@ -108,3 +108,7 @@ preventing a durable queued job from losing its source files. Recovery is explic
   tied to the full provider configuration hash, before tokenization or inference.
   Local search remains available without a generation provider. Deterministic
   budget/control-token tests establish plumbing; real-model evidence is separate.
+- Step 10: strict bounded answer schemas, evidence membership and exact-quote
+  checks, unsupported numerical-literal rejection, no-evidence abstention and
+  markup/link rejection. Validation failures remain explicit; there is no
+  automatic extra paid repair call. Structural validity is not semantic support.
