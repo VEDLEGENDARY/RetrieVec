@@ -1,14 +1,17 @@
 """Owned, immutable research requests. Replays always create a new run."""
 
+import json
 import uuid
 from typing import Literal
 
-from fastapi import Header, Request
+from fastapi import Header, Query, Request
+from fastapi.responses import Response
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, ConfigDict, Field
 
 from retrievec.app.auth import principal
 from retrievec.app.errors import APIError
+from retrievec.app.generation import load_providers
 from retrievec.corpus.snapshot import canonical, digest
 from retrievec.registry.artifacts import Store
 from retrievec.registry.database import Conflict
@@ -52,6 +55,91 @@ def run_view(row):
 
 def install_research(app):
     registry, policy = app.state.registry, app.state.resources
+    app.state.providers = load_providers(app.state.settings.generation_config)
+
+    @app.post("/api/v1/runs/{run_id}/cancel", status_code=204)
+    def cancel(run_id: uuid.UUID, request: Request):
+        from retrievec.app.run_state import RunState
+
+        RunState(registry).cancel(principal(request), run_id)
+
+    @app.get("/api/v1/runs/{run_id}/events")
+    def events(run_id: uuid.UUID, request: Request, after: int = Query(default=0, ge=0)):
+        # Finite resumable SSE batches: each reconnect rechecks the live session and resource.
+        with registry.connect() as db:
+            policy.owned(db, principal(request), "run", run_id)
+            rows = db.execute(
+                "SELECT event_id,type,payload FROM run_events WHERE run_id=%s "
+                "AND event_id>%s ORDER BY event_id LIMIT 100",
+                (run_id, after),
+            ).fetchall()
+        body = "retry: 1500\n\n" + "".join(
+            f"id: {row['event_id']}\nevent: {row['type']}\ndata: "
+            + json.dumps({"run_id": str(run_id), **row["payload"]})
+            + "\n\n"
+            for row in rows
+        )
+        return Response(body, media_type="text/event-stream", headers={"Cache-Control": "no-store"})
+
+    @app.get("/api/v1/collections/{collection_id}/providers")
+    def providers(collection_id: str, request: Request):
+        with registry.connect() as db:
+            policy.collection(db, principal(request), collection_id)
+            consents = {
+                row["provider_hash"]
+                for row in db.execute(
+                    "SELECT provider_hash FROM provider_consents WHERE collection_id=%s",
+                    (collection_id,),
+                ).fetchall()
+            }
+            return [
+                {
+                    **provider.public(),
+                    "identity": provider.identity,
+                    "consented": not provider.cloud or provider.identity in consents,
+                }
+                for provider in app.state.providers.values()
+            ]
+
+    @app.put(
+        "/api/v1/collections/{collection_id}/providers/{provider_name}/consent", status_code=204
+    )
+    def consent(collection_id: str, provider_name: str, request: Request):
+        user = principal(request)
+        with registry.connect() as db:
+            policy.collection(db, user, collection_id, manage=True, lock=True)
+            provider = app.state.providers.get(provider_name)
+            if provider is None:
+                raise APIError(404, "provider_unavailable", "Provider is not configured")
+            db.execute(
+                "INSERT INTO provider_consents(collection_id,provider_hash,granted_by) "
+                "VALUES(%s,%s,%s) ON CONFLICT DO NOTHING",
+                (collection_id, provider.identity, user),
+            )
+
+    @app.delete(
+        "/api/v1/collections/{collection_id}/providers/{provider_name}/consent", status_code=204
+    )
+    def revoke_consent(collection_id: str, provider_name: str, request: Request):
+        with registry.connect() as db:
+            policy.collection(db, principal(request), collection_id, manage=True, lock=True)
+            provider = app.state.providers.get(provider_name)
+            if provider is None:
+                raise APIError(404, "provider_unavailable", "Provider is not configured")
+            db.execute(
+                "DELETE FROM provider_consents WHERE collection_id=%s AND provider_hash=%s",
+                (collection_id, provider.identity),
+            )
+            from retrievec.app.run_state import event
+
+            rows = db.execute(
+                "UPDATE research_runs SET state='cancelled',fencing_token=fencing_token+1,"
+                "lease_until=NULL WHERE collection_id=%s AND configuration->>'provider_hash'=%s "
+                "AND state IN ('queued','retrieving','generating','validating') RETURNING run_id",
+                (collection_id, provider.identity),
+            ).fetchall()
+            for row in rows:
+                event(db, row["run_id"], "cancelled")
 
     @app.post("/api/v1/conversations", status_code=201)
     def create(value: ConversationInput, request: Request):
@@ -162,6 +250,25 @@ def install_research(app):
                 "candidates": 100,
                 "query_policy": "explicit-standalone-v1",
             }
+            provider = app.state.providers.get(value.provider)
+            if provider is None:
+                raise APIError(
+                    409,
+                    "provider_unavailable",
+                    "Configure a generation provider; search remains available",
+                )
+            if (
+                provider.cloud
+                and not db.execute(
+                    "SELECT 1 FROM provider_consents WHERE collection_id=%s AND provider_hash=%s",
+                    (collection["collection_id"], provider.identity),
+                ).fetchone()
+            ):
+                raise APIError(
+                    403, "consent_required", "Collection owner must enable this cloud provider"
+                )
+            config["generation"] = provider.public()
+            config["provider_hash"] = provider.identity
             row = db.execute(
                 "INSERT INTO research_runs(run_id,conversation_id,owner_id,collection_id,"
                 "snapshot_id,original_question,effective_query,configuration,state,"
@@ -181,4 +288,7 @@ def install_research(app):
                     value.parent_run,
                 ),
             ).fetchone()
+            from retrievec.app.run_state import event
+
+            event(db, row["run_id"], "queued")
             return run_view(row)

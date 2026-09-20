@@ -102,3 +102,19 @@ preventing a durable queued job from losing its source files. Recovery is explic
   Database integration covers duplicate/conflicting requests, replay, missing
   artifacts and two-user isolation; it runs with PostgreSQL in CI.
   Commit prepared on `feat/saved-research-runs` under the owner's batch authorization.
+- Step 9: tool-free llama.cpp HTTP provider, operator-pinned configuration and
+  exact server-tokenizer budgeting; whole passages are excluded rather than
+  silently truncated. Remote HTTPS providers require collection-owner consent
+  tied to the full provider configuration hash, before tokenization or inference.
+  Local search remains available without a generation provider. Deterministic
+  budget/control-token tests establish plumbing; real-model evidence is separate.
+- Step 10: strict bounded answer schemas, evidence membership and exact-quote
+  checks, unsupported numerical-literal rejection, no-evidence abstention and
+  markup/link rejection. Validation failures remain explicit; there is no
+  automatic extra paid repair call. Structural validity is not semantic support.
+- Step 11: separate single-consumer research worker, persisted resumable SSE
+  batches, monotonic events, short transactions, leases and fencing, cancellation
+  and archive/consent revocation. HTTP generation is cancelled cooperatively;
+  late results cannot publish. An expired attempt fails explicitly instead of
+  silently repeating a potentially billed request. Retry is a new lineage run.
+  Evidence and original-source integrity are rechecked before publication.

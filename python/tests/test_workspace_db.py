@@ -87,8 +87,12 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(self.sessions.identity("test-issuer", "a" + token[1:]), self.a)
 
     def test_saved_history_idempotency_replay_and_isolation(self):
+        from retrievec.app.generation import ProviderConfig
         from retrievec.corpus.snapshot import canonical
 
+        self.app.state.providers = {
+            "local": ProviderConfig("local", "http://127.0.0.1:8095", "fixture", "test-only")
+        }
         self.user(self.a)
         collection = self.client.post(
             "/api/v1/collections", json={"title": "Research"}, headers=self.headers
@@ -134,15 +138,38 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(replay.status_code, 202, replay.text)
         self.assertNotEqual(first["run_id"], replay.json()["run_id"])
         self.assertEqual(len(self.client.get(path).json()), 2)
+        from retrievec.app.run_state import RunState
+
+        state = RunState(self.registry)
+        claimed = state.claim()
+        self.assertEqual(str(claimed["run_id"]), first["run_id"])
+        events = self.client.get(f"/api/v1/runs/{first['run_id']}/events").text
+        self.assertIn("event: queued", events)
+        self.assertIn("event: retrieving", events)
+        resumed = self.client.get(f"/api/v1/runs/{first['run_id']}/events?after=1").text
+        self.assertNotIn("event: queued", resumed)
+        self.client.post(f"/api/v1/runs/{first['run_id']}/cancel", headers=self.headers)
+        self.assertFalse(state.transition(claimed, "generating"))
+        self.assertFalse(state.heartbeat(claimed))
         self.user(self.b)
         self.assertEqual(self.client.get(path).status_code, 404)
         self.assertEqual(self.client.get("/api/v1/runs/" + first["run_id"]).status_code, 404)
+        self.assertEqual(self.client.get(f"/api/v1/runs/{first['run_id']}/events").status_code, 404)
         self.user(self.a)
         (folder / "manifest.json").unlink()
         response = self.client.post(
             path, json=payload, headers={**self.headers, "Idempotency-Key": "missing"}
         )
         self.assertEqual(response.json()["code"], "artifact_unavailable")
+        self.client.delete("/api/v1/collections/" + collection, headers=self.headers)
+        self.assertEqual(self.client.get(f"/api/v1/runs/{first['run_id']}/events").status_code, 404)
+        with self.registry.connect() as db:
+            self.assertEqual(
+                db.execute(
+                    "SELECT state FROM research_runs WHERE run_id=%s", (replay.json()["run_id"],)
+                ).fetchone()["state"],
+                "cancelled",
+            )
 
     def test_upload_job_isolation_and_archive_cancellation(self):
         self.user(self.a)
