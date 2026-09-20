@@ -55,3 +55,7 @@ The owner authorized steps 1–7 and the RetrieVec naming migration. Steps 8–1
 remain deferred. The naming migration changes source packages, commands, RPC
 namespace and environment variables while retaining immutable stored formats.
 Each implementation step remains a separate commit; merge commits preserve them.
+
+- Step 1: application factory, bounded request schemas, safe error envelopes,
+  versioned OpenAPI and additive workspace migrations. Resource routes remain
+  closed until authentication and authorization are installed.

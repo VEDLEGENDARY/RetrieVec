@@ -25,9 +25,10 @@ class Registry:
             if not 180000 <= connection.info.server_version < 190000:
                 raise ValueError("PostgreSQL 18 is required")
             connection.execute("SELECT pg_advisory_xact_lock(7823401)")
-            connection.execute(
-                files("retrievec.registry").joinpath("migrations/001_registry.sql").read_text()
-            )
+            migrations = files("retrievec.registry").joinpath("migrations")
+            for migration in sorted(migrations.iterdir(), key=lambda path: path.name):
+                if migration.name.endswith(".sql"):
+                    connection.execute(migration.read_text())
 
     @staticmethod
     def authorize(connection, principal: str, collection: str, *, lock: bool = False) -> dict:
