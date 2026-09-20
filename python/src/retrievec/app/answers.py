@@ -90,6 +90,9 @@ def validate_answer(raw: str, evidence: list[dict]) -> dict:
             raise ValueError("unknown evidence identity")
         supplied = " ".join(sources[identity]["text"] for identity in item.evidence_ids)
         text = item.text if isinstance(item, Claim) else item.reported_value
+        if re.search(r"\bretrievec\b", text, re.I) and re.search(r"\d", text):
+            # This provider contract contains paper passages, never measured run artifacts.
+            raise ValueError("paper evidence cannot establish a RetrieVec measurement")
         # Reject invented numerical literals; matching numbers are not semantic proof.
         if set(re.findall(r"\d+(?:\.\d+)?", text)) - set(re.findall(r"\d+(?:\.\d+)?", supplied)):
             raise ValueError("unsupported numerical literal")

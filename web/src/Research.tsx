@@ -415,6 +415,7 @@ export function Research({
           <p role="status">Research run: {run.state}</p>
           {activeStates.has(run.state) && (
             <button
+              disabled={busy}
               onClick={async () => {
                 try {
                   await api(
