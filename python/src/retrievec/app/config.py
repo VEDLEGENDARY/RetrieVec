@@ -24,7 +24,7 @@ class Settings:
     def __post_init__(self):
         for address in (self.origin, self.issuer):
             url = urlsplit(address)
-            if url.username or url.password or url.query or url.fragment:
+            if not url.hostname or url.username or url.password or url.query or url.fragment:
                 raise ValueError("invalid application URL")
             if url.scheme != "https" and not (
                 self.local_http
@@ -34,6 +34,15 @@ class Settings:
                 raise ValueError("HTTP requires explicit localhost development mode")
         if urlsplit(self.origin).path not in ("", "/"):
             raise ValueError("application origin must not include a path")
+        if self.origin.endswith("/"):
+            raise ValueError("application origin must not have a trailing slash")
+        if (
+            not 1 <= self.max_files <= 10
+            or not 1 <= self.max_file_bytes <= 25 * 1024 * 1024
+            or self.storage_quota < self.max_file_bytes
+            or not 1 <= self.max_pending_jobs <= 10
+        ):
+            raise ValueError("invalid upload limits")
 
     @classmethod
     def from_env(cls):

@@ -3,6 +3,7 @@
 import hashlib
 import secrets
 import uuid
+from urllib.parse import urlsplit
 
 from authlib.integrations.starlette_client import OAuth
 from fastapi import Request
@@ -57,6 +58,15 @@ class Sessions:
                     (Jsonb(data), token_hash(old_token)),
                 )
 
+    def consume(self, token):
+        with self.registry.connect() as db:
+            row = db.execute(
+                "DELETE FROM browser_sessions WHERE token_hash=%s "
+                "AND expires_at>clock_timestamp() RETURNING data",
+                (token_hash(token),),
+            ).fetchone()
+            return row["data"] if row else {}
+
     def identity(self, issuer, subject):
         with self.registry.connect() as db:
             db.execute(
@@ -109,7 +119,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
                     new_token,
                     httponly=True,
                     samesite="lax",
-                    secure=not self.settings.local_http,
+                    secure=urlsplit(self.settings.origin).scheme == "https",
                     max_age=28800 if data.get("principal") else 600,
                     path="/",
                 )
@@ -118,6 +128,11 @@ class SessionMiddleware(BaseHTTPMiddleware):
         response.headers["Cache-Control"] = "no-store"
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "same-origin"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self'; "
+            "img-src 'self' data:; frame-src 'self'; object-src 'self'; "
+            "base-uri 'none'; frame-ancestors 'self'; form-action 'self'"
+        )
         return response
 
 
@@ -166,16 +181,30 @@ def install_auth(app, sessions=None):
 
         # Consume the flow before contacting the provider, preventing concurrent replay.
         old = request.cookies.get(COOKIE, "")
-        await run_in_threadpool(sessions.save, old, "", {})
+        flow = await run_in_threadpool(sessions.consume, old)
+        request.session.clear()
+        request.session.update(flow)
         request.state.rotate_session = True
         try:
+            state = request.query_params.get("state", "")
+            state_data = await provider.framework.get_state_data(request.session, state)
+            nonce = (state_data or {}).get("nonce")
+            if not nonce:
+                raise ValueError("missing login flow")
             token = await provider.authorize_access_token(
                 request,
-                claims_options={"iss": {"essential": True, "value": settings.issuer}},
+                claims_options={
+                    "iss": {"essential": True, "value": settings.issuer},
+                    "nonce": {"essential": True, "value": nonce},
+                },
                 leeway=30,
             )
             info = token.get("userinfo", {})
-            if not info.get("sub") or info.get("iss") != settings.issuer or not info.get("nonce"):
+            if (
+                not info.get("sub")
+                or info.get("iss") != settings.issuer
+                or info.get("nonce") != nonce
+            ):
                 raise ValueError("required identity claims missing")
             user = await run_in_threadpool(sessions.identity, settings.issuer, info["sub"])
         except Exception:

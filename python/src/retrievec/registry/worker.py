@@ -152,10 +152,16 @@ class Worker:
                 if isinstance(error, Conflict)
                 else "invalid_input"
             )
+            if isinstance(error, subprocess.TimeoutExpired):
+                code = "extraction_timeout"
+            elif isinstance(error, subprocess.CalledProcessError):
+                safe_code = (error.stdout or "").strip()
+                if safe_code in ("encrypted_pdf", "ocr_required", "invalid_input"):
+                    code = safe_code
             try:
                 self.jobs.fail(job, code, retry=transient)
-            except LeaseLost:
-                pass
+            except (LeaseLost, PermissionError):
+                return {"job_id": str(job["job_id"]), "state": "cancelled"}
             return {
                 "job_id": str(job["job_id"]),
                 "state": "retry_wait"

@@ -26,8 +26,15 @@ def main():
             GoAnalyzer(Path(engine)),
             max_pages=100,
         )
-    except Exception:
+    except Exception as error:
         # Original text and parser diagnostics must not enter worker logs.
+        message = str(error)
+        code = (
+            "encrypted_pdf"
+            if "encrypted PDF" in message
+            else ("ocr_required" if "no indexable text" in message else "invalid_input")
+        )
+        print(code)
         raise SystemExit(2) from None
     print(corpus.name)
 
