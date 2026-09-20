@@ -112,3 +112,9 @@ preventing a durable queued job from losing its source files. Recovery is explic
   checks, unsupported numerical-literal rejection, no-evidence abstention and
   markup/link rejection. Validation failures remain explicit; there is no
   automatic extra paid repair call. Structural validity is not semantic support.
+- Step 11: separate single-consumer research worker, persisted resumable SSE
+  batches, monotonic events, short transactions, leases and fencing, cancellation
+  and archive/consent revocation. HTTP generation is cancelled cooperatively;
+  late results cannot publish. An expired attempt fails explicitly instead of
+  silently repeating a potentially billed request. Retry is a new lineage run.
+  Evidence and original-source integrity are rechecked before publication.

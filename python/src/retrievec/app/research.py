@@ -1,9 +1,11 @@
 """Owned, immutable research requests. Replays always create a new run."""
 
+import json
 import uuid
 from typing import Literal
 
-from fastapi import Header, Request
+from fastapi import Header, Query, Request
+from fastapi.responses import Response
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -55,6 +57,30 @@ def install_research(app):
     registry, policy = app.state.registry, app.state.resources
     app.state.providers = load_providers(app.state.settings.generation_config)
 
+    @app.post("/api/v1/runs/{run_id}/cancel", status_code=204)
+    def cancel(run_id: uuid.UUID, request: Request):
+        from retrievec.app.run_state import RunState
+
+        RunState(registry).cancel(principal(request), run_id)
+
+    @app.get("/api/v1/runs/{run_id}/events")
+    def events(run_id: uuid.UUID, request: Request, after: int = Query(default=0, ge=0)):
+        # Finite resumable SSE batches: each reconnect rechecks the live session and resource.
+        with registry.connect() as db:
+            policy.owned(db, principal(request), "run", run_id)
+            rows = db.execute(
+                "SELECT event_id,type,payload FROM run_events WHERE run_id=%s "
+                "AND event_id>%s ORDER BY event_id LIMIT 100",
+                (run_id, after),
+            ).fetchall()
+        body = "retry: 1500\n\n" + "".join(
+            f"id: {row['event_id']}\nevent: {row['type']}\ndata: "
+            + json.dumps({"run_id": str(run_id), **row["payload"]})
+            + "\n\n"
+            for row in rows
+        )
+        return Response(body, media_type="text/event-stream", headers={"Cache-Control": "no-store"})
+
     @app.get("/api/v1/collections/{collection_id}/providers")
     def providers(collection_id: str, request: Request):
         with registry.connect() as db:
@@ -104,6 +130,16 @@ def install_research(app):
                 "DELETE FROM provider_consents WHERE collection_id=%s AND provider_hash=%s",
                 (collection_id, provider.identity),
             )
+            from retrievec.app.run_state import event
+
+            rows = db.execute(
+                "UPDATE research_runs SET state='cancelled',fencing_token=fencing_token+1,"
+                "lease_until=NULL WHERE collection_id=%s AND configuration->>'provider_hash'=%s "
+                "AND state IN ('queued','retrieving','generating','validating') RETURNING run_id",
+                (collection_id, provider.identity),
+            ).fetchall()
+            for row in rows:
+                event(db, row["run_id"], "cancelled")
 
     @app.post("/api/v1/conversations", status_code=201)
     def create(value: ConversationInput, request: Request):
@@ -252,4 +288,7 @@ def install_research(app):
                     value.parent_run,
                 ),
             ).fetchone()
+            from retrievec.app.run_state import event
+
+            event(db, row["run_id"], "queued")
             return run_view(row)

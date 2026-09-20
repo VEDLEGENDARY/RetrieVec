@@ -130,7 +130,9 @@ class LlamaProvider:
         return json.loads(body)
 
     async def count(self, text: str) -> int:
-        value = await self.request("/tokenize", {"content": text, "add_special": True})
+        value = await self.request(
+            "/tokenize", {"content": text, "add_special": True, "parse_special": True}
+        )
         tokens = value.get("tokens")
         if not isinstance(tokens, list) or not all(type(token) is int for token in tokens):
             raise ProviderError("tokenizer response invalid")
