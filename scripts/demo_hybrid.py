@@ -8,15 +8,15 @@ import threading
 import uuid
 from pathlib import Path
 
-from retrievallab.client.capture import capture
-from retrievallab.client.rpc import RPCClient
-from retrievallab.corpus.snapshot import canonical, digest, parse_json
-from retrievallab.dense.hybrid import PinnedClient
-from retrievallab.dense.model import adapter
-from retrievallab.registry.artifacts import Store
-from retrievallab.registry.database import Registry
-from retrievallab.registry.jobs import Jobs
-from retrievallab.registry.worker import Worker, stage_inputs
+from retrievec.client.capture import capture
+from retrievec.client.rpc import RPCClient
+from retrievec.corpus.snapshot import canonical, digest, parse_json
+from retrievec.dense.hybrid import PinnedClient
+from retrievec.dense.model import adapter
+from retrievec.registry.artifacts import Store
+from retrievec.registry.database import Registry
+from retrievec.registry.jobs import Jobs
+from retrievec.registry.worker import Worker, stage_inputs
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -34,7 +34,7 @@ def main():
     if args.output.exists():
         parser.error("output must be new")
     args.output.mkdir(parents=True)
-    registry = Registry(os.environ["RETRIEVALLAB_DSN"])
+    registry = Registry(os.environ["RETRIEVEC_DSN"])
     registry.migrate()
     principal, collection = "demo-" + uuid.uuid4().hex, "demo-" + uuid.uuid4().hex
     registry.create_collection(principal, collection)
@@ -66,9 +66,9 @@ def main():
     read_token, worker_token = uuid.uuid4().hex, uuid.uuid4().hex
     environment = {
         **os.environ,
-        "RETRIEVALLAB_PRINCIPAL": principal,
-        "RETRIEVALLAB_READ_TOKEN": read_token,
-        "RETRIEVALLAB_WORKER_TOKEN": worker_token,
+        "RETRIEVEC_PRINCIPAL": principal,
+        "RETRIEVEC_READ_TOKEN": read_token,
+        "RETRIEVEC_WORKER_TOKEN": worker_token,
     }
 
     def start():

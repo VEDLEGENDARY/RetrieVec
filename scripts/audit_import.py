@@ -4,9 +4,9 @@ import argparse
 import json
 from pathlib import Path
 
-from retrievallab.corpus.analyzer import GoAnalyzer
-from retrievallab.corpus.importer import extract_pages
-from retrievallab.corpus.snapshot import digest, load_snapshot, parse_json
+from retrievec.corpus.analyzer import GoAnalyzer
+from retrievec.corpus.importer import extract_pages
+from retrievec.corpus.snapshot import digest, load_snapshot, parse_json
 
 
 def audit(snapshot: Path, source_manifest: Path, source_root: Path) -> dict:

@@ -3,9 +3,9 @@ package search
 import (
 	"context"
 	"fmt"
-	"retrievallab/engine/internal/corpus"
-	"retrievallab/engine/internal/index"
-	"retrievallab/engine/internal/scoring"
+	"retrievec/engine/internal/corpus"
+	"retrievec/engine/internal/index"
+	"retrievec/engine/internal/scoring"
 	"testing"
 )
 

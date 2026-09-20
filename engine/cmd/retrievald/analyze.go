@@ -7,7 +7,7 @@ import (
 	"io"
 	"unicode/utf8"
 
-	"retrievallab/engine/internal/analysis"
+	"retrievec/engine/internal/analysis"
 )
 
 const maxAnalysisBytes = 8 * 1024 * 1024

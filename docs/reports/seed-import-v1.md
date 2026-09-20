@@ -44,8 +44,8 @@ PDFs from the manifest's landing pages and place them under artifacts/papers wit
 the listed filenames. A changed download is rejected by its SHA-256 pin.
 
 ```powershell
-$env:RETRIEVALLAB_ENGINE = (Resolve-Path artifacts/bin/retrievald.exe).Path
-.\.venv\Scripts\python.exe -m retrievallab import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/seed-snapshots
+$env:RETRIEVEC_ENGINE = (Resolve-Path artifacts/bin/retrievald.exe).Path
+.\.venv\Scripts\python.exe -m retrievec import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/seed-snapshots
 .\.venv\Scripts\python.exe scripts/audit_import.py artifacts/seed-snapshots/ss_b135c1917acedc77650e0e21f5fff9fd58e28d36f460f4d392125c3f50048d8d --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers
 ```
 

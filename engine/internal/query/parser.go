@@ -2,7 +2,7 @@ package query
 
 import (
 	"fmt"
-	"retrievallab/engine/internal/analysis"
+	"retrievec/engine/internal/analysis"
 	"sort"
 	"unicode"
 	"unicode/utf8"

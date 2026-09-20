@@ -11,7 +11,7 @@ without cloud services, and separate retrieval correctness from experiment tooli
 
 Use one repository with a Go module under `engine/` and an installable Python
 package under `python/`. A root Go workspace is unnecessary while there is only
-one module. Use `retrievallab` for Python imports and `retrievallab/engine` for the
+one module. Use `retrievec` for Python imports and `retrievec/engine` for the
 local Go module, independent of the Git hosting address.
 
 Begin with standard-library runtime code. Use Python unittest for scaffold tests,

@@ -2,11 +2,11 @@ import os
 import unittest
 import uuid
 
-from retrievallab.registry.database import Conflict, Registry
-from retrievallab.registry.jobs import Jobs, LeaseLost
+from retrievec.registry.database import Conflict, Registry
+from retrievec.registry.jobs import Jobs, LeaseLost
 
 
-@unittest.skipUnless(os.environ.get("RETRIEVALLAB_TEST_DSN"), "requires isolated PostgreSQL 18")
+@unittest.skipUnless(os.environ.get("RETRIEVEC_TEST_DSN"), "requires isolated PostgreSQL 18")
 class RegistryTests(unittest.TestCase):
     def test_job_idempotency_and_stale_fencing(self):
         jobs = Jobs(self.registry, "test-owner")
@@ -36,7 +36,7 @@ class RegistryTests(unittest.TestCase):
             jobs.heartbeat(replacement)
 
     def setUp(self):
-        self.registry = Registry(os.environ["RETRIEVALLAB_TEST_DSN"])
+        self.registry = Registry(os.environ["RETRIEVEC_TEST_DSN"])
         self.registry.migrate()
         self.collection = "test-" + uuid.uuid4().hex
         self.registry.create_collection("test-owner", self.collection)

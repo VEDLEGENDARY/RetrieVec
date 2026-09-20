@@ -3,10 +3,10 @@ package search
 import (
 	"context"
 	"fmt"
-	"retrievallab/engine/internal/analysis"
-	"retrievallab/engine/internal/index"
-	"retrievallab/engine/internal/query"
-	"retrievallab/engine/internal/scoring"
+	"retrievec/engine/internal/analysis"
+	"retrievec/engine/internal/index"
+	"retrievec/engine/internal/query"
+	"retrievec/engine/internal/scoring"
 	"unicode/utf8"
 )
 

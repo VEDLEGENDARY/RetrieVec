@@ -2,8 +2,8 @@ package scoring
 
 import (
 	"math"
-	"retrievallab/engine/internal/corpus"
-	"retrievallab/engine/internal/index"
+	"retrievec/engine/internal/corpus"
+	"retrievec/engine/internal/index"
 	"testing"
 )
 

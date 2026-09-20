@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from retrievallab.corpus.snapshot import make_chunk, make_paper, parse_json, publish_snapshot
+from retrievec.corpus.snapshot import make_chunk, make_paper, parse_json, publish_snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
 
