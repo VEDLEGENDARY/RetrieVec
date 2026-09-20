@@ -11,15 +11,13 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await expect(
     page.getByRole("heading", { name: "Retrieval experiments", exact: true }),
   ).toBeVisible();
-  await page
-    .getByLabel("Choose documents")
-    .setInputFiles({
-      name: "private-evidence.txt",
-      mimeType: "text/plain",
-      buffer: Buffer.from(
-        "Dense retrieval matches semantic evidence. Sparse retrieval uses lexical matching. Hybrid retrieval combines both methods.",
-      ),
-    });
+  await page.getByLabel("Choose documents").setInputFiles({
+    name: "private-evidence.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from(
+      "Dense retrieval matches semantic evidence. Sparse retrieval uses lexical matching. Hybrid retrieval combines both methods.",
+    ),
+  });
   await page
     .getByRole("button", { name: "Upload documents", exact: true })
     .click();
