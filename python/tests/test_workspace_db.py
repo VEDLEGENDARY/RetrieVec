@@ -86,6 +86,64 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(self.sessions.load(token), {})
         self.assertEqual(self.sessions.identity("test-issuer", "a" + token[1:]), self.a)
 
+    def test_saved_history_idempotency_replay_and_isolation(self):
+        from retrievec.corpus.snapshot import canonical
+
+        self.user(self.a)
+        collection = self.client.post(
+            "/api/v1/collections", json={"title": "Research"}, headers=self.headers
+        ).json()["collection_id"]
+        manifest = {
+            "schema_version": 1,
+            "collection_id": collection,
+            "corpus_snapshot_id": "ss_" + "a" * 64,
+            "capabilities": ["sparse"],
+        }
+        pinned = self.registry.register(self.a, manifest)
+        folder = self.app.state.settings.store / "snapshots" / pinned
+        folder.mkdir(parents=True)
+        (folder / "manifest.json").write_bytes(canonical(manifest) + b"\n")
+        self.registry.ready(self.a, collection, pinned)
+        self.registry.activate(self.a, collection, pinned, None)
+        conversation = self.client.post(
+            "/api/v1/conversations",
+            headers=self.headers,
+            json={"collection_id": collection, "title": "Evidence"},
+        ).json()["conversation_id"]
+        path = f"/api/v1/conversations/{conversation}/runs"
+        payload = {"question": "What works?", "retrieval": "sparse"}
+        headers = {**self.headers, "Idempotency-Key": "first"}
+        response = self.client.post(path, json=payload, headers=headers)
+        self.assertEqual(response.status_code, 202, response.text)
+        first = response.json()
+        self.assertEqual(first["snapshot_id"], pinned)
+        self.assertEqual(
+            self.client.post(path, json=payload, headers=headers).json()["run_id"], first["run_id"]
+        )
+        self.assertEqual(
+            self.client.post(
+                path, json={**payload, "question": "Different"}, headers=headers
+            ).status_code,
+            409,
+        )
+        replay = self.client.post(
+            path,
+            json={**payload, "parent_run": first["run_id"], "snapshot": "historical"},
+            headers={**self.headers, "Idempotency-Key": "replay"},
+        )
+        self.assertEqual(replay.status_code, 202, replay.text)
+        self.assertNotEqual(first["run_id"], replay.json()["run_id"])
+        self.assertEqual(len(self.client.get(path).json()), 2)
+        self.user(self.b)
+        self.assertEqual(self.client.get(path).status_code, 404)
+        self.assertEqual(self.client.get("/api/v1/runs/" + first["run_id"]).status_code, 404)
+        self.user(self.a)
+        (folder / "manifest.json").unlink()
+        response = self.client.post(
+            path, json=payload, headers={**self.headers, "Idempotency-Key": "missing"}
+        )
+        self.assertEqual(response.json()["code"], "artifact_unavailable")
+
     def test_upload_job_isolation_and_archive_cancellation(self):
         self.user(self.a)
         collection = self.client.post(

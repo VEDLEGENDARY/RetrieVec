@@ -83,7 +83,7 @@ tests, plus TypeScript/Vite production build. Six database-dependent tests and
 the real Python/Go/PostgreSQL browser flow run in CI because local Docker is
 unavailable. Browser evidence uses a test-only signed OIDC issuer and deterministic
 embeddings; it does not establish real-corpus retrieval quality. Final CI status
-is recorded in the PRs. Steps 8–14 remain untouched.
+is recorded in the PRs.
 
 Final review found and fixed an executable-module error-class mismatch: running
 the API with `python -m` now uses the same safe errors as an imported factory.
@@ -93,3 +93,12 @@ Extraction limits now cover Windows committed memory as well as Linux address
 space/CPU; a subprocess test verifies limit installation on both CI platforms.
 Upload handoff retains originals when database commit acknowledgement is uncertain,
 preventing a durable queued job from losing its source files. Recovery is explicit.
+
+### Weeks 5–6 continuation
+
+- Step 8: owned conversations and persisted research requests, snapshot pinning,
+  immutable replay lineage, explicit standalone follow-up queries, per-user queue
+  limits, and request-hash idempotency. Missing retained manifests fail explicitly.
+  Database integration covers duplicate/conflicting requests, replay, missing
+  artifacts and two-user isolation; it runs with PostgreSQL in CI.
+  Commit prepared on `feat/saved-research-runs` under the owner's batch authorization.
