@@ -61,3 +61,6 @@ Each implementation step remains a separate commit; merge commits preserve them.
   closed until authentication and authorization are installed.
 - Step 2: Authlib OIDC, PKCE, pinned issuer, PostgreSQL browser sessions, rotation,
   expiration, logout and CSRF. Local Keycloak setup generates two private users.
+- Step 3: live owner/curated policy, collection create/rename/archive and
+  resource-specific ownership queries. Internal RPC independently checks the
+  trusted service's principal assertion and blocks archived scopes.
