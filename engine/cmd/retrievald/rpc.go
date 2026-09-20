@@ -9,8 +9,8 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	pb "retrievallab/engine/gen/retrieval/v1"
-	"retrievallab/engine/internal/rpcapi"
+	pb "retrievec/engine/gen/retrieval/v1"
+	"retrievec/engine/internal/rpcapi"
 	"syscall"
 	"time"
 )
@@ -30,7 +30,7 @@ func rpcCommand(args []string, stdout, stderr io.Writer) int {
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	service, err := rpcapi.New(ctx, os.Getenv("RETRIEVALLAB_DSN"), *root, os.Getenv("RETRIEVALLAB_PRINCIPAL"), os.Getenv("RETRIEVALLAB_READ_TOKEN"), os.Getenv("RETRIEVALLAB_WORKER_TOKEN"))
+	service, err := rpcapi.New(ctx, os.Getenv("RETRIEVEC_DSN"), *root, os.Getenv("RETRIEVEC_PRINCIPAL"), os.Getenv("RETRIEVEC_READ_TOKEN"), os.Getenv("RETRIEVEC_WORKER_TOKEN"))
 	if err != nil {
 		fmt.Fprintln(stderr, "RPC registry or artifact startup failed")
 		return 1

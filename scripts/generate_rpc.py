@@ -16,10 +16,10 @@ if __name__ == "__main__":
             "--python_out=" + str(ROOT / "python/src"),
             "--grpc_python_out=" + str(ROOT / "python/src"),
             "--go_out=" + str(ROOT / "engine"),
-            "--go_opt=module=retrievallab/engine",
+            "--go_opt=module=retrievec/engine",
             "--go-grpc_out=" + str(ROOT / "engine"),
-            "--go-grpc_opt=module=retrievallab/engine",
-            str(ROOT / "proto/retrievallab/retrieval/v1/retrieval.proto"),
+            "--go-grpc_opt=module=retrievec/engine",
+            str(ROOT / "proto/retrievec/retrieval/v1/retrieval.proto"),
         ],
         check=True,
     )

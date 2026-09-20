@@ -6,7 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
-	"retrievallab/engine/internal/index"
+	"retrievec/engine/internal/index"
 )
 
 const MaxFileBytes = 256 << 20

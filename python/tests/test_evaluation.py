@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from retrievallab.evaluation.metrics import metrics
+from retrievec.evaluation.metrics import metrics
 
 
 class MetricTests(unittest.TestCase):

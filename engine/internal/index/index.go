@@ -5,8 +5,8 @@ import (
 	"slices"
 	"sort"
 
-	"retrievallab/engine/internal/analysis"
-	"retrievallab/engine/internal/corpus"
+	"retrievec/engine/internal/analysis"
+	"retrievec/engine/internal/corpus"
 )
 
 // Posting records all positions of one term within an internal chunk ID.

@@ -2,8 +2,8 @@ import math
 import unittest
 
 import numpy as np
-from retrievallab.dense.model import FixtureModel, normalize
-from retrievallab.dense.search import exact_search
+from retrievec.dense.model import FixtureModel, normalize
+from retrievec.dense.search import exact_search
 
 
 class DenseTests(unittest.TestCase):
@@ -12,13 +12,13 @@ class DenseTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
 
-        from retrievallab.corpus.snapshot import publish_snapshot
-        from retrievallab.registry.artifacts import Store
+        from retrievec.corpus.snapshot import publish_snapshot
+        from retrievec.registry.artifacts import Store
 
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             corpus = publish_snapshot(root / "corpora", [], [], "empty", {})
-            snapshot = Store(root).build(Path(os.environ["RETRIEVALLAB_ENGINE"]), corpus)
+            snapshot = Store(root).build(Path(os.environ["RETRIEVEC_ENGINE"]), corpus)
             self.assertEqual(Store(root).manifest(snapshot)["segments"], [])
         self.assertEqual(exact_search(np.empty((0, 2)), [], [1, 0]), [])
 

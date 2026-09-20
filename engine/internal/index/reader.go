@@ -1,6 +1,6 @@
 package index
 
-import "retrievallab/engine/internal/corpus"
+import "retrievec/engine/internal/corpus"
 
 // Reader is the shared immutable search boundary for memory and disk snapshots.
 type Reader interface {
