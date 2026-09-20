@@ -46,12 +46,13 @@ def extract_pages(
             raise CorpusError(f"{path.name}: encrypted PDF is unsupported")
         if len(reader.pages) > max_pages:
             raise CorpusError(f"{path.name}: PDF exceeds {max_pages} pages")
-        pages = [
-            (number, page.extract_text(extraction_mode="plain") or "")
-            for number, page in enumerate(reader.pages, 1)
-        ]
-        if sum(len(text.encode("utf-8")) for _, text in pages) > 10 * 1024 * 1024:
-            raise CorpusError("PDF extracted text exceeds 10 MiB")
+        pages, text_bytes = [], 0
+        for number, page in enumerate(reader.pages, 1):
+            text = page.extract_text(extraction_mode="plain") or ""
+            text_bytes += len(text.encode("utf-8"))
+            if text_bytes > 10 * 1024 * 1024:
+                raise CorpusError("PDF extracted text exceeds 10 MiB")
+            pages.append((number, text))
         return f"pypdf-{pypdf.__version__}-plain-v1", pages
     except CorpusError:
         raise
