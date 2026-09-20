@@ -10,7 +10,9 @@ from retrievec.retrieval.v1 import retrieval_pb2_grpc as rpc
 
 
 class RPCClient:
-    def __init__(self, address: str, token: str, timeout: float = 5):
+    def __init__(
+        self, address: str, token: str, timeout: float = 5, *, principal: str | None = None
+    ):
         if not token or not math.isfinite(timeout) or timeout <= 0:
             raise ValueError("credential and finite deadline required")
         host = address.rsplit(":", 1)[0].strip("[]")
@@ -27,6 +29,10 @@ class RPCClient:
         )
         self.stub = rpc.RetrievalStub(self.channel)
         self.metadata = (("authorization", "Bearer " + token),)
+        if principal is not None:
+            if not principal or len(principal) > 256 or not principal.isascii():
+                raise ValueError("invalid principal assertion")
+            self.metadata += (("x-retrievec-principal", principal),)
         self.timeout = timeout
 
     def close(self):
