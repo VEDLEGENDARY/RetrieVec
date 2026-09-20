@@ -137,7 +137,7 @@ class SessionMiddleware(BaseHTTPMiddleware):
 
 
 def principal(request: Request) -> str:
-    from retrievec.app.main import APIError
+    from retrievec.app.errors import APIError
 
     value = request.session.get("principal")
     if not value:
@@ -177,7 +177,7 @@ def install_auth(app, sessions=None):
 
     @app.get("/auth/callback")
     async def callback(request: Request):
-        from retrievec.app.main import APIError
+        from retrievec.app.errors import APIError
 
         # Consume the flow before contacting the provider, preventing concurrent replay.
         old = request.cookies.get(COOKIE, "")

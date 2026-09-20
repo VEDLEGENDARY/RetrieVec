@@ -84,3 +84,8 @@ the real Python/Go/PostgreSQL browser flow run in CI because local Docker is
 unavailable. Browser evidence uses a test-only signed OIDC issuer and deterministic
 embeddings; it does not establish real-corpus retrieval quality. Final CI status
 is recorded in the PRs. Steps 8–14 remain untouched.
+
+Final review found and fixed an executable-module error-class mismatch: running
+the API with `python -m` now uses the same safe errors as an imported factory.
+The regression test exercises that actual entry point. Cross-user search is also
+asserted to fail before creating an RPC client or reading a source artifact.

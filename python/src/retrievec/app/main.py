@@ -4,13 +4,9 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
 from retrievec.app.config import Settings
+from retrievec.app.errors import APIError
 from retrievec.app.schemas import Error
 from retrievec.registry.database import Conflict, Registry
-
-
-class APIError(Exception):
-    def __init__(self, status: int, code: str, message: str):
-        self.status, self.code, self.message = status, code, message
 
 
 def create_app(settings: Settings | None = None, *, registry=None, sessions=None) -> FastAPI:

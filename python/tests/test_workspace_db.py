@@ -3,6 +3,7 @@ import tempfile
 import unittest
 import uuid
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 from retrievec.app.auth import COOKIE, Sessions
@@ -101,6 +102,26 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(self.client.get("/api/v1/jobs/" + job_id).json()["state"], "queued")
         self.user(self.b)
         self.assertEqual(self.client.get("/api/v1/jobs/" + job_id).status_code, 404)
+        with patch("retrievec.app.search.RPCClient") as rpc:
+            self.assertEqual(
+                self.client.post(
+                    "/api/v1/search",
+                    json={"collection_id": collection, "query": "private evidence"},
+                    headers=self.headers,
+                ).status_code,
+                404,
+            )
+            rpc.assert_not_called()
+        with self.registry.connect() as db:
+            source = db.execute(
+                "SELECT source_id FROM upload_sources WHERE job_id=%s", (job_id,)
+            ).fetchone()["source_id"]
+        self.assertEqual(
+            self.client.get(
+                f"/api/v1/sources/{source}", params={"snapshot_id": "rs_" + "a" * 64}
+            ).status_code,
+            404,
+        )
         self.assertEqual(
             self.client.post(
                 url,
