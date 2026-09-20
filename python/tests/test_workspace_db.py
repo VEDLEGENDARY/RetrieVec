@@ -87,8 +87,12 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(self.sessions.identity("test-issuer", "a" + token[1:]), self.a)
 
     def test_saved_history_idempotency_replay_and_isolation(self):
+        from retrievec.app.generation import ProviderConfig
         from retrievec.corpus.snapshot import canonical
 
+        self.app.state.providers = {
+            "local": ProviderConfig("local", "http://127.0.0.1:8095", "fixture", "test-only")
+        }
         self.user(self.a)
         collection = self.client.post(
             "/api/v1/collections", json={"title": "Research"}, headers=self.headers
