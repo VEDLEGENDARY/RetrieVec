@@ -46,10 +46,27 @@ and [evaluation](../contracts/evaluation-v1.md).
 Setup and reproduction: [week 4 handoff](../reports/week-04-baseline.md).
 Human-reviewed relevance and broader real-corpus evidence remain explicit gates.
 
-Data flow planned for the milestone:
-local sources → validated corpus snapshot → Go index/service → Python client
-→ saved results and recomputable metrics. The HTTP service will bind to loopback.
-No proxy API is needed for this milestone.
+## Weeks 5–6 workspace
+
+React uses a same-origin FastAPI service with OIDC/PKCE, opaque database-backed
+sessions and CSRF checks. PostgreSQL owns live resource policy, conversations,
+run configuration, immutable results, citations, events and expiring exports.
+Two independently bounded workers handle ingestion and generation. Go remains
+an internal authenticated retrieval service; it checks the asserted principal.
+
+A research request pins the snapshot before enqueueing. The generation worker
+retrieves from that identity, packs whole passages against the provider's actual
+tokenizer, calls a tool-free model, validates output, rechecks sources and access,
+then atomically saves citations/result plus completion. Heartbeats and fencing
+prevent cancellation or expired work from publishing a late answer. Inference
+never runs inside a database transaction. Interrupted attempts fail explicitly;
+replay creates a new run rather than mutating the original.
+
+Local llama.cpp and explicitly consented remote llama.cpp deployments share the
+provider interface. Consent binds the collection to the exact configuration
+hash. Search does not require generation. See [ADR 0006](0006-grounded-research.md),
+the [research contract](../contracts/research-v1.md), and
+[week 6 handoff](../reports/week-06-workspace.md).
 
 ## Reproducibility and data handling
 
@@ -64,10 +81,11 @@ Relevance judgments require owner review; drafts do not count as reviewed data.
 
 ## Deferred work
 
-Persistent segment files, gRPC/Protobuf, dense retrieval, fusion, model integration,
-frontend, production authentication, PostgreSQL, OCR, and cloud hosting are later
-work. The plan's segment and RPC specifications are design inputs, not implemented
-contracts. Future authorization must cover retrieval, citations, caches, and exports.
+Human-reviewed answer quality, broader real-corpus retrieval evaluation, load
+testing, advanced PDF extraction/OCR and public deployment remain future work.
+OIDC protocol checks use a signed test issuer; the provided Keycloak setup still
+needs a local end-to-end operator smoke test. Structural citation checks alone
+cannot establish semantic support or comparative scientific validity.
 AskUTD integration is independent of delivery.
 
 See [ADR 0001](0001-local-workspace-and-checks.md) for the initial decisions.
