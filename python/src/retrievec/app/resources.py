@@ -103,3 +103,13 @@ def install_resources(app):
                 "AND state IN ('queued','retry_wait','running')",
                 (collection_id,),
             )
+            from retrievec.app.run_state import event
+
+            rows = db.execute(
+                "UPDATE research_runs SET state='cancelled',fencing_token=fencing_token+1,"
+                "lease_until=NULL WHERE collection_id=%s AND state IN "
+                "('queued','retrieving','generating','validating') RETURNING run_id",
+                (collection_id,),
+            ).fetchall()
+            for row in rows:
+                event(db, row["run_id"], "cancelled")

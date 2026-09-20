@@ -1,0 +1,12 @@
+[
+  {
+    "name": "local",
+    "endpoint": "http://127.0.0.1:8095",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "replace-with-downloaded-gguf-sha256",
+    "cloud": false,
+    "context_tokens": 4096,
+    "output_tokens": 1024,
+    "timeout_seconds": 120
+  }
+]
