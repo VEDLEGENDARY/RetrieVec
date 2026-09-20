@@ -70,3 +70,6 @@ Each implementation step remains a separate commit; merge commits preserve them.
   one workspace worker holds a PostgreSQL advisory lock across heavy tasks.
 - Step 5: React/TypeScript authenticated collection workspace, responsive layout,
   collection creation/archive, session expiry, accessible forms and focus states.
+- Step 6: real multipart uploads and authorized polling; stage labels, automatic
+  retry states and searchable confirmation reflect persisted job state, not
+  fabricated processing percentages. Failed submission retains file selection.

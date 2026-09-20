@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { api, APIError, type Collection, type Session } from "./api";
 import "./style.css";
+import { Uploads } from "./Uploads";
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -74,6 +75,7 @@ function App() {
       <header><div><p className="eyebrow">RESEARCH WORKSPACE</p><h1>{active?.title ?? "A place for your next question"}</h1></div>
         {active?.can_manage && <button className="quiet" onClick={archive} disabled={busy}>Archive collection</button>}</header>
       {error && <p role="alert" className="error">{error}</p>}
+      {active && <Uploads key={active.collection_id} collection={active} session={session} refresh={refresh} fail={fail} />}
       {!active ? <section className="empty"><span className="empty-symbol">＋</span><h2>Start with a collection</h2><p>Give your research a home. Create a private collection, then add your source documents.</p></section>
         : <section className="empty"><h2>Your evidence belongs here</h2><p>{active.active_snapshot ? "Your collection has a searchable snapshot." : "Add documents to prepare your first searchable snapshot."}</p>
           <small>{active.visibility === "curated" ? "Authenticated readers can explore this curated collection." : "Only you can access this collection."}</small></section>}
