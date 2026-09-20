@@ -36,6 +36,9 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
     from retrievec.app.research import install_research
 
     install_research(app)
+    from retrievec.app.exports import install_exports
+
+    install_exports(app)
 
     @app.exception_handler(APIError)
     async def api_error(request: Request, error: APIError):

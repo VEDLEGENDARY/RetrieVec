@@ -118,3 +118,8 @@ preventing a durable queued job from losing its source files. Recovery is explic
   late results cannot publish. An expired attempt fails explicitly instead of
   silently repeating a potentially billed request. Retry is a new lineage run.
   Evidence and original-source integrity are rechecked before publication.
+- Step 12: saved conversations/runs, explicit follow-up query, provider consent,
+  cancellation/replay, cited claims and comparison rows, source inspection and
+  Markdown/BibTeX/JSON/CSV downloads. Exports come from stored runs, expire after
+  20 minutes, require live ownership, and escape text/formulas. Unknown metadata
+  is omitted. The UI uses escaped text and periodically revalidates viewed runs.
