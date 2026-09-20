@@ -9,13 +9,14 @@ Migrations are additive and idempotent. Existing principal ownership remains
 unchanged; external identities must be explicitly linked by an operator when
 migrating an existing local principal. No email-based ownership reassignment.
 
-Steps 8–14 (conversation execution, generation, streaming and exports) are not
-exposed by this batch. Their resource tables reserve ownership relationships.
+Conversations, research runs, citations, progress and exports follow the
+[research-run contract](research-v1.md). Their ownership is checked on each read;
+being able to read a curated collection does not expose another user's runs.
 
 Private collections allow only owners. Curated collections allow authenticated
 reads; their owner is the designated curator and sole manager. Only operators
 can designate curated collections. Archive revokes all access immediately and
-fences/cancels ingestion. Physical purge is a separate operator operation.
+fences/cancels ingestion and generation. Physical purge is a separate operator operation.
 
 For the workspace, set the Go RPC `RETRIEVEC_PRINCIPAL` to `*`. Authenticated
 Python service calls must then assert the session-derived principal in internal

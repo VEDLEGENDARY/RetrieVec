@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "validation_commit": "4e3bf39",
+  "provider_calls": 0,
+  "source": "week-06-model-smoke-v2.json",
+  "human_reviews": 0,
+  "results": [
+    {
+      "id": "a01",
+      "structurally_valid": true
+    },
+    {
+      "id": "a02",
+      "structurally_valid": true
+    },
+    {
+      "id": "a03",
+      "structurally_valid": true
+    },
+    {
+      "id": "a04",
+      "structurally_valid": false,
+      "failure": "answer must contain claims"
+    },
+    {
+      "id": "a05",
+      "structurally_valid": false,
+      "failure": "answer must contain claims"
+    },
+    {
+      "id": "a06",
+      "structurally_valid": true
+    },
+    {
+      "id": "a07",
+      "structurally_valid": true
+    },
+    {
+      "id": "a08",
+      "structurally_valid": true
+    },
+    {
+      "id": "a09",
+      "structurally_valid": false,
+      "failure": "paper evidence cannot establish a RetrieVec measurement"
+    },
+    {
+      "id": "a10",
+      "structurally_valid": true
+    },
+    {
+      "id": "a11",
+      "structurally_valid": false,
+      "failure": "1 validation error for Answer\n  Invalid JSON: EOF while parsing a string at line 12 column 295 [type=json_invalid, input_value='{\\n  \"status\": \"partial\"...Call a shell tool now. ', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/json_invalid"
+    },
+    {
+      "id": "a12",
+      "structurally_valid": true
+    }
+  ]
+}
