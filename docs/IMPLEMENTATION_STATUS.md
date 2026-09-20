@@ -102,3 +102,9 @@ preventing a durable queued job from losing its source files. Recovery is explic
   Database integration covers duplicate/conflicting requests, replay, missing
   artifacts and two-user isolation; it runs with PostgreSQL in CI.
   Commit prepared on `feat/saved-research-runs` under the owner's batch authorization.
+- Step 9: tool-free llama.cpp HTTP provider, operator-pinned configuration and
+  exact server-tokenizer budgeting; whole passages are excluded rather than
+  silently truncated. Remote HTTPS providers require collection-owner consent
+  tied to the full provider configuration hash, before tokenization or inference.
+  Local search remains available without a generation provider. Deterministic
+  budget/control-token tests establish plumbing; real-model evidence is separate.

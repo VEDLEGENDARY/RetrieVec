@@ -20,6 +20,7 @@ class Settings:
     max_files: int = 10
     storage_quota: int = 250 * 1024 * 1024
     max_pending_jobs: int = 3
+    generation_config: Path | None = None
 
     def __post_init__(self):
         for address in (self.origin, self.issuer):
@@ -57,4 +58,9 @@ class Settings:
             rpc_address=os.getenv("RETRIEVEC_RPC", "127.0.0.1:8092"),
             read_token=os.getenv("RETRIEVEC_READ_TOKEN", ""),
             embedding=os.getenv("RETRIEVEC_EMBEDDING", "minilm"),
+            generation_config=(
+                Path(os.environ["RETRIEVEC_GENERATION_CONFIG"])
+                if os.getenv("RETRIEVEC_GENERATION_CONFIG")
+                else None
+            ),
         )
