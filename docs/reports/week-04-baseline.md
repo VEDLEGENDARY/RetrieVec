@@ -12,10 +12,10 @@ Install the pinned Go/Python versions and Python requirements as in the root REA
 Start Docker Desktop. In PowerShell, set a fresh local database password and DSN:
 
 ```powershell
-$env:RETRIEVALLAB_DB_PASSWORD = [guid]::NewGuid().ToString('N')
-$env:RETRIEVALLAB_DSN = "postgresql://retrievallab:$($env:RETRIEVALLAB_DB_PASSWORD)@127.0.0.1:55432/retrievallab"
+$env:RETRIEVEC_DB_PASSWORD = [guid]::NewGuid().ToString('N')
+$env:RETRIEVEC_DSN = "postgresql://retrievec:$($env:RETRIEVEC_DB_PASSWORD)@127.0.0.1:55432/retrievec"
 docker compose up -d --wait
-$env:RETRIEVALLAB_TEST_DSN = $env:RETRIEVALLAB_DSN
+$env:RETRIEVEC_TEST_DSN = $env:RETRIEVEC_DSN
 .venv/Scripts/python.exe scripts/check.py
 .venv/Scripts/python.exe scripts/demo_hybrid.py --output artifacts/runs/hybrid-fixture
 .venv/Scripts/python.exe scripts/demo_hybrid.py --embedding minilm --output artifacts/runs/hybrid-model

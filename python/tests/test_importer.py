@@ -5,9 +5,9 @@ from pathlib import Path
 
 from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
-from retrievallab.corpus.analyzer import GoAnalyzer
-from retrievallab.corpus.importer import chunk_page, extract_pages, import_manifest
-from retrievallab.corpus.snapshot import CorpusError, canonical, digest, load_snapshot
+from retrievec.corpus.analyzer import GoAnalyzer
+from retrievec.corpus.importer import chunk_page, extract_pages, import_manifest
+from retrievec.corpus.snapshot import CorpusError, canonical, digest, load_snapshot
 
 
 def pdf_bytes(texts: list[str]) -> bytes:

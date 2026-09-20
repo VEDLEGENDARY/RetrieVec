@@ -1,6 +1,6 @@
 import unittest
 
-from retrievallab.dense.hybrid import fuse
+from retrievec.dense.hybrid import fuse
 
 
 class FusionTests(unittest.TestCase):

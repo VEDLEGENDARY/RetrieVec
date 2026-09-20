@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"io"
 
-	"retrievallab/engine/internal/corpus"
-	"retrievallab/engine/internal/index"
+	"retrievec/engine/internal/corpus"
+	"retrievec/engine/internal/index"
 )
 
 func inspectCommand(args []string, stdout, stderr io.Writer) int {

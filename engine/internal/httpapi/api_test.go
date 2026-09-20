@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"retrievallab/engine/internal/corpus"
+	"retrievec/engine/internal/corpus"
 	"strings"
 	"sync"
 	"testing"

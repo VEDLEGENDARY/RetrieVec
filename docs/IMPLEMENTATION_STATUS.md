@@ -47,4 +47,11 @@ power-loss durability or broad performance claim is made. These evidence gates
 prevent claiming unconditional completion of both plans despite the implemented
 software. Generated candidate pools do not satisfy human review.
 
-Weeks 5–6 application work is outside this batch. Main changes only through PRs.
+PR #15 passed Windows, Linux and PostgreSQL/RPC integration and merged to main.
+
+## Weeks 5–6 continuation
+
+The owner authorized steps 1–7 and the RetrieVec naming migration. Steps 8–14
+remain deferred. The naming migration changes source packages, commands, RPC
+namespace and environment variables while retaining immutable stored formats.
+Each implementation step remains a separate commit; merge commits preserve them.

@@ -7,7 +7,7 @@ and LF endings. Each record occupies one line. Duplicate keys are rejected.
 Paper records sort by paper_version_id; chunk records sort by chunk_id.
 
 Record fields are defined by PAPER_FIELDS and CHUNK_FIELDS in
-python/src/retrievallab/corpus/snapshot.py. Unknown/missing fields and schema
+python/src/retrievec/corpus/snapshot.py. Unknown/missing fields and schema
 versions are errors. Empty author arrays are allowed for unattributed sources.
 Pages are null when unavailable, otherwise an inclusive positive [first,last] pair.
 A snapshot has one collection and at least one paper and chunk. Multiple versions

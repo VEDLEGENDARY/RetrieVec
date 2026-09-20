@@ -7,8 +7,8 @@ import statistics
 import time
 from pathlib import Path
 
-from retrievallab.client.http import Client
-from retrievallab.corpus.snapshot import canonical
+from retrievec.client.http import Client
+from retrievec.corpus.snapshot import canonical
 
 
 def measure(client: Client, count: int, concurrency: int) -> dict:

@@ -4,8 +4,8 @@ import (
 	"sync"
 	"testing"
 
-	"retrievallab/engine/internal/analysis"
-	"retrievallab/engine/internal/corpus"
+	"retrievec/engine/internal/analysis"
+	"retrievec/engine/internal/corpus"
 )
 
 func document(id, text string) corpus.Document {

@@ -1,4 +1,4 @@
-# Retrieval Lab Engineering Workflow
+# RetrieVec Engineering Workflow
 
 This policy governs every plan and implementation milestone. Read it before changing the repository. If a repository-level contribution guide or branch-protection rule is stricter, follow the stricter rule.
 
@@ -167,16 +167,16 @@ Benchmark and evaluation claims must point to versioned run manifests. Do not pu
 The six existing handoffs and this workflow form one roadmap documentation set. Since `Plans/` is currently untracked, onboard it as one atomic documentation change before implementation work.
 
 1. On the integration branch, inspect `git status`, tracked files, ignore rules, and remotes without changing history.
-2. Ask the owner to approve branch `docs/project-roadmap` and proposed commit `docs: add Retrieval Lab implementation roadmap`.
+2. Ask the owner to approve branch `docs/project-roadmap` and proposed commit `docs: add RetrieVec implementation roadmap`.
 3. After approval, create the branch from the current integration branch. Do not edit implementation code on this branch.
 4. Ensure `Plans/` contains:
    - `ENGINEERING_WORKFLOW.md`
-   - `retrievallab_1-2.md`
-   - `retrievallab_3-4.md`
-   - `retrievallab_5-6.md`
-   - `retrievallab_7-8.md`
-   - `retrievallab_9-10.md`
-   - `retrievallab_11-12.md`
+   - `retrievec_1-2.md`
+   - `retrievec_3-4.md`
+   - `retrievec_5-6.md`
+   - `retrievec_7-8.md`
+   - `retrievec_9-10.md`
+   - `retrievec_11-12.md`
 5. Normalize Markdown formatting and line endings according to `.editorconfig`/`.gitattributes`; do not rewrite technical meaning during normalization.
 6. Check internal paths, milestone order, step counts, terminology, and that every handoff references this workflow.
 7. Scan for credentials, private document contents, personal contact information, unsupported claims, temporary files, and local-only paths that should not be published.
@@ -194,4 +194,4 @@ Do not split the initial roadmap into one commit per Markdown file; the files co
 
 ## Plan file requirements
 
-Future plan filenames follow `retrievallab_<start>-<end>.md` for time-boxed milestones or `retrievallab_<Topic>.md` for conditional tracks. Use stable title case and ordinary project language. Every plan includes objective, prerequisites, scope/deferred work, contracts, commit-sized steps, acceptance gates, and a neutral implementation-task prompt.
+Future plan filenames follow `retrievec_<start>-<end>.md` for time-boxed milestones or `retrievec_<Topic>.md` for conditional tracks. Use stable title case and ordinary project language. Every plan includes objective, prerequisites, scope/deferred work, contracts, commit-sized steps, acceptance gates, and a neutral implementation-task prompt.

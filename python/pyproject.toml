@@ -3,23 +3,23 @@ requires = ["setuptools==84.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "retrievallab"
+name = "retrievec"
 version = "0.1.0"
-description = "Corpus preparation and evaluation tooling for Retrieval Lab"
+description = "Corpus preparation and evaluation tooling for RetrieVec"
 requires-python = ">=3.13"
 dependencies = ["pypdf==6.18.1", "psycopg[binary]==3.3.5", "grpcio==1.84.0", "protobuf==7.36.2", "numpy==2.5.3", "onnxruntime==1.30.0", "tokenizers==0.23.2", "huggingface-hub==1.32.0"]
 
 [tool.setuptools.package-data]
-"retrievallab.registry" = ["migrations/*.sql"]
+"retrievec.registry" = ["migrations/*.sql"]
 
 [project.scripts]
-retrievallab = "retrievallab.cli:main"
+retrievec = "retrievec.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.ruff]
-extend-exclude = ["python/src/retrievallab/retrieval"]
+extend-exclude = ["python/src/retrievec/retrieval"]
 target-version = "py313"
 line-length = 100
 

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v7.35.1
-// source: retrievallab/retrieval/v1/retrieval.proto
+// source: retrievec/retrieval/v1/retrieval.proto
 
 package retrievalv1
 
@@ -54,11 +54,11 @@ func (x QueryMode) String() string {
 }
 
 func (QueryMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_retrievallab_retrieval_v1_retrieval_proto_enumTypes[0].Descriptor()
+	return file_retrievec_retrieval_v1_retrieval_proto_enumTypes[0].Descriptor()
 }
 
 func (QueryMode) Type() protoreflect.EnumType {
-	return &file_retrievallab_retrieval_v1_retrieval_proto_enumTypes[0]
+	return &file_retrievec_retrieval_v1_retrieval_proto_enumTypes[0]
 }
 
 func (x QueryMode) Number() protoreflect.EnumNumber {
@@ -67,7 +67,7 @@ func (x QueryMode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use QueryMode.Descriptor instead.
 func (QueryMode) EnumDescriptor() ([]byte, []int) {
-	return file_retrievallab_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{0}
+	return file_retrievec_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{0}
 }
 
 type SnapshotRequest struct {
@@ -80,7 +80,7 @@ type SnapshotRequest struct {
 
 func (x *SnapshotRequest) Reset() {
 	*x = SnapshotRequest{}
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[0]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -92,7 +92,7 @@ func (x *SnapshotRequest) String() string {
 func (*SnapshotRequest) ProtoMessage() {}
 
 func (x *SnapshotRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[0]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -105,7 +105,7 @@ func (x *SnapshotRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SnapshotRequest.ProtoReflect.Descriptor instead.
 func (*SnapshotRequest) Descriptor() ([]byte, []int) {
-	return file_retrievallab_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{0}
+	return file_retrievec_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *SnapshotRequest) GetCollectionId() string {
@@ -127,7 +127,7 @@ type SearchRequest struct {
 	CollectionId   string                 `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 	SnapshotId     string                 `protobuf:"bytes,2,opt,name=snapshot_id,json=snapshotId,proto3" json:"snapshot_id,omitempty"`
 	Query          string                 `protobuf:"bytes,3,opt,name=query,proto3" json:"query,omitempty"`
-	Mode           QueryMode              `protobuf:"varint,4,opt,name=mode,proto3,enum=retrievallab.retrieval.v1.QueryMode" json:"mode,omitempty"`
+	Mode           QueryMode              `protobuf:"varint,4,opt,name=mode,proto3,enum=retrievec.retrieval.v1.QueryMode" json:"mode,omitempty"`
 	CandidateLimit uint32                 `protobuf:"varint,5,opt,name=candidate_limit,json=candidateLimit,proto3" json:"candidate_limit,omitempty"`
 	Explain        bool                   `protobuf:"varint,6,opt,name=explain,proto3" json:"explain,omitempty"`
 	unknownFields  protoimpl.UnknownFields
@@ -136,7 +136,7 @@ type SearchRequest struct {
 
 func (x *SearchRequest) Reset() {
 	*x = SearchRequest{}
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[1]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -148,7 +148,7 @@ func (x *SearchRequest) String() string {
 func (*SearchRequest) ProtoMessage() {}
 
 func (x *SearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[1]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -161,7 +161,7 @@ func (x *SearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchRequest.ProtoReflect.Descriptor instead.
 func (*SearchRequest) Descriptor() ([]byte, []int) {
-	return file_retrievallab_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{1}
+	return file_retrievec_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *SearchRequest) GetCollectionId() string {
@@ -218,7 +218,7 @@ type Contribution struct {
 
 func (x *Contribution) Reset() {
 	*x = Contribution{}
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[2]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -230,7 +230,7 @@ func (x *Contribution) String() string {
 func (*Contribution) ProtoMessage() {}
 
 func (x *Contribution) ProtoReflect() protoreflect.Message {
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[2]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -243,7 +243,7 @@ func (x *Contribution) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Contribution.ProtoReflect.Descriptor instead.
 func (*Contribution) Descriptor() ([]byte, []int) {
-	return file_retrievallab_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{2}
+	return file_retrievec_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Contribution) GetTerm() string {
@@ -288,7 +288,7 @@ type Hit struct {
 
 func (x *Hit) Reset() {
 	*x = Hit{}
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[3]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -300,7 +300,7 @@ func (x *Hit) String() string {
 func (*Hit) ProtoMessage() {}
 
 func (x *Hit) ProtoReflect() protoreflect.Message {
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[3]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -313,7 +313,7 @@ func (x *Hit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Hit.ProtoReflect.Descriptor instead.
 func (*Hit) Descriptor() ([]byte, []int) {
-	return file_retrievallab_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{3}
+	return file_retrievec_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Hit) GetRank() uint32 {
@@ -369,7 +369,7 @@ type Configuration struct {
 
 func (x *Configuration) Reset() {
 	*x = Configuration{}
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[4]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -381,7 +381,7 @@ func (x *Configuration) String() string {
 func (*Configuration) ProtoMessage() {}
 
 func (x *Configuration) ProtoReflect() protoreflect.Message {
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[4]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -394,7 +394,7 @@ func (x *Configuration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Configuration.ProtoReflect.Descriptor instead.
 func (*Configuration) Descriptor() ([]byte, []int) {
-	return file_retrievallab_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{4}
+	return file_retrievec_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Configuration) GetScoringVersion() string {
@@ -433,7 +433,7 @@ type SearchResponse struct {
 
 func (x *SearchResponse) Reset() {
 	*x = SearchResponse{}
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[5]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -445,7 +445,7 @@ func (x *SearchResponse) String() string {
 func (*SearchResponse) ProtoMessage() {}
 
 func (x *SearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[5]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -458,7 +458,7 @@ func (x *SearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchResponse.ProtoReflect.Descriptor instead.
 func (*SearchResponse) Descriptor() ([]byte, []int) {
-	return file_retrievallab_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{5}
+	return file_retrievec_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SearchResponse) GetSnapshotId() string {
@@ -527,7 +527,7 @@ type SnapshotInfo struct {
 
 func (x *SnapshotInfo) Reset() {
 	*x = SnapshotInfo{}
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[6]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -539,7 +539,7 @@ func (x *SnapshotInfo) String() string {
 func (*SnapshotInfo) ProtoMessage() {}
 
 func (x *SnapshotInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_retrievallab_retrieval_v1_retrieval_proto_msgTypes[6]
+	mi := &file_retrievec_retrieval_v1_retrieval_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -552,7 +552,7 @@ func (x *SnapshotInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SnapshotInfo.ProtoReflect.Descriptor instead.
 func (*SnapshotInfo) Descriptor() ([]byte, []int) {
-	return file_retrievallab_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{6}
+	return file_retrievec_retrieval_v1_retrieval_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SnapshotInfo) GetSnapshotId() string {
@@ -618,47 +618,47 @@ func (x *SnapshotInfo) GetCapabilities() []string {
 	return nil
 }
 
-var File_retrievallab_retrieval_v1_retrieval_proto protoreflect.FileDescriptor
+var File_retrievec_retrieval_v1_retrieval_proto protoreflect.FileDescriptor
 
-const file_retrievallab_retrieval_v1_retrieval_proto_rawDesc = "" +
+const file_retrievec_retrieval_v1_retrieval_proto_rawDesc = "" +
 	"\n" +
-	")retrievallab/retrieval/v1/retrieval.proto\x12\x19retrievallab.retrieval.v1\"W\n" +
+	"&retrievec/retrieval/v1/retrieval.proto\x12\x16retrievec.retrieval.v1\"W\n" +
 	"\x0fSnapshotRequest\x12#\n" +
 	"\rcollection_id\x18\x01 \x01(\tR\fcollectionId\x12\x1f\n" +
 	"\vsnapshot_id\x18\x02 \x01(\tR\n" +
-	"snapshotId\"\xe8\x01\n" +
+	"snapshotId\"\xe5\x01\n" +
 	"\rSearchRequest\x12#\n" +
 	"\rcollection_id\x18\x01 \x01(\tR\fcollectionId\x12\x1f\n" +
 	"\vsnapshot_id\x18\x02 \x01(\tR\n" +
 	"snapshotId\x12\x14\n" +
-	"\x05query\x18\x03 \x01(\tR\x05query\x128\n" +
-	"\x04mode\x18\x04 \x01(\x0e2$.retrievallab.retrieval.v1.QueryModeR\x04mode\x12'\n" +
+	"\x05query\x18\x03 \x01(\tR\x05query\x125\n" +
+	"\x04mode\x18\x04 \x01(\x0e2!.retrievec.retrieval.v1.QueryModeR\x04mode\x12'\n" +
 	"\x0fcandidate_limit\x18\x05 \x01(\rR\x0ecandidateLimit\x12\x18\n" +
 	"\aexplain\x18\x06 \x01(\bR\aexplain\"X\n" +
 	"\fContribution\x12\x12\n" +
 	"\x04term\x18\x01 \x01(\tR\x04term\x12\x14\n" +
 	"\x05score\x18\x02 \x01(\x01R\x05score\x12\x0e\n" +
 	"\x02tf\x18\x03 \x01(\rR\x02tf\x12\x0e\n" +
-	"\x02df\x18\x04 \x01(\rR\x02df\"\xde\x01\n" +
+	"\x02df\x18\x04 \x01(\rR\x02df\"\xdb\x01\n" +
 	"\x03Hit\x12\x12\n" +
 	"\x04rank\x18\x01 \x01(\rR\x04rank\x12\x19\n" +
 	"\bchunk_id\x18\x02 \x01(\tR\achunkId\x12\x19\n" +
 	"\bpaper_id\x18\x03 \x01(\tR\apaperId\x12(\n" +
 	"\x10paper_version_id\x18\x04 \x01(\tR\x0epaperVersionId\x12\x14\n" +
-	"\x05score\x18\x05 \x01(\x01R\x05score\x12M\n" +
-	"\rcontributions\x18\x06 \x03(\v2'.retrievallab.retrieval.v1.ContributionR\rcontributions\"V\n" +
+	"\x05score\x18\x05 \x01(\x01R\x05score\x12J\n" +
+	"\rcontributions\x18\x06 \x03(\v2$.retrievec.retrieval.v1.ContributionR\rcontributions\"V\n" +
 	"\rConfiguration\x12'\n" +
 	"\x0fscoring_version\x18\x01 \x01(\tR\x0escoringVersion\x12\x0e\n" +
 	"\x02k1\x18\x02 \x01(\x01R\x02k1\x12\f\n" +
-	"\x01b\x18\x03 \x01(\x01R\x01b\"\xd0\x02\n" +
+	"\x01b\x18\x03 \x01(\x01R\x01b\"\xca\x02\n" +
 	"\x0eSearchResponse\x12\x1f\n" +
 	"\vsnapshot_id\x18\x01 \x01(\tR\n" +
 	"snapshotId\x12,\n" +
 	"\x12corpus_snapshot_id\x18\x02 \x01(\tR\x10corpusSnapshotId\x12)\n" +
-	"\x10analyzer_version\x18\x03 \x01(\tR\x0fanalyzerVersion\x12N\n" +
-	"\rconfiguration\x18\x04 \x01(\v2(.retrievallab.retrieval.v1.ConfigurationR\rconfiguration\x12#\n" +
-	"\rtotal_matches\x18\x05 \x01(\x04R\ftotalMatches\x122\n" +
-	"\x04hits\x18\x06 \x03(\v2\x1e.retrievallab.retrieval.v1.HitR\x04hits\x12\x1b\n" +
+	"\x10analyzer_version\x18\x03 \x01(\tR\x0fanalyzerVersion\x12K\n" +
+	"\rconfiguration\x18\x04 \x01(\v2%.retrievec.retrieval.v1.ConfigurationR\rconfiguration\x12#\n" +
+	"\rtotal_matches\x18\x05 \x01(\x04R\ftotalMatches\x12/\n" +
+	"\x04hits\x18\x06 \x03(\v2\x1b.retrievec.retrieval.v1.HitR\x04hits\x12\x1b\n" +
 	"\tsearch_ms\x18\a \x01(\x01R\bsearchMs\"\xdb\x02\n" +
 	"\fSnapshotInfo\x12\x1f\n" +
 	"\vsnapshot_id\x18\x01 \x01(\tR\n" +
@@ -677,47 +677,47 @@ const file_retrievallab_retrieval_v1_retrieval_proto_rawDesc = "" +
 	"\x16QUERY_MODE_UNSPECIFIED\x10\x00\x12\r\n" +
 	"\tFREE_TEXT\x10\x01\x12\x0e\n" +
 	"\n" +
-	"STRUCTURED\x10\x022\xba\x02\n" +
-	"\tRetrieval\x12]\n" +
-	"\x06Search\x12(.retrievallab.retrieval.v1.SearchRequest\x1a).retrievallab.retrieval.v1.SearchResponse\x12f\n" +
-	"\x0fGetSnapshotInfo\x12*.retrievallab.retrieval.v1.SnapshotRequest\x1a'.retrievallab.retrieval.v1.SnapshotInfo\x12f\n" +
-	"\x0fPrepareSnapshot\x12*.retrievallab.retrieval.v1.SnapshotRequest\x1a'.retrievallab.retrieval.v1.SnapshotInfoB2Z0retrievallab/engine/gen/retrieval/v1;retrievalv1b\x06proto3"
+	"STRUCTURED\x10\x022\xa8\x02\n" +
+	"\tRetrieval\x12W\n" +
+	"\x06Search\x12%.retrievec.retrieval.v1.SearchRequest\x1a&.retrievec.retrieval.v1.SearchResponse\x12`\n" +
+	"\x0fGetSnapshotInfo\x12'.retrievec.retrieval.v1.SnapshotRequest\x1a$.retrievec.retrieval.v1.SnapshotInfo\x12`\n" +
+	"\x0fPrepareSnapshot\x12'.retrievec.retrieval.v1.SnapshotRequest\x1a$.retrievec.retrieval.v1.SnapshotInfoB/Z-retrievec/engine/gen/retrieval/v1;retrievalv1b\x06proto3"
 
 var (
-	file_retrievallab_retrieval_v1_retrieval_proto_rawDescOnce sync.Once
-	file_retrievallab_retrieval_v1_retrieval_proto_rawDescData []byte
+	file_retrievec_retrieval_v1_retrieval_proto_rawDescOnce sync.Once
+	file_retrievec_retrieval_v1_retrieval_proto_rawDescData []byte
 )
 
-func file_retrievallab_retrieval_v1_retrieval_proto_rawDescGZIP() []byte {
-	file_retrievallab_retrieval_v1_retrieval_proto_rawDescOnce.Do(func() {
-		file_retrievallab_retrieval_v1_retrieval_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_retrievallab_retrieval_v1_retrieval_proto_rawDesc), len(file_retrievallab_retrieval_v1_retrieval_proto_rawDesc)))
+func file_retrievec_retrieval_v1_retrieval_proto_rawDescGZIP() []byte {
+	file_retrievec_retrieval_v1_retrieval_proto_rawDescOnce.Do(func() {
+		file_retrievec_retrieval_v1_retrieval_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_retrievec_retrieval_v1_retrieval_proto_rawDesc), len(file_retrievec_retrieval_v1_retrieval_proto_rawDesc)))
 	})
-	return file_retrievallab_retrieval_v1_retrieval_proto_rawDescData
+	return file_retrievec_retrieval_v1_retrieval_proto_rawDescData
 }
 
-var file_retrievallab_retrieval_v1_retrieval_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_retrievallab_retrieval_v1_retrieval_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_retrievallab_retrieval_v1_retrieval_proto_goTypes = []any{
-	(QueryMode)(0),          // 0: retrievallab.retrieval.v1.QueryMode
-	(*SnapshotRequest)(nil), // 1: retrievallab.retrieval.v1.SnapshotRequest
-	(*SearchRequest)(nil),   // 2: retrievallab.retrieval.v1.SearchRequest
-	(*Contribution)(nil),    // 3: retrievallab.retrieval.v1.Contribution
-	(*Hit)(nil),             // 4: retrievallab.retrieval.v1.Hit
-	(*Configuration)(nil),   // 5: retrievallab.retrieval.v1.Configuration
-	(*SearchResponse)(nil),  // 6: retrievallab.retrieval.v1.SearchResponse
-	(*SnapshotInfo)(nil),    // 7: retrievallab.retrieval.v1.SnapshotInfo
+var file_retrievec_retrieval_v1_retrieval_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_retrievec_retrieval_v1_retrieval_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_retrievec_retrieval_v1_retrieval_proto_goTypes = []any{
+	(QueryMode)(0),          // 0: retrievec.retrieval.v1.QueryMode
+	(*SnapshotRequest)(nil), // 1: retrievec.retrieval.v1.SnapshotRequest
+	(*SearchRequest)(nil),   // 2: retrievec.retrieval.v1.SearchRequest
+	(*Contribution)(nil),    // 3: retrievec.retrieval.v1.Contribution
+	(*Hit)(nil),             // 4: retrievec.retrieval.v1.Hit
+	(*Configuration)(nil),   // 5: retrievec.retrieval.v1.Configuration
+	(*SearchResponse)(nil),  // 6: retrievec.retrieval.v1.SearchResponse
+	(*SnapshotInfo)(nil),    // 7: retrievec.retrieval.v1.SnapshotInfo
 }
-var file_retrievallab_retrieval_v1_retrieval_proto_depIdxs = []int32{
-	0, // 0: retrievallab.retrieval.v1.SearchRequest.mode:type_name -> retrievallab.retrieval.v1.QueryMode
-	3, // 1: retrievallab.retrieval.v1.Hit.contributions:type_name -> retrievallab.retrieval.v1.Contribution
-	5, // 2: retrievallab.retrieval.v1.SearchResponse.configuration:type_name -> retrievallab.retrieval.v1.Configuration
-	4, // 3: retrievallab.retrieval.v1.SearchResponse.hits:type_name -> retrievallab.retrieval.v1.Hit
-	2, // 4: retrievallab.retrieval.v1.Retrieval.Search:input_type -> retrievallab.retrieval.v1.SearchRequest
-	1, // 5: retrievallab.retrieval.v1.Retrieval.GetSnapshotInfo:input_type -> retrievallab.retrieval.v1.SnapshotRequest
-	1, // 6: retrievallab.retrieval.v1.Retrieval.PrepareSnapshot:input_type -> retrievallab.retrieval.v1.SnapshotRequest
-	6, // 7: retrievallab.retrieval.v1.Retrieval.Search:output_type -> retrievallab.retrieval.v1.SearchResponse
-	7, // 8: retrievallab.retrieval.v1.Retrieval.GetSnapshotInfo:output_type -> retrievallab.retrieval.v1.SnapshotInfo
-	7, // 9: retrievallab.retrieval.v1.Retrieval.PrepareSnapshot:output_type -> retrievallab.retrieval.v1.SnapshotInfo
+var file_retrievec_retrieval_v1_retrieval_proto_depIdxs = []int32{
+	0, // 0: retrievec.retrieval.v1.SearchRequest.mode:type_name -> retrievec.retrieval.v1.QueryMode
+	3, // 1: retrievec.retrieval.v1.Hit.contributions:type_name -> retrievec.retrieval.v1.Contribution
+	5, // 2: retrievec.retrieval.v1.SearchResponse.configuration:type_name -> retrievec.retrieval.v1.Configuration
+	4, // 3: retrievec.retrieval.v1.SearchResponse.hits:type_name -> retrievec.retrieval.v1.Hit
+	2, // 4: retrievec.retrieval.v1.Retrieval.Search:input_type -> retrievec.retrieval.v1.SearchRequest
+	1, // 5: retrievec.retrieval.v1.Retrieval.GetSnapshotInfo:input_type -> retrievec.retrieval.v1.SnapshotRequest
+	1, // 6: retrievec.retrieval.v1.Retrieval.PrepareSnapshot:input_type -> retrievec.retrieval.v1.SnapshotRequest
+	6, // 7: retrievec.retrieval.v1.Retrieval.Search:output_type -> retrievec.retrieval.v1.SearchResponse
+	7, // 8: retrievec.retrieval.v1.Retrieval.GetSnapshotInfo:output_type -> retrievec.retrieval.v1.SnapshotInfo
+	7, // 9: retrievec.retrieval.v1.Retrieval.PrepareSnapshot:output_type -> retrievec.retrieval.v1.SnapshotInfo
 	7, // [7:10] is the sub-list for method output_type
 	4, // [4:7] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name
@@ -725,27 +725,27 @@ var file_retrievallab_retrieval_v1_retrieval_proto_depIdxs = []int32{
 	0, // [0:4] is the sub-list for field type_name
 }
 
-func init() { file_retrievallab_retrieval_v1_retrieval_proto_init() }
-func file_retrievallab_retrieval_v1_retrieval_proto_init() {
-	if File_retrievallab_retrieval_v1_retrieval_proto != nil {
+func init() { file_retrievec_retrieval_v1_retrieval_proto_init() }
+func file_retrievec_retrieval_v1_retrieval_proto_init() {
+	if File_retrievec_retrieval_v1_retrieval_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_retrievallab_retrieval_v1_retrieval_proto_rawDesc), len(file_retrievallab_retrieval_v1_retrieval_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_retrievec_retrieval_v1_retrieval_proto_rawDesc), len(file_retrievec_retrieval_v1_retrieval_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_retrievallab_retrieval_v1_retrieval_proto_goTypes,
-		DependencyIndexes: file_retrievallab_retrieval_v1_retrieval_proto_depIdxs,
-		EnumInfos:         file_retrievallab_retrieval_v1_retrieval_proto_enumTypes,
-		MessageInfos:      file_retrievallab_retrieval_v1_retrieval_proto_msgTypes,
+		GoTypes:           file_retrievec_retrieval_v1_retrieval_proto_goTypes,
+		DependencyIndexes: file_retrievec_retrieval_v1_retrieval_proto_depIdxs,
+		EnumInfos:         file_retrievec_retrieval_v1_retrieval_proto_enumTypes,
+		MessageInfos:      file_retrievec_retrieval_v1_retrieval_proto_msgTypes,
 	}.Build()
-	File_retrievallab_retrieval_v1_retrieval_proto = out.File
-	file_retrievallab_retrieval_v1_retrieval_proto_goTypes = nil
-	file_retrievallab_retrieval_v1_retrieval_proto_depIdxs = nil
+	File_retrievec_retrieval_v1_retrieval_proto = out.File
+	file_retrievec_retrieval_v1_retrieval_proto_goTypes = nil
+	file_retrievec_retrieval_v1_retrieval_proto_depIdxs = nil
 }

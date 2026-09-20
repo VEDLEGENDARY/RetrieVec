@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v7.35.1
-// source: retrievallab/retrieval/v1/retrieval.proto
+// source: retrievec/retrieval/v1/retrieval.proto
 
 package retrievalv1
 
@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Retrieval_Search_FullMethodName          = "/retrievallab.retrieval.v1.Retrieval/Search"
-	Retrieval_GetSnapshotInfo_FullMethodName = "/retrievallab.retrieval.v1.Retrieval/GetSnapshotInfo"
-	Retrieval_PrepareSnapshot_FullMethodName = "/retrievallab.retrieval.v1.Retrieval/PrepareSnapshot"
+	Retrieval_Search_FullMethodName          = "/retrievec.retrieval.v1.Retrieval/Search"
+	Retrieval_GetSnapshotInfo_FullMethodName = "/retrievec.retrieval.v1.Retrieval/GetSnapshotInfo"
+	Retrieval_PrepareSnapshot_FullMethodName = "/retrievec.retrieval.v1.Retrieval/PrepareSnapshot"
 )
 
 // RetrievalClient is the client API for Retrieval service.
@@ -176,7 +176,7 @@ func _Retrieval_PrepareSnapshot_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Retrieval_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "retrievallab.retrieval.v1.Retrieval",
+	ServiceName: "retrievec.retrieval.v1.Retrieval",
 	HandlerType: (*RetrievalServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -193,5 +193,5 @@ var Retrieval_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "retrievallab/retrieval/v1/retrieval.proto",
+	Metadata: "retrievec/retrieval/v1/retrieval.proto",
 }

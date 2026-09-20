@@ -55,17 +55,17 @@ jobs:
       postgres:
         image: postgres:18.3
         env:
-          POSTGRES_USER: retrievallab
-          POSTGRES_DB: retrievallab
+          POSTGRES_USER: retrievec
+          POSTGRES_DB: retrievec
           POSTGRES_PASSWORD: integration-only
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U retrievallab -d retrievallab"
+          --health-cmd "pg_isready -U retrievec -d retrievec"
           --health-interval 2s --health-timeout 5s --health-retries 30
     env:
-      RETRIEVALLAB_TEST_DSN: postgresql://retrievallab:integration-only@127.0.0.1:5432/retrievallab
-      RETRIEVALLAB_DSN: postgresql://retrievallab:integration-only@127.0.0.1:5432/retrievallab
+      RETRIEVEC_TEST_DSN: postgresql://retrievec:integration-only@127.0.0.1:5432/retrievec
+      RETRIEVEC_DSN: postgresql://retrievec:integration-only@127.0.0.1:5432/retrievec
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
@@ -81,7 +81,7 @@ jobs:
       - run: go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
       - run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.2
       - run: python scripts/generate_rpc.py
-      - run: git diff --exit-code -- engine/gen python/src/retrievallab/retrieval
+      - run: git diff --exit-code -- engine/gen python/src/retrievec/retrieval
       - run: python scripts/demo_hybrid.py --output artifacts/ci-hybrid
       - run: go test ./internal/query -fuzz=FuzzParse -fuzztime=3s
         working-directory: engine
