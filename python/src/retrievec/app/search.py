@@ -11,7 +11,7 @@ from fastapi import Query, Request
 from fastapi.responses import FileResponse
 
 from retrievec.app.auth import principal
-from retrievec.app.main import APIError
+from retrievec.app.errors import APIError
 from retrievec.app.schemas import SearchInput
 from retrievec.client.rpc import RPCClient
 from retrievec.corpus.snapshot import load_snapshot

@@ -10,7 +10,7 @@ from starlette.concurrency import run_in_threadpool
 from starlette.datastructures import UploadFile
 
 from retrievec.app.auth import principal
-from retrievec.app.main import APIError
+from retrievec.app.errors import APIError
 from retrievec.app.schemas import Job
 from retrievec.corpus.snapshot import canonical, digest
 from retrievec.registry.jobs import Jobs
