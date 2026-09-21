@@ -82,11 +82,13 @@ func (s *Server) Close() {
 }
 func equal(a, b string) bool { return subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1 }
 func (s *Server) Interceptor(ctx context.Context, request any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (response any, err error) {
+	started := time.Now()
 	defer func() {
 		if recover() != nil {
 			response = nil
 			err = status.Error(codes.Internal, "unexpected service failure")
 		}
+		traceRPC(ctx, request, info.FullMethod, started, err)
 	}()
 	md, _ := metadata.FromIncomingContext(ctx)
 	auth := md.Get("authorization")

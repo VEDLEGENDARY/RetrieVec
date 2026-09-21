@@ -9,12 +9,14 @@ from fastapi.responses import Response
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, ConfigDict, Field
 
+from retrievec.app.admission import lock_admission, require_capacity
 from retrievec.app.auth import principal
 from retrievec.app.errors import APIError
 from retrievec.app.generation import load_providers
 from retrievec.corpus.snapshot import canonical, digest
 from retrievec.registry.artifacts import Store
 from retrievec.registry.database import Conflict
+from retrievec.telemetry import CONTEXT
 
 
 class ConversationInput(BaseModel):
@@ -199,6 +201,7 @@ def install_research(app):
         request_hash = digest(canonical(value.model_dump(mode="json")))
         with registry.connect() as db:
             conversation = policy.owned(db, user, "conversation", conversation_id)
+            lock_admission(db, user)
             collection = policy.collection(db, user, conversation["collection_id"], lock=True)
             existing = db.execute(
                 "SELECT * FROM research_runs WHERE owner_id=%s AND conversation_id=%s "
@@ -209,6 +212,7 @@ def install_research(app):
                 if existing["request_hash"] != request_hash:
                     raise Conflict("idempotency key reused with different request")
                 return run_view(existing)
+            require_capacity(db, app.state.settings.max_pending_work)
             parent = None
             if value.parent_run:
                 parent = policy.owned(db, user, "run", value.parent_run)
@@ -237,10 +241,6 @@ def install_research(app):
                 ) from None
             if value.retrieval not in snapshot["capabilities"]:
                 raise APIError(409, "capability_unavailable", "Select an available retrieval mode")
-            # Serialize per-user quota across all owned conversations and collections.
-            db.execute(
-                "SELECT principal_id FROM principals WHERE principal_id=%s FOR UPDATE", (user,)
-            )
             pending = db.execute(
                 "SELECT count(*) AS count FROM research_runs WHERE owner_id=%s "
                 "AND state IN ('queued','retrieving','generating','validating')",
@@ -255,6 +255,7 @@ def install_research(app):
                 "top_k": 8,
                 "candidates": 100,
                 "query_policy": "explicit-standalone-v1",
+                "evidence_policy": "typed-evidence-grounding-v1",
             }
             provider = app.state.providers.get(value.provider)
             if provider is None:
@@ -296,5 +297,9 @@ def install_research(app):
             ).fetchone()
             from retrievec.app.run_state import event
 
+            db.execute(
+                "UPDATE research_runs SET request_id=%s WHERE run_id=%s",
+                (CONTEXT.get().get("request_id"), row["run_id"]),
+            )
             event(db, row["run_id"], "queued")
             return run_view(row)

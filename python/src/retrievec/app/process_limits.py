@@ -6,6 +6,13 @@ import os
 def limit_extraction():
     if os.name != "nt":
         import resource
+        import signal
+
+        def terminate(signum, frame):
+            # Permit adapter finally blocks to stop their process groups before a forced kill.
+            raise SystemExit(128 + signum)
+
+        signal.signal(signal.SIGTERM, terminate)
 
         resource.setrlimit(resource.RLIMIT_AS, (3 * 1024**3, 3 * 1024**3))
         resource.setrlimit(resource.RLIMIT_CPU, (90, 90))
@@ -56,7 +63,7 @@ def limit_extraction():
         raise ctypes.WinError(ctypes.get_last_error())
     limits = ExtendedLimits()
     # Per-process and aggregate committed-memory limits include analyzer children.
-    limits.basic.flags = 0x100 | 0x200
+    limits.basic.flags = 0x100 | 0x200 | 0x2000
     limits.process_memory = 1024**3
     limits.job_memory = 2 * 1024**3
     if not kernel.SetInformationJobObject(handle, 9, ctypes.byref(limits), ctypes.sizeof(limits)):

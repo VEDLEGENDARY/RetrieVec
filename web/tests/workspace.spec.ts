@@ -64,6 +64,16 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await expect(
     page.getByRole("complementary", { name: "Citation evidence" }),
   ).toContainText("Dense retrieval");
+  await expect(
+    page.getByRole("button", { name: "Close citation" }),
+  ).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("complementary", { name: "Citation evidence" }),
+  ).toBeHidden();
+  await expect(
+    page.getByRole("button", { name: /Inspect citation/ }).first(),
+  ).toBeFocused();
   const saved = await page.evaluate(async () => {
     const session = await (await fetch("/api/v1/me")).json();
     const collections = await (await fetch("/api/v1/collections")).json();
@@ -93,6 +103,29 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     ).json();
     return { run, exported, csrf: session.csrf_token };
   });
+  await page.route(
+    `**/api/v1/runs/${saved.run.run_id}`,
+    async (route) => {
+      await route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({
+          code: "service_unavailable",
+          message: "Temporary outage",
+        }),
+      });
+    },
+    { times: 1 },
+  );
+  await expect(page.getByText(/Reconnecting to the saved run/)).toBeVisible({
+    timeout: 10000,
+  });
+  await expect(
+    page.getByRole("button", { name: "Export json", exact: true }),
+  ).toBeHidden();
+  await expect(
+    page.getByText("Research run: completed", { exact: true }),
+  ).toBeVisible();
   expect((await page.request.get(saved.exported.download_url)).status()).toBe(
     200,
   );

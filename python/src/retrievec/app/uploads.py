@@ -90,12 +90,14 @@ async def stage_file(upload, settings):
 
 
 def enqueue_uploads(app, user, collection, key, staged):
+    from retrievec.app.admission import lock_admission, require_capacity
+
     settings, registry = app.state.settings, app.state.registry
     policy = app.state.resources
     with registry.connect() as db:
-        # Serialize quota accounting across this user's collections.
-        db.execute("SELECT principal_id FROM principals WHERE principal_id=%s FOR UPDATE", (user,))
+        lock_admission(db, user)
         current = policy.collection(db, user, collection, manage=True, lock=True)
+        require_capacity(db, settings.max_pending_work)
         active = db.execute(
             "SELECT count(*) AS n FROM ingestion_jobs j JOIN collections c "
             "USING(collection_id) WHERE c.owner_id=%s "

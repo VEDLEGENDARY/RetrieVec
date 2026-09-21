@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AdvancedEvidence } from "./AdvancedEvidence";
 import {
   api,
   type Collection,
@@ -239,7 +240,14 @@ export function Search({
                 </p>
                 <blockquote>{selected.text}</blockquote>
                 <small>Chunk {selected.chunk_id}</small>
-                {sourceURL ? (
+                {selected.evidence_object_id ? (
+                  <AdvancedEvidence
+                    key={selected.chunk_id}
+                    collectionId={collection.collection_id}
+                    snapshotId={result.snapshot_id}
+                    chunkId={selected.chunk_id}
+                  />
+                ) : sourceURL ? (
                   <>
                     <a
                       className="button source-link"

@@ -7,6 +7,7 @@ import grpc
 
 from retrievec.retrieval.v1 import retrieval_pb2 as pb
 from retrievec.retrieval.v1 import retrieval_pb2_grpc as rpc
+from retrievec.telemetry import CONTEXT, emit, request_identity
 
 
 class RPCClient:
@@ -40,12 +41,36 @@ class RPCClient:
 
     def call(self, method, request):
         deadline = time.monotonic() + self.timeout
+        started = time.perf_counter()
+        trace = CONTEXT.get()
+        metadata = self.metadata + (("x-request-id", request_identity(trace.get("request_id"))),)
+        for key in ("job_id", "run_id"):
+            if trace.get(key):
+                metadata += (("x-retrievec-" + key.replace("_", "-"), str(trace[key])),)
         for attempt in range(2):
             try:
-                return method(
-                    request, timeout=max(0, deadline - time.monotonic()), metadata=self.metadata
+                value = method(
+                    request, timeout=max(0, deadline - time.monotonic()), metadata=metadata
                 )
+                emit(
+                    "rpc.finished",
+                    service="rpc_client",
+                    outcome="completed",
+                    attempt=attempt + 1,
+                    snapshot_id=request.snapshot_id,
+                    elapsed_ms=(time.perf_counter() - started) * 1000,
+                )
+                return value
             except grpc.RpcError as error:
+                emit(
+                    "rpc.attempt",
+                    service="rpc_client",
+                    outcome="failed",
+                    attempt=attempt + 1,
+                    error_code=error.code().name,
+                    snapshot_id=request.snapshot_id,
+                    elapsed_ms=(time.perf_counter() - started) * 1000,
+                )
                 if (
                     attempt
                     or error.code() != grpc.StatusCode.UNAVAILABLE

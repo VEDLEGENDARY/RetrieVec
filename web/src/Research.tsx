@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import { api, type Collection, type Session } from "./api";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { api, APIError, type Collection, type Session } from "./api";
+import { AdvancedEvidence } from "./AdvancedEvidence";
 
 type Conversation = { conversation_id: string; title: string };
 type Provider = {
@@ -9,6 +10,8 @@ type Provider = {
   consented: boolean;
 };
 type Evidence = {
+  chunk_id?: string;
+  evidence_object_id?: string;
   evidence_id: string;
   citation_id: string;
   title: string;
@@ -90,7 +93,24 @@ export function Research({
   const [question, setQuestion] = useState("");
   const [effective, setEffective] = useState("");
   const [run, setRun] = useState<Run | null>(null);
+  const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+  const [runRefresh, setRunRefresh] = useState(0);
+  const [runConnection, setRunConnection] = useState<
+    "connected" | "retrying" | "offline"
+  >("connected");
   const [evidence, setEvidence] = useState<Evidence | null>(null);
+  const citationClose = useRef<HTMLButtonElement>(null);
+  const citationTrigger = useRef<HTMLButtonElement | null>(null);
+  const inspectionVersion = useRef(0);
+  useEffect(() => {
+    if (evidence) citationClose.current?.focus();
+  }, [evidence]);
+  useEffect(
+    () => () => {
+      inspectionVersion.current += 1;
+    },
+    [],
+  );
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
@@ -128,22 +148,31 @@ export function Research({
     api<Run[]>(`/api/v1/conversations/${conversation}/runs`, {
       signal: controller.signal,
     })
-      .then(setHistory)
+      .then((rows) => {
+        if (!controller.signal.aborted) setHistory(rows);
+      })
       .catch((error) => {
         if (error.name !== "AbortError") fail(error);
       });
     return () => controller.abort();
   }, [conversation, run?.state, fail]);
-  const runId = run?.run_id;
+  const runId = selectedRunId;
   useEffect(() => {
     if (!runId) return;
     const controller = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
+    let failures = 0;
     async function refresh() {
       try {
         const current = await api<Run>(`/api/v1/runs/${runId}`, {
-          signal: controller.signal,
+          signal: AbortSignal.any([
+            controller.signal,
+            AbortSignal.timeout(15000),
+          ]),
         });
+        if (controller.signal.aborted) return;
+        failures = 0;
+        setRunConnection("connected");
         setRun(current);
         timer = setTimeout(
           refresh,
@@ -151,9 +180,26 @@ export function Research({
         );
       } catch (error) {
         if (!controller.signal.aborted) {
+          inspectionVersion.current += 1;
           setRun(null);
           setEvidence(null);
-          fail(error);
+          if (
+            error instanceof APIError &&
+            error.status < 500 &&
+            error.status !== 429
+          ) {
+            setSelectedRunId(null);
+            setRunConnection("connected");
+            fail(error);
+          } else {
+            failures += 1;
+            setRunConnection(failures <= 4 ? "retrying" : "offline");
+            if (failures <= 4)
+              timer = setTimeout(
+                refresh,
+                Math.min(15000, 1000 * 2 ** failures),
+              );
+          }
         }
       }
     }
@@ -162,12 +208,13 @@ export function Research({
       controller.abort();
       clearTimeout(timer);
     };
-  }, [runId, fail]);
+  }, [runId, runRefresh, fail]);
 
   async function submit(
     snapshot: "current" | "historical" = "current",
     replay = false,
   ) {
+    inspectionVersion.current += 1;
     setBusy(true);
     setNotice("");
     setEvidence(null);
@@ -209,6 +256,8 @@ export function Research({
         session.csrf_token,
       );
       setRun(created);
+      setSelectedRunId(created.run_id);
+      setRunConnection("connected");
       setRequestKey(crypto.randomUUID());
     } catch (error) {
       fail(error);
@@ -216,13 +265,24 @@ export function Research({
       setBusy(false);
     }
   }
-  async function inspect(item: Evidence) {
+  async function inspect(item: Evidence, trigger: HTMLButtonElement) {
+    const version = ++inspectionVersion.current;
+    citationTrigger.current = trigger;
     try {
-      setEvidence(await api<Evidence>(`/api/v1/citations/${item.citation_id}`));
+      const value = await api<Evidence>(
+        `/api/v1/citations/${item.citation_id}`,
+      );
+      if (version === inspectionVersion.current) setEvidence(value);
     } catch (error) {
+      if (version !== inspectionVersion.current) return;
       setEvidence(null);
       fail(error);
     }
+  }
+  function closeCitation() {
+    inspectionVersion.current += 1;
+    setEvidence(null);
+    citationTrigger.current?.focus();
   }
   async function exportRun(format: string) {
     if (!run) return;
@@ -272,7 +332,7 @@ export function Research({
         <button
           className="quiet citation"
           key={id}
-          onClick={() => inspect(item)}
+          onClick={(event) => inspect(item, event.currentTarget)}
           aria-label={`Inspect citation ${id}`}
         >
           {item.title}
@@ -290,10 +350,14 @@ export function Research({
       <label htmlFor="conversation">Conversation</label>
       <select
         id="conversation"
+        disabled={busy}
         value={conversation}
         onChange={(event) => {
+          inspectionVersion.current += 1;
           setConversation(event.target.value);
           setRun(null);
+          setSelectedRunId(null);
+          setRunConnection("connected");
           setEvidence(null);
           setRequestKey(crypto.randomUUID());
         }}
@@ -314,6 +378,7 @@ export function Research({
         <label htmlFor="research-question">Question for cited answer</label>
         <textarea
           id="research-question"
+          disabled={busy}
           value={question}
           maxLength={4096}
           required
@@ -328,6 +393,7 @@ export function Research({
         </label>
         <input
           id="effective-query"
+          disabled={busy}
           value={effective}
           maxLength={4096}
           onChange={(event) => {
@@ -339,6 +405,7 @@ export function Research({
         <label htmlFor="generation-provider">Generation provider</label>
         <select
           id="generation-provider"
+          disabled={busy}
           value={provider}
           onChange={(event) => {
             setProvider(event.target.value);
@@ -398,9 +465,15 @@ export function Research({
           {history.map((item) => (
             <button
               key={item.run_id}
-              aria-pressed={run?.run_id === item.run_id}
+              disabled={busy}
+              aria-pressed={selectedRunId === item.run_id}
               onClick={() => {
-                setRun(item);
+                inspectionVersion.current += 1;
+                // Reauthorize history before showing a cached answer or enabling exports.
+                setRun(null);
+                setSelectedRunId(item.run_id);
+                setRunRefresh((value) => value + 1);
+                setRunConnection("retrying");
                 setEvidence(null);
               }}
             >
@@ -408,6 +481,26 @@ export function Research({
             </button>
           ))}
         </nav>
+      )}
+      {selectedRunId && runConnection !== "connected" && (
+        <div role="status">
+          <p>
+            {runConnection === "retrying"
+              ? "Reconnecting to the saved run. Evidence is hidden until access is confirmed."
+              : "The saved run is unavailable right now. Retry when the service is available."}
+          </p>
+          {runConnection === "offline" && (
+            <button
+              type="button"
+              onClick={() => {
+                setRunConnection("retrying");
+                setRunRefresh((value) => value + 1);
+              }}
+            >
+              Reconnect to saved run
+            </button>
+          )}
+        </div>
       )}
       {run && (
         <article className="answer">
@@ -516,8 +609,19 @@ export function Research({
         </article>
       )}
       {evidence && (
-        <aside className="citation-inspector" aria-label="Citation evidence">
-          <button onClick={() => setEvidence(null)}>Close citation</button>
+        <aside
+          className="citation-inspector"
+          aria-label="Citation evidence"
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              closeCitation();
+            }
+          }}
+        >
+          <button ref={citationClose} onClick={closeCitation}>
+            Close citation
+          </button>
           <h3>{evidence.title}</h3>
           <p>
             {evidence.page_range
@@ -525,6 +629,13 @@ export function Research({
               : "Page locator unavailable"}
           </p>
           <blockquote>{evidence.text}</blockquote>
+          {evidence.evidence_object_id && evidence.chunk_id && run && (
+            <AdvancedEvidence
+              collectionId={collection.collection_id}
+              snapshotId={run.snapshot_id}
+              chunkId={evidence.chunk_id}
+            />
+          )}
           {evidence.source_id ? (
             <a
               target="_blank"

@@ -7,6 +7,7 @@ from psycopg.types.json import Jsonb
 
 from retrievec.corpus.snapshot import canonical, digest
 from retrievec.registry.database import Conflict, Registry
+from retrievec.telemetry import CONTEXT, emit
 
 
 class LeaseLost(Conflict):
@@ -58,6 +59,11 @@ class Jobs:
             ).fetchone()
             if job["input_hash"] != input_hash or job["config_hash"] != config_hash:
                 raise Conflict("idempotency key was used for different input/configuration")
+            if not job["request_id"] and CONTEXT.get().get("request_id"):
+                connection.execute(
+                    "UPDATE ingestion_jobs SET request_id=%s WHERE job_id=%s",
+                    (CONTEXT.get()["request_id"], job["job_id"]),
+                )
             return job
 
     def claim(self, lease_seconds: int = 60) -> dict | None:
@@ -83,7 +89,8 @@ class Jobs:
               ORDER BY j.available_at,j.job_id FOR UPDATE OF j SKIP LOCKED LIMIT 1
             ) UPDATE ingestion_jobs j SET state='running',attempts=j.attempts+1,
               fencing_token=j.fencing_token+1,
-              lease_until=clock_timestamp()+(%s * interval '1 second')
+              lease_until=clock_timestamp()+(%s * interval '1 second'),
+              stage_started_at=clock_timestamp()
               FROM candidate WHERE j.job_id=candidate.job_id RETURNING j.*""",
                 (self.principal, lease_seconds),
             ).fetchone()
@@ -96,10 +103,19 @@ class Jobs:
             raise ValueError("invalid stage or lease")
         with self.registry.connect() as connection:
             self.registry.authorize(connection, self.principal, job["collection_id"])
+            prior = connection.execute(
+                "SELECT stage,extract(epoch FROM (clock_timestamp()-stage_started_at))*1000 "
+                "AS elapsed_ms FROM ingestion_jobs WHERE job_id=%s AND fencing_token=%s "
+                "AND state='running' AND lease_until>clock_timestamp() FOR UPDATE",
+                (job["job_id"], job["fencing_token"]),
+            ).fetchone()
+            if prior is None:
+                raise LeaseLost("job lease is no longer current")
             row = connection.execute(
                 (
                     "UPDATE ingestion_jobs SET "
-                    "stage=%s,progress=%s,lease_until=clock_timestamp()+(%s * interval '1 "
+                    "stage=%s,progress=%s,stage_started_at=clock_timestamp(),"
+                    "lease_until=clock_timestamp()+(%s * interval '1 "
                     "second') WHERE job_id=%s AND fencing_token=%s AND state='running' AND "
                     "lease_until>clock_timestamp() RETURNING job_id"
                 ),
@@ -107,6 +123,13 @@ class Jobs:
             ).fetchone()
             if row is None:
                 raise LeaseLost("job lease is no longer current")
+        emit(
+            "ingestion.stage",
+            job_id=job["job_id"],
+            stage=prior["stage"],
+            elapsed_ms=max(0, float(prior["elapsed_ms"])),
+            outcome="completed",
+        )
 
     def heartbeat(self, job: dict, lease_seconds: int = 60) -> None:
         if not 1 <= lease_seconds <= 3600:
@@ -126,6 +149,10 @@ class Jobs:
 
     def complete(self, job: dict, snapshot_id: str, *, papers: list[dict] | None = None) -> None:
         with self.registry.connect() as connection:
+            # Every path takes the collection lock before a job lock, including archive.
+            collection = self.registry.authorize(
+                connection, self.principal, job["collection_id"], lock=True
+            )
             current = connection.execute(
                 (
                     "SELECT * FROM ingestion_jobs WHERE job_id=%s AND fencing_token=%s AND "
@@ -135,9 +162,6 @@ class Jobs:
             ).fetchone()
             if current is None:
                 raise LeaseLost("stale worker cannot activate")
-            collection = self.registry.authorize(
-                connection, self.principal, current["collection_id"], lock=True
-            )
             snapshot = connection.execute(
                 (
                     "SELECT snapshot_id FROM retrieval_snapshots WHERE snapshot_id=%s AND "
@@ -189,6 +213,13 @@ class Jobs:
                 ),
                 (snapshot_id, current["job_id"]),
             )
+        emit(
+            "ingestion.activated",
+            job_id=job["job_id"],
+            snapshot_id=snapshot_id,
+            collection_id=job["collection_id"],
+            attempt=job["attempts"],
+        )
 
     def fail(self, job: dict, code: str, *, retry: bool) -> None:
         if code not in (
