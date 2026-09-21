@@ -99,6 +99,95 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(self.sessions.load(token), {})
         self.assertEqual(self.sessions.identity("test-issuer", "a" + token[1:]), self.a)
 
+    def test_cached_history_and_reconnect_recheck_revoked_collection(self):
+        from psycopg.types.json import Jsonb
+        from retrievec.app.run_state import event
+
+        # This scenario exercises live policy; source integrity has separate integration fixtures.
+        source_check = patch("retrievec.app.research_worker.ResearchWorker.verify_sources")
+        verify_sources = source_check.start()
+        self.addCleanup(source_check.stop)
+        self.registry.create_collection(self.a, "revocation-fixture")
+        snapshot = self.registry.register(
+            self.a,
+            {
+                "schema_version": 1,
+                "collection_id": "revocation-fixture",
+                "corpus_snapshot_id": "ss_" + "a" * 64,
+                "capabilities": ["sparse"],
+            },
+        )
+        self.registry.ready(self.a, "revocation-fixture", snapshot)
+        conversation, run, citation, exported = (uuid.uuid4() for _ in range(4))
+        with self.registry.connect() as db:
+            db.execute(
+                "UPDATE collections SET visibility='curated' WHERE collection_id=%s",
+                ("revocation-fixture",),
+            )
+            db.execute(
+                "INSERT INTO conversations(conversation_id,owner_id,collection_id,title) "
+                "VALUES(%s,%s,'revocation-fixture','Synthetic')",
+                (conversation, self.b),
+            )
+            db.execute(
+                "INSERT INTO research_runs(run_id,conversation_id,owner_id,collection_id,"
+                "snapshot_id,original_question,effective_query,configuration,state,result) "
+                "VALUES(%s,%s,%s,'revocation-fixture',%s,'question','question',%s,'completed',%s)",
+                (run, conversation, self.b, snapshot, Jsonb({}), Jsonb({"answer": "synthetic"})),
+            )
+            db.execute(
+                "INSERT INTO evidence_citations(citation_id,run_id,chunk_id,evidence) "
+                "VALUES(%s,%s,'synthetic',%s)",
+                (citation, run, Jsonb({"text": "retained synthetic passage"})),
+            )
+            db.execute(
+                "INSERT INTO exports(export_id,run_id,storage_key,media_type,content,"
+                "extension,expires_at) VALUES(%s,%s,'synthetic','application/json',"
+                "'{}','json',clock_timestamp()+interval '1 hour')",
+                (exported, run),
+            )
+            event(db, run, "completed")
+        paths = [
+            f"/api/v1/runs/{run}",
+            f"/api/v1/runs/{run}/events",
+            f"/api/v1/conversations/{conversation}/runs",
+            f"/api/v1/citations/{citation}",
+            f"/api/v1/exports/{exported}",
+        ]
+        self.user(self.b)
+        for path in paths:
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200, response.text)
+            self.assertEqual(response.headers.get("cache-control"), "no-store")
+        self.assertEqual(verify_sources.call_count, 1)
+        self.user(self.a)
+        for path in paths:
+            self.assertEqual(self.client.get(path).status_code, 404)
+        with self.registry.connect() as db:
+            db.execute(
+                "UPDATE collections SET visibility='private' WHERE collection_id=%s",
+                ("revocation-fixture",),
+            )
+        self.user(self.b)
+        for path in paths:
+            response = self.client.get(path, headers={"Last-Event-ID": "1"})
+            self.assertEqual(response.status_code, 404)
+            self.assertNotIn("retained synthetic passage", response.text)
+        self.assertEqual(verify_sources.call_count, 1)
+        with patch("retrievec.app.search.RPCClient") as rpc:
+            response = self.client.post(
+                "/api/v1/search",
+                headers=self.headers,
+                json={
+                    "collection_id": "revocation-fixture",
+                    "snapshot_id": snapshot,
+                    "query": "retained synthetic passage",
+                    "retrieval": "sparse",
+                },
+            )
+            self.assertEqual(response.status_code, 404)
+            rpc.assert_not_called()
+
     def test_saved_history_idempotency_replay_and_isolation(self):
         from retrievec.app.generation import ProviderConfig
         from retrievec.corpus.snapshot import canonical
