@@ -58,10 +58,15 @@ class PinnedClient:
             raise ValueError("registry and artifact manifest differ")
         if retrieval not in self.manifest["capabilities"]:
             raise ValueError("snapshot does not declare requested capability")
-        _, _, chunks = load_snapshot(
+        corpus, _, chunks = load_snapshot(
             store.path("corpora", self.manifest["corpus_snapshot_id"], "ss_")
         )
         self.chunks = {chunk["chunk_id"]: chunk for chunk in chunks}
+        self.evidence_index = None
+        if corpus["configuration"].get("evidence_map_id"):
+            from retrievec.extraction.indexing import EvidenceIndex
+
+            self.evidence_index = EvidenceIndex(store.root, corpus)
         _, papers, _ = load_snapshot(
             store.path("corpora", self.manifest["corpus_snapshot_id"], "ss_")
         )
@@ -183,6 +188,10 @@ class PinnedClient:
                 hit["contributions"] = sparse_scores.get(chunk["chunk_id"], {}).get(
                     "contributions", []
                 )
+            if self.evidence_index is not None:
+                hit.update(self.evidence_index.attributes(chunk))
+            else:
+                hit.update(evidence_type="prose", source_locator=None)
             hits.append(hit)
         timings["search_ms"] = (time.perf_counter() - start) * 1000
         return {
