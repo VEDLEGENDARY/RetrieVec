@@ -105,8 +105,20 @@ def prompt(question: str, evidence: list[dict]) -> str:
     # JSON escapes stop document text from becoming ChatML control tokens.
     data = json.dumps({"question": question, "evidence": evidence}, ensure_ascii=True)
     data = data.replace("<", "\\u003c").replace(">", "\\u003e")
+    system = SYSTEM
+    if any(item.get("extraction") is not None for item in evidence):
+        system += (
+            "\nTyped evidence policy v1: extraction is not interpretation. "
+            "Explicitly label any OCR-supported claim as 'OCR transcription'. "
+            "Label equation claims as transcriptions, never equivalent mathematics. "
+            "Label model-derived observations as inferred observations. "
+            "For comparisons using OCR, state 'OCR transcription' in limitations. "
+            "Do not report precise values from figures or treat generated row numbers "
+            "as paper values. "
+            "Missing cells, units and ambiguous structures remain missing or uncertain."
+        )
     return (
-        f"<|im_start|>system\n{SYSTEM}<|im_end|>\n"
+        f"<|im_start|>system\n{system}<|im_end|>\n"
         f"<|im_start|>user\n{data}<|im_end|>\n<|im_start|>assistant\n"
     )
 
@@ -173,6 +185,10 @@ async def pack_evidence(provider, question: str, hits: list[dict]):
     if count > budget:
         raise ProviderError("question exceeds prompt budget")
     for hit in hits[:100]:
+        extraction = hit.get("extraction")
+        if extraction is not None and extraction.get("synthesis_allowed") is not True:
+            excluded.append({"chunk_id": hit["chunk_id"], "reason": "extraction_review_required"})
+            continue
         evidence = {
             **hit,
             "evidence_id": "e_"

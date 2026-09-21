@@ -9,6 +9,8 @@ export type Job = {
   output_snapshot: string | null;
 };
 export type Hit = {
+  evidence_object_id?: string;
+  evidence_type?: "prose" | "table" | "equation" | "figure";
   rank: number;
   chunk_id: string;
   title: string;

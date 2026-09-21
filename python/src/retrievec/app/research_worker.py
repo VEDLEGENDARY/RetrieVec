@@ -6,6 +6,7 @@ import re
 import threading
 import time
 import uuid
+from datetime import UTC, datetime
 
 import grpc
 import httpx
@@ -26,6 +27,9 @@ from retrievec.dense.hybrid import PinnedClient
 from retrievec.dense.model import adapter
 from retrievec.registry.artifacts import Store
 from retrievec.registry.database import Registry
+from retrievec.registry.scheduling import heavy_slot
+from retrievec.registry.supervisor import serve_worker
+from retrievec.telemetry import configure, correlate, emit, request_identity, stage
 
 
 class ResearchWorker:
@@ -84,7 +88,14 @@ class ResearchWorker:
             run["owner_id"], run["collection_id"], run["snapshot_id"]
         )
         store = Store(self.settings.store)
-        _, _, chunks = load_snapshot(store.path("corpora", registered["corpus_snapshot_id"], "ss_"))
+        corpus, _, chunks = load_snapshot(
+            store.path("corpora", registered["corpus_snapshot_id"], "ss_")
+        )
+        typed_index = None
+        if corpus["configuration"].get("evidence_map_id"):
+            from retrievec.extraction.indexing import EvidenceIndex
+
+            typed_index = EvidenceIndex(store.root, corpus)
         retained = {chunk["chunk_id"]: chunk for chunk in chunks}
         with self.registry.connect() as db:
             self.state.access(db, run)
@@ -92,6 +103,10 @@ class ResearchWorker:
                 chunk = retained.get(item["chunk_id"])
                 if not chunk or chunk["text"] != item["text"]:
                     raise ProviderError("retained evidence unavailable")
+                if typed_index is not None:
+                    attributes = typed_index.attributes(chunk)
+                    if any(item.get(key) != value for key, value in attributes.items()):
+                        raise ProviderError("extraction provenance changed")
                 if item["source_id"] is None:
                     # Curated snapshots can retain exact passages without an uploaded original.
                     item["original_available"] = False
@@ -116,9 +131,32 @@ class ResearchWorker:
                 item["original_available"] = True
 
     def run_once(self):
+        with heavy_slot(self.registry, "research") as acquired:
+            return self.claim_once() if acquired else False
+
+    def claim_once(self):
         run = self.state.claim()
         if run is None:
             return False
+        with correlate(
+            request_id=request_identity(run.get("request_id")),
+            run_id=run["run_id"],
+            snapshot_id=run["snapshot_id"],
+            collection_id=run["collection_id"],
+            service="research",
+        ):
+            emit("worker.active", worker_kind="research", active_workers=1)
+            emit(
+                "research.claimed",
+                attempt=run["attempts"],
+                queue_age_ms=max(0, (datetime.now(UTC) - run["created_at"]).total_seconds() * 1000),
+            )
+            try:
+                return self.execute(run)
+            finally:
+                emit("worker.idle", worker_kind="research", active_workers=0)
+
+    def execute(self, run):
         cancelled, done = threading.Event(), threading.Event()
 
         def heartbeat():
@@ -142,7 +180,8 @@ class ResearchWorker:
             if configured is None or configured.identity != run["configuration"]["provider_hash"]:
                 raise ProviderError("provider configuration changed")
             error = "retrieval_unavailable"
-            retrieved = self.retrieve(run)
+            with stage("retrieving"):
+                retrieved = self.retrieve(run)
             if not self.state.transition(run, "generating"):
                 return True
             provider = self.provider_factory(configured)
@@ -163,9 +202,10 @@ class ResearchWorker:
                 raw = await provider.generate(packet["prompt"], answer_schema(packet["evidence"]))
                 return packet, raw
 
-            packet, raw = asyncio.run(
-                cancellable(asyncio.wait_for(generate(), timeout=240), cancelled)
-            )
+            with stage("generating"):
+                packet, raw = asyncio.run(
+                    cancellable(asyncio.wait_for(generate(), timeout=240), cancelled)
+                )
             if not self.state.transition(run, "validating"):
                 return True
             error = "invalid_answer"
@@ -186,11 +226,26 @@ class ResearchWorker:
                 "validation": "structural_only",
                 "human_review": "pending",
             }
-            self.state.transition(run, "completed", result=result, evidence=evidence)
+            published = self.state.transition(run, "completed", result=result, evidence=evidence)
+            emit(
+                "research.finished",
+                outcome="completed" if published else "fenced",
+                elapsed_ms=(time.perf_counter() - started) * 1000,
+            )
         except (asyncio.CancelledError, PermissionError):
             # Revocation/cancellation fences publication; expired work is failed by the next claim.
-            pass
+            emit(
+                "research.finished",
+                outcome="cancelled",
+                elapsed_ms=(time.perf_counter() - started) * 1000,
+            )
         except (ValueError, OSError, httpx.HTTPError, grpc.RpcError):
+            emit(
+                "research.finished",
+                outcome="failed",
+                error_code=error,
+                elapsed_ms=(time.perf_counter() - started) * 1000,
+            )
             try:
                 self.state.transition(run, "failed", code=error)
             except PermissionError:
@@ -202,18 +257,11 @@ class ResearchWorker:
 
 
 def main():
+    configure()
     settings = Settings.from_env()
     registry = Registry(settings.dsn)
     worker = ResearchWorker(registry, settings)
-    with registry.connect() as guard:
-        if not guard.execute("SELECT pg_try_advisory_lock(7823403) AS acquired").fetchone()[
-            "acquired"
-        ]:
-            raise SystemExit("A research worker is already running")
-        guard.commit()
-        while True:
-            if not worker.run_once():
-                time.sleep(1)
+    serve_worker(registry, 7823403, worker.run_once)
 
 
 if __name__ == "__main__":

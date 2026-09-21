@@ -17,7 +17,7 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
         openapi_url="/api/v1/openapi.json",
         docs_url="/api/docs",
         redoc_url=None,
-        responses={status: {"model": Error} for status in (401, 403, 404, 409, 422, 503)},
+        responses={status: {"model": Error} for status in (401, 403, 404, 409, 422, 429, 503)},
     )
     app.state.settings = settings
     app.state.registry = registry or Registry(settings.dsn)
@@ -39,11 +39,19 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
     from retrievec.app.exports import install_exports
 
     install_exports(app)
+    from retrievec.app.evidence import install_evidence
+
+    install_evidence(app)
+    from retrievec.app.telemetry import RequestTelemetry
+
+    app.add_middleware(RequestTelemetry)
 
     @app.exception_handler(APIError)
     async def api_error(request: Request, error: APIError):
         return JSONResponse(
-            {"code": error.code, "message": error.message}, status_code=error.status
+            {"code": error.code, "message": error.message},
+            status_code=error.status,
+            headers={"Retry-After": "2"} if error.status in (429, 503) else None,
         )
 
     @app.exception_handler(PermissionError)
@@ -97,6 +105,10 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
 def main():
     import uvicorn
 
+    from retrievec.telemetry import configure
+
+    configure()
+
     uvicorn.run(
         create_app(),
         host="127.0.0.1",
@@ -104,6 +116,7 @@ def main():
         proxy_headers=False,
         limit_concurrency=32,
         timeout_keep_alive=5,
+        access_log=False,
     )
 
 
