@@ -101,6 +101,8 @@ def import_manifest(
     analyzer: GoAnalyzer | None = None,
     *,
     max_pages: int = 500,
+    evidence_bundles: dict[str, str] | None = None,
+    evidence_root: Path | None = None,
 ) -> Path:
     if type(token_budget) is not int or not 1 <= token_budget <= 4096:
         raise CorpusError("token budget must be between 1 and 4096")
@@ -118,6 +120,7 @@ def import_manifest(
     analyzer.analyze([])
     chunker_version = f"paragraph-v1-{token_budget}-{analyzer.version}"
     papers, chunks = [], []
+    evidence_mapping = {}
     source_root = source_root.resolve(strict=True)
     for record in manifest["sources"]:
         if not isinstance(record, dict) or set(record) != SOURCE_FIELDS:
@@ -134,7 +137,30 @@ def import_manifest(
         source = path.read_bytes()
         if digest(source) != record["source_sha256"]:
             raise CorpusError(f"{path.name}: source hash mismatch")
-        extraction_version, pages = extract_pages(path, source, max_pages)
+        typed = {}
+        bundle_id = (evidence_bundles or {}).get(record["source_sha256"])
+        if bundle_id:
+            from retrievec.extraction.pages import reading_order
+            from retrievec.extraction.representation import searchable
+            from retrievec.extraction.store import EvidenceStore
+
+            if evidence_root is None:
+                raise CorpusError("typed extraction requires a retained evidence store")
+            bundle, objects = EvidenceStore(evidence_root).bundle(bundle_id)
+            if bundle["source_sha256"] != record["source_sha256"]:
+                raise CorpusError("typed evidence belongs to a different source")
+            ordered = []
+            for number in sorted({item.geometry.page for item in objects}):
+                if number > max_pages:
+                    raise CorpusError("typed evidence exceeds page limit")
+                ordered.extend(
+                    reading_order([item for item in objects if item.geometry.page == number])
+                )
+            pages = [(item.geometry.page, searchable(item)) for item in ordered]
+            typed = dict(enumerate(ordered))
+            extraction_version = "typed-evidence-v1-" + bundle_id
+        else:
+            extraction_version, pages = extract_pages(path, source, max_pages)
         paper = make_paper(
             paper_id=record["paper_id"],
             title=record["title"],
@@ -146,7 +172,7 @@ def import_manifest(
         )
         papers.append(paper)
         ordinal = 0
-        for page_number, text in pages:
+        for page_index, (page_number, text) in enumerate(pages):
             tokens = analyzer.analyze([text])[0]
             for chunk_text in chunk_page(text, tokens, token_budget):
                 chunks.append(
@@ -160,8 +186,20 @@ def import_manifest(
                     )
                 )
                 ordinal += 1
+                if page_index in typed:
+                    item = typed[page_index]
+                    evidence_mapping[chunks[-1]["chunk_id"]] = {
+                        "evidence_id": item.identity,
+                        "source_sha256": item.source_sha256,
+                        "text_sha256": chunks[-1]["text_sha256"],
+                    }
         if ordinal == 0:
             raise CorpusError(f"{path.name}: no indexable text; OCR is outside this milestone")
+    extra = {}
+    if evidence_mapping:
+        from retrievec.extraction.indexing import publish_map
+
+        extra["evidence_map_id"] = publish_map(evidence_root, evidence_mapping)
     return publish_snapshot(
         output_root,
         papers,
@@ -172,5 +210,6 @@ def import_manifest(
             "analyzer_version": analyzer.version,
             "chunker_version": chunker_version,
             "overlap": 0,
+            **extra,
         },
     )

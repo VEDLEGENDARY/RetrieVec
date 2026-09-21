@@ -5,6 +5,8 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
+from datetime import UTC, datetime
 from pathlib import Path
 
 import grpc
@@ -15,6 +17,8 @@ from retrievec.corpus.snapshot import canonical, digest, load_snapshot, parse_js
 from retrievec.registry.artifacts import Store, prepare
 from retrievec.registry.database import Conflict, Registry
 from retrievec.registry.jobs import Jobs, LeaseLost
+from retrievec.registry.scheduling import heavy_slot
+from retrievec.telemetry import correlate, emit, request_identity
 
 
 def publish_bytes(path: Path, data: bytes) -> None:
@@ -70,9 +74,39 @@ class Worker:
         self.jobs = Jobs(registry, principal)
 
     def run_once(self) -> dict | None:
+        with heavy_slot(self.registry, "ingestion") as acquired:
+            return self.claim_once() if acquired else None
+
+    def claim_once(self) -> dict | None:
         job = self.jobs.claim()
         if job is None:
             return None
+        with correlate(
+            request_id=request_identity(job.get("request_id")),
+            job_id=job["job_id"],
+            collection_id=job["collection_id"],
+            service="ingestion",
+        ):
+            emit("worker.active", worker_kind="ingestion", active_workers=1)
+            emit(
+                "ingestion.claimed",
+                attempt=job["attempts"],
+                queue_age_ms=max(0, (datetime.now(UTC) - job["created_at"]).total_seconds() * 1000),
+            )
+            started = time.perf_counter()
+            try:
+                result = self.execute(job)
+                emit(
+                    "ingestion.finished",
+                    outcome=result["state"],
+                    elapsed_ms=(time.perf_counter() - started) * 1000,
+                    error_code=result.get("error_code"),
+                )
+                return result
+            finally:
+                emit("worker.idle", worker_kind="ingestion", active_workers=0)
+
+    def execute(self, job):
         stop, lost = threading.Event(), threading.Event()
 
         def heartbeat():
@@ -95,24 +129,55 @@ class Worker:
             if digest(source_manifest.read_bytes()) != key:
                 raise ValueError("source manifest changed")
             self.jobs.checkpoint(job, "extract", {"manifest_hash": key})
-            if configuration.get("private_upload"):
-                result = subprocess.run(
-                    [
-                        sys.executable,
-                        "-m",
-                        "retrievec.app.extract",
-                        str(source_manifest),
-                        str(self.store.root),
-                        job["collection_id"],
-                        str(self.engine),
-                    ],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL,
-                    text=True,
-                    timeout=120,
-                    check=True,
+            if configuration.get("private_upload") or configuration.get("extraction_adapter"):
+                command = [
+                    sys.executable,
+                    "-m",
+                    "retrievec.app.extract",
+                    str(source_manifest),
+                    str(self.store.root),
+                    job["collection_id"],
+                    str(self.engine),
+                ]
+                if configuration.get("evidence_bundles") or configuration.get("extraction_adapter"):
+                    raw_config = canonical(
+                        {
+                            key: configuration[key]
+                            for key in ("evidence_bundles", "extraction_adapter")
+                            if key in configuration
+                        }
+                    )
+                    if len(raw_config) > 65536:
+                        raise ValueError("extraction configuration exceeds limit")
+                    config_path = (
+                        self.store.root / "extractor-configs" / (digest(raw_config) + ".json")
+                    )
+                    publish_bytes(config_path, raw_config)
+                    command.append(str(config_path))
+                options = (
+                    {"creationflags": subprocess.CREATE_NO_WINDOW}
+                    if os.name == "nt"
+                    else {"start_new_session": True}
                 )
-                corpus = self.store.path("corpora", result.stdout.strip(), "ss_")
+                with subprocess.Popen(
+                    command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, **options
+                ) as process:
+                    try:
+                        output, _ = process.communicate(timeout=120)
+                    except subprocess.TimeoutExpired:
+                        from retrievec.extraction.adapters import terminate
+
+                        process.terminate()
+                        try:
+                            process.wait(timeout=5)
+                        except subprocess.TimeoutExpired:
+                            terminate(process)
+                        raise
+                    if process.returncode:
+                        raise subprocess.CalledProcessError(
+                            process.returncode, command, output=output
+                        )
+                corpus = self.store.path("corpora", output.strip(), "ss_")
             else:
                 corpus = import_manifest(
                     source_manifest,
@@ -121,6 +186,8 @@ class Worker:
                     job["collection_id"],
                     configuration.get("token_budget", 256),
                     GoAnalyzer(self.engine),
+                    evidence_bundles=configuration.get("evidence_bundles"),
+                    evidence_root=self.store.root,
                 )
             self.jobs.checkpoint(job, "chunk", {"corpus_snapshot_id": corpus.name})
             embedding_id = None

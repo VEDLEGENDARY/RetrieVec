@@ -88,7 +88,30 @@ def validate_answer(raw: str, evidence: list[dict]) -> dict:
             raise ValueError("duplicate citation")
         if any(identity not in sources for identity in item.evidence_ids):
             raise ValueError("unknown evidence identity")
-        supplied = " ".join(sources[identity]["text"] for identity in item.evidence_ids)
+        supplied = " ".join(
+            sources[identity].get("numeric_support_text", sources[identity]["text"])
+            for identity in item.evidence_ids
+        )
+        for identity in item.evidence_ids:
+            extraction = sources[identity].get("extraction")
+            if extraction is not None and extraction.get("synthesis_allowed") is not True:
+                raise ValueError(
+                    "unreviewed or low-quality extracted evidence cannot support a claim"
+                )
+            if extraction is not None:
+                qualification = item.text if isinstance(item, Claim) else item.limitations
+                if extraction.get("derivation") == "ocr" and not re.search(
+                    r"\bOCR\b", qualification
+                ):
+                    raise ValueError("OCR support must be explicitly qualified")
+                if sources[identity].get("evidence_type") == "equation" and not re.search(
+                    r"\btranscription\b", qualification, re.I
+                ):
+                    raise ValueError("equation support must be described as transcription")
+                if extraction.get("derivation") == "model_derived" and not re.search(
+                    r"\b(inferred|interpreted)\b", qualification, re.I
+                ):
+                    raise ValueError("model-derived support must be explicitly qualified")
         text = item.text if isinstance(item, Claim) else item.reported_value
         if re.search(r"\bretrievec\b", text, re.I) and re.search(r"\d", text):
             # This provider contract contains paper passages, never measured run artifacts.

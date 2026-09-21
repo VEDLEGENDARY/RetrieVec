@@ -10,13 +10,29 @@ NEXT = {"retrieving": "generating", "generating": "validating", "validating": "c
 
 def event(db, run_id, kind, payload=None):
     row = db.execute(
-        "UPDATE research_runs SET event_sequence=event_sequence+1 "
-        "WHERE run_id=%s RETURNING event_sequence",
+        "SELECT event_sequence,extract(epoch FROM (clock_timestamp()-stage_started_at))*1000 "
+        "AS stage_elapsed_ms FROM research_runs WHERE run_id=%s FOR UPDATE",
         (run_id,),
     ).fetchone()
+    sequence = row["event_sequence"] + 1
+    db.execute(
+        "UPDATE research_runs SET event_sequence=%s,stage_started_at=clock_timestamp() "
+        "WHERE run_id=%s",
+        (sequence, run_id),
+    )
     db.execute(
         "INSERT INTO run_events(run_id,event_id,type,payload) VALUES(%s,%s,%s,%s)",
-        (run_id, row["event_sequence"], kind, Jsonb(payload or {"state": kind})),
+        (
+            run_id,
+            sequence,
+            kind,
+            Jsonb(
+                {
+                    **(payload or {"state": kind}),
+                    "previous_stage_elapsed_ms": max(0, float(row["stage_elapsed_ms"])),
+                }
+            ),
+        ),
     )
 
 

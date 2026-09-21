@@ -20,6 +20,7 @@ class Settings:
     max_files: int = 10
     storage_quota: int = 250 * 1024 * 1024
     max_pending_jobs: int = 3
+    max_pending_work: int = 64
     generation_config: Path | None = None
 
     def __post_init__(self):
@@ -42,6 +43,7 @@ class Settings:
             or not 1 <= self.max_file_bytes <= 25 * 1024 * 1024
             or self.storage_quota < self.max_file_bytes
             or not 1 <= self.max_pending_jobs <= 10
+            or not 1 <= self.max_pending_work <= 1024
         ):
             raise ValueError("invalid upload limits")
 
@@ -58,6 +60,7 @@ class Settings:
             rpc_address=os.getenv("RETRIEVEC_RPC", "127.0.0.1:8092"),
             read_token=os.getenv("RETRIEVEC_READ_TOKEN", ""),
             embedding=os.getenv("RETRIEVEC_EMBEDDING", "minilm"),
+            max_pending_work=int(os.getenv("RETRIEVEC_MAX_PENDING_WORK", "64")),
             generation_config=(
                 Path(os.environ["RETRIEVEC_GENERATION_CONFIG"])
                 if os.getenv("RETRIEVEC_GENERATION_CONFIG")
