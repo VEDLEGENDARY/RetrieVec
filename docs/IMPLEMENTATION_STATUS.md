@@ -1,5 +1,35 @@
 # Implementation status
 
+## Weeks 9–10 in progress
+
+Implementation follows the owner-pasted instructions. Typed source-region contracts,
+retained evidence bundles, classification, optional pinned local adapter execution,
+structured representations, snapshot-bound chunk mappings, authorized region inspection,
+and extraction-aware synthesis are now being implemented without commits. See the
+[advanced capability matrix](reports/advanced-extraction.md). Real OCR/model selection,
+reviewed source fixtures, hardware/resource measurements and acceptance remain pending.
+
+## Current uncommitted work: Weeks 7–8
+
+As of 2026-09-20, Weeks 5–6 implementation is present on main through the final
+workspace merges. Human answer acceptance and the real local Keycloak smoke remain
+pending. The current `feat/workspace-hardening` branch contains uncommitted Weeks
+7–8 implementation; the owner requested no commits and deferred broad validation.
+
+Added cross-service safe telemetry, database stage timestamps, ingestion activation
+lock-order correction, process-interruption/lease/cancellation/isolation scenarios,
+bounded workload and CPU/RSS capture, shared heavy-worker admission and combined
+workspace queue limits, paired bootstrap reports and reviewed-dataset freezing,
+citation focus/race fixes, offline backup/isolated-restore tooling, and operating,
+benchmark and release draft documentation. No measured retrieval optimization was
+made without a baseline. No human judgments were invented.
+
+This is authored implementation, **not completed milestone acceptance**. New tests,
+real workloads, restore rehearsal, clean checkout, security/license audit and manual
+accessibility review are pending. See [the current report](reports/week-08-release.md)
+for step-level status and deferred gates. No commits, pushes, PRs, merges, tags or
+releases were made in this batch. Historical validation below applies to prior code.
+
 Weeks 1–2 steps 1–10 remain merged. This continuation implements the remaining
 software for weeks 1–2 steps 11–14 and all fourteen weeks 3–4 implementation steps.
 The historical feature commits are preserved. The owner's README redesign is
