@@ -142,9 +142,6 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await page.getByRole("button", { name: "Export csv", exact: true }).click();
   expect((await downloadPromise).suggestedFilename()).toMatch(/\.csv$/);
   await page
-    .getByRole("button", { name: "Close citation", exact: true })
-    .click();
-  await page
     .getByRole("button", { name: "Replay pinned snapshot", exact: true })
     .focus();
   await page.keyboard.press("Enter");
