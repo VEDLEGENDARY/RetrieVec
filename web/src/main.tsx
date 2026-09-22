@@ -5,6 +5,15 @@ import "./style.css";
 import { Uploads } from "./Uploads";
 import { Search } from "./Search";
 import { Research } from "./Research";
+import {
+  Archive,
+  ArrowUpRight,
+  BookOpenText,
+  LogOut,
+  Plus,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -112,7 +121,7 @@ function App() {
     return (
       <main className="welcome">
         <div className="wordmark">
-          R<span>↗</span> RetrieVec
+          <span className="logo-mark"><BookOpenText size={19} /></span> RetrieVec
         </div>
         <p className="eyebrow">YOUR PAPERS. TRACEABLE EVIDENCE.</p>
         <h1>
@@ -125,7 +134,7 @@ function App() {
           inspect the evidence behind every result.
         </p>
         <a className="button primary" href="/auth/login">
-          Sign in to your workspace →
+          Sign in to your workspace <ArrowUpRight size={17} />
         </a>
         {error && (
           <p role="alert" className="error">
@@ -144,7 +153,7 @@ function App() {
       </a>
       <aside className="navigation">
         <div className="wordmark">
-          R<span>↗</span> RetrieVec
+          <span className="logo-mark"><BookOpenText size={18} /></span> RetrieVec
         </div>
         <p className="eyebrow">COLLECTIONS</p>
         <nav aria-label="Collections">
@@ -180,12 +189,12 @@ function App() {
             placeholder="e.g. Retrieval methods"
           />
           <button disabled={busy || !title.trim()} type="submit">
-            + Create collection
+            <Plus size={16} /> Create collection
           </button>
         </form>
         <div className="account">
-          <span>Private workspace</span>
-          <button onClick={logout}>Sign out</button>
+          <span><ShieldCheck size={14} /> Private workspace</span>
+          <button onClick={logout}><LogOut size={14} /> Sign out</button>
         </div>
       </aside>
       <main id="research" className="research">
@@ -196,7 +205,7 @@ function App() {
           </div>
           {active?.can_manage && (
             <button className="quiet" onClick={archive} disabled={busy}>
-              Archive collection
+              <Archive size={15} /> Archive collection
             </button>
           )}
         </header>
@@ -224,7 +233,7 @@ function App() {
         )}
         {!active ? (
           <section className="empty">
-            <span className="empty-symbol">＋</span>
+            <span className="empty-symbol"><Sparkles size={30} /></span>
             <h2>Start with a collection</h2>
             <p>
               Give your research a home. Create a private collection, then add
