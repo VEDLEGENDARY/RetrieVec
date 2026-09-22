@@ -1,13 +1,18 @@
 # Implementation status
 
-## Weeks 11–12 protocol
+## Weeks 11–12 experiment infrastructure
 
-Step 1 is authored on `docs/ml-index-protocol`: hypotheses, split isolation,
-provenance, bounded resumable-training requirements, ANN reference comparison,
-immutable compaction lifecycle and explicit retain/reject gates. See
+Steps 1–14 have authored implementation across the protocol, reranker, ANN,
+sparse compaction and final comparison branches. The work includes hypotheses,
+split isolation, provenance, bounded resumable training, frozen checkpoint
+selection, ANN reference comparison, immutable compaction lifecycle, an explicit
+rejected top-k experiment and conservative retain/reject gates. See
 [protocol](ml-index-protocol.md) and [findings](reports/ml-index-experiments.md).
-No validation or experiment execution was performed for this change at the
-owner's request. Steps 2–14, reviewed data and measured decisions remain pending.
+No validation or experiment execution was performed for this batch at the
+owner's request. Reviewed data, selected current model/backend documentation,
+training, held-out evaluation and resource measurements remain acceptance gates.
+All experimental components are opt-in; exact cosine and the correct sparse
+implementation remain references and product defaults.
 
 The historical uncommitted-work descriptions below are superseded for Git state:
 Weeks 7–10 implementation was integrated through PR #24 at main `11d9404`.
