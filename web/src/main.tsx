@@ -9,11 +9,20 @@ import {
   Archive,
   ArrowUpRight,
   BookOpenText,
+  Database,
+  FileText,
+  LayoutDashboard,
   LogOut,
+  Menu,
+  MessageSquareText,
   Plus,
+  Search as SearchIcon,
   ShieldCheck,
   Sparkles,
+  X,
 } from "lucide-react";
+
+type View = "overview" | "sources" | "search" | "answers";
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -23,6 +32,8 @@ function App() {
   const [title, setTitle] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [view, setView] = useState<View>("overview");
+  const [navigationOpen, setNavigationOpen] = useState(false);
   const active = collections.find((item) => item.collection_id === selected);
   const fail = useCallback((error: unknown) => {
     if (error instanceof APIError && error.status === 401) {
@@ -73,6 +84,7 @@ function App() {
       setTitle("");
       await refresh();
       setSelected(result.collection_id);
+      setView("overview");
     } catch (error) {
       fail(error);
     } finally {
@@ -151,9 +163,10 @@ function App() {
       <a className="skip" href="#research">
         Skip to research
       </a>
-      <aside className="navigation">
+      <aside className={navigationOpen ? "navigation open" : "navigation"}>
         <div className="wordmark">
           <span className="logo-mark"><BookOpenText size={18} /></span> RetrieVec
+          <button className="mobile-close" aria-label="Close navigation" onClick={() => setNavigationOpen(false)}><X size={18} /></button>
         </div>
         <p className="eyebrow">COLLECTIONS</p>
         <nav aria-label="Collections">
@@ -169,6 +182,8 @@ function App() {
               onClick={() => {
                 setSelected(item.collection_id);
                 setError("");
+                setView("overview");
+                setNavigationOpen(false);
               }}
             >
               <span>{item.title}</span>
@@ -200,8 +215,10 @@ function App() {
       <main id="research" className="research">
         <header>
           <div>
+            <button className="mobile-menu" aria-label="Open navigation" onClick={() => setNavigationOpen(true)}><Menu size={19} /></button>
             <p className="eyebrow">RESEARCH WORKSPACE</p>
             <h1>{active?.title ?? "A place for your next question"}</h1>
+            {active && <p className="header-meta"><ShieldCheck size={14} /> {active.visibility === "curated" ? "Curated collection" : "Private collection"}<span />{active.active_snapshot ? "Search ready" : "Awaiting sources"}</p>}
           </div>
           {active?.can_manage && (
             <button className="quiet" onClick={archive} disabled={busy}>
@@ -214,23 +231,31 @@ function App() {
             {error}
           </p>
         )}
-        {active && (
-          <Uploads
-            key={active.collection_id}
-            collection={active}
-            session={session}
-            refresh={refresh}
-            fail={fail}
-          />
+        {active && <nav className="view-tabs" aria-label="Workspace sections">
+          {([
+            ["overview", LayoutDashboard, "Overview"],
+            ["sources", FileText, "Sources"],
+            ["search", SearchIcon, "Search"],
+            ["answers", MessageSquareText, "Cited answers"],
+          ] as const).map(([id, Icon, label]) => <button key={id} className={view === id ? "active" : ""} aria-current={view === id ? "page" : undefined} onClick={() => setView(id)}><Icon size={16} />{label}</button>)}
+        </nav>}
+        {active && view === "overview" && (
+          <section className="dashboard" aria-labelledby="overview-title">
+            <div className="hero-card">
+              <span className="hero-icon"><Sparkles size={24} /></span>
+              <div><p className="eyebrow">COLLECTION OVERVIEW</p><h2 id="overview-title">Turn papers into traceable evidence.</h2><p>Upload your source material, compare retrieval methods, and build answers where every claim leads back to the original passage.</p></div>
+              <button className="primary" onClick={() => setView(active.active_snapshot ? "search" : "sources")}>{active.active_snapshot ? "Search this collection" : "Add your first sources"}<ArrowUpRight size={16} /></button>
+            </div>
+            <div className="stat-grid">
+              <article><span><Database size={18} /></span><small>Snapshot</small><strong>{active.active_snapshot ? "Active" : "Not created"}</strong><p>{active.active_snapshot ? active.active_snapshot.slice(0, 16) + "…" : "Upload sources to build one"}</p></article>
+              <article><span><SearchIcon size={18} /></span><small>Retrieval</small><strong>3 modes</strong><p>Sparse, dense and hybrid comparison</p></article>
+              <article><span><ShieldCheck size={18} /></span><small>Access</small><strong>{active.visibility === "curated" ? "Curated" : "Private"}</strong><p>Identity-scoped sources and results</p></article>
+            </div>
+            <div className="workflow-card"><div><p className="eyebrow">RESEARCH FLOW</p><h2>A clear path from document to answer</h2></div><ol><li><span>01</span><div><strong>Add sources</strong><p>Import PDFs, Markdown, or text.</p></div></li><li><span>02</span><div><strong>Find evidence</strong><p>Compare exact retrieval methods.</p></div></li><li><span>03</span><div><strong>Build cited answers</strong><p>Save reproducible research runs.</p></div></li></ol></div>
+          </section>
         )}
-        {active && (
-          <Search
-            key={`search-${active.collection_id}`}
-            collection={active}
-            session={session}
-            fail={fail}
-          />
-        )}
+        {active && view === "sources" && <Uploads key={active.collection_id} collection={active} session={session} refresh={refresh} fail={fail} />}
+        {active && view === "search" && <Search key={`search-${active.collection_id}`} collection={active} session={session} fail={fail} />}
         {!active ? (
           <section className="empty">
             <span className="empty-symbol"><Sparkles size={30} /></span>
@@ -241,7 +266,7 @@ function App() {
             </p>
           </section>
         ) : null}
-        {active && (
+        {active && view === "answers" && (
           <Research
             key={`research-${active.collection_id}`}
             collection={active}
