@@ -22,6 +22,7 @@ class Settings:
     max_pending_jobs: int = 3
     max_pending_work: int = 64
     generation_config: Path | None = None
+    experiment_config: Path | None = None
 
     def __post_init__(self):
         for address in (self.origin, self.issuer):
@@ -64,6 +65,11 @@ class Settings:
             generation_config=(
                 Path(os.environ["RETRIEVEC_GENERATION_CONFIG"])
                 if os.getenv("RETRIEVEC_GENERATION_CONFIG")
+                else None
+            ),
+            experiment_config=(
+                Path(os.environ["RETRIEVEC_EXPERIMENT_CONFIG"])
+                if os.getenv("RETRIEVEC_EXPERIMENT_CONFIG")
                 else None
             ),
         )
