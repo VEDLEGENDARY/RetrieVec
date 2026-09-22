@@ -13,7 +13,7 @@ It is a protocol specification, not an executed or frozen study manifest.
 | Fine-tuned reranker | Training, checkpoint selection and held-out comparison not run | Retain current configuration |
 | ANN | Backend selection, implementation and comparison pending | Retain exact cosine |
 | Sparse compaction | Implementation and lifecycle/equivalence execution pending | Retain existing immutable segments |
-| Sparse optimization | No measured bottleneck or improvement recorded | Retain correct scorer |
+| Sparse optimization | Bounded top-k parity prototype still consumes the sorted reference; no measured improvement | Reject prototype; retain correct scorer |
 | Product promotion | No reviewed tradeoff evidence | No default change |
 
 No test, benchmark, model download or training run was executed for this protocol
