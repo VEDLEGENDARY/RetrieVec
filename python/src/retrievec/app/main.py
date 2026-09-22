@@ -103,6 +103,8 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
 
 
 def main():
+    import os
+
     import uvicorn
 
     from retrievec.telemetry import configure
@@ -111,8 +113,8 @@ def main():
 
     uvicorn.run(
         create_app(),
-        host="127.0.0.1",
-        port=8000,
+        host=os.getenv("RETRIEVEC_HOST", "127.0.0.1"),
+        port=int(os.getenv("RETRIEVEC_PORT", "8000")),
         proxy_headers=False,
         limit_concurrency=32,
         timeout_keep_alive=5,

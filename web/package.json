@@ -9,8 +9,11 @@
     "test": "playwright test"
   },
   "dependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "lucide-react": "1.47.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "tailwindcss": "4.3.3"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
