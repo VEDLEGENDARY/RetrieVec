@@ -1,5 +1,19 @@
 # Implementation status
 
+## Weeks 11–12 protocol
+
+Step 1 is authored on `docs/ml-index-protocol`: hypotheses, split isolation,
+provenance, bounded resumable-training requirements, ANN reference comparison,
+immutable compaction lifecycle and explicit retain/reject gates. See
+[protocol](ml-index-protocol.md) and [findings](reports/ml-index-experiments.md).
+No validation or experiment execution was performed for this change at the
+owner's request. Steps 2–14, reviewed data and measured decisions remain pending.
+
+The historical uncommitted-work descriptions below are superseded for Git state:
+Weeks 7–10 implementation was integrated through PR #24 at main `11d9404`.
+Historical acceptance limitations still apply. No claim of full project or
+experimental acceptance is made by integration alone.
+
 ## Weeks 9–10 in progress
 
 Implementation follows the owner-pasted instructions. Typed source-region contracts,
