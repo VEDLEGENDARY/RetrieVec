@@ -280,6 +280,6 @@ Backups contain private corpus data and are not encrypted by this tool.
 | Stale frontend | Rebuild `web/dist` with `npm run build` |
 | Interrupted run | Inspect saved state and create a new run; do not mutate history |
 
-## Contributing
+## Development workflow
 
-Development reaches protected `main` through pull requests with visible, unsquashed commits. See [CONTRIBUTING.md](CONTRIBUTING.md). Report measurements with their actual corpus, split, configuration and limitations.
+Develop on focused feature branches and merge into protected `main` through reviewed pull requests with visible, unsquashed commits. Keep dependencies pinned, preserve data provenance, and report measurements with their actual corpus, split, configuration and limitations.
