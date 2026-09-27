@@ -28,6 +28,7 @@ export function Search({
   const [result, setResult] = useState<SearchResult | null>(null);
   const [selected, setSelected] = useState<Hit | null>(null);
   const [busy, setBusy] = useState(false);
+  const [compact, setCompact] = useState(false);
   const [sourceError, setSourceError] = useState("");
   const request = useRef<AbortController | null>(null);
   const inspector = useRef<HTMLElement>(null);
@@ -90,6 +91,17 @@ export function Search({
           required
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (
+              (event.ctrlKey || event.metaKey) &&
+              event.key === "Enter" &&
+              !busy &&
+              collection.active_snapshot
+            ) {
+              event.preventDefault();
+              event.currentTarget.form?.requestSubmit();
+            }
+          }}
           placeholder="How does dense retrieval compare with lexical matching?"
         />
         <div className="search-controls">
@@ -145,6 +157,16 @@ export function Search({
       </p>
       {result && (
         <>
+          <div className="result-toolbar">
+            <p>Compare passages from the same source snapshot.</p>
+            <button
+              type="button"
+              aria-pressed={compact}
+              onClick={() => setCompact((value) => !value)}
+            >
+              {compact ? "Show full excerpts" : "Compact results"}
+            </button>
+          </div>
           <details className="diagnostics">
             <summary>Snapshot and search diagnostics</summary>
             <p>
@@ -172,7 +194,7 @@ export function Search({
               selected ? "evidence-layout inspecting" : "evidence-layout"
             }
           >
-            <div className="rankings">
+            <div className={compact ? "rankings compact" : "rankings"}>
               {Object.entries(result.results).map(([mode, value]) => (
                 <section
                   key={mode}
