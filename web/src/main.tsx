@@ -5,6 +5,7 @@ import "./style.css";
 import { Uploads } from "./Uploads";
 import { Search } from "./Search";
 import { Research } from "./Research";
+import { CommandMenu } from "./CommandMenu";
 import {
   Archive,
   ArrowUpRight,
@@ -34,6 +35,7 @@ function App() {
   const [busy, setBusy] = useState(false);
   const [view, setView] = useState<View>("overview");
   const [navigationOpen, setNavigationOpen] = useState(false);
+  const [collectionFilter, setCollectionFilter] = useState("");
   const active = collections.find((item) => item.collection_id === selected);
   const fail = useCallback((error: unknown) => {
     if (error instanceof APIError && error.status === 401) {
@@ -133,7 +135,10 @@ function App() {
     return (
       <main className="welcome">
         <div className="wordmark">
-          <span className="logo-mark"><BookOpenText size={19} /></span> RetrieVec
+          <span className="logo-mark">
+            <BookOpenText size={19} />
+          </span>{" "}
+          RetrieVec
         </div>
         <p className="eyebrow">YOUR PAPERS. TRACEABLE EVIDENCE.</p>
         <h1>
@@ -165,34 +170,64 @@ function App() {
       </a>
       <aside className={navigationOpen ? "navigation open" : "navigation"}>
         <div className="wordmark">
-          <span className="logo-mark"><BookOpenText size={18} /></span> RetrieVec
-          <button className="mobile-close" aria-label="Close navigation" onClick={() => setNavigationOpen(false)}><X size={18} /></button>
+          <span className="logo-mark">
+            <BookOpenText size={18} />
+          </span>{" "}
+          RetrieVec
+          <button
+            className="mobile-close"
+            aria-label="Close navigation"
+            onClick={() => setNavigationOpen(false)}
+          >
+            <X size={18} />
+          </button>
         </div>
         <p className="eyebrow">COLLECTIONS</p>
+        <label className="collection-filter">
+          Find a collection
+          <input
+            type="search"
+            value={collectionFilter}
+            onChange={(event) => setCollectionFilter(event.target.value)}
+            placeholder="Filter collections…"
+          />
+        </label>
         <nav aria-label="Collections">
-          {collections.map((item) => (
-            <button
-              key={item.collection_id}
-              className={
-                selected === item.collection_id
-                  ? "collection selected"
-                  : "collection"
-              }
-              aria-pressed={selected === item.collection_id}
-              onClick={() => {
-                setSelected(item.collection_id);
-                setError("");
-                setView("overview");
-                setNavigationOpen(false);
-              }}
-            >
-              <span>{item.title}</span>
-              <small>
-                {item.visibility === "curated" ? "Curated" : "Private"}
-              </small>
-            </button>
-          ))}
+          {collections
+            .filter((item) =>
+              item.title.toLowerCase().includes(collectionFilter.toLowerCase()),
+            )
+            .map((item) => (
+              <button
+                key={item.collection_id}
+                className={
+                  selected === item.collection_id
+                    ? "collection selected"
+                    : "collection"
+                }
+                aria-pressed={selected === item.collection_id}
+                onClick={() => {
+                  setSelected(item.collection_id);
+                  setError("");
+                  setView("overview");
+                  setNavigationOpen(false);
+                }}
+              >
+                <span>{item.title}</span>
+                <small>
+                  {item.visibility === "curated" ? "Curated" : "Private"}
+                </small>
+              </button>
+            ))}
         </nav>
+        {collectionFilter &&
+          !collections.some((item) =>
+            item.title.toLowerCase().includes(collectionFilter.toLowerCase()),
+          ) && (
+            <p className="muted" role="status">
+              No collections match “{collectionFilter}”.
+            </p>
+          )}
         <form onSubmit={create} className="new-collection">
           <label htmlFor="collection-title">New collection</label>
           <input
@@ -208,17 +243,76 @@ function App() {
           </button>
         </form>
         <div className="account">
-          <span><ShieldCheck size={14} /> Private workspace</span>
-          <button onClick={logout}><LogOut size={14} /> Sign out</button>
+          <span>
+            <ShieldCheck size={14} /> Private workspace
+          </span>
+          <button onClick={logout}>
+            <LogOut size={14} /> Sign out
+          </button>
         </div>
       </aside>
       <main id="research" className="research">
+        <div className="workspace-toolbar">
+          <span>Library / {view === "answers" ? "Cited answers" : view}</span>
+          <CommandMenu
+            actions={[
+              ...(active
+                ? (["overview", "sources", "search", "answers"] as const)
+                : []
+              ).map((id) => ({
+                id,
+                label:
+                  id === "answers"
+                    ? "Cited answers"
+                    : id.charAt(0).toUpperCase() + id.slice(1),
+                detail: active?.title ?? "Workspace",
+                run: () => setView(id),
+              })),
+              {
+                id: "create",
+                label: "Create a collection",
+                detail: "Organize a new research topic",
+                run: () => {
+                  setNavigationOpen(true);
+                  requestAnimationFrame(() =>
+                    document.getElementById("collection-title")?.focus(),
+                  );
+                },
+              },
+              ...collections.map((item) => ({
+                id: item.collection_id,
+                label: item.title,
+                detail: "Open collection",
+                run: () => {
+                  setSelected(item.collection_id);
+                  setView("overview");
+                  setError("");
+                },
+              })),
+            ]}
+          />
+        </div>
         <header>
           <div>
-            <button className="mobile-menu" aria-label="Open navigation" onClick={() => setNavigationOpen(true)}><Menu size={19} /></button>
+            <button
+              className="mobile-menu"
+              aria-label="Open navigation"
+              onClick={() => setNavigationOpen(true)}
+            >
+              <Menu size={19} />
+            </button>
             <p className="eyebrow">RESEARCH WORKSPACE</p>
             <h1>{active?.title ?? "A place for your next question"}</h1>
-            {active && <p className="header-meta"><ShieldCheck size={14} /> {active.visibility === "curated" ? "Curated collection" : "Private collection"}<span />{active.active_snapshot ? "Search ready" : "Awaiting sources"}</p>}
+            {active && (
+              <p className="header-meta">
+                <ShieldCheck size={14} />{" "}
+                {active.visibility === "curated"
+                  ? "Curated collection"
+                  : "Private collection"}
+                <span />
+                {active.active_snapshot ? "Search ready" : "Awaiting sources"}
+              </p>
+            )}
           </div>
           {active?.can_manage && (
             <button className="quiet" onClick={archive} disabled={busy}>
@@ -231,34 +325,148 @@ function App() {
             {error}
           </p>
         )}
-        {active && <nav className="view-tabs" aria-label="Workspace sections">
-          {([
-            ["overview", LayoutDashboard, "Overview"],
-            ["sources", FileText, "Sources"],
-            ["search", SearchIcon, "Search"],
-            ["answers", MessageSquareText, "Cited answers"],
-          ] as const).map(([id, Icon, label]) => <button key={id} className={view === id ? "active" : ""} aria-current={view === id ? "page" : undefined} onClick={() => setView(id)}><Icon size={16} />{label}</button>)}
-        </nav>}
+        {active && (
+          <nav className="view-tabs" aria-label="Workspace sections">
+            {(
+              [
+                ["overview", LayoutDashboard, "Overview"],
+                ["sources", FileText, "Sources"],
+                ["search", SearchIcon, "Search"],
+                ["answers", MessageSquareText, "Cited answers"],
+              ] as const
+            ).map(([id, Icon, label]) => (
+              <button
+                key={id}
+                className={view === id ? "active" : ""}
+                aria-current={view === id ? "page" : undefined}
+                onClick={() => setView(id)}
+              >
+                <Icon size={16} />
+                {label}
+              </button>
+            ))}
+          </nav>
+        )}
         {active && view === "overview" && (
           <section className="dashboard" aria-labelledby="overview-title">
             <div className="hero-card">
-              <span className="hero-icon"><Sparkles size={24} /></span>
-              <div><p className="eyebrow">COLLECTION OVERVIEW</p><h2 id="overview-title">Turn papers into traceable evidence.</h2><p>Upload your source material, compare retrieval methods, and build answers where every claim leads back to the original passage.</p></div>
-              <button className="primary" onClick={() => setView(active.active_snapshot ? "search" : "sources")}>{active.active_snapshot ? "Search this collection" : "Add your first sources"}<ArrowUpRight size={16} /></button>
+              <span className="hero-icon">
+                <Sparkles size={24} />
+              </span>
+              <div>
+                <p className="eyebrow">COLLECTION OVERVIEW</p>
+                <h2 id="overview-title">
+                  Turn papers into traceable evidence.
+                </h2>
+                <p>
+                  Upload your source material, compare retrieval methods, and
+                  build answers where every claim leads back to the original
+                  passage.
+                </p>
+              </div>
+              <button
+                className="primary"
+                onClick={() =>
+                  setView(active.active_snapshot ? "search" : "sources")
+                }
+              >
+                {active.active_snapshot
+                  ? "Search this collection"
+                  : "Add your first sources"}
+                <ArrowUpRight size={16} />
+              </button>
             </div>
             <div className="stat-grid">
-              <article><span><Database size={18} /></span><small>Snapshot</small><strong>{active.active_snapshot ? "Active" : "Not created"}</strong><p>{active.active_snapshot ? active.active_snapshot.slice(0, 16) + "…" : "Upload sources to build one"}</p></article>
-              <article><span><SearchIcon size={18} /></span><small>Retrieval</small><strong>3 modes</strong><p>Sparse, dense and hybrid comparison</p></article>
-              <article><span><ShieldCheck size={18} /></span><small>Access</small><strong>{active.visibility === "curated" ? "Curated" : "Private"}</strong><p>Identity-scoped sources and results</p></article>
+              <article>
+                <span>
+                  <Database size={18} />
+                </span>
+                <small>Snapshot</small>
+                <strong>
+                  {active.active_snapshot ? "Active" : "Not created"}
+                </strong>
+                <p>
+                  {active.active_snapshot
+                    ? active.active_snapshot.slice(0, 16) + "…"
+                    : "Upload sources to build one"}
+                </p>
+              </article>
+              <article>
+                <span>
+                  <SearchIcon size={18} />
+                </span>
+                <small>Retrieval</small>
+                <strong>3 modes</strong>
+                <p>Sparse, dense and hybrid comparison</p>
+              </article>
+              <article>
+                <span>
+                  <ShieldCheck size={18} />
+                </span>
+                <small>Access</small>
+                <strong>
+                  {active.visibility === "curated" ? "Curated" : "Private"}
+                </strong>
+                <p>Identity-scoped sources and results</p>
+              </article>
             </div>
-            <div className="workflow-card"><div><p className="eyebrow">RESEARCH FLOW</p><h2>A clear path from document to answer</h2></div><ol><li><span>01</span><div><strong>Add sources</strong><p>Import PDFs, Markdown, or text.</p></div></li><li><span>02</span><div><strong>Find evidence</strong><p>Compare exact retrieval methods.</p></div></li><li><span>03</span><div><strong>Build cited answers</strong><p>Save reproducible research runs.</p></div></li></ol></div>
+            <div className="workflow-card">
+              <div>
+                <p className="eyebrow">RESEARCH FLOW</p>
+                <h2>A clear path from document to answer</h2>
+              </div>
+              <ol>
+                <li>
+                  <span>01</span>
+                  <div>
+                    <strong>Add sources</strong>
+                    <p>Import PDFs, Markdown, or text.</p>
+                  </div>
+                </li>
+                <li>
+                  <span>02</span>
+                  <div>
+                    <strong>Find evidence</strong>
+                    <p>Compare exact retrieval methods.</p>
+                  </div>
+                </li>
+                <li>
+                  <span>03</span>
+                  <div>
+                    <strong>Build cited answers</strong>
+                    <p>Save reproducible research runs.</p>
+                  </div>
+                </li>
+              </ol>
+            </div>
           </section>
         )}
-        {active && view === "sources" && <Uploads key={active.collection_id} collection={active} session={session} refresh={refresh} fail={fail} />}
-        {active && view === "search" && <Search key={`search-${active.collection_id}`} collection={active} session={session} fail={fail} />}
+        {active && (
+          <div hidden={view !== "sources"}>
+            <Uploads
+              key={active.collection_id}
+              collection={active}
+              session={session}
+              refresh={refresh}
+              fail={fail}
+            />
+          </div>
+        )}
+        {active && (
+          <div hidden={view !== "search"}>
+            <Search
+              key={`search-${active.collection_id}`}
+              collection={active}
+              session={session}
+              fail={fail}
+            />
+          </div>
+        )}
         {!active ? (
           <section className="empty">
-            <span className="empty-symbol"><Sparkles size={30} /></span>
+            <span className="empty-symbol">
+              <Sparkles size={30} />
+            </span>
             <h2>Start with a collection</h2>
             <p>
               Give your research a home. Create a private collection, then add
@@ -266,13 +474,15 @@ function App() {
             </p>
           </section>
         ) : null}
-        {active && view === "answers" && (
-          <Research
-            key={`research-${active.collection_id}`}
-            collection={active}
-            session={session}
-            fail={fail}
-          />
+        {active && (
+          <div hidden={view !== "answers"}>
+            <Research
+              key={`research-${active.collection_id}`}
+              collection={active}
+              session={session}
+              fail={fail}
+            />
+          </div>
         )}
         <footer>
           Paper evidence and RetrieVec measurements are distinct. Retrieval
