@@ -72,7 +72,7 @@ def span(name, *, incoming=None):
     context = None
     if incoming is not None:
         context = TraceContextTextMapPropagator().extract(
-            {"traceparent": incoming.get("traceparent", "")}
+            {"traceparent": incoming.get("traceparent") or ""}
         )
     with _provider.get_tracer("retrievec").start_as_current_span(
         name,

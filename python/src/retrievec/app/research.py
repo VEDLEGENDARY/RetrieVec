@@ -14,6 +14,7 @@ from retrievec.app.auth import principal
 from retrievec.app.errors import APIError
 from retrievec.app.generation import load_providers
 from retrievec.corpus.snapshot import canonical, digest
+from retrievec.observability import carrier as trace_carrier
 from retrievec.registry.artifacts import Store
 from retrievec.registry.database import Conflict
 from retrievec.telemetry import CONTEXT
@@ -298,8 +299,12 @@ def install_research(app):
             from retrievec.app.run_state import event
 
             db.execute(
-                "UPDATE research_runs SET request_id=%s WHERE run_id=%s",
-                (CONTEXT.get().get("request_id"), row["run_id"]),
+                "UPDATE research_runs SET request_id=%s,traceparent=%s WHERE run_id=%s",
+                (
+                    CONTEXT.get().get("request_id"),
+                    trace_carrier().get("traceparent"),
+                    row["run_id"],
+                ),
             )
             event(db, row["run_id"], "queued")
             return run_view(row)

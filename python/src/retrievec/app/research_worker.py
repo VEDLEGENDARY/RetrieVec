@@ -25,6 +25,7 @@ from retrievec.client.rpc import RPCClient
 from retrievec.corpus.snapshot import load_snapshot
 from retrievec.dense.hybrid import PinnedClient
 from retrievec.dense.model import adapter
+from retrievec.observability import span
 from retrievec.registry.artifacts import Store
 from retrievec.registry.database import Registry
 from retrievec.registry.scheduling import heavy_slot
@@ -138,12 +139,15 @@ class ResearchWorker:
         run = self.state.claim()
         if run is None:
             return False
-        with correlate(
-            request_id=request_identity(run.get("request_id")),
-            run_id=run["run_id"],
-            snapshot_id=run["snapshot_id"],
-            collection_id=run["collection_id"],
-            service="research",
+        with (
+            span("research.run", incoming={"traceparent": run.get("traceparent")}),
+            correlate(
+                request_id=request_identity(run.get("request_id")),
+                run_id=run["run_id"],
+                snapshot_id=run["snapshot_id"],
+                collection_id=run["collection_id"],
+                service="research",
+            ),
         ):
             emit("worker.active", worker_kind="research", active_workers=1)
             emit(

@@ -14,6 +14,7 @@ import grpc
 from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.importer import import_manifest
 from retrievec.corpus.snapshot import canonical, digest, load_snapshot, parse_json
+from retrievec.observability import span
 from retrievec.registry.artifacts import Store, prepare
 from retrievec.registry.database import Conflict, Registry
 from retrievec.registry.jobs import Jobs, LeaseLost
@@ -81,11 +82,14 @@ class Worker:
         job = self.jobs.claim()
         if job is None:
             return None
-        with correlate(
-            request_id=request_identity(job.get("request_id")),
-            job_id=job["job_id"],
-            collection_id=job["collection_id"],
-            service="ingestion",
+        with (
+            span("ingestion.job", incoming={"traceparent": job.get("traceparent")}),
+            correlate(
+                request_id=request_identity(job.get("request_id")),
+                job_id=job["job_id"],
+                collection_id=job["collection_id"],
+                service="ingestion",
+            ),
         ):
             emit("worker.active", worker_kind="ingestion", active_workers=1)
             emit(
