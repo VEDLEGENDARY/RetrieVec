@@ -23,9 +23,9 @@ func rpcCommand(args []string, stdout, stderr io.Writer) int {
 	if flags.Parse(args) != nil || flags.NArg() != 0 || *root == "" {
 		return 2
 	}
-	host, _, err := net.SplitHostPort(*address)
-	if err != nil || net.ParseIP(host) == nil || !net.ParseIP(host).IsLoopback() {
-		fmt.Fprintln(stderr, "RPC requires numeric loopback address")
+	options, err := transportOptions(*address, os.Getenv("RETRIEVEC_RPC_TLS_CERT"), os.Getenv("RETRIEVEC_RPC_TLS_KEY"), os.Getenv("RETRIEVEC_RPC_TLS_CA"))
+	if err != nil {
+		fmt.Fprintln(stderr, err)
 		return 2
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -36,7 +36,8 @@ func rpcCommand(args []string, stdout, stderr io.Writer) int {
 		return 1
 	}
 	defer service.Close()
-	server := grpc.NewServer(grpc.UnaryInterceptor(service.Interceptor), grpc.MaxRecvMsgSize(4<<20), grpc.MaxSendMsgSize(4<<20), grpc.MaxConcurrentStreams(32))
+	options = append(options, grpc.UnaryInterceptor(service.Interceptor), grpc.MaxRecvMsgSize(4<<20), grpc.MaxSendMsgSize(4<<20), grpc.MaxConcurrentStreams(32))
+	server := grpc.NewServer(options...)
 	pb.RegisterRetrievalServer(server, service)
 	listener, err := net.Listen("tcp", *address)
 	if err != nil {
