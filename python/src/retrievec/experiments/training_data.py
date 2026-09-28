@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, Literal
+from typing import Literal
 
 from retrievec.corpus.snapshot import canonical, digest
 
@@ -31,7 +32,7 @@ class TrainingSample:
     provenance: Literal["human", "synthetic", "pseudo"]
 
     @classmethod
-    def create(cls, **values) -> "TrainingSample":
+    def create(cls, **values) -> TrainingSample:
         identity = {key: value for key, value in values.items() if key != "sample_id"}
         expected = "ts_" + digest(canonical(identity))
         supplied = values.pop("sample_id", expected)

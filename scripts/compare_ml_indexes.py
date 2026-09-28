@@ -15,8 +15,13 @@ def main() -> int:
     parser.add_argument("--criteria", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    load = lambda path: json.loads(path.read_text(encoding="utf-8"))
-    decision = compare_final_configs(load(args.reference), load(args.experimental), load(args.criteria))
+
+    def load(path):
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    decision = compare_final_configs(
+        load(args.reference), load(args.experimental), load(args.criteria)
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_bytes(canonical(decision) + b"\n")
     print(decision["decision_id"])
