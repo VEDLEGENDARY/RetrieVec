@@ -72,6 +72,14 @@ class RPCIntegrationTests(unittest.TestCase):
             hybrid_id = store.build(engine, corpus, embedding)
             process, address = start(store.root)
             reader, worker = RPCClient(address, read_token), RPCClient(address, worker_token)
+            self.assertTrue(reader.ready())
+            denied_health = RPCClient(address, "invalid-token")
+            try:
+                with self.assertRaises(grpc.RpcError) as denied:
+                    denied_health.ready()
+                self.assertEqual(denied.exception.code(), grpc.StatusCode.UNAUTHENTICATED)
+            finally:
+                denied_health.close()
             try:
                 registry.register(principal, store.manifest(sparse_id))
                 with self.assertRaises(grpc.RpcError) as denied:

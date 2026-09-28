@@ -5,6 +5,7 @@ ruff==0.16.7
 pypdf==6.18.1
 psycopg[binary]==3.3.5
 grpcio==1.84.0
+grpcio-health-checking==1.84.0
 grpcio-tools==1.84.0
 protobuf==7.36.2
 numpy==2.5.3
