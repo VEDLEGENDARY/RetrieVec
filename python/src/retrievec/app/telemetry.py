@@ -2,6 +2,7 @@
 
 import time
 
+from retrievec.observability import span
 from retrievec.telemetry import correlate, emit, request_identity
 
 
@@ -32,11 +33,21 @@ class RequestTelemetry:
                 }
             await send(message)
 
-        with correlate(request_id=identity, service="application"):
+        incoming_trace = dict(scope.get("headers", ())).get(b"traceparent", b"")
+        with (
+            span(
+                "http.request",
+                incoming={"traceparent": incoming_trace.decode("ascii", errors="ignore")},
+            ) as current,
+            correlate(request_id=identity, service="application"),
+        ):
             try:
                 await self.app(scope, receive, correlated_send)
             finally:
                 route = scope.get("route")
+                if current is not None:
+                    current.update_name("http." + getattr(route, "name", "unmatched"))
+                    current.set_attribute("http.response.status_code", status)
                 emit(
                     "http.finished",
                     operation=getattr(route, "name", "unmatched"),

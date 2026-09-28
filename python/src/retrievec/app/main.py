@@ -123,7 +123,7 @@ def main():
 
     from retrievec.telemetry import configure
 
-    configure()
+    configure("retrievec.api")
 
     uvicorn.run(
         create_app(),
