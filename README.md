@@ -259,6 +259,38 @@ Backups contain private corpus data and are not encrypted by this tool.
 
 ## Security
 
+### Container roles and private RPC
+
+The image accepts `workspace` (default), `api`, `rpc`, `ingestion`, `research`, or
+`migrate` as its command. Run migrations before starting separate roles. The
+workspace command stops all children if any required role exits, and allows 35
+seconds for shutdown. Workers stop claiming new jobs on SIGTERM; interrupted jobs
+remain governed by their database leases. Keep one ingestion and one research
+worker: their database singleton locks intentionally reject additional instances.
+
+`/healthz` checks API liveness; `/readyz` checks database connectivity and the
+collection table with bounded timeouts. Readiness does not certify model availability
+or retrieval quality. `RETRIEVEC_FRONTEND` selects the built frontend directory;
+the image sets it to `/app/web/dist`. Persist `/app/artifacts/cache` for model downloads.
+
+Plaintext RPC accepts numeric loopback addresses only. For separate hosts, mount
+a private CA and distinct server/client certificates, then set these variables in
+each role's environment:
+
+| Variable | Retrieval server | Python clients |
+| --- | --- | --- |
+| `RETRIEVEC_RPC_TLS_CA` | CA that issues client certificates | CA that issues server certificates |
+| `RETRIEVEC_RPC_TLS_CERT` | Server certificate chain | Client certificate chain |
+| `RETRIEVEC_RPC_TLS_KEY` | Server private key | Client private key |
+| `RETRIEVEC_RPC_LISTEN` | e.g. `0.0.0.0:8092` | Unused |
+| `RETRIEVEC_RPC` | Unused by server | DNS name matching the server certificate SAN |
+
+All three TLS files are required together. The Go server requires TLS 1.3 and a
+verified client certificate; role bearer tokens and collection authorization are
+still enforced. No hostname-verification bypass is provided. Restart roles after
+certificate rotation. Keep keys outside Git and restrict mounts to their own role.
+This follows the [gRPC authentication model](https://grpc.io/docs/guides/auth/).
+
 - Use HTTPS outside localhost and exact OIDC callback/origin values.
 - Keep RPC, PostgreSQL and model servers private.
 - Rotate read, worker, OIDC and generation secrets independently.
