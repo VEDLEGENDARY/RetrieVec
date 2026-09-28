@@ -23,7 +23,12 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      RETRIEVEC_DSN: postgresql://retrievec:${RETRIEVEC_DB_PASSWORD}@postgres:5432/retrievec
+      RETRIEVEC_DSN: ""
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGDATABASE: retrievec
+      PGUSER: retrievec
+      PGPASSWORD: ${RETRIEVEC_DB_PASSWORD}
       RETRIEVEC_PRINCIPAL: "*"
       RETRIEVEC_READ_TOKEN: ${RETRIEVEC_READ_TOKEN:?Set a read token}
       RETRIEVEC_WORKER_TOKEN: ${RETRIEVEC_WORKER_TOKEN:?Set a worker token}
