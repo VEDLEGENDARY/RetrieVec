@@ -21,10 +21,16 @@ def compare_final_configs(reference: dict, experimental: dict, criteria: dict) -
         minimum = criteria.get("minimum_quality_delta")
         maximum_p95 = criteria.get("maximum_p95_ms")
         maximum_memory = criteria.get("maximum_memory_bytes")
-        if not all(isinstance(value, (int, float)) for value in (minimum, maximum_p95, maximum_memory)):
+        if not all(
+            isinstance(value, (int, float)) for value in (minimum, maximum_p95, maximum_memory)
+        ):
             raise ValueError("numeric retain criteria are incomplete")
         quality_delta = experimental["quality"] - reference["quality"]
-        passed = quality_delta >= minimum and experimental["latency"]["p95"] <= maximum_p95 and experimental["memory"] <= maximum_memory
+        passed = (
+            quality_delta >= minimum
+            and experimental["latency"]["p95"] <= maximum_p95
+            and experimental["memory"] <= maximum_memory
+        )
         decision = "retain_experimental" if passed else "retain_reference"
         reasons = [] if passed else ["one or more frozen quality/resource criteria failed"]
     identity = {
@@ -40,7 +46,9 @@ def compare_final_configs(reference: dict, experimental: dict, criteria: dict) -
     return dict(identity, decision_id="fd_" + digest(canonical(identity)))
 
 
-def verify_adapter_scope(run: dict, *, principal_id: str, collection_id: str, snapshot_id: str) -> None:
+def verify_adapter_scope(
+    run: dict, *, principal_id: str, collection_id: str, snapshot_id: str
+) -> None:
     if run.get("principal_id") != principal_id or run.get("collection_id") != collection_id:
         raise PermissionError("experiment run scope mismatch")
     if run.get("retrieval_snapshot_id") != snapshot_id:

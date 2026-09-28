@@ -6,7 +6,6 @@ import unittest
 from pathlib import Path
 
 from fastapi.testclient import TestClient
-
 from retrievec.app.config import Settings
 from retrievec.app.main import create_app
 from retrievec.runtime import supervise

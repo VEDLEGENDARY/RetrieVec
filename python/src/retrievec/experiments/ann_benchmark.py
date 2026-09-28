@@ -35,13 +35,18 @@ def benchmark_ann(
             approximate, elapsed = timed_search(index, vector, top_k=top_k, snapshot_id=snapshot_id)
             exact_ids = {row["chunk_id"] for row in exact}
             approximate_ids = [row["chunk_id"] for row in approximate]
-            recalls.append(len(exact_ids.intersection(approximate_ids)) / len(exact_ids) if exact_ids else 1.0)
+            recalls.append(
+                len(exact_ids.intersection(approximate_ids)) / len(exact_ids) if exact_ids else 1.0
+            )
             latencies.append(elapsed)
             relevance.append(metrics(approximate_ids, judgments.get(query["query_id"], {}), top_k))
         except Exception as error:
             failures.append({"query_id": query.get("query_id"), "error": type(error).__name__})
     ordered = sorted(latencies)
-    percentile = lambda q: ordered[min(len(ordered) - 1, int((len(ordered) - 1) * q))] if ordered else None
+
+    def percentile(q):
+        return ordered[min(len(ordered) - 1, int((len(ordered) - 1) * q))] if ordered else None
+
     return {
         "schema_version": 1,
         "index_id": index.index_id,
@@ -50,8 +55,13 @@ def benchmark_ann(
         "scale": {"vectors": len(chunk_ids), "dimension": int(vectors.shape[1])},
         "build_ms": build_ms,
         "memory_bytes": int(index.centers.nbytes + sum(group.nbytes for group in index.members)),
-        "disk_bytes": os.path.getsize(serialized_path) if serialized_path and serialized_path.exists() else None,
-        "ann_recall_at_k": {"mean": statistics.fmean(recalls) if recalls else None, "queries": len(recalls)},
+        "disk_bytes": os.path.getsize(serialized_path)
+        if serialized_path and serialized_path.exists()
+        else None,
+        "ann_recall_at_k": {
+            "mean": statistics.fmean(recalls) if recalls else None,
+            "queries": len(recalls),
+        },
         "judged_relevance": aggregate(relevance),
         "latency_ms": {"p50": percentile(0.5), "p95": percentile(0.95), "samples": len(latencies)},
         "failures": failures,
