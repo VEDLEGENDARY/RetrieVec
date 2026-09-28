@@ -51,5 +51,6 @@ def compare_three_way(
         "candidate_pool_hashes": hashes[0],
         "systems": reports,
         "failures": {name: report.get("failures", []) for name, report in reports.items()},
-        "comparison_id": "rc_" + digest(canonical({name: digest(canonical(report)) for name, report in reports.items()})),
+        "comparison_id": "rc_"
+        + digest(canonical({name: digest(canonical(report)) for name, report in reports.items()})),
     }

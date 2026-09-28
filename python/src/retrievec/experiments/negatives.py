@@ -34,13 +34,26 @@ def mine_hard_negatives(
         for rank, candidate in enumerate(pool["candidates"], 1):
             sample = by_pair.get((query_id, candidate["chunk_id"]))
             if sample is None:
-                excluded.append({"query_id": query_id, "chunk_id": candidate["chunk_id"], "reason": "unjudged"})
+                excluded.append(
+                    {"query_id": query_id, "chunk_id": candidate["chunk_id"], "reason": "unjudged"}
+                )
             elif sample.review_status != "reviewed" or sample.provenance != "human":
-                excluded.append({"query_id": query_id, "chunk_id": sample.chunk_id, "reason": "uncertain"})
+                excluded.append(
+                    {"query_id": query_id, "chunk_id": sample.chunk_id, "reason": "uncertain"}
+                )
             elif sample.grade != 0:
-                excluded.append({"query_id": query_id, "chunk_id": sample.chunk_id, "reason": "not_negative"})
+                excluded.append(
+                    {"query_id": query_id, "chunk_id": sample.chunk_id, "reason": "not_negative"}
+                )
             else:
-                eligible.append({"sample_id": sample.sample_id, "query_id": query_id, "chunk_id": sample.chunk_id, "rank": rank})
+                eligible.append(
+                    {
+                        "sample_id": sample.sample_id,
+                        "query_id": query_id,
+                        "chunk_id": sample.chunk_id,
+                        "rank": rank,
+                    }
+                )
         rng.shuffle(eligible)
         selected.extend(sorted(eligible[:per_query], key=lambda row: row["rank"]))
     identity = {
