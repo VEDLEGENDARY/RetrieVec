@@ -230,6 +230,18 @@ Compare rerankers on identical candidate pools. Measure ANN recall against exact
 
 ## Validation
 
+The versioned API contract is `contracts/openapi.json`. Regenerate it with
+`python -m retrievec.contracts` after changing routes and review the diff. CI runs
+`python -m retrievec.contracts --check` to reject drift. The export records browser
+session and CSRF requirements, local schema references, and streaming limitations.
+Some research responses currently have permissive schemas; a passing contract
+check does not imply complete response validation.
+
+For an isolated JSON mock, run `npm ci` then `npm run mock` in `contracts/`.
+Prism listens on `127.0.0.1:4010`. It does not implement OIDC, private-scope policy,
+model inference, or real SSE replay/cancellation; keep those end-to-end tests against
+the actual application. Never send private research data to a mock server.
+
 ```bash
 python scripts/check.py
 cd web && npm run build
