@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import math
 import time
+from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass
-from typing import Callable, Iterable, Protocol
+from typing import Protocol
 
 from retrievec.corpus.snapshot import canonical, digest
 from retrievec.evaluation.metrics import aggregate, metrics
@@ -48,7 +49,9 @@ class Reranker(Protocol):
 
 
 class CallableReranker:
-    def __init__(self, config: RerankerConfig, scorer: Callable[[list[tuple[str, str]]], list[float]]):
+    def __init__(
+        self, config: RerankerConfig, scorer: Callable[[list[tuple[str, str]]], list[float]]
+    ):
         config.validate()
         self.config = config
         self._scorer = scorer
@@ -64,15 +67,21 @@ class CallableReranker:
         return [float(value) for value in scores]
 
 
-def rerank(query: str, candidates: list[dict], model: Reranker, *, top_k: int) -> tuple[list[dict], float]:
+def rerank(
+    query: str, candidates: list[dict], model: Reranker, *, top_k: int
+) -> tuple[list[dict], float]:
     if not 1 <= top_k <= len(candidates) <= 1000:
         raise ValueError("invalid reranker candidate bounds")
     ids = [row.get("chunk_id") for row in candidates]
-    if any(not isinstance(identity, str) or not identity for identity in ids) or len(set(ids)) != len(ids):
+    if any(not isinstance(identity, str) or not identity for identity in ids) or len(
+        set(ids)
+    ) != len(ids):
         raise ValueError("candidate IDs must be unique")
     start = time.perf_counter()
     scores = model.score([(query, row["text"]) for row in candidates])
-    ranked = [dict(row, reranker_score=score) for row, score in zip(candidates, scores, strict=True)]
+    ranked = [
+        dict(row, reranker_score=score) for row, score in zip(candidates, scores, strict=True)
+    ]
     ranked.sort(key=lambda row: (-row["reranker_score"], row["chunk_id"]))
     return ranked[:top_k], (time.perf_counter() - start) * 1000
 
@@ -92,12 +101,17 @@ def evaluate_baseline(
         pool_hashes.append(digest(canonical(pool)))
         try:
             ranked, latency = rerank(query, candidates, model, top_k=min(top_k, len(candidates)))
-            rows.append(metrics([row["chunk_id"] for row in ranked], judgments.get(query_id, {}), top_k))
+            rows.append(
+                metrics([row["chunk_id"] for row in ranked], judgments.get(query_id, {}), top_k)
+            )
             elapsed.append(latency)
         except Exception as error:
             failures.append({"query_id": query_id, "error": type(error).__name__})
     ordered = sorted(elapsed)
-    percentile = lambda q: ordered[min(len(ordered) - 1, int((len(ordered) - 1) * q))] if ordered else None
+
+    def percentile(q):
+        return ordered[min(len(ordered) - 1, int((len(ordered) - 1) * q))] if ordered else None
+
     return {
         "schema_version": 1,
         "configuration": asdict(model.config),
