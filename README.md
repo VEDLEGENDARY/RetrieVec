@@ -230,6 +230,40 @@ Compare rerankers on identical candidate pools. Measure ANN recall against exact
 
 ## Validation
 
+### Optional pgvector study
+
+The experimental adapter lives in `retrievec.experiments.pgvector`; the product
+continues to use its exact file-backed dense reference. Use an isolated PostgreSQL
+18 study database with the vector extension (`compose.vector-study.yaml` pins the
+official image by digest). Set `RETRIEVEC_DSN` to that database and populate it with
+authorized, ready snapshots and their verified artifact store before benchmarking.
+
+```bash
+docker compose -p retrievec-vector-study -f compose.vector-study.yaml up -d
+python scripts/benchmark_pgvector.py --initialize --store artifacts/study-store \
+  --principal YOUR_PRINCIPAL --collection YOUR_COLLECTION --snapshot rs_YOUR_SNAPSHOT \
+  --queries private/vector-queries.json --output artifacts/pgvector-report.json
+```
+
+The query file contains `configuration` matching the pinned embedding encoder,
+`queries` containing unique `query_id`, encoded `vector`, and optional `judgments`
+mapping chunk IDs to grades 0–3, plus `judgment_provenance`. Preserve the frozen
+held-out split and paper versions; synthetic labels are not human review.
+
+Backfill verifies source hashes, every persisted vector's float32 checksum and
+external IDs before atomic publication. Each immutable snapshot/model/config has
+its own table and HNSW index, avoiding cross-collection ANN filtering. Existing
+indexes are retained. The CLI's `--initialize` is an explicit administrator action
+in a separate experimental schema; it never runs with ordinary product migrations.
+Builds are bounded to 100,000 vectors by default and 2,000 dimensions, with SQL
+timeouts. Interrupted builds roll back and can be restarted.
+
+Reports separate ANN recall from judged relevance, exact ranking parity, build or
+verification time, p50/p95 latency, failures and on-disk bytes. Memory and controlled
+cache experiments remain explicit missing measurements. Fixture parity tests do not
+establish real-model quality. The recorded decision remains **retain the reference
+pending review** until representative quality/resource evidence supports a change.
+
 ### Optional distributed tracing
 
 Enable the collector and Jaeger alongside the app with:

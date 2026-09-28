@@ -49,7 +49,8 @@ def initialize(registry):
         )""")
 
 
-def build(registry, store, principal, collection, snapshot_id, config=VectorConfig()):
+def build(registry, store, principal, collection, snapshot_id, config=None):
+    config = config or VectorConfig()
     registered = registry.resolve(principal, collection, snapshot_id)
     manifest = store.manifest(snapshot_id)
     if manifest != registered["manifest"] or not manifest.get("embedding_id"):
@@ -133,13 +134,15 @@ def build(registry, store, principal, collection, snapshot_id, config=VectorConf
         # This table is new and unpublished. Index creation cannot block existing readers.
         db.execute(
             sql.SQL(
-                "CREATE INDEX ON {} USING hnsw (embedding vector_cosine_ops) WITH (m={}, ef_construction={})"
+                "CREATE INDEX ON {} USING hnsw (embedding vector_cosine_ops) "
+                "WITH (m={}, ef_construction={})"
             ).format(table, sql.Literal(config.m), sql.Literal(config.ef_construction))
         )
         db.execute(sql.SQL("ANALYZE {}").format(table))
         registry.authorize(db, principal, collection, lock=True)
         db.execute(
-            "INSERT INTO retrievec_experiments.vector_indexes VALUES (%s,%s,%s,%s,clock_timestamp())",
+            "INSERT INTO retrievec_experiments.vector_indexes "
+            "VALUES (%s,%s,%s,%s,clock_timestamp())",
             (index_id, collection, snapshot_id, Jsonb(descriptor)),
         )
     from retrievec.telemetry import emit
@@ -166,7 +169,8 @@ class PgvectorIndex:
             db.execute("SET LOCAL statement_timeout = '5s'")
             self.registry.authorize(db, self.principal, self.collection, lock=True, read=True)
             row = db.execute(
-                "SELECT manifest FROM retrievec_experiments.vector_indexes WHERE index_id=%s AND collection_id=%s AND snapshot_id=%s",
+                "SELECT manifest FROM retrievec_experiments.vector_indexes "
+                "WHERE index_id=%s AND collection_id=%s AND snapshot_id=%s",
                 (self.index_id, self.collection, self.snapshot_id),
             ).fetchone()
             if not row:
@@ -191,7 +195,8 @@ class PgvectorIndex:
                 order = sql.SQL("distance, chunk_id")
             rows = db.execute(
                 sql.SQL(
-                    "SELECT chunk_id, embedding <=> %s::vector AS distance FROM {} ORDER BY {} LIMIT %s"
+                    "SELECT chunk_id, embedding <=> %s::vector AS distance "
+                    "FROM {} ORDER BY {} LIMIT %s"
                 ).format(self.table, order),
                 (value, top_k),
             ).fetchall()
