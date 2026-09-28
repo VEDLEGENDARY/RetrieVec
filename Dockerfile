@@ -24,7 +24,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     RETRIEVEC_FRONTEND=/app/web/dist \
     HF_HOME=/app/artifacts/cache/huggingface
 WORKDIR /app
-RUN groupadd --system retrievec && useradd --system --gid retrievec --home /app retrievec
+RUN groupadd --gid 10001 retrievec && useradd --uid 10001 --gid retrievec --home /app retrievec
 COPY python/pyproject.toml /tmp/retrievec/pyproject.toml
 COPY python/src /tmp/retrievec/src
 RUN pip install --no-cache-dir '/tmp/retrievec[app]' && rm -rf /tmp/retrievec
