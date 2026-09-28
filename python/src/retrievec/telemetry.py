@@ -19,7 +19,10 @@ COUNTS = {"elapsed_ms", "queue_age_ms", "attempt", "active_workers", "status_cod
 IDENTIFIER = re.compile(r"^[A-Za-z0-9_.:-]{1,128}$")
 
 
-def configure():
+def configure(service="retrievec.python"):
+    from retrievec.observability import configure as configure_tracing
+
+    configure_tracing(service)
     if not LOGGER.handlers:
         handler = logging.StreamHandler()
         handler.setFormatter(logging.Formatter("%(message)s"))

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import grpc
 
+from retrievec.observability import carrier, span
 from retrievec.retrieval.v1 import retrieval_pb2 as pb
 from retrievec.retrieval.v1 import retrieval_pb2_grpc as rpc
 from retrievec.telemetry import CONTEXT, emit, request_identity
@@ -55,10 +56,15 @@ class RPCClient:
         self.channel.close()
 
     def call(self, method, request):
+        with span("rpc.retrieval"):
+            return self._call(method, request)
+
+    def _call(self, method, request):
         deadline = time.monotonic() + self.timeout
         started = time.perf_counter()
         trace = CONTEXT.get()
         metadata = self.metadata + (("x-request-id", request_identity(trace.get("request_id"))),)
+        metadata += tuple(carrier().items())
         for key in ("job_id", "run_id"):
             if trace.get(key):
                 metadata += (("x-retrievec-" + key.replace("_", "-"), str(trace[key])),)

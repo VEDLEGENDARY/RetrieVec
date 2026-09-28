@@ -230,6 +230,28 @@ Compare rerankers on identical candidate pools. Measure ANN recall against exact
 
 ## Validation
 
+### Optional distributed tracing
+
+Enable the collector and Jaeger alongside the app with:
+
+```bash
+docker compose -f compose.app.yaml -f compose.observability.yaml up --build -d
+```
+
+Open Jaeger at `http://127.0.0.1:16686`. Native processes can install
+`python -m pip install -e "./python[app,telemetry]"` and set `RETRIEVEC_OTEL=1`,
+`RETRIEVEC_OTEL_ENDPOINT=http://127.0.0.1:4318/v1/traces`, and optionally
+`RETRIEVEC_OTEL_SAMPLE_RATIO` between 0 and 1 (default 0.1). Restart after changes.
+Tracing is disabled by default. The sample collector uses bounded memory/queues;
+Jaeger uses transient storage, so restarting it loses traces.
+
+API requests propagate W3C traceparent through Python RPC into Go. Database connection
+and worker tick spans are included. SQL, query text, source text, credentials,
+exception messages and baggage are not captured. Asynchronous jobs currently begin
+new worker traces: durable producer-to-consumer trace links remain a follow-up gate.
+Do not expose these unauthenticated local collector/UI ports publicly. Collector
+startup and a full deployed trace still require a working Docker engine.
+
 The versioned API contract is `contracts/openapi.json`. Regenerate it with
 `python -m retrievec.contracts` after changing routes and review the diff. CI runs
 `python -m retrievec.contracts --check` to reject drift. The export records browser
