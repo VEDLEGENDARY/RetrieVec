@@ -259,6 +259,61 @@ Backups contain private corpus data and are not encrypted by this tool.
 
 ## Security
 
+### Optional single-node Kubernetes
+
+Docker Compose remains the reference deployment. The Kubernetes renderer targets
+a Linux k3s node with the `local-path` storage class and NetworkPolicy enforcement.
+For Minikube, select an enforcing CNI and pass its storage class explicitly. This is
+a single-node deployment with restart downtime, not a high-availability service.
+Do not scale the workspace replica count: worker locks and local storage require it.
+
+Build/push the image to your registry, obtain its immutable digest, then render:
+
+```bash
+python -m retrievec.deployment --image YOUR_REGISTRY/retrievec@sha256:YOUR_DIGEST \
+  --origin https://research.example.com --issuer https://identity.example.com/realms/retrievec \
+  --output artifacts/deploy/workspace.json
+kubectl create namespace retrievec
+```
+
+Provision `database-secrets` with key `password`, and `workspace-secrets` with
+`RETRIEVEC_DSN`, `RETRIEVEC_READ_TOKEN`, `RETRIEVEC_WORKER_TOKEN`, and optionally
+`RETRIEVEC_OIDC_SECRET`. Use a local private environment file or a secret manager;
+never put secret values in command history or checked-in manifests. The DSN must
+target `postgres:5432/retrievec` with user `retrievec` and the same database password.
+Percent-encode special characters if using a PostgreSQL URI.
+
+```bash
+kubectl -n retrievec create secret generic database-secrets --from-file=password=private/db-password
+kubectl -n retrievec create secret generic workspace-secrets --from-env-file=private/workspace.env
+kubectl apply --dry-run=server -f artifacts/deploy/workspace.json
+kubectl apply -f artifacts/deploy/workspace.json
+kubectl -n retrievec rollout status deployment/workspace --timeout=300s
+```
+
+The deployment creates three PVCs, resource budgets, a nonroot/read-only workspace,
+startup/readiness/liveness probes, and default-deny network policies. HTTPS egress
+is allowed for the configured identity provider and model downloads; tighten it
+with your CNI's domain policy or preloaded models where required. No RPC port is
+exposed. Back up both PostgreSQL and artifact storage before upgrades. Local-path
+volumes stay on their node; replacing that node requires a restore.
+
+For HTTPS, install a maintained Gateway API controller and TLS certificate separately.
+Create a Gateway named `retrievec` in `gateway-system` with an `https` listener,
+permit routes from the application namespace, and label the controller namespace
+`retrievec.io/gateway=true`. Render with `--gateway` to include its HTTPRoute.
+Register the exact HTTPS OIDC callback shown in the authentication setup above.
+The controller, certificate issuance and live OIDC flow require deployment validation.
+
+Alternatively, use `deploy/tofu` to manage the rendered resources. Run `tofu init`,
+commit the generated provider lockfile after reviewing checksums, and run
+`tofu plan` with explicit `kubeconfig`, `context`, and absolute `manifest_path`
+variables. Import an already-created namespace before the first plan. Do not manage
+the same deployment with both `kubectl apply` and OpenTofu. Destruction is blocked
+by lifecycle guards. State and plans stay local and may contain operational data.
+OpenTofu initialization, provider locks, server-side dry-run, restore, and pod-kill
+checks must pass before considering this path production-ready.
+
 ### Container roles and private RPC
 
 The image accepts `workspace` (default), `api`, `rpc`, `ingestion`, `research`, or
