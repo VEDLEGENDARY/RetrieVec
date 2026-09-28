@@ -447,4 +447,28 @@ This follows the [gRPC authentication model](https://grpc.io/docs/guides/auth/).
 
 ## Development workflow
 
+### Infrastructure acceptance gates
+
+`configs/infrastructure-study.json` records the baseline revision, required
+provenance, proposed acceptance thresholds, and decisions for the expanded stack.
+The new infrastructure is optional. Passing software tests establishes functional
+behavior; it does not establish production capacity, real-model quality, or a
+successful live deployment.
+
+| Capability | Current decision |
+| --- | --- |
+| Containers, mutual TLS, tracing, OpenAPI tooling | Available, with automated functional checks |
+| Kubernetes/OpenTofu/Gateway route | Deployment tooling available; live cluster, HTTPS identity and recovery rehearsal required |
+| pgvector exact/HNSW | Experimental adapter and benchmark available; retain exact reference pending reviewed measurements |
+| Kafka and Redis | Deferred until a measured bottleneck justifies their operational cost |
+| Streaming retrieval/generated claims | Retain bounded RPC and progress plus validated final answers |
+| HPA/multi-node workers | Deferred while singleton locks and node-local storage apply |
+| AskUTD | Requires its actual API, identity, permission and retention contract |
+
+Before changing defaults, freeze the real corpus, held-out queries and reviewed
+judgments; capture p50/p95 latency, throughput, failures, memory and disk under stated
+resource/concurrency limits; then rehearse restore, interrupted jobs, database loss
+and rollback on the target deployment. No benchmark numbers or acceptance results
+are implied by this checklist. Do not substitute fixture vectors for quality evidence.
+
 Develop on focused feature branches and merge into protected `main` through reviewed pull requests with visible, unsquashed commits. Keep dependencies pinned, preserve data provenance, and report measurements with their actual corpus, split, configuration and limitations.
