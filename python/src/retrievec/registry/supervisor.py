@@ -47,7 +47,10 @@ def _serve_worker(registry, guard_key, tick, *, idle_seconds, stop):
                     # Never trust a process guard that belonged to a disconnected session.
                     guard.execute("SELECT 1")
                     guard.commit()
-                    worked = tick()
+                    from retrievec.observability import span
+
+                    with span("worker.tick"):
+                        worked = tick()
                     if failures:
                         emit("worker.recovered", attempt=failures)
                     failures = 0

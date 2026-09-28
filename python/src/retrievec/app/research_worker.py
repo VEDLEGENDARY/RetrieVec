@@ -257,7 +257,7 @@ class ResearchWorker:
 
 
 def main():
-    configure()
+    configure("retrievec.research")
     settings = Settings.from_env()
     registry = Registry(settings.dsn)
     worker = ResearchWorker(registry, settings)
