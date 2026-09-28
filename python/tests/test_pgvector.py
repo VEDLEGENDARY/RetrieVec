@@ -48,12 +48,17 @@ class VectorDatabaseTests(unittest.TestCase):
             index = PgvectorIndex(registry, owner, collection, snapshot, index_id)
             embedding, vectors = load_embeddings(store, embedding_id, corpus.name)
             query = model.encode(["retrieval"])[0]
-            reference = exact_search(vectors, [c["chunk_id"] for c in embedding["chunks"]], query)
-            exact = index.search(query, configuration=model.config)
+            limit = len(embedding["chunks"])
+            reference = exact_search(
+                vectors, [c["chunk_id"] for c in embedding["chunks"]], query, limit
+            )
+            exact = index.search(query, configuration=model.config, top_k=limit)
             self.assertEqual([r["chunk_id"] for r in reference], [r["chunk_id"] for r in exact])
             for left, right in zip(reference, exact, strict=True):
                 self.assertAlmostEqual(left["cosine_score"], right["cosine_score"], places=6)
-            approximate = index.search(query, configuration=model.config, approximate=True)
+            approximate = index.search(
+                query, configuration=model.config, approximate=True, top_k=limit
+            )
             self.assertEqual({r["chunk_id"] for r in approximate}, {r["chunk_id"] for r in exact})
             with self.assertRaises(ValueError):
                 index.search(query, configuration={"model": "wrong"})
