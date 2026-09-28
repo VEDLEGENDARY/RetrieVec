@@ -362,6 +362,12 @@ collection table with bounded timeouts. Readiness does not certify model availab
 or retrieval quality. `RETRIEVEC_FRONTEND` selects the built frontend directory;
 the image sets it to `/app/web/dist`. Persist `/app/artifacts/cache` for model downloads.
 
+The image now uses UID/GID 10001. Before upgrading an existing deployment, back up
+its data and ensure the artifact/cache volumes are writable by that identity;
+older images used a distribution-assigned system UID. Kubernetes sets the matching
+filesystem group. Compose passes PostgreSQL credentials as separate libpq environment
+variables so punctuation in passwords is not interpreted as URI syntax.
+
 Plaintext RPC accepts numeric loopback addresses only. For separate hosts, mount
 a private CA and distinct server/client certificates, then set these variables in
 each role's environment:
