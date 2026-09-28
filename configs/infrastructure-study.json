@@ -29,8 +29,7 @@
     "redis": "Deferred until measured repeat-query or admission pressure justifies another service; sessions remain in PostgreSQL.",
     "streaming_retrieval": "Retain bounded unary RPC until measured streaming benefits justify its cancellation and ordering complexity.",
     "streaming_generation": "Retain progress events and validated final answers; do not publish unvalidated generated claims.",
-    "autoscaling": "Disabled while singleton worker locks and local storage constrain the workspace deployment.",
-    "askutd": "Blocked on the real API, identity mapping, data permissions and retention contract."
+    "autoscaling": "Disabled while singleton worker locks and local storage constrain the workspace deployment."
   },
   "release_gates": [
     "Live Kubernetes server-side dry-run and deployment",
