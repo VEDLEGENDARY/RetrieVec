@@ -281,8 +281,10 @@ Jaeger uses transient storage, so restarting it loses traces.
 
 API requests propagate W3C traceparent through Python RPC into Go. Database connection
 and worker tick spans are included. SQL, query text, source text, credentials,
-exception messages and baggage are not captured. Asynchronous jobs currently begin
-new worker traces: durable producer-to-consumer trace links remain a follow-up gate.
+exception messages and baggage are not captured. Enqueued ingestion/research jobs
+persist only their W3C traceparent and resume that context when claimed, including
+retries. Migration 008 adds nullable columns with a three-second lock timeout;
+older code ignores them, so rollback does not require dropping any data.
 Do not expose these unauthenticated local collector/UI ports publicly. Collector
 startup and a full deployed trace still require a working Docker engine.
 

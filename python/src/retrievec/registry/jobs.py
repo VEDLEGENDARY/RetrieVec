@@ -6,6 +6,7 @@ from contextlib import nullcontext
 from psycopg.types.json import Jsonb
 
 from retrievec.corpus.snapshot import canonical, digest
+from retrievec.observability import carrier
 from retrievec.registry.database import Conflict, Registry
 from retrievec.telemetry import CONTEXT, emit
 
@@ -39,7 +40,8 @@ class Jobs:
                 (
                     "INSERT INTO "
                     "ingestion_jobs(job_id,collection_id,idempotency_key,input_hash,config_ha"
-                    "sh,payload,expected_parent,max_attempts) VALUES(%s,%s,%s,%s,%s,%s,%s,%s) "
+                    "sh,payload,expected_parent,max_attempts,traceparent) "
+                    "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s) "
                     "ON CONFLICT DO NOTHING"
                 ),
                 (
@@ -51,6 +53,7 @@ class Jobs:
                     Jsonb({"input": payload, "configuration": configuration}),
                     owner["active_snapshot"],
                     max_attempts,
+                    carrier().get("traceparent"),
                 ),
             )
             job = connection.execute(
