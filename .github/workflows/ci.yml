@@ -94,6 +94,10 @@ jobs:
           node-version: '26.1.0'
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - run: npm ci --ignore-scripts
+        working-directory: contracts
+      - run: npm test
+        working-directory: contracts
       - run: npm ci
         working-directory: web
       - run: npm run build
