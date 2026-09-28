@@ -17,7 +17,7 @@ func (values scoreHeap) Less(i, j int) bool {
 	}
 	return values[i].ID > values[j].ID
 }
-func (values scoreHeap) Swap(i, j int) { values[i], values[j] = values[j], values[i] }
+func (values scoreHeap) Swap(i, j int)   { values[i], values[j] = values[j], values[i] }
 func (values *scoreHeap) Push(value any) { *values = append(*values, value.(Score)) }
 func (values *scoreHeap) Pop() any {
 	old := *values
