@@ -644,10 +644,9 @@ code {
 }
 .search-controls {
   display: grid;
-  grid-template-columns: auto minmax(150px, 0.65fr) auto minmax(
-      150px,
-      0.65fr
-    ) auto;
+  grid-template-columns:
+    auto minmax(150px, 0.65fr) auto minmax(150px, 0.65fr)
+    auto;
   align-items: center;
   gap: 0.65rem;
 }
@@ -1201,6 +1200,10 @@ kbd {
   .result-toolbar {
     align-items: flex-start;
   }
-  .navigation { visibility: hidden; }
-  .navigation.open { visibility: visible; }
+  .navigation {
+    visibility: hidden;
+  }
+  .navigation.open {
+    visibility: visible;
+  }
 }

@@ -56,7 +56,9 @@ def _atomic(path: Path, data: bytes) -> None:
     os.replace(stage, path)
 
 
-def _save_checkpoint(directory: Path, config: TrainingConfig, weights: np.ndarray, state: dict) -> str:
+def _save_checkpoint(
+    directory: Path, config: TrainingConfig, weights: np.ndarray, state: dict
+) -> str:
     payload = weights.astype("<f4").tobytes()
     manifest = dict(state, schema_version=1, config=asdict(config), config_id=config.config_id)
     manifest["weights_sha256"] = digest(payload)
@@ -64,7 +66,9 @@ def _save_checkpoint(directory: Path, config: TrainingConfig, weights: np.ndarra
     target = directory / manifest["checkpoint_id"]
     _atomic(target / "weights.f32", payload)
     _atomic(target / "manifest.json", canonical(manifest) + b"\n")
-    _atomic(directory / "latest.json", canonical({"checkpoint_id": manifest["checkpoint_id"]}) + b"\n")
+    _atomic(
+        directory / "latest.json", canonical({"checkpoint_id": manifest["checkpoint_id"]}) + b"\n"
+    )
     return manifest["checkpoint_id"]
 
 
@@ -119,7 +123,11 @@ def train_pairwise(
             weights -= config.learning_rate * gradient.astype(np.float32)
             step += 1
             if step % config.checkpoint_every == 0:
-                checkpoints.append(_save_checkpoint(checkpoint_directory, config, weights, {"step": step, "epoch": epoch}))
+                checkpoints.append(
+                    _save_checkpoint(
+                        checkpoint_directory, config, weights, {"step": step, "epoch": epoch}
+                    )
+                )
         epoch += 1
     final = _save_checkpoint(checkpoint_directory, config, weights, {"step": step, "epoch": epoch})
     return {

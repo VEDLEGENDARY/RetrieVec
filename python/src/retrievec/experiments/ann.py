@@ -32,7 +32,9 @@ class IVFConfig:
 class IVFIndex:
     """A deterministic research adapter; exact cosine remains authoritative."""
 
-    def __init__(self, vectors: np.ndarray, chunk_ids: list[str], snapshot_id: str, config: IVFConfig):
+    def __init__(
+        self, vectors: np.ndarray, chunk_ids: list[str], snapshot_id: str, config: IVFConfig
+    ):
         values = normalize(vectors)
         if len(values) != len(chunk_ids) or not snapshot_id.startswith("rs_"):
             raise ValueError("ANN vectors, IDs or snapshot are invalid")
@@ -62,7 +64,9 @@ class IVFIndex:
                 break
             centers = next_centers
         self.centers = centers
-        self.members = [np.flatnonzero(assignments == cluster) for cluster in range(self.config.clusters)]
+        self.members = [
+            np.flatnonzero(assignments == cluster) for cluster in range(self.config.clusters)
+        ]
         identity = {
             "schema_version": 1,
             "snapshot_id": self.snapshot_id,
@@ -83,9 +87,16 @@ class IVFIndex:
         if not len(candidates):
             return []
         scores = self.vectors[candidates] @ vector
-        order = sorted(range(len(candidates)), key=lambda at: (-float(scores[at]), self.chunk_ids[int(candidates[at])]))[:top_k]
+        order = sorted(
+            range(len(candidates)),
+            key=lambda at: (-float(scores[at]), self.chunk_ids[int(candidates[at])]),
+        )[:top_k]
         return [
-            {"chunk_id": self.chunk_ids[int(candidates[at])], "cosine_score": float(scores[at]), "index_id": self.index_id}
+            {
+                "chunk_id": self.chunk_ids[int(candidates[at])],
+                "cosine_score": float(scores[at]),
+                "index_id": self.index_id,
+            }
             for at in order
         ]
 
@@ -93,7 +104,9 @@ class IVFIndex:
         return exact_search(self.vectors, self.chunk_ids, query, top_k)
 
 
-def timed_search(index: IVFIndex, query: np.ndarray, *, top_k: int, snapshot_id: str) -> tuple[list[dict], float]:
+def timed_search(
+    index: IVFIndex, query: np.ndarray, *, top_k: int, snapshot_id: str
+) -> tuple[list[dict], float]:
     started = time.perf_counter()
     result = index.search(query, top_k=top_k, snapshot_id=snapshot_id)
     return result, (time.perf_counter() - started) * 1000

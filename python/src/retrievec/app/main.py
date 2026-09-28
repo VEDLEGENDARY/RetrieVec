@@ -91,11 +91,25 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
     def health():
         return {"status": "ok"}
 
+    @app.get("/readyz", include_in_schema=False)
+    def ready():
+        import psycopg
+
+        try:
+            with psycopg.connect(settings.dsn, connect_timeout=2) as db:
+                db.execute("SET LOCAL statement_timeout = '1500ms'")
+                db.execute("SELECT 1 FROM collections LIMIT 0")
+        except psycopg.Error:
+            return JSONResponse({"status": "unavailable"}, status_code=503)
+        return {"status": "ready"}
+
     from pathlib import Path
 
     from starlette.staticfiles import StaticFiles
 
-    frontend = Path(__file__).resolve().parents[4] / "web" / "dist"
+    frontend = settings.frontend or Path(__file__).resolve().parents[4] / "web" / "dist"
+    if settings.frontend is not None and not (frontend / "index.html").is_file():
+        raise ValueError("configured frontend must contain index.html")
     if frontend.is_dir():
         app.mount("/", StaticFiles(directory=frontend, html=True), name="workspace")
 
