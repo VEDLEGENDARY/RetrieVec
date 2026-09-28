@@ -359,8 +359,10 @@ seconds for shutdown. Workers stop claiming new jobs on SIGTERM; interrupted job
 remain governed by their database leases. Keep one ingestion and one research
 worker: their database singleton locks intentionally reject additional instances.
 
-`/healthz` checks API liveness; `/readyz` checks database connectivity and the
-collection table with bounded timeouts. Readiness does not certify model availability
+`/healthz` checks API liveness; `/readyz` checks the database, collection table and
+authenticated Go RPC readiness with bounded timeouts. Go exposes role-authenticated
+gRPC health services `live` (process only) and `ready` (database pool available).
+Readiness does not certify model availability
 or retrieval quality. `RETRIEVEC_FRONTEND` selects the built frontend directory;
 the image sets it to `/app/web/dist`. Persist `/app/artifacts/cache` for model downloads.
 
