@@ -13,7 +13,7 @@ from retrievec.telemetry import configure
 
 
 def main():
-    configure()
+    configure("retrievec.ingestion")
     settings = Settings.from_env()
     registry = Registry(settings.dsn)
     engine = Path(os.environ["RETRIEVEC_ENGINE"]).resolve()

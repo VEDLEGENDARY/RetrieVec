@@ -18,7 +18,10 @@ class Registry:
         self.dsn = dsn
 
     def connect(self):
-        return psycopg.connect(self.dsn, row_factory=dict_row, connect_timeout=5)
+        from retrievec.observability import span
+
+        with span("database.connect"):
+            return psycopg.connect(self.dsn, row_factory=dict_row, connect_timeout=5)
 
     def migrate(self) -> None:
         with self.connect() as connection:

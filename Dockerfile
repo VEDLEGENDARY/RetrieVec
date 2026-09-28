@@ -27,7 +27,7 @@ WORKDIR /app
 RUN groupadd --gid 10001 retrievec && useradd --uid 10001 --gid retrievec --home /app retrievec
 COPY python/pyproject.toml /tmp/retrievec/pyproject.toml
 COPY python/src /tmp/retrievec/src
-RUN pip install --no-cache-dir '/tmp/retrievec[app]' && rm -rf /tmp/retrievec
+RUN pip install --no-cache-dir '/tmp/retrievec[app,telemetry]' && rm -rf /tmp/retrievec
 COPY --from=engine /out/retrievald /usr/local/bin/retrievald
 COPY --from=web /src/web/dist /app/web/dist
 COPY configs /app/configs

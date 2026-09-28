@@ -30,13 +30,23 @@ func rpcCommand(args []string, stdout, stderr io.Writer) int {
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+	shutdownTracing, err := rpcapi.ConfigureTracing(ctx)
+	if err != nil {
+		fmt.Fprintln(stderr, err)
+		return 2
+	}
+	defer func() {
+		flush, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		_ = shutdownTracing(flush)
+	}()
 	service, err := rpcapi.New(ctx, os.Getenv("RETRIEVEC_DSN"), *root, os.Getenv("RETRIEVEC_PRINCIPAL"), os.Getenv("RETRIEVEC_READ_TOKEN"), os.Getenv("RETRIEVEC_WORKER_TOKEN"))
 	if err != nil {
 		fmt.Fprintln(stderr, "RPC registry or artifact startup failed")
 		return 1
 	}
 	defer service.Close()
-	options = append(options, grpc.UnaryInterceptor(service.Interceptor), grpc.MaxRecvMsgSize(4<<20), grpc.MaxSendMsgSize(4<<20), grpc.MaxConcurrentStreams(32))
+	options = append(options, grpc.ChainUnaryInterceptor(rpcapi.TraceInterceptor, service.Interceptor), grpc.MaxRecvMsgSize(4<<20), grpc.MaxSendMsgSize(4<<20), grpc.MaxConcurrentStreams(32))
 	server := grpc.NewServer(options...)
 	pb.RegisterRetrievalServer(server, service)
 	listener, err := net.Listen("tcp", *address)
