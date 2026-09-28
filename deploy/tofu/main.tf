@@ -26,7 +26,7 @@ provider "kubernetes" {
 }
 
 locals {
-  bundle = jsondecode(file(var.manifest_path))
+  bundle     = jsondecode(file(var.manifest_path))
   namespaces = [for item in local.bundle.items : item if item.kind == "Namespace"]
   resources = {
     for item in local.bundle.items : "${item.kind}/${item.metadata.name}" => item
@@ -44,13 +44,13 @@ resource "kubernetes_namespace_v1" "workspace" {
 }
 
 resource "kubernetes_manifest" "workspace" {
-  for_each = local.resources
-  manifest = each.value
+  for_each   = local.resources
+  manifest   = each.value
   depends_on = [kubernetes_namespace_v1.workspace]
   lifecycle {
     prevent_destroy = true
     precondition {
-      condition = each.value.kind != "Secret"
+      condition     = each.value.kind != "Secret"
       error_message = "Secrets must be provisioned outside this state."
     }
   }
