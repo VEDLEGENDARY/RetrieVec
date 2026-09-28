@@ -1,0 +1,11 @@
+{
+  "name": "retrievec-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "mock": "prism mock openapi.json --host 127.0.0.1 --port 4010"
+  },
+  "devDependencies": {
+    "@stoplight/prism-cli": "5.16.0"
+  }
+}
