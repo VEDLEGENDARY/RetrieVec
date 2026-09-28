@@ -463,7 +463,9 @@ successful live deployment.
 | Kafka and Redis | Deferred until a measured bottleneck justifies their operational cost |
 | Streaming retrieval/generated claims | Retain bounded RPC and progress plus validated final answers |
 | HPA/multi-node workers | Deferred while singleton locks and node-local storage apply |
-| AskUTD | Requires its actual API, identity, permission and retention contract |
+
+RetrieVec and AskUTD are separate projects. This repository has no AskUTD integration
+work planned.
 
 Before changing defaults, freeze the real corpus, held-out queries and reviewed
 judgments; capture p50/p95 latency, throughput, failures, memory and disk under stated
