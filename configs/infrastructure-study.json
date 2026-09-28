@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "b0ff105",
+  "default_decision": "retain_reference_pending_review",
+  "hypotheses": {
+    "pgvector_hnsw": "Lower p95 dense retrieval latency without unacceptable candidate recall or judged relevance loss.",
+    "distributed_runtime": "Improve deployment reproducibility and failure diagnosis without weakening private-scope or snapshot guarantees."
+  },
+  "required_provenance": [
+    "full_git_commit", "dependency_versions", "hardware", "operating_system",
+    "corpus_snapshot_id", "embedding_id", "model_revision", "query_bundle_sha256",
+    "judgments_sha256", "judgment_review_status", "frozen_split_id", "index_parameters",
+    "warmup_policy", "cache_policy", "concurrency", "resource_limits", "failure_counts"
+  ],
+  "proposed_acceptance": {
+    "minimum_queries": 100,
+    "minimum_corpus_vectors": 20000,
+    "ann_recall_at_k_minimum": 0.99,
+    "experimental_to_reference_p95_ratio_maximum": 0.8,
+    "judged_ndcg_delta_minimum": -0.01,
+    "exact_ranking_parity_required": true,
+    "private_scope_failures_allowed": 0,
+    "snapshot_identity_failures_allowed": 0,
+    "peak_memory_measurement_required": true,
+    "human_review_before_default_change": true
+  },
+  "conditional_decisions": {
+    "kafka": "Deferred until a reproducible PostgreSQL queue bottleneck is demonstrated; any adoption requires transactional outbox and idempotent replay.",
+    "redis": "Deferred until measured repeat-query or admission pressure justifies another service; sessions remain in PostgreSQL.",
+    "streaming_retrieval": "Retain bounded unary RPC until measured streaming benefits justify its cancellation and ordering complexity.",
+    "streaming_generation": "Retain progress events and validated final answers; do not publish unvalidated generated claims.",
+    "autoscaling": "Disabled while singleton worker locks and local storage constrain the workspace deployment.",
+    "askutd": "Blocked on the real API, identity mapping, data permissions and retention contract."
+  },
+  "release_gates": [
+    "Live Kubernetes server-side dry-run and deployment",
+    "Real HTTPS OIDC callback, cookies, CSRF, upload and source-access flow",
+    "Cross-service collector trace including durable worker continuation",
+    "Representative frozen workload baseline and experiment reports",
+    "Backup/restore, pod interruption, database outage and rollback rehearsal",
+    "Owner review of quality, latency, memory and operational tradeoffs"
+  ]
+}

@@ -69,7 +69,7 @@ jobs:
     timeout-minutes: 20
     services:
       postgres:
-        image: postgres:18.3
+        image: pgvector/pgvector@sha256:2ba9ca5f2e7daa0f0e7723cba1ee9167bab54efd3640516a44ac1a928dd67e7a
         env:
           POSTGRES_USER: retrievec
           POSTGRES_DB: retrievec
@@ -81,6 +81,7 @@ jobs:
           --health-interval 2s --health-timeout 5s --health-retries 30
     env:
       RETRIEVEC_TEST_DSN: postgresql://retrievec:integration-only@127.0.0.1:5432/retrievec
+      RETRIEVEC_VECTOR_TEST_DSN: postgresql://retrievec:integration-only@127.0.0.1:5432/retrievec
       RETRIEVEC_DSN: postgresql://retrievec:integration-only@127.0.0.1:5432/retrievec
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
