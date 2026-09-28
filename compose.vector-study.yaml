@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: pgvector/pgvector@sha256:2ba9ca5f2e7daa0f0e7723cba1ee9167bab54efd3640516a44ac1a928dd67e7a
+    environment:
+      POSTGRES_DB: retrievec
+      POSTGRES_USER: retrievec
+      POSTGRES_PASSWORD: ${RETRIEVEC_VECTOR_DB_PASSWORD:?Set a private experimental database password}
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - vector-study-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U retrievec -d retrievec"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+volumes:
+  vector-study-data:
