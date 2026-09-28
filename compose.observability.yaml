@@ -1,0 +1,27 @@
+services:
+  workspace:
+    environment:
+      RETRIEVEC_OTEL: "1"
+      RETRIEVEC_OTEL_ENDPOINT: http://collector:4318/v1/traces
+      RETRIEVEC_OTEL_SAMPLE_RATIO: "0.1"
+  collector:
+    image: otel/opentelemetry-collector:0.134.0
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./deploy/otel/collector.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "127.0.0.1:4318:4318"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    restart: unless-stopped
+  jaeger:
+    image: cr.jaegertracing.io/jaegertracing/jaeger:2.21.0
+    ports:
+      - "127.0.0.1:16686:16686"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    restart: unless-stopped
