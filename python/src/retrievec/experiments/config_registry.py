@@ -7,7 +7,6 @@ from pathlib import Path
 
 from retrievec.corpus.snapshot import canonical, digest, parse_json
 
-
 REFERENCE_CONFIG = {
     "schema_version": 1,
     "kind": "reference",
@@ -56,7 +55,9 @@ def load_config(directory: Path, config_id: str | None) -> dict:
     return config
 
 
-def authorize_config(config: dict, *, requested_collection: str, authorized_collection: str, snapshot_id: str) -> None:
+def authorize_config(
+    config: dict, *, requested_collection: str, authorized_collection: str, snapshot_id: str
+) -> None:
     if requested_collection != authorized_collection:
         raise PermissionError("experiment collection scope denied")
     pinned = config.get("retrieval_snapshot_id")

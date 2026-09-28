@@ -23,6 +23,7 @@ class Settings:
     max_pending_work: int = 64
     generation_config: Path | None = None
     experiment_config: Path | None = None
+    frontend: Path | None = None
 
     def __post_init__(self):
         for address in (self.origin, self.issuer):
@@ -61,6 +62,9 @@ class Settings:
             rpc_address=os.getenv("RETRIEVEC_RPC", "127.0.0.1:8092"),
             read_token=os.getenv("RETRIEVEC_READ_TOKEN", ""),
             embedding=os.getenv("RETRIEVEC_EMBEDDING", "minilm"),
+            frontend=Path(os.environ["RETRIEVEC_FRONTEND"])
+            if os.getenv("RETRIEVEC_FRONTEND")
+            else None,
             max_pending_work=int(os.getenv("RETRIEVEC_MAX_PENDING_WORK", "64")),
             generation_config=(
                 Path(os.environ["RETRIEVEC_GENERATION_CONFIG"])

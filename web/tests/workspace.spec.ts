@@ -7,10 +7,14 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await page.getByRole("link", { name: /Sign in to your workspace/ }).click();
   await page.getByRole("link", { name: "Sign in as a", exact: true }).click();
   await page.getByLabel("New collection").fill("Retrieval experiments");
-  await page.getByRole("button", { name: "+ Create collection" }).click();
+  await page
+    .getByRole("button", { name: "Create collection", exact: true })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Retrieval experiments", exact: true }),
   ).toBeVisible();
+  const sections = page.getByRole("navigation", { name: "Workspace sections" });
+  await sections.getByRole("button", { name: "Sources", exact: true }).click();
   await page.getByLabel("Choose documents").setInputFiles({
     name: "private-evidence.txt",
     mimeType: "text/plain",
@@ -24,6 +28,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await expect(
     page.getByText("Snapshot activated. Ready to search."),
   ).toBeVisible({ timeout: 90000 });
+  await sections.getByRole("button", { name: "Search", exact: true }).click();
   await page.getByLabel("Research question").fill("retrieval evidence");
   await page
     .getByRole("button", { name: "Search evidence →", exact: true })
@@ -48,6 +53,9 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   });
   expect(authorized.status()).toBe(206);
   expect(await authorized.text()).toBe("Dense");
+  await sections
+    .getByRole("button", { name: "Cited answers", exact: true })
+    .click();
   await page
     .getByLabel("Question for cited answer")
     .fill("What does dense retrieval match?");
