@@ -37,3 +37,12 @@ node_modules/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Infrastructure state and local credentials
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+crash.log
