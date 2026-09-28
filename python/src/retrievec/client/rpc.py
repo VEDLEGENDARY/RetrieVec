@@ -1,7 +1,9 @@
 """Generated RPC client with bounded deadlines and explicit snapshot identities."""
 
 import math
+import os
 import time
+from pathlib import Path
 
 import grpc
 
@@ -16,18 +18,31 @@ class RPCClient:
     ):
         if not token or not math.isfinite(timeout) or timeout <= 0:
             raise ValueError("credential and finite deadline required")
+        if principal is not None and (
+            not principal
+            or len(principal) > 256
+            or not principal.isascii()
+            or any(ord(character) < 32 or ord(character) == 127 for character in principal)
+        ):
+            raise ValueError("invalid principal assertion")
         host = address.rsplit(":", 1)[0].strip("[]")
         import ipaddress
 
-        if not ipaddress.ip_address(host).is_loopback:
-            raise ValueError("unencrypted RPC is restricted to loopback")
-        self.channel = grpc.insecure_channel(
-            address,
-            options=[
-                ("grpc.max_receive_message_length", 4 << 20),
-                ("grpc.max_send_message_length", 4 << 20),
-            ],
-        )
+        options = [
+            ("grpc.max_receive_message_length", 4 << 20),
+            ("grpc.max_send_message_length", 4 << 20),
+        ]
+        paths = [os.getenv("RETRIEVEC_RPC_TLS_" + name) for name in ("CA", "CERT", "KEY")]
+        if any(paths):
+            if not all(paths):
+                raise ValueError("RPC CA, client certificate and key must all be configured")
+            ca, cert, key = [Path(path).read_bytes() for path in paths]
+            credentials = grpc.ssl_channel_credentials(ca, key, cert)
+            self.channel = grpc.secure_channel(address, credentials, options=options)
+        else:
+            if not ipaddress.ip_address(host).is_loopback:
+                raise ValueError("unencrypted RPC is restricted to loopback")
+            self.channel = grpc.insecure_channel(address, options=options)
         self.stub = rpc.RetrievalStub(self.channel)
         self.metadata = (("authorization", "Bearer " + token),)
         if principal is not None:
