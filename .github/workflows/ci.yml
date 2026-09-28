@@ -17,6 +17,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  container:
+    name: Container build and installed frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - run: docker build -t retrievec:ci .
+      - name: Smoke test installed image as its nonroot user
+        run: >-
+          docker run --rm --read-only --tmpfs /tmp
+          -e RETRIEVEC_DSN=unused -e RETRIEVEC_LOCAL_HTTP=1
+          --entrypoint python retrievec:ci -c
+          "import os; from fastapi.testclient import TestClient; from retrievec.app.main import create_app; assert os.getuid() != 0; client = TestClient(create_app()); assert client.get('/').status_code == 200; assert client.get('/healthz').status_code == 200; assert client.get('/api/v1/collections').status_code == 401"
+
   checks:
     name: checks (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
