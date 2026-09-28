@@ -55,6 +55,16 @@ class RPCClient:
     def close(self):
         self.channel.close()
 
+    def ready(self):
+        from grpc_health.v1 import health_pb2, health_pb2_grpc
+
+        response = health_pb2_grpc.HealthStub(self.channel).Check(
+            health_pb2.HealthCheckRequest(service="ready"),
+            timeout=self.timeout,
+            metadata=self.metadata + tuple(carrier().items()),
+        )
+        return response.status == health_pb2.HealthCheckResponse.SERVING
+
     def call(self, method, request):
         with span("rpc.retrieval"):
             return self._call(method, request)

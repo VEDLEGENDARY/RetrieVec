@@ -93,13 +93,22 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
 
     @app.get("/readyz", include_in_schema=False)
     def ready():
+        import grpc
         import psycopg
+
+        from retrievec.client.rpc import RPCClient
 
         try:
             with psycopg.connect(settings.dsn, connect_timeout=2) as db:
                 db.execute("SET LOCAL statement_timeout = '1500ms'")
                 db.execute("SELECT 1 FROM collections LIMIT 0")
-        except psycopg.Error:
+            node = RPCClient(settings.rpc_address, settings.read_token, timeout=1)
+            try:
+                if not node.ready():
+                    return JSONResponse({"status": "unavailable"}, status_code=503)
+            finally:
+                node.close()
+        except (psycopg.Error, grpc.RpcError, OSError, ValueError):
             return JSONResponse({"status": "unavailable"}, status_code=503)
         return {"status": "ready"}
 

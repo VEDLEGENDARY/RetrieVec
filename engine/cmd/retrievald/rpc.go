@@ -49,6 +49,7 @@ func rpcCommand(args []string, stdout, stderr io.Writer) int {
 	options = append(options, grpc.ChainUnaryInterceptor(rpcapi.TraceInterceptor, service.Interceptor), grpc.MaxRecvMsgSize(4<<20), grpc.MaxSendMsgSize(4<<20), grpc.MaxConcurrentStreams(32))
 	server := grpc.NewServer(options...)
 	pb.RegisterRetrievalServer(server, service)
+	rpcapi.RegisterHealth(server, service)
 	listener, err := net.Listen("tcp", *address)
 	if err != nil {
 		fmt.Fprintln(stderr, err)
