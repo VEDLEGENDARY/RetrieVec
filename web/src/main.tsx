@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { recordTiming } from "./performance";
 import { createRoot } from "react-dom/client";
 import { api, type Collection } from "./api";
 import "./style.css";
@@ -41,6 +42,9 @@ function App() {
     logout,
   } = useWorkspace();
   const [title, setTitle] = useState("");
+  useEffect(() => {
+    if (!loading) recordTiming("app.ready", performance.now());
+  }, [loading]);
 
   const [busy, setBusy] = useState(false);
   const [view, setView] = useState<View>("overview");
