@@ -21,11 +21,16 @@ test("command navigation keeps query drafts and collection filtering works", asy
     return route.fulfill({ json: data });
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Retrieval literature", exact: true })).toBeVisible();
-  await page.screenshot({ path: "test-results/workspace-desktop.png", fullPage: true });
+  await expect(
+    page.getByRole("heading", { name: "Retrieval literature", exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "test-results/workspace-desktop.png",
+    fullPage: true,
+  });
   await page.getByRole("button", { name: "Quick actions" }).click();
   await page
-    .getByRole("textbox", { name: "Find actions and collections" })
+    .getByRole("combobox", { name: "Find actions and collections" })
     .fill("Search");
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog")).not.toBeVisible();
@@ -54,5 +59,9 @@ test("command navigation keeps query drafts and collection filtering works", asy
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
-  await page.screenshot({ path: "test-results/workspace-mobile.png", fullPage: true, animations: "disabled" });
+  await page.screenshot({
+    path: "test-results/workspace-mobile.png",
+    fullPage: true,
+    animations: "disabled",
+  });
 });
