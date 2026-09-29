@@ -117,7 +117,7 @@ jobs:
         working-directory: web
       - run: npm run build
         working-directory: web
-      - run: npx prettier --check src tests playwright.config.ts vite.config.ts
+      - run: npx prettier --check src tests ui-tests playwright.config.ts playwright.ui.config.ts vite.config.ts
         working-directory: web
       - run: npx playwright install --with-deps chromium
         working-directory: web
@@ -125,6 +125,8 @@ jobs:
         working-directory: web
         env:
           RETRIEVEC_ENGINE: ${{ github.workspace }}/artifacts/bin/retrievald
+      - run: npm run test:ui
+        working-directory: web
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:

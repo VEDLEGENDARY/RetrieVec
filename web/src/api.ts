@@ -49,6 +49,7 @@ export class APIError extends Error {
     message: string,
   ) {
     super(message);
+    this.name = "APIError";
   }
 }
 export async function api<T>(
@@ -67,11 +68,26 @@ export async function api<T>(
     cache: "no-store",
   });
   if (!response.ok) {
-    const error = await response.json().catch(() => ({
-      code: "unavailable",
-      message: "Service unavailable. Try again.",
-    }));
-    throw new APIError(response.status, error.code, error.message);
+    const body: unknown = await response.json().catch(() => null);
+    const error =
+      body && typeof body === "object" ? (body as Record<string, unknown>) : {};
+    const code =
+      typeof error.code === "string" && /^[a-z_]{1,80}$/.test(error.code)
+        ? error.code
+        : "unavailable";
+    const fallback =
+      response.status === 401
+        ? "Your session has ended. Sign in to continue."
+        : response.status === 429
+          ? "The workspace is busy. Wait a moment, then try again."
+          : "The request could not be completed. Try again shortly.";
+    const message =
+      typeof error.message === "string" &&
+      error.message.trim() &&
+      error.message.length <= 1000
+        ? error.message
+        : fallback;
+    throw new APIError(response.status, code, message);
   }
   return response.status === 204 ? (undefined as T) : response.json();
 }
