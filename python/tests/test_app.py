@@ -1,7 +1,9 @@
+import json
 import runpy
 import unittest
 from unittest.mock import patch
 
+from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 from retrievec.app.config import Settings
@@ -10,6 +12,25 @@ from retrievec.app.schemas import SearchInput
 
 
 class ApplicationTests(unittest.TestCase):
+    def test_unexpected_failure_keeps_correlation_without_private_details(self):
+        app = create_app(Settings(dsn="unused", local_http=True))
+
+        def broken():
+            raise RuntimeError("private evidence and credentials")
+
+        app.router.routes.insert(0, APIRoute("/broken", broken))
+        client = TestClient(app, raise_server_exceptions=False)
+        with self.assertLogs("retrievec.events", level="INFO") as logs:
+            response = client.get("/broken", headers={"X-Request-ID": "b" * 32})
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.headers.get("x-request-id"), "b" * 32)
+        self.assertEqual(response.headers["cache-control"], "no-store")
+        self.assertNotIn("private evidence", response.text)
+        event = json.loads(logs.records[-1].getMessage())
+        self.assertEqual(event["status_code"], response.status_code)
+        self.assertEqual(event["request_id"], response.headers["x-request-id"])
+        self.assertNotIn("private evidence", logs.output[0])
+
     def test_module_entry_point_uses_the_same_error_contract(self):
         created = []
         with (
