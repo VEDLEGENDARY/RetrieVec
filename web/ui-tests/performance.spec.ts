@@ -69,9 +69,11 @@ test("local performance baseline and recorder privacy", async ({
       expect(JSON.stringify(recorder)).not.toMatch(
         /private|secret|question|snapshot/i,
       );
-      await page.evaluate(() => window.retrievecPerformance?.clear());
       expect(
-        await page.evaluate(() => window.retrievecPerformance?.snapshot()),
+        await page.evaluate(() => {
+          window.retrievecPerformance?.clear();
+          return window.retrievecPerformance?.snapshot();
+        }),
       ).toEqual([]);
     }
     if (i >= 2) runs.push({ enabled, readyObserved, samples: recorder });

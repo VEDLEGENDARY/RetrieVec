@@ -1,0 +1,99 @@
+/* Single source of truth. Media-query breakpoints remain literal CSS conditions. */
+:root {
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  font-synthesis: none;
+  color: var(--ink);
+  background: var(--canvas);
+  line-height: var(--leading-normal);
+  color-scheme: light;
+  --canvas: #f5f7f5;
+  --ink: #18221f;
+  --muted: #52635b;
+  --subtle: #edf2ef;
+  --surface: #ffffff;
+  --surface-solid: #ffffff;
+  --line: #c9d6cf;
+  --brand: #076454;
+  --brand-dark: #064f43;
+  --brand-soft: #dff7ef;
+  --violet: #5846ae;
+  --violet-soft: #eeeafa;
+  --danger: #972f25;
+  --danger-soft: #fcece9;
+  --action-background: #076454;
+  --action-hover: #064f43;
+  --on-action: #ffffff;
+  --overlay: #10251f88;
+  --transparent: transparent;
+  --font-ui:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-evidence: Georgia, "Times New Roman", serif;
+  --font-code: ui-monospace, Consolas, monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-display: clamp(2rem, 4vw, 3.5rem);
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-reading: 1.75;
+  --weight-normal: 400;
+  --weight-medium: 600;
+  --weight-bold: 700;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-round: 999px;
+  --shadow-sm: 0 1px 2px #11231d0d;
+  --shadow: 0 8px 24px #203b3114;
+  --shadow-overlay: 0 16px 48px #0004;
+  --ring: 0 0 0 4px #087f6a2b;
+  --motion-fast: 150ms;
+  --motion-normal: 200ms;
+  --motion-slow: 250ms;
+  --motion-reduced: 0.01ms;
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --canvas: #101713;
+    --ink: #e7eeea;
+    --muted: #b4c4bb;
+    --subtle: #22312b;
+    --surface: #1b2722;
+    --surface-solid: #1b2722;
+    --line: #53685f;
+    --brand: #68dfc1;
+    --brand-dark: #8be9d0;
+    --brand-soft: #173f35;
+    --violet: #c8baff;
+    --violet-soft: #302946;
+    --danger: #ffb1a5;
+    --danger-soft: #482820;
+    --overlay: #0009;
+    --ring: 0 0 0 4px #68dfc133;
+  }
+}
+
+:root {
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-9: 2.25rem;
+  --space-11: 2.75rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-18: 4.5rem;
+  --space-32: 8rem;
+}

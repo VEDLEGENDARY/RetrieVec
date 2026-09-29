@@ -220,7 +220,7 @@ export function AdvancedEvidence({
             width={x1 - x0}
             height={y1 - y0}
             fill="none"
-            stroke="#b04416"
+            stroke="var(--brand)"
             strokeWidth="2"
           />
         </svg>
