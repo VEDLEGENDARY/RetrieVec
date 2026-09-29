@@ -81,10 +81,15 @@ def create_app(settings: Settings | None = None, *, registry=None, sessions=None
 
     @app.exception_handler(Exception)
     async def unexpected(request: Request, error: Exception):
+        from retrievec.telemetry import request_identity
+
         return JSONResponse(
             {"code": "service_unavailable", "message": "Service unavailable; try again shortly"},
             status_code=503,
-            headers={"Cache-Control": "no-store"},
+            headers={
+                "Cache-Control": "no-store",
+                "X-Request-ID": request_identity(getattr(request.state, "request_id", None)),
+            },
         )
 
     @app.get("/healthz")

@@ -17,11 +17,13 @@ class RequestTelemetry:
         identity = request_identity(incoming.decode("ascii", errors="ignore"))
         scope.setdefault("state", {})["request_id"] = identity
         started, status = time.perf_counter(), 500
+        response_started = False
 
         async def correlated_send(message):
-            nonlocal status
+            nonlocal status, response_started
             if message["type"] == "http.response.start":
                 status = message["status"]
+                response_started = True
                 message = {
                     **message,
                     "headers": [
@@ -43,6 +45,12 @@ class RequestTelemetry:
         ):
             try:
                 await self.app(scope, receive, correlated_send)
+            except Exception:
+                # The outer application error handler returns a safe 503 envelope.
+                # Streaming responses retain the status already sent to the client.
+                if not response_started:
+                    status = 503
+                raise
             finally:
                 route = scope.get("route")
                 if current is not None:

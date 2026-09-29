@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { api, APIError, type Collection, type Session } from "./api";
+import { api, type Collection } from "./api";
 import "./style.css";
 import { Uploads } from "./Uploads";
 import { Search } from "./Search";
 import { Research } from "./Research";
 import { CommandMenu } from "./CommandMenu";
+import { useWorkspace } from "./useWorkspace";
+import { NavigationPanel } from "./NavigationPanel";
 import {
   Archive,
   ArrowUpRight,
@@ -26,53 +28,25 @@ import {
 type View = "overview" | "sources" | "search" | "answers";
 
 function App() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [selected, setSelected] = useState("");
+  const {
+    session,
+    loading,
+    collections,
+    selected,
+    setSelected,
+    error,
+    setError,
+    refresh,
+    fail,
+    logout,
+  } = useWorkspace();
   const [title, setTitle] = useState("");
-  const [error, setError] = useState("");
+
   const [busy, setBusy] = useState(false);
   const [view, setView] = useState<View>("overview");
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [collectionFilter, setCollectionFilter] = useState("");
   const active = collections.find((item) => item.collection_id === selected);
-  const fail = useCallback((error: unknown) => {
-    if (error instanceof APIError && error.status === 401) {
-      setSession(null);
-      setCollections([]);
-      setSelected("");
-    }
-    if (error instanceof APIError && error.status === 404) {
-      setSelected("");
-      setCollections([]);
-    }
-    setError(
-      error instanceof Error ? error.message : "Request failed. Try again.",
-    );
-  }, []);
-  const refresh = useCallback(async () => {
-    const values = await api<Collection[]>("/api/v1/collections");
-    setCollections(values);
-    setSelected((current) =>
-      values.some((item) => item.collection_id === current)
-        ? current
-        : (values[0]?.collection_id ?? ""),
-    );
-  }, []);
-  useEffect(() => {
-    const controller = new AbortController();
-    api<Session>("/api/v1/me", { signal: controller.signal })
-      .then((value) => {
-        setSession(value);
-        return refresh();
-      })
-      .catch((error) => {
-        if (error.name !== "AbortError" && error.status !== 401) fail(error);
-      })
-      .finally(() => setLoading(false));
-    return () => controller.abort();
-  }, [refresh, fail]);
   async function create(event: React.SubmitEvent) {
     event.preventDefault();
     setBusy(true);
@@ -115,16 +89,6 @@ function App() {
       setBusy(false);
     }
   }
-  async function logout() {
-    try {
-      await api("/auth/logout", { method: "POST" }, session?.csrf_token);
-      setSession(null);
-      setCollections([]);
-      setSelected("");
-    } catch (error) {
-      fail(error);
-    }
-  }
   if (loading)
     return (
       <main className="welcome">
@@ -140,7 +104,7 @@ function App() {
           </span>{" "}
           RetrieVec
         </div>
-        <p className="eyebrow">YOUR PAPERS. TRACEABLE EVIDENCE.</p>
+        <p className="eyebrow">Your papers. Traceable evidence.</p>
         <h1>
           Research begins
           <br />
@@ -168,7 +132,10 @@ function App() {
       <a className="skip" href="#research">
         Skip to research
       </a>
-      <aside className={navigationOpen ? "navigation open" : "navigation"}>
+      <NavigationPanel
+        open={navigationOpen}
+        onClose={() => setNavigationOpen(false)}
+      >
         <div className="wordmark">
           <span className="logo-mark">
             <BookOpenText size={18} />
@@ -182,7 +149,7 @@ function App() {
             <X size={18} />
           </button>
         </div>
-        <p className="eyebrow">COLLECTIONS</p>
+        <p className="eyebrow">Collections</p>
         <label className="collection-filter">
           Find a collection
           <input
@@ -250,7 +217,7 @@ function App() {
             <LogOut size={14} /> Sign out
           </button>
         </div>
-      </aside>
+      </NavigationPanel>
       <main id="research" className="research">
         <div className="workspace-toolbar">
           <span>Library / {view === "answers" ? "Cited answers" : view}</span>
@@ -297,11 +264,13 @@ function App() {
             <button
               className="mobile-menu"
               aria-label="Open navigation"
+              aria-controls="workspace-navigation"
+              aria-expanded={navigationOpen}
               onClick={() => setNavigationOpen(true)}
             >
               <Menu size={19} />
             </button>
-            <p className="eyebrow">RESEARCH WORKSPACE</p>
+            <p className="eyebrow">Research workspace</p>
             <h1>{active?.title ?? "A place for your next question"}</h1>
             {active && (
               <p className="header-meta">
@@ -354,7 +323,7 @@ function App() {
                 <Sparkles size={24} />
               </span>
               <div>
-                <p className="eyebrow">COLLECTION OVERVIEW</p>
+                <p className="eyebrow">Collection overview</p>
                 <h2 id="overview-title">
                   Turn papers into traceable evidence.
                 </h2>
@@ -412,7 +381,7 @@ function App() {
             </div>
             <div className="workflow-card">
               <div>
-                <p className="eyebrow">RESEARCH FLOW</p>
+                <p className="eyebrow">Research flow</p>
                 <h2>A clear path from document to answer</h2>
               </div>
               <ol>
