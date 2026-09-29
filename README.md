@@ -46,6 +46,16 @@ FastAPI workspace  -------- PostgreSQL 18
 
 Go owns analysis, parsing, BM25, positional indexes, segment readers and retrieval RPC. Python owns corpus preparation, the registry, workers, evaluation, model adapters and FastAPI. React builds to static assets served by FastAPI. PostgreSQL is authoritative for ownership, active snapshots, leases, sessions and application state.
 
+The browser keeps session lifetime and collection refreshes in `useWorkspace`,
+separate from page layout. Signing out aborts outstanding collection reads, and
+older refreshes cannot replace newer state. Mobile navigation uses a modal dialog;
+quick actions expose keyboard selection through a combobox and listbox. Shared
+color tokens and visible focus indicators apply across those controls.
+
+Run `npm run test:ui` in `web/` for browser interaction tests with synthetic HTTP
+fixtures. The full `npm test` suite exercises the PostgreSQL, RPC, and OIDC flow;
+interaction fixtures do not replace those integration checks.
+
 | Path | Purpose |
 | --- | --- |
 | `engine/` | Go search, indexing, ranking and RPC |
