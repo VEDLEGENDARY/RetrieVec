@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { AdvancedEvidence } from "./AdvancedEvidence";
 import {
+  BookmarkPlus,
+  BookmarkCheck,
+  SlidersHorizontal,
+  History,
+  Search as SearchIcon,
+  X,
+} from "lucide-react";
+import { EvidenceTray, passageKey, type SavedPassage } from "./EvidenceTray";
+import {
   api,
   type Collection,
   type Hit,
@@ -30,6 +39,14 @@ export function Search({
   const [busy, setBusy] = useState(false);
   const [compact, setCompact] = useState(false);
   const [sourceError, setSourceError] = useState("");
+  const [filter, setFilter] = useState("");
+  const [method, setMethod] = useState("all");
+  const [shortlist, setShortlist] = useState<SavedPassage[]>([]);
+  const [notice, setNotice] = useState("");
+  const [recent, setRecent] = useState<
+    { query: string; mode: string; retrieval: string }[]
+  >([]);
+  const trigger = useRef<HTMLButtonElement | null>(null);
   const request = useRef<AbortController | null>(null);
   const inspector = useRef<HTMLElement>(null);
   useEffect(
@@ -63,6 +80,19 @@ export function Search({
         setResult(value);
         setSelected(null);
         setSourceError("");
+        setFilter("");
+        setMethod("all");
+        setRecent((current) =>
+          [
+            { query, mode, retrieval },
+            ...current.filter(
+              (item) =>
+                item.query !== query ||
+                item.mode !== mode ||
+                item.retrieval !== retrieval,
+            ),
+          ].slice(0, 5),
+        );
       }
     } catch (error) {
       if (!controller.signal.aborted) fail(error);
@@ -70,10 +100,40 @@ export function Search({
       if (!controller.signal.aborted) setBusy(false);
     }
   }
-  function inspect(hit: Hit) {
+  function inspect(hit: Hit, button: HTMLButtonElement) {
+    trigger.current = button;
     setSelected(hit);
     setSourceError("");
     setTimeout(() => inspector.current?.focus(), 0);
+  }
+  function closeInspector() {
+    setSelected(null);
+    trigger.current?.focus();
+  }
+  function save(hit: Hit) {
+    if (!result) return;
+    const item = {
+      hit,
+      snapshot_id: result.snapshot_id,
+      query: result.query,
+      methods: Object.entries(result.results)
+        .filter(([, value]) =>
+          value.hits.some((candidate) => candidate.chunk_id === hit.chunk_id),
+        )
+        .map(([name]) => name),
+    };
+    if (shortlist.some((saved) => passageKey(saved) === passageKey(item))) {
+      setShortlist((current) =>
+        current.filter((saved) => passageKey(saved) !== passageKey(item)),
+      );
+      setNotice("Passage removed from the shortlist.");
+    } else if (shortlist.length < 6) {
+      setShortlist((current) => [...current, item]);
+      setNotice("Passage added to the evidence shortlist.");
+    } else
+      setNotice(
+        "Your shortlist has six passages. Remove one before adding another.",
+      );
   }
   const sourceURL =
     selected?.source_id && result
@@ -81,7 +141,17 @@ export function Search({
       : null;
   return (
     <section aria-labelledby="search-heading">
-      <h2 id="search-heading">Ask your sources</h2>
+      <div className="section-heading">
+        <div>
+          <p className="section-kicker">Evidence workbench</p>
+          <h2 id="search-heading">Ask your sources</h2>
+          <p>
+            Follow an idea across your papers, then compare the passages that
+            matter.
+          </p>
+        </div>
+        <SearchIcon size={28} aria-hidden="true" />
+      </div>
       <form className="search-form" onSubmit={submit}>
         <label htmlFor="question">Research question</label>
         <textarea
@@ -141,6 +211,20 @@ export function Search({
           >
             {busy ? "Searching…" : "Search evidence →"}
           </button>
+          {busy && (
+            <button
+              type="button"
+              onClick={() => {
+                request.current?.abort();
+                setBusy(false);
+                setNotice(
+                  "Search cancelled. Previous results are still available.",
+                );
+              }}
+            >
+              Cancel search
+            </button>
+          )}
         </div>
         {!collection.active_snapshot && (
           <p className="muted">
@@ -148,6 +232,46 @@ export function Search({
           </p>
         )}
       </form>
+      {recent.length > 0 && (
+        <details className="recent-searches">
+          <summary>
+            <History size={16} aria-hidden="true" /> Recent searches in this
+            collection
+          </summary>
+          <div>
+            {recent.map((item, index) => (
+              <button
+                key={`${item.query}-${index}`}
+                onClick={() => {
+                  setQuery(item.query);
+                  setMode(item.mode);
+                  setRetrieval(item.retrieval);
+                  document.getElementById("question")?.focus();
+                }}
+              >
+                <span>{item.query}</span>
+                <small>
+                  {item.retrieval === "compare"
+                    ? "Compare all methods"
+                    : labels[item.retrieval]}
+                </small>
+              </button>
+            ))}
+          </div>
+        </details>
+      )}
+      <EvidenceTray
+        items={shortlist}
+        collectionId={collection.collection_id}
+        remove={(key) =>
+          setShortlist((current) =>
+            current.filter((item) => passageKey(item) !== key),
+          )
+        }
+      />
+      <p role="status" className="interaction-notice">
+        {notice}
+      </p>
       <p role="status" aria-live="polite">
         {busy
           ? "Searching one pinned snapshot…"
@@ -158,7 +282,20 @@ export function Search({
       {result && (
         <>
           <div className="result-toolbar">
-            <p>Compare passages from the same source snapshot.</p>
+            <p>
+              <strong>
+                {
+                  new Set(
+                    Object.values(result.results).flatMap((value) =>
+                      value.hits.map((hit) => hit.chunk_id),
+                    ),
+                  ).size
+                }{" "}
+                unique passages
+              </strong>
+              <br />
+              Returned from one pinned snapshot.
+            </p>
             <button
               type="button"
               aria-pressed={compact}
@@ -166,6 +303,35 @@ export function Search({
             >
               {compact ? "Show full excerpts" : "Compact results"}
             </button>
+          </div>
+          <div className="evidence-controls">
+            <SlidersHorizontal size={18} aria-hidden="true" />
+            <label>
+              Filter returned passages
+              <input
+                type="search"
+                value={filter}
+                placeholder="Find a title or phrase…"
+                onChange={(event) => setFilter(event.target.value)}
+              />
+            </label>
+            <label>
+              Show retrieval method
+              <select
+                value={method}
+                onChange={(event) => setMethod(event.target.value)}
+              >
+                <option value="all">All returned methods</option>
+                {Object.keys(result.results).map((name) => (
+                  <option key={name} value={name}>
+                    {labels[name] ?? name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <small>
+              Filters refine these results without running another search.
+            </small>
           </div>
           <details className="diagnostics">
             <summary>Snapshot and search diagnostics</summary>
@@ -195,49 +361,95 @@ export function Search({
             }
           >
             <div className={compact ? "rankings compact" : "rankings"}>
-              {Object.entries(result.results).map(([mode, value]) => (
-                <section
-                  key={mode}
-                  className="ranking"
-                  aria-label={labels[mode]}
-                >
-                  <h3>{labels[mode]}</h3>
-                  <small>{value.total_matches} candidates / matches</small>
-                  {!value.hits.length && (
-                    <p className="no-results">
-                      No matching passages. Try a different question.
-                    </p>
-                  )}
-                  <ol>
-                    {value.hits.map((hit) => (
-                      <li key={hit.chunk_id}>
-                        <button
-                          className={
-                            selected?.chunk_id === hit.chunk_id
-                              ? "hit active"
-                              : "hit"
-                          }
-                          onClick={() => inspect(hit)}
-                        >
-                          <span className="hit-title">{hit.title}</span>
-                          <span className="excerpt">{hit.text}</span>
-                          <small>
-                            {hit.page_range
-                              ? `Page ${hit.page_range[0]}`
-                              : "Page unavailable"}{" "}
-                            ·{" "}
-                            {mode === "sparse"
-                              ? `BM25 ${hit.bm25_score?.toFixed(3)}`
-                              : mode === "dense"
-                                ? `Cosine ${hit.cosine_score?.toFixed(3)}`
-                                : `RRF ${hit.rrf_score?.toFixed(5)}`}
-                          </small>
-                        </button>
-                      </li>
-                    ))}
-                  </ol>
-                </section>
-              ))}
+              {Object.entries(result.results)
+                .filter(([name]) => method === "all" || name === method)
+                .map(([mode, value]) => (
+                  <section
+                    key={mode}
+                    className="ranking"
+                    aria-label={labels[mode]}
+                  >
+                    <h3>{labels[mode]}</h3>
+                    <small>
+                      {
+                        value.hits.filter((hit) =>
+                          `${hit.title} ${hit.text}`
+                            .toLowerCase()
+                            .includes(filter.toLowerCase()),
+                        ).length
+                      }{" "}
+                      shown / {value.hits.length} returned ·{" "}
+                      {value.total_matches} candidates
+                    </small>
+                    {!value.hits.some((hit) =>
+                      `${hit.title} ${hit.text}`
+                        .toLowerCase()
+                        .includes(filter.toLowerCase()),
+                    ) && (
+                      <p className="no-results">
+                        {filter
+                          ? "No returned passages match this filter. Clear it or try another phrase."
+                          : "No matching passages. Try a different question."}
+                      </p>
+                    )}
+                    <ol>
+                      {value.hits
+                        .filter((hit) =>
+                          `${hit.title} ${hit.text}`
+                            .toLowerCase()
+                            .includes(filter.toLowerCase()),
+                        )
+                        .map((hit) => (
+                          <li key={hit.chunk_id} value={hit.rank}>
+                            <button
+                              className={
+                                selected?.chunk_id === hit.chunk_id
+                                  ? "hit active"
+                                  : "hit"
+                              }
+                              onClick={(event) =>
+                                inspect(hit, event.currentTarget)
+                              }
+                            >
+                              <span className="hit-title">{hit.title}</span>
+                              <span className="excerpt">{hit.text}</span>
+                              <small>
+                                {hit.page_range
+                                  ? `Page ${hit.page_range[0]}`
+                                  : "Page unavailable"}{" "}
+                                ·{" "}
+                                {mode === "sparse"
+                                  ? `BM25 ${hit.bm25_score?.toFixed(3)}`
+                                  : mode === "dense"
+                                    ? `Cosine ${hit.cosine_score?.toFixed(3)}`
+                                    : `RRF ${hit.rrf_score?.toFixed(5)}`}
+                              </small>
+                            </button>
+                            <button
+                              className="shortlist-action"
+                              aria-pressed={shortlist.some(
+                                (item) =>
+                                  item.snapshot_id === result.snapshot_id &&
+                                  item.hit.chunk_id === hit.chunk_id,
+                              )}
+                              onClick={() => save(hit)}
+                            >
+                              {shortlist.some(
+                                (item) =>
+                                  item.snapshot_id === result.snapshot_id &&
+                                  item.hit.chunk_id === hit.chunk_id,
+                              ) ? (
+                                <BookmarkCheck size={15} aria-hidden="true" />
+                              ) : (
+                                <BookmarkPlus size={15} aria-hidden="true" />
+                              )}{" "}
+                              Shortlist passage
+                            </button>
+                          </li>
+                        ))}
+                    </ol>
+                  </section>
+                ))}
             </div>
             {selected && (
               <aside
@@ -245,14 +457,20 @@ export function Search({
                 tabIndex={-1}
                 className="inspector"
                 aria-label="Evidence inspector"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    event.stopPropagation();
+                    closeInspector();
+                  }
+                }}
               >
                 <div className="inspector-heading">
                   <h3>Evidence inspector</h3>
                   <button
                     aria-label="Close evidence inspector"
-                    onClick={() => setSelected(null)}
+                    onClick={closeInspector}
                   >
-                    ×
+                    <X size={18} />
                   </button>
                 </div>
                 <h2>{selected.title}</h2>
