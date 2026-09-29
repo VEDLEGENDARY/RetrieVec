@@ -56,6 +56,17 @@ Run `npm run test:ui` in `web/` for browser interaction tests with synthetic HTT
 fixtures. The full `npm test` suite exercises the PostgreSQL, RPC, and OIDC flow;
 interaction fixtures do not replace those integration checks.
 
+The evidence workbench filters returned passages by text or retrieval method,
+recalls the last five searches, and compares up to six shortlisted passages.
+Shortlists and recent searches stay in memory for the selected collection and
+clear on reload or collection changes. Export a shortlist to JSON to retain its
+questions, passage content, retrieval methods, and snapshot identities. Exports
+contain private source text, so store them with your research material.
+
+Uploads support drag-and-drop and a review queue with per-file validation and
+removal before submission. Retrying the same unchanged batch reuses its request
+key to avoid duplicate ingestion when an earlier response was not confirmed.
+
 | Path | Purpose |
 | --- | --- |
 | `engine/` | Go search, indexing, ranking and RPC |
