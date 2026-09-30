@@ -7,6 +7,38 @@ from retrievec.dense.search import exact_search
 
 
 class DenseTests(unittest.TestCase):
+    def test_wordpiece_overflow_rejects_before_inference(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+
+        from retrievec.dense.model import MiniLM
+
+        model = MiniLM.__new__(MiniLM)
+        model.tokenizer = Mock()
+        model.tokenizer.encode_batch.return_value = [SimpleNamespace(ids=list(range(257)))]
+        model.session = Mock()
+        with self.assertRaisesRegex(ValueError, "exceeds 256 wordpieces"):
+            model.encode(["scientific terms"])
+        model.session.run.assert_not_called()
+
+    def test_partition_matches_full_sort_at_tied_cutoff(self):
+        rng = np.random.default_rng(19)
+        vectors = normalize(rng.integers(-2, 3, (257, 7)).astype(np.float32) + 0.1)
+        vectors[80:140] = vectors[0]
+        ids = [f"chunk-{256 - i:04}" for i in range(len(vectors))]
+        query = vectors[0]
+        for block_size in (1, 31, 257):
+            scores = np.concatenate(
+                [vectors[i : i + block_size] @ query for i in range(0, len(vectors), block_size)]
+            )
+            reference = sorted(zip(scores, ids, strict=True), key=lambda item: (-item[0], item[1]))
+            for limit in (1, 17, 100, 300):
+                with self.subTest(block=block_size, limit=limit):
+                    hits = exact_search(vectors, ids, query, limit, block_size)
+                    self.assertEqual(
+                        [h["chunk_id"] for h in hits], [key for _, key in reference[:limit]]
+                    )
+
     def test_empty_collection_snapshot(self):
         import os
         import tempfile

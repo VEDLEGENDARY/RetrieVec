@@ -41,6 +41,7 @@ class PinnedClient:
         model=None,
         snapshot_id: str | None = None,
         candidates: int = 100,
+        artifact_cache: dict | None = None,
     ):
         if (
             retrieval not in ("sparse", "dense", "hybrid")
@@ -58,24 +59,28 @@ class PinnedClient:
             raise ValueError("registry and artifact manifest differ")
         if retrieval not in self.manifest["capabilities"]:
             raise ValueError("snapshot does not declare requested capability")
-        corpus, _, chunks = load_snapshot(
-            store.path("corpora", self.manifest["corpus_snapshot_id"], "ss_")
-        )
+        cache = artifact_cache if artifact_cache is not None else {}
+        corpus_key = (str(store.root.resolve()), "corpus", self.manifest["corpus_snapshot_id"])
+        if corpus_key not in cache:
+            cache[corpus_key] = load_snapshot(
+                store.path("corpora", self.manifest["corpus_snapshot_id"], "ss_")
+            )
+        corpus, papers, chunks = cache[corpus_key]
         self.chunks = {chunk["chunk_id"]: chunk for chunk in chunks}
         self.evidence_index = None
         if corpus["configuration"].get("evidence_map_id"):
             from retrievec.extraction.indexing import EvidenceIndex
 
             self.evidence_index = EvidenceIndex(store.root, corpus)
-        _, papers, _ = load_snapshot(
-            store.path("corpora", self.manifest["corpus_snapshot_id"], "ss_")
-        )
         self.titles = {paper["paper_version_id"]: paper["title"] for paper in papers}
         self.vectors, self.embedding = None, None
         if retrieval != "sparse":
-            self.embedding, self.vectors = load_embeddings(
-                store, self.manifest["embedding_id"], self.manifest["corpus_snapshot_id"]
-            )
+            embedding_key = (corpus_key, self.manifest["embedding_id"])
+            if embedding_key not in cache:
+                cache[embedding_key] = load_embeddings(
+                    store, self.manifest["embedding_id"], self.manifest["corpus_snapshot_id"]
+                )
+            self.embedding, self.vectors = cache[embedding_key]
             if model is None or model.config != self.embedding["configuration"]:
                 raise ValueError("query encoder does not match pinned embedding configuration")
         self.configuration = {
