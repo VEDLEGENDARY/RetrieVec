@@ -37,8 +37,8 @@ test("command navigation keeps query drafts and collection filtering works", asy
   await page
     .getByLabel("Research question")
     .fill("How does hybrid retrieval work?");
-  await page.getByRole("button", { name: "Overview", exact: true }).click();
-  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await page.getByRole("button", { name: "Sources", exact: true }).click();
+  await page.getByRole("button", { name: "Ask", exact: true }).click();
   await expect(page.getByLabel("Research question")).toHaveValue(
     "How does hybrid retrieval work?",
   );

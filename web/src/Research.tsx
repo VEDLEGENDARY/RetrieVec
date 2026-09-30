@@ -1,4 +1,4 @@
-import { Button, Input, Select, Textarea } from "./ui";
+import { Button, Input, Select, Textarea, More } from "./ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
@@ -81,7 +81,9 @@ export function Research({
   collection,
   session,
   fail,
+  showHistory = false,
 }: {
+  showHistory?: boolean;
   collection: Collection;
   session: Session;
   fail: (error: unknown) => void;
@@ -342,35 +344,39 @@ export function Research({
     });
   return (
     <section className="saved-research" aria-labelledby="saved-title">
-      <p className="eyebrow">SAVED RESEARCH</p>
-      <h2 id="saved-title">Ask the evidence</h2>
+      <h2 id="saved-title">
+        {showHistory ? "Saved research" : "Ask your sources"}
+      </h2>
       <p className="muted">
         Answers stay tied to their sources. Structural checks do not establish
         scientific or semantic correctness.
       </p>
-      <label htmlFor="conversation">Conversation</label>
-      <Select
-        id="conversation"
-        disabled={busy}
-        value={conversation}
-        onChange={(event) => {
-          inspectionVersion.current += 1;
-          setConversation(event.target.value);
-          setRun(null);
-          setSelectedRunId(null);
-          setRunConnection("connected");
-          setEvidence(null);
-          setRequestKey(crypto.randomUUID());
-        }}
-      >
-        <option value="">New conversation</option>
-        {conversations.map((item) => (
-          <option key={item.conversation_id} value={item.conversation_id}>
-            {item.title}
-          </option>
-        ))}
-      </Select>
+      <div hidden={!showHistory}>
+        <label htmlFor="conversation">Conversation</label>
+        <Select
+          id="conversation"
+          disabled={busy}
+          value={conversation}
+          onChange={(event) => {
+            inspectionVersion.current += 1;
+            setConversation(event.target.value);
+            setRun(null);
+            setSelectedRunId(null);
+            setRunConnection("connected");
+            setEvidence(null);
+            setRequestKey(crypto.randomUUID());
+          }}
+        >
+          <option value="">New conversation</option>
+          {conversations.map((item) => (
+            <option key={item.conversation_id} value={item.conversation_id}>
+              {item.title}
+            </option>
+          ))}
+        </Select>
+      </div>
       <form
+        hidden={showHistory}
         onSubmit={(event) => {
           event.preventDefault();
           void submit();
@@ -384,44 +390,61 @@ export function Research({
           maxLength={4096}
           required
           rows={3}
+          onKeyDown={(event) => {
+            if (
+              (event.ctrlKey || event.metaKey) &&
+              event.key === "Enter" &&
+              !event.nativeEvent.isComposing
+            ) {
+              event.preventDefault();
+              event.currentTarget.form?.requestSubmit();
+            }
+          }}
           onChange={(event) => {
             setQuestion(event.target.value);
             setRequestKey(crypto.randomUUID());
           }}
         />
-        <label htmlFor="effective-query">
-          Standalone query for a follow-up (optional)
-        </label>
-        <Input
-          id="effective-query"
-          disabled={busy}
-          value={effective}
-          maxLength={4096}
-          onChange={(event) => {
-            setEffective(event.target.value);
-            setRequestKey(crypto.randomUUID());
-          }}
-          placeholder="Include the method or paper your follow-up refers to"
-        />
-        <label htmlFor="generation-provider">Generation provider</label>
-        <Select
-          id="generation-provider"
-          disabled={busy}
-          value={provider}
-          onChange={(event) => {
-            setProvider(event.target.value);
-            setRequestKey(crypto.randomUUID());
-          }}
-        >
-          {!providers.length && (
-            <option value="">No provider configured</option>
-          )}
-          {providers.map((item) => (
-            <option key={item.name} value={item.name}>
-              {item.model} · {item.cloud ? "Cloud" : "Local"}
-            </option>
-          ))}
-        </Select>
+        <More>
+          <label htmlFor="effective-query">
+            Standalone query for a follow-up (optional)
+          </label>
+          <Input
+            id="effective-query"
+            disabled={busy}
+            value={effective}
+            maxLength={4096}
+            onChange={(event) => {
+              setEffective(event.target.value);
+              setRequestKey(crypto.randomUUID());
+            }}
+            placeholder="Include the method or paper your follow-up refers to"
+          />
+          <label htmlFor="generation-provider">Generation provider</label>
+          <Select
+            id="generation-provider"
+            disabled={busy}
+            value={provider}
+            onChange={(event) => {
+              setProvider(event.target.value);
+              setRequestKey(crypto.randomUUID());
+            }}
+          >
+            {!providers.length && (
+              <option value="">No provider configured</option>
+            )}
+            {providers.map((item) => (
+              <option key={item.name} value={item.name}>
+                {item.model} · {item.cloud ? "Cloud" : "Local"}
+              </option>
+            ))}
+          </Select>
+        </More>
+        <p className="muted">
+          {selectedProvider
+            ? `${selectedProvider.model} · ${selectedProvider.cloud ? "Cloud" : "Local"}`
+            : "No answer provider configured. Use Find passages to search your sources."}
+        </p>
         <Button
           className="primary"
           disabled={
@@ -440,7 +463,7 @@ export function Research({
       {!providers.length && (
         <p>
           Generation is not configured. You can continue searching and
-          inspecting sources above.
+          inspecting sources in Find passages.
         </p>
       )}
       {selectedProvider?.cloud && (
@@ -461,7 +484,7 @@ export function Research({
           )}
         </div>
       )}
-      {!!history.length && (
+      {showHistory && !!history.length && (
         <nav aria-label="Saved research runs" className="run-history">
           {history.map((item) => (
             <Button
@@ -574,13 +597,15 @@ export function Research({
                 Structurally checked · Human review pending ·{" "}
                 {Math.round(run.result.elapsed_ms)} ms
               </p>
-              <div className="export-actions">
-                {["markdown", "bibtex", "json", "csv"].map((format) => (
-                  <Button key={format} onClick={() => exportRun(format)}>
-                    Export {format}
-                  </Button>
-                ))}
-              </div>
+              <More label="Export answer">
+                <div className="export-actions">
+                  {["markdown", "bibtex", "json", "csv"].map((format) => (
+                    <Button key={format} onClick={() => exportRun(format)}>
+                      Export {format}
+                    </Button>
+                  ))}
+                </div>
+              </More>
             </>
           )}
           {!activeStates.has(run.state) && (

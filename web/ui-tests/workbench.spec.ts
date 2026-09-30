@@ -59,7 +59,10 @@ async function openWorkbench(page: Page, view: "Search" | "Sources") {
   await page.goto("/");
   await page
     .getByRole("navigation", { name: "Workspace sections" })
-    .getByRole("button", { name: view, exact: true })
+    .getByRole("button", {
+      name: view === "Search" ? "Ask" : view,
+      exact: true,
+    })
     .click();
 }
 
@@ -194,7 +197,7 @@ test("recent searches restore drafts and collection changes clear the shortlist"
     .click();
   await page
     .getByRole("navigation", { name: "Workspace sections" })
-    .getByRole("button", { name: "Search", exact: true })
+    .getByRole("button", { name: "Ask", exact: true })
     .click();
   await expect(page.locator(".count-pill")).toHaveText("0/6");
   await expect(page.getByLabel("Research question")).toHaveValue("");

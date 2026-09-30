@@ -1,4 +1,4 @@
-import { Button, Input, Select, Textarea } from "./ui";
+import { Button, Input, Select, Textarea, More } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { AdvancedEvidence } from "./AdvancedEvidence";
 import {
@@ -34,7 +34,7 @@ export function Search({
 }) {
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState("free_text");
-  const [retrieval, setRetrieval] = useState("compare");
+  const [retrieval, setRetrieval] = useState("hybrid");
   const [result, setResult] = useState<SearchResult | null>(null);
   const [selected, setSelected] = useState<Hit | null>(null);
   const [busy, setBusy] = useState(false);
@@ -176,35 +176,37 @@ export function Search({
           placeholder="How does dense retrieval compare with lexical matching?"
         />
         <div className="search-controls">
-          <label htmlFor="parser">Query syntax</label>
-          <Select
-            id="parser"
-            value={mode}
-            onChange={(event) => {
-              setMode(event.target.value);
-              if (event.target.value === "structured") setRetrieval("sparse");
-            }}
-          >
-            <option value="free_text">Natural language</option>
-            <option value="structured">Boolean / phrase</option>
-          </Select>
-          <label htmlFor="retrieval">Retrieval method</label>
-          <Select
-            id="retrieval"
-            value={retrieval}
-            onChange={(event) => setRetrieval(event.target.value)}
-          >
-            <option value="compare" disabled={mode === "structured"}>
-              Compare all three
-            </option>
-            <option value="sparse">Sparse</option>
-            <option value="dense" disabled={mode === "structured"}>
-              Dense
-            </option>
-            <option value="hybrid" disabled={mode === "structured"}>
-              Hybrid
-            </option>
-          </Select>
+          <More>
+            <label htmlFor="parser">Query syntax</label>
+            <Select
+              id="parser"
+              value={mode}
+              onChange={(event) => {
+                setMode(event.target.value);
+                if (event.target.value === "structured") setRetrieval("sparse");
+              }}
+            >
+              <option value="free_text">Natural language</option>
+              <option value="structured">Boolean / phrase</option>
+            </Select>
+            <label htmlFor="retrieval">Retrieval method</label>
+            <Select
+              id="retrieval"
+              value={retrieval}
+              onChange={(event) => setRetrieval(event.target.value)}
+            >
+              <option value="compare" disabled={mode === "structured"}>
+                Compare all three
+              </option>
+              <option value="sparse">Sparse</option>
+              <option value="dense" disabled={mode === "structured"}>
+                Dense
+              </option>
+              <option value="hybrid" disabled={mode === "structured"}>
+                Hybrid
+              </option>
+            </Select>
+          </More>
           <Button
             type="submit"
             className="primary"

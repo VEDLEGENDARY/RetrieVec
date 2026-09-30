@@ -43,7 +43,7 @@ test("local performance baseline and recorder privacy", async ({
     const readyObserved = await page.evaluate(() => performance.now());
     await page
       .getByRole("navigation", { name: "Workspace sections" })
-      .getByRole("button", { name: "Search", exact: true })
+      .getByRole("button", { name: "Ask", exact: true })
       .click();
     await page.getByLabel("Research question").fill("Private question");
     await page
