@@ -1,3 +1,4 @@
+import { Button, Input } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { api, type Collection, type Job, type Session } from "./api";
 import { FileText, UploadCloud, X, CheckCircle2 } from "lucide-react";
@@ -181,7 +182,7 @@ export function Uploads({
             Drop documents here, or choose files to review before uploading.
           </p>
           <label htmlFor="documents">Choose documents</label>
-          <input
+          <Input
             id="documents"
             ref={input}
             type="file"
@@ -213,7 +214,7 @@ export function Uploads({
                       {fileProblem(file) ?? fileSize(file.size)}
                     </small>
                   </div>
-                  <button
+                  <Button
                     type="button"
                     disabled={sending}
                     aria-label={`Remove ${file.name}`}
@@ -225,7 +226,7 @@ export function Uploads({
                     }}
                   >
                     <X size={17} />
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -236,7 +237,7 @@ export function Uploads({
             <CheckCircle2 size={16} aria-hidden="true" /> Files stay in your
             private collection.
           </span>
-          <button
+          <Button
             className="primary"
             type="submit"
             disabled={
@@ -251,7 +252,7 @@ export function Uploads({
               : pending
                 ? "Processing current upload…"
                 : "Upload documents"}
-          </button>
+          </Button>
         </div>
       </form>
       <p role="status" aria-live="polite">

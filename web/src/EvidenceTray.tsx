@@ -1,3 +1,4 @@
+import { Button } from "./ui";
 import { Download, BookmarkCheck, X } from "lucide-react";
 import type { Hit } from "./api";
 
@@ -58,9 +59,9 @@ export function EvidenceTray({
             browser session; changing collections or reloading clears the
             shortlist.
           </p>
-          <button onClick={download} disabled={!items.length}>
+          <Button onClick={download} disabled={!items.length}>
             <Download size={16} aria-hidden="true" /> Export evidence
-          </button>
+          </Button>
         </div>
         {items.length === 0 ? (
           <p className="no-results">
@@ -73,12 +74,12 @@ export function EvidenceTray({
               <article key={passageKey(item)}>
                 <div className="passage-heading">
                   <h3>{item.hit.title}</h3>
-                  <button
+                  <Button
                     aria-label={`Remove ${item.hit.title} from shortlist`}
                     onClick={() => remove(passageKey(item))}
                   >
                     <X size={16} />
-                  </button>
+                  </Button>
                 </div>
                 <p className="passage-meta">
                   {item.hit.page_range
