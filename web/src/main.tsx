@@ -10,6 +10,7 @@ import { Research } from "./Research";
 import { CommandMenu } from "./CommandMenu";
 import { useWorkspace } from "./useWorkspace";
 import { NavigationPanel } from "./NavigationPanel";
+import { navigate, readRoute, useWorkspaceRoute } from "./routing";
 import {
   Archive,
   ArrowUpRight,
@@ -37,7 +38,7 @@ function App() {
     loading,
     collections,
     selected,
-    setSelected,
+    setSelected: setWorkspaceSelected,
     error,
     setError,
     refresh,
@@ -52,8 +53,24 @@ function App() {
   const [busy, setBusy] = useState(false);
   const [archived, setArchived] = useState<Collection | null>(null);
   useEffect(() => setArchived(null), [session?.principal_id]);
-  const [view, setView] = useState<View>("ask");
-  const [askMode, setAskMode] = useState<"passages" | "answer">("passages");
+  const route = useWorkspaceRoute();
+  const view = route.view;
+  const setView = (view: View) =>
+    navigate({ view, collection: readRoute().collection || selected });
+  const setSelected = (collection: string) => {
+    setWorkspaceSelected(collection);
+    navigate({ collection, view: "ask", run: "" });
+  };
+  useEffect(() => {
+    if (
+      route.collection &&
+      collections.some((item) => item.collection_id === route.collection)
+    )
+      setWorkspaceSelected(route.collection);
+  }, [route.collection, collections, setWorkspaceSelected]);
+  const [askMode, setAskMode] = useState<"passages" | "answer">(
+    route.run ? "answer" : "passages",
+  );
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [collectionFilter, setCollectionFilter] = useState("");
   const active = collections.find((item) => item.collection_id === selected);
@@ -475,6 +492,9 @@ function App() {
             <Research
               key={`research-${active.collection_id}`}
               showHistory={view === "saved"}
+              linkedRun={
+                route.collection === active.collection_id ? route.run : ""
+              }
               collection={active}
               session={session}
               fail={fail}

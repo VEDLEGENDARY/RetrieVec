@@ -1,5 +1,11 @@
 /* Single source of truth. Media-query breakpoints remain literal CSS conditions. */
 :root {
+  --dialog-offset: 12vh;
+  --welcome-padding: 8vh max(6vw, var(--space-8));
+  --welcome-logo-gap: clamp(var(--space-16), 10vh, var(--space-32));
+  --workspace-inline-padding: clamp(var(--space-5), 4vw, var(--space-18));
+  --panel-padding: clamp(var(--space-6), 4vw, var(--space-11));
+  --research-padding: clamp(var(--space-5), 3vw, var(--space-8));
   font-family: var(--font-ui);
   font-size: var(--text-base);
   font-synthesis: none;

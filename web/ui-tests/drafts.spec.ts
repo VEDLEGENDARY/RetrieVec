@@ -46,6 +46,35 @@ test("question drafts survive reload, follow Ask modes, and clear on logout", as
   await expect(page.getByLabel("Research question")).toHaveValue(
     "Draft to restore",
   );
+  await page.evaluate(() => {
+    localStorage.setItem(
+      "retrievec:draft:v1:owner:one:question",
+      JSON.stringify({ text: "Expired secret", expires: Date.now() - 1 }),
+    );
+    localStorage.setItem(
+      "retrievec:draft:v1:another:one:question",
+      JSON.stringify({ text: "Other principal", expires: Date.now() + 100000 }),
+    );
+    localStorage.setItem(
+      "retrievec:draft:v1:owner:two:question",
+      JSON.stringify({
+        text: "Other collection",
+        expires: Date.now() + 100000,
+      }),
+    );
+  });
+  await page.reload();
+  await expect(page.getByLabel("Research question")).toHaveValue("");
+  expect(
+    await page.evaluate(() =>
+      localStorage.getItem("retrievec:draft:v1:another:one:question"),
+    ),
+  ).toBeNull();
+  expect(
+    await page.evaluate(() =>
+      localStorage.getItem("retrievec:draft:v1:owner:two:question"),
+    ),
+  ).toContain("Other collection");
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(
     page.getByRole("link", { name: /Sign in to your workspace/ }),

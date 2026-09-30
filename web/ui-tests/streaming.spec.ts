@@ -69,10 +69,9 @@ test("early evidence and provisional deltas disappear when run access changes", 
     .getByRole("button", { name: /Question/ })
     .click();
   await expect(page.getByText("Retrieved before completion.")).toBeVisible();
-  await page.getByText("Live draft — not yet checked", { exact: true }).click();
   await expect(
     page.getByText("provisional fragment", { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   revoked = true;
   await expect(page.getByText("Access changed.")).toBeVisible();
   await expect(page.getByText("Retrieved before completion.")).toHaveCount(0);
