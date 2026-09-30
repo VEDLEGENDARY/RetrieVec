@@ -186,6 +186,37 @@ def install_research(app):
                 ).fetchall()
             ]
 
+    @app.get("/api/v1/collections/{collection_id}/runs")
+    def saved_runs(
+        collection_id: str,
+        request: Request,
+        q: str = Query(default="", max_length=256),
+        before: uuid.UUID | None = None,
+        limit: int = Query(default=50, ge=1, le=100),
+    ):
+        user = principal(request)
+        with registry.connect() as db:
+            policy.collection(db, user, collection_id)
+            cursor = None
+            if before is not None:
+                cursor = policy.owned(db, user, "run", before)
+                if cursor["collection_id"] != collection_id:
+                    raise APIError(404, "unavailable", "Saved research is unavailable")
+            rows = db.execute(
+                "SELECT run_id,conversation_id,original_question,state,created_at "
+                "FROM research_runs WHERE owner_id=%s AND collection_id=%s "
+                "AND strpos(lower(original_question),lower(%s))>0 "
+                + ("AND (created_at,run_id)<(%s,%s) " if cursor else "")
+                + "ORDER BY created_at DESC,run_id DESC LIMIT %s",
+                (user, collection_id, q.strip())
+                + ((cursor["created_at"], before) if cursor else ())
+                + (limit + 1,),
+            ).fetchall()
+            return {
+                "items": rows[:limit],
+                "next_cursor": str(rows[limit - 1]["run_id"]) if len(rows) > limit else None,
+            }
+
     @app.get("/api/v1/runs/{run_id}")
     def read(run_id: uuid.UUID, request: Request):
         with registry.connect() as db:

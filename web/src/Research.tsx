@@ -6,6 +6,13 @@ import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
 
 type Conversation = { conversation_id: string; title: string };
+type SavedRun = {
+  run_id: string;
+  conversation_id: string;
+  original_question: string;
+  state: string;
+  created_at: string;
+};
 type Provider = {
   name: string;
   model: string;
@@ -137,6 +144,49 @@ export function Research({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversation, setConversation] = useState("");
   const [history, setHistory] = useState<Run[]>([]);
+  const [saved, setSaved] = useState<SavedRun[]>([]);
+  const [savedQuery, setSavedQuery] = useState("");
+  const [savedCursor, setSavedCursor] = useState<string | null>(null);
+  const [savedPage, setSavedPage] = useState<string | null>(null);
+  const [savedLoading, setSavedLoading] = useState(false);
+  const [savedError, setSavedError] = useState("");
+  useEffect(() => {
+    if (!showHistory) return;
+    const controller = new AbortController();
+    setSavedLoading(true);
+    setSavedError("");
+    const params = new URLSearchParams({ q: savedQuery });
+    if (savedPage) params.set("before", savedPage);
+    const timer = setTimeout(() => {
+      api<{ items: SavedRun[]; next_cursor: string | null }>(
+        `/api/v1/collections/${collection.collection_id}/runs?${params}`,
+        { signal: controller.signal },
+      )
+        .then((value) => {
+          if (!controller.signal.aborted) {
+            setSaved(value.items);
+            setSavedCursor(value.next_cursor);
+          }
+        })
+        .catch((error) => {
+          if (!controller.signal.aborted) {
+            setSaved([]);
+            setSavedCursor(null);
+            setSavedError(
+              "Saved research could not be loaded. Reopen Saved research to retry.",
+            );
+            fail(error);
+          }
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setSavedLoading(false);
+        });
+    }, 150);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [showHistory, collection.collection_id, savedQuery, savedPage, fail]);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [provider, setProvider] = useState("");
   const [question, setQuestion, draftSaved] = useDraft(
@@ -393,28 +443,85 @@ export function Research({
         scientific or semantic correctness.
       </p>
       <div hidden={!showHistory}>
-        <label htmlFor="conversation">Conversation</label>
-        <Select
-          id="conversation"
-          disabled={busy}
-          value={conversation}
+        <label htmlFor="saved-search">Find saved research</label>
+        <Input
+          id="saved-search"
+          type="search"
+          maxLength={256}
+          value={savedQuery}
           onChange={(event) => {
-            inspectionVersion.current += 1;
-            setConversation(event.target.value);
-            setRun(null);
-            setSelectedRunId(null);
-            setRunConnection("connected");
-            setEvidence(null);
-            setRequestKey(crypto.randomUUID());
+            setSavedQuery(event.target.value);
+            setSavedPage(null);
+            setSaved([]);
           }}
-        >
-          <option value="">New conversation</option>
-          {conversations.map((item) => (
-            <option key={item.conversation_id} value={item.conversation_id}>
-              {item.title}
-            </option>
-          ))}
-        </Select>
+        />
+        {savedLoading ? (
+          <p role="status">Loading saved research…</p>
+        ) : savedError ? (
+          <p role="alert">{savedError}</p>
+        ) : (
+          <nav aria-label="All saved research">
+            {saved.map((item) => (
+              <Button
+                key={item.run_id}
+                onClick={() => {
+                  setConversation(item.conversation_id);
+                  setRun(null);
+                  setEvidence(null);
+                  inspectionVersion.current += 1;
+                  setSelectedRunId(item.run_id);
+                  setRunRefresh((value) => value + 1);
+                }}
+              >
+                {item.original_question}
+                <small>
+                  {item.state.replaceAll("_", " ")} ·{" "}
+                  {new Date(item.created_at).toLocaleDateString()}
+                </small>
+              </Button>
+            ))}
+            {saved.length === 0 && (
+              <p>
+                No saved research matches. Ask a question to start a saved run.
+              </p>
+            )}
+          </nav>
+        )}
+        {savedPage && (
+          <Button onClick={() => setSavedPage(null)}>Newest research</Button>
+        )}
+        {savedCursor && (
+          <Button
+            disabled={savedLoading}
+            onClick={() => setSavedPage(savedCursor)}
+          >
+            Older research
+          </Button>
+        )}
+        <More label="Browse conversations">
+          <label htmlFor="conversation">Conversation</label>
+          <Select
+            id="conversation"
+            disabled={busy}
+            value={conversation}
+            onChange={(event) => {
+              inspectionVersion.current += 1;
+              setConversation(event.target.value);
+              setRun(null);
+              setSelectedRunId(null);
+              setRunConnection("connected");
+              setEvidence(null);
+              setRequestKey(crypto.randomUUID());
+            }}
+          >
+            <option value="">New conversation</option>
+            {conversations.map((item) => (
+              <option key={item.conversation_id} value={item.conversation_id}>
+                {item.title}
+              </option>
+            ))}
+          </Select>
+        </More>
       </div>
       <form
         hidden={showHistory}

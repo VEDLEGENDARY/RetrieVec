@@ -3,7 +3,9 @@ import { test, expect } from "@playwright/test";
 test("question drafts survive reload, follow Ask modes, and clear on logout", async ({
   page,
 }) => {
-  page.on("pageerror", error => { throw error; });
+  page.on("pageerror", (error) => {
+    throw error;
+  });
   let signedIn = true;
   await page.route("**/auth/logout", (route) => {
     signedIn = false;
@@ -32,7 +34,9 @@ test("question drafts survive reload, follow Ask modes, and clear on logout", as
     });
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Papers", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Papers", exact: true }),
+  ).toBeVisible();
   await page.getByLabel("Research question").fill("Draft to restore");
   await page.getByRole("button", { name: "Answer", exact: true }).click();
   await expect(page.getByLabel("Question for cited answer")).toHaveValue(
