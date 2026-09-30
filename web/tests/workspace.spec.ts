@@ -164,6 +164,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await expect(
     page.getByText("Research run: completed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
+  await sections.getByRole("button", { name: "Ask", exact: true }).click();
   await page
     .getByLabel("Question for cited answer")
     .fill("cancel this retrieval answer");
@@ -198,6 +199,9 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await expect(
     page.getByText("Research run: failed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
+  await sections
+    .getByRole("button", { name: "Saved research", exact: true })
+    .click();
   await page
     .getByRole("navigation", { name: "Saved research runs" })
     .getByRole("button", { name: /What does dense retrieval match/ })
