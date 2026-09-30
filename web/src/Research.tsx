@@ -1,4 +1,5 @@
 import { EvidencePanel } from "./EvidencePanel";
+import { useDraft } from "./drafts";
 import { Button, Input, Select, Textarea, More } from "./ui";
 import { useCallback, useEffect, useRef, useState, useId } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
@@ -138,8 +139,16 @@ export function Research({
   const [history, setHistory] = useState<Run[]>([]);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [provider, setProvider] = useState("");
-  const [question, setQuestion] = useState("");
-  const [effective, setEffective] = useState("");
+  const [question, setQuestion, draftSaved] = useDraft(
+    session.principal_id,
+    collection.collection_id,
+    "question",
+  );
+  const [effective, setEffective] = useDraft(
+    session.principal_id,
+    collection.collection_id,
+    "follow-up",
+  );
   const [run, setRun] = useState<Run | null>(null);
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [runRefresh, setRunRefresh] = useState(0);
@@ -437,6 +446,11 @@ export function Research({
             setRequestKey(crypto.randomUUID());
           }}
         />
+        <p className="muted">
+          {draftSaved
+            ? "Draft saved on this device for 7 days. Cleared on sign out."
+            : "Device storage is unavailable. Keep this tab open to retain your draft."}
+        </p>
         <More>
           <label htmlFor="effective-query">
             Standalone query for a follow-up (optional)
