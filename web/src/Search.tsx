@@ -1,4 +1,5 @@
 import { EvidencePanel } from "./EvidencePanel";
+import { useDraft } from "./drafts";
 import { Button, Input, Select, Textarea, More } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { AdvancedEvidence } from "./AdvancedEvidence";
@@ -32,7 +33,11 @@ export function Search({
   session: Session;
   fail: (error: unknown) => void;
 }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery, draftSaved] = useDraft(
+    session.principal_id,
+    collection.collection_id,
+    "question",
+  );
   const [mode, setMode] = useState("free_text");
   const [retrieval, setRetrieval] = useState("hybrid");
   const [result, setResult] = useState<SearchResult | null>(null);
@@ -173,6 +178,11 @@ export function Search({
           }}
           placeholder="How does dense retrieval compare with lexical matching?"
         />
+        <p className="muted">
+          {draftSaved
+            ? "Draft saved on this device for 7 days. Cleared on sign out."
+            : "Device storage is unavailable. Keep this tab open to retain your draft."}
+        </p>
         <div className="search-controls">
           <More>
             <label htmlFor="parser">Query syntax</label>
