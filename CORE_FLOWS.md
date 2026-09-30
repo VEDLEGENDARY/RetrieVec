@@ -1,6 +1,6 @@
 # RetrieVec core flows and navigation proposal
 
-Date: 2026-09-29. Plan 2, Step 1 and proposed Step 2 only. **Awaiting owner approval; no application changes.** Complements `AUDIT.md`; it does not approve or implement Plan 1's remaining steps.
+Date: 2026-09-29. **Navigation and implementation approved by the owner.** This document preserves the original flow inventory and proposal; implementation is underway in PR #46.
 
 ## One mental model
 
@@ -78,7 +78,7 @@ Starting point is the signed-in desktop Overview with an active collection. Coun
 
 Backend experiments, deployment, ingestion administration, and training commands are developer/operator facilities, not hidden browser destinations. This plan preserves them and does not invent UI controls for all CLI operations.
 
-## Proposed navigation — approval required
+## Approved navigation
 
 **Three top-level destinations: Ask · Sources · Saved research.** Collection selection remains global context, not a fourth destination. Settings are a sheet reached from a persistent toolbar button; quick actions remain globally accessible. On mobile, keep all three destination controls visible.
 

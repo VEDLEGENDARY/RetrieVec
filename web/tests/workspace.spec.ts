@@ -145,6 +145,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
       await page.request.get(`/api/v1/runs/${saved.run.run_id}/events?after=5`)
     ).status(),
   ).toBe(200);
+  await page.getByText("Export answer", { exact: true }).click();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export csv", exact: true }).click();
   expect((await downloadPromise).suggestedFilename()).toMatch(/\.csv$/);
@@ -152,6 +153,9 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .getByRole("button", { name: "Replay pinned snapshot", exact: true })
     .focus();
   await page.keyboard.press("Enter");
+  await page
+    .getByRole("button", { name: "Saved research", exact: true })
+    .click();
   await expect(
     page
       .getByRole("navigation", { name: "Saved research runs" })
@@ -183,7 +187,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .getByRole("button", { name: "Generate cited answer", exact: true })
     .click();
   await expect(
-    page.getByText("insufficient evidence", { exact: true }),
+    page.getByText("I could not find this in your papers.", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
   await page
     .getByLabel("Question for cited answer")

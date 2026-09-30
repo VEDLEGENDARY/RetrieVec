@@ -216,7 +216,9 @@ class ResearchWorker:
                 ):
                     raise asyncio.CancelledError()
                 schema = answer_schema(packet["evidence"])
-                if hasattr(provider, "generate_stream"):
+                if run["configuration"].get(
+                    "generation_transport"
+                ) == "llama-completion-sse-v1" and hasattr(provider, "generate_stream"):
                     parts, pending = [], ""
                     first = True
                     output_size = 0
