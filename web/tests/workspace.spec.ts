@@ -9,6 +9,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await page.getByLabel("New collection").fill("Retrieval experiments");
   await page
     .getByRole("button", { name: "Create collection", exact: true })
+    .first()
     .click();
   await expect(
     page.getByRole("heading", { name: "Retrieval experiments", exact: true }),
@@ -68,14 +69,14 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .first()
     .click();
   await expect(
-    page.getByRole("complementary", { name: "Citation evidence" }),
+    page.getByRole("complementary", { name: "Evidence inspector" }),
   ).toContainText("Dense retrieval");
   await expect(
-    page.getByRole("button", { name: "Close citation" }),
+    page.getByRole("complementary", { name: "Evidence inspector" }),
   ).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(
-    page.getByRole("complementary", { name: "Citation evidence" }),
+    page.getByRole("complementary", { name: "Evidence inspector" }),
   ).toBeHidden();
   await expect(
     page.getByRole("button", { name: /Inspect citation/ }).first(),

@@ -10,6 +10,40 @@
   gap: var(--space-2);
   margin-block: var(--space-4);
 }
+.citation-preview-owner {
+  position: relative;
+  display: inline-flex;
+}
+.citation-preview {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 30;
+  width: min(24rem, 75vw);
+  max-height: 16rem;
+  overflow: auto;
+  padding: var(--space-4);
+  background: var(--surface-solid);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+  font-size: var(--text-sm);
+}
+.citation-preview-owner:hover .citation-preview,
+.citation-preview-owner:focus-within .citation-preview {
+  display: block;
+}
+.saved-research > .inspector {
+  position: fixed;
+  inset: 5vh var(--space-4) 5vh auto;
+  width: min(32rem, calc(100vw - 2rem));
+  overflow: auto;
+  z-index: 25;
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-overlay);
+}
 .ask-modes button[aria-pressed="true"] {
   color: var(--brand);
   background: var(--brand-soft);

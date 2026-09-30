@@ -1,3 +1,4 @@
+import { EvidencePanel } from "./EvidencePanel";
 import { Button, Input, Select, Textarea, More } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { AdvancedEvidence } from "./AdvancedEvidence";
@@ -7,7 +8,6 @@ import {
   SlidersHorizontal,
   History,
   Search as SearchIcon,
-  X,
 } from "lucide-react";
 import { EvidenceTray, passageKey, type SavedPassage } from "./EvidenceTray";
 import {
@@ -49,7 +49,6 @@ export function Search({
   >([]);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const request = useRef<AbortController | null>(null);
-  const inspector = useRef<HTMLElement>(null);
   useEffect(
     () => () => {
       request.current?.abort();
@@ -105,7 +104,6 @@ export function Search({
     trigger.current = button;
     setSelected(hit);
     setSourceError("");
-    setTimeout(() => inspector.current?.focus(), 0);
   }
   function closeInspector() {
     setSelected(null);
@@ -455,34 +453,13 @@ export function Search({
                 ))}
             </div>
             {selected && (
-              <aside
-                ref={inspector}
-                tabIndex={-1}
-                className="inspector"
-                aria-label="Evidence inspector"
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    event.stopPropagation();
-                    closeInspector();
-                  }
-                }}
+              <EvidencePanel
+                title={selected.title}
+                text={selected.text}
+                pages={selected.page_range}
+                snapshot={result.snapshot_id}
+                onClose={closeInspector}
               >
-                <div className="inspector-heading">
-                  <h3>Evidence inspector</h3>
-                  <Button
-                    aria-label="Close evidence inspector"
-                    onClick={closeInspector}
-                  >
-                    <X size={18} />
-                  </Button>
-                </div>
-                <h2>{selected.title}</h2>
-                <p className="eyebrow">
-                  PAPER EVIDENCE
-                  {selected.page_range && ` · PAGE ${selected.page_range[0]}`}
-                </p>
-                <blockquote>{selected.text}</blockquote>
-                <small>Chunk {selected.chunk_id}</small>
                 {selected.evidence_object_id ? (
                   <AdvancedEvidence
                     key={selected.chunk_id}
@@ -521,7 +498,7 @@ export function Search({
                     pinned extracted passage is shown above.
                   </p>
                 )}
-              </aside>
+              </EvidencePanel>
             )}
           </div>
         </>
