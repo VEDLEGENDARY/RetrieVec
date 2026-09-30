@@ -1,0 +1,55 @@
+{
+  "model": "sentence-transformers/all-MiniLM-L6-v2",
+  "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+  "tokenizer_sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+  "limit_including_special_tokens": 256,
+  "policy": "reject-v1",
+  "corpora": [
+    {
+      "snapshot": "ss_67f0451c17e76d9ecea06eade29e195de78a852c89fc986e675601d75335bee4",
+      "configuration": {
+        "analyzer_version": "analyzer-v1-unicode-15.0.0",
+        "chunker_version": "paragraph-v1-256-analyzer-v1-unicode-15.0.0",
+        "overlap": 0,
+        "token_budget": 256
+      },
+      "chunks": 193,
+      "overflow_count": 160,
+      "overflow_rate": 0.8290155440414507,
+      "p50_wordpieces": 371,
+      "p95_wordpieces": 492,
+      "max_wordpieces": 588
+    },
+    {
+      "snapshot": "ss_b135c1917acedc77650e0e21f5fff9fd58e28d36f460f4d392125c3f50048d8d",
+      "configuration": {
+        "analyzer_version": "analyzer-v1-unicode-15.0.0",
+        "chunker_version": "paragraph-v1-256-analyzer-v1-unicode-15.0.0",
+        "overlap": 0,
+        "token_budget": 256
+      },
+      "chunks": 193,
+      "overflow_count": 160,
+      "overflow_rate": 0.8290155440414507,
+      "p50_wordpieces": 371,
+      "p95_wordpieces": 492,
+      "max_wordpieces": 588
+    },
+    {
+      "snapshot": "ss_f4d1e063fee6a84f24ac875bf6e7f208d06353f2aecfc53d23cfc1d10515a9ed",
+      "configuration": {
+        "analyzer_version": "analyzer-v1-unicode-15.0.0",
+        "chunker_version": "paragraph-v1-96-analyzer-v1-unicode-15.0.0",
+        "overlap": 0,
+        "token_budget": 96
+      },
+      "chunks": 467,
+      "overflow_count": 0,
+      "overflow_rate": 0.0,
+      "p50_wordpieces": 146,
+      "p95_wordpieces": 198,
+      "max_wordpieces": 244
+    }
+  ],
+  "note": "Retained local corpora only; not a general overflow estimate."
+}
