@@ -7,11 +7,13 @@ type Preview = {
   evidence_id: string;
 };
 /** Native SSE reconnection resumes event IDs; final run polling reauthorizes publication. */
-export function useRunProgress(runId: string | null, active: boolean) {
-  const [draft, setDraft] = useState("");
+export function useRunProgress(
+  runId: string | null,
+  active: boolean,
+  refresh: () => void,
+) {
   const [sources, setSources] = useState<Preview[]>([]);
   useEffect(() => {
-    setDraft("");
     setSources([]);
     if (!runId || !active) return;
     const events = new EventSource(
@@ -33,15 +35,10 @@ export function useRunProgress(runId: string | null, active: boolean) {
           last = sequence;
         } catch {
           events.close();
-          setDraft("");
           setSources([]);
         }
       });
     };
-    listen("draft_delta", (data) => {
-      if (typeof data.text !== "string") throw Error("Invalid draft event");
-      setDraft((previous) => (previous + data.text).slice(0, 65536));
-    });
     listen("evidence_ready", (data) => {
       if (
         !Array.isArray(data.evidence) ||
@@ -57,7 +54,22 @@ export function useRunProgress(runId: string | null, active: boolean) {
         throw Error("Invalid evidence event");
       setSources(data.evidence as Preview[]);
     });
+    for (const stage of [
+      "queued",
+      "retrieving",
+      "generating",
+      "validating",
+      "completed",
+      "failed",
+      "cancelled",
+    ]) {
+      listen(stage, () => {
+        if (["completed", "failed", "cancelled"].includes(stage))
+          setSources([]);
+        refresh();
+      });
+    }
     return () => events.close();
-  }, [runId, active]);
-  return { draft, sources };
+  }, [runId, active, refresh]);
+  return { sources };
 }

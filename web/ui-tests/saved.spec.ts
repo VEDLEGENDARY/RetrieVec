@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 test("saved research opens directly and citations share the evidence pane", async ({
   page,
@@ -81,6 +82,9 @@ test("saved research opens directly and citations share the evidence pane", asyn
     .getByRole("button", { name: /What is supported/ })
     .click();
   await expect(page.getByText("A supported claim.")).toBeVisible();
+  await expect(page).toHaveURL(/run=run/);
+  await page.reload();
+  await expect(page.getByText("A supported claim.")).toBeVisible();
   const citation = page
     .getByRole("button", { name: "Inspect citation e1", exact: true })
     .last();
@@ -93,6 +97,14 @@ test("saved research opens directly and citations share the evidence pane", asyn
   await citation.click();
   const pane = page.getByRole("complementary", { name: "Evidence inspector" });
   await expect(pane).toBeFocused();
+  const scan = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+    .analyze();
+  expect(
+    scan.violations.filter(
+      (item) => item.impact === "serious" || item.impact === "critical",
+    ),
+  ).toEqual([]);
   await pane.getByRole("button", { name: "Copy with citation" }).click();
   await expect(pane.getByRole("status")).toHaveText(
     "Passage and citation copied.",

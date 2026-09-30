@@ -1,122 +1,26 @@
+import { Citation } from "./Citation";
+import type {
+  Conversation,
+  SavedRun,
+  Provider,
+  Evidence,
+  Run,
+} from "./researchTypes";
 import { EvidencePanel } from "./EvidencePanel";
 import { useDraft } from "./drafts";
 import { useRunProgress } from "./useRunProgress";
 import { Button, Input, Select, Textarea, More, Skeleton } from "./ui";
-import { useCallback, useEffect, useRef, useState, useId } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
+import { navigate } from "./routing";
 
-type Conversation = { conversation_id: string; title: string };
-type SavedRun = {
-  run_id: string;
-  conversation_id: string;
-  original_question: string;
-  state: string;
-  created_at: string;
-};
-type Provider = {
-  name: string;
-  model: string;
-  cloud: boolean;
-  consented: boolean;
-};
-type Evidence = {
-  chunk_id?: string;
-  evidence_object_id?: string;
-  evidence_id: string;
-  citation_id: string;
-  title: string;
-  text: string;
-  page_range: number[] | null;
-  source_id: string | null;
-  snapshot_id?: string;
-};
-type Claim = { id: string; text: string; evidence_ids: string[] };
-type Comparison = {
-  method: string;
-  dataset: string;
-  metric: string;
-  reported_value: string;
-  experimental_conditions: string;
-  limitations: string;
-  evidence_ids: string[];
-  comparability_note: string;
-};
-type Run = {
-  run_id: string;
-  conversation_id: string;
-  original_question: string;
-  effective_query: string;
-  snapshot_id: string;
-  state: string;
-  error_code: string | null;
-  configuration: {
-    provider: string;
-    retrieval: string;
-    generation: { model: string; revision: string };
-  };
-  result: null | {
-    answer: {
-      status: string;
-      claims: Claim[];
-      comparisons: Comparison[];
-      limitations: string[];
-    };
-    evidence: Evidence[];
-    elapsed_ms: number;
-    budget: { excluded: unknown[]; input_tokens: number };
-  };
-};
 const activeStates = new Set([
   "queued",
   "retrieving",
   "generating",
   "validating",
 ]);
-function Citation({
-  item,
-  inspect,
-}: {
-  item: Evidence;
-  inspect: (item: Evidence, trigger: HTMLButtonElement) => void;
-}) {
-  const id = useId();
-  const [dismissed, setDismissed] = useState(false);
-  return (
-    <span
-      className="citation-preview-owner"
-      onMouseEnter={() => setDismissed(false)}
-      onFocus={() => setDismissed(false)}
-      onKeyDown={(event) => {
-        if (event.key === "Escape") {
-          event.stopPropagation();
-          setDismissed(true);
-        }
-      }}
-    >
-      <Button
-        className="quiet citation"
-        aria-label={`Inspect citation ${item.evidence_id}`}
-        aria-describedby={dismissed ? undefined : id}
-        onClick={(event) => {
-          setDismissed(true);
-          inspect(item, event.currentTarget);
-        }}
-      >
-        {item.title}
-      </Button>
-      {!dismissed && (
-        <span id={id} role="tooltip" className="citation-preview">
-          {item.text}
-          <br />
-          {item.page_range
-            ? `Pages ${item.page_range.join("–")}`
-            : "Page unavailable"}
-        </span>
-      )}
-    </span>
-  );
-}
 const failure: Record<string, string> = {
   provider_unavailable:
     "The configured model is unavailable or changed. Check the provider setup, then retry.",
@@ -136,8 +40,10 @@ export function Research({
   session,
   fail,
   showHistory = false,
+  linkedRun = "",
 }: {
   showHistory?: boolean;
+  linkedRun?: string;
   collection: Collection;
   session: Session;
   fail: (error: unknown) => void;
@@ -201,12 +107,28 @@ export function Research({
     "follow-up",
   );
   const [run, setRun] = useState<Run | null>(null);
+  const [selectedRunId, setRunSelection] = useState<string | null>(
+    linkedRun || null,
+  );
+  function setSelectedRunId(run: string | null) {
+    setRunSelection(run);
+    navigate({ collection: collection.collection_id, run: run ?? "" });
+  }
+  useEffect(() => {
+    setRunSelection(linkedRun || null);
+    setRun(null);
+    setEvidence(null);
+  }, [linkedRun]);
+  const [runRefresh, setRunRefresh] = useState(0);
+  const refreshFromEvent = useCallback(
+    () => setRunRefresh((value) => value + 1),
+    [],
+  );
   const progress = useRunProgress(
     run?.run_id ?? null,
     Boolean(run && activeStates.has(run.state)),
+    refreshFromEvent,
   );
-  const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
-  const [runRefresh, setRunRefresh] = useState(0);
   const [runConnection, setRunConnection] = useState<
     "connected" | "retrying" | "offline"
   >("connected");
@@ -223,6 +145,49 @@ export function Research({
   const [notice, setNotice] = useState("");
   const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
   const selectedProvider = providers.find((item) => item.name === provider);
+  const [rewritePreview, setRewritePreview] = useState("");
+  const [rewriteError, setRewriteError] = useState("");
+  useEffect(() => {
+    setRewritePreview("");
+    setRewriteError("");
+    if (
+      !run?.run_id ||
+      !question.trim() ||
+      effective ||
+      !selectedProvider?.consented
+    )
+      return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      api<{ effective_query: string }>(
+        `/api/v1/runs/${run.run_id}/rewrite`,
+        {
+          method: "POST",
+          signal: controller.signal,
+          body: JSON.stringify({ question, provider }),
+        },
+        session.csrf_token,
+      )
+        .then((value) => {
+          if (!controller.signal.aborted)
+            setRewritePreview(value.effective_query);
+        })
+        .catch((error) => {
+          if (!controller.signal.aborted) setRewriteError(error.message);
+        });
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [
+    run?.run_id,
+    question,
+    effective,
+    provider,
+    selectedProvider?.consented,
+    session.csrf_token,
+  ]);
   const refreshProviders = useCallback(async () => {
     const rows = await api<Provider[]>(
       `/api/v1/collections/${collection.collection_id}/providers`,
@@ -282,6 +247,7 @@ export function Research({
         failures = 0;
         setRunConnection("connected");
         setRun(current);
+        setConversation(current.conversation_id);
         timer = setTimeout(
           refresh,
           activeStates.has(current.state) ? 1200 : 5000,
@@ -563,7 +529,27 @@ export function Research({
             ? "Draft saved on this device for 7 days. Cleared on sign out."
             : "Device storage is unavailable. Keep this tab open to retain your draft."}
         </p>
-        <More>
+        <p>
+          Searching for:{" "}
+          {effective || rewritePreview || question || "Enter a question"}
+          <Button
+            type="button"
+            className="quiet"
+            onClick={() => {
+              setEffective(effective || rewritePreview || question);
+              const input = document.getElementById(
+                "effective-query",
+              ) as HTMLInputElement | null;
+              const details = input?.closest("details");
+              if (details) details.open = true;
+              input?.focus();
+            }}
+          >
+            Edit search query
+          </Button>
+        </p>
+        {rewriteError && <p role="alert">{rewriteError}</p>}
+        <More label="Advanced question settings">
           <label htmlFor="effective-query">
             Standalone query for a follow-up (optional)
           </label>
@@ -690,7 +676,7 @@ export function Research({
         <article className="answer">
           <h3>{run.original_question}</h3>
           <p role="status">Research run: {run.state}</p>
-          {activeStates.has(run.state) && !progress.draft && (
+          {activeStates.has(run.state) && (
             <Skeleton
               label={
                 run.state === "retrieving"
@@ -715,15 +701,6 @@ export function Research({
                   <blockquote>{source.text}</blockquote>
                 </article>
               ))}
-            </More>
-          )}
-          {activeStates.has(run.state) && progress.draft && (
-            <More label="Live draft — not yet checked">
-              <p>
-                Provisional model output. Only the final checked answer can be
-                cited or exported.
-              </p>
-              <pre className="stream-draft">{progress.draft}</pre>
             </More>
           )}
           {activeStates.has(run.state) && (

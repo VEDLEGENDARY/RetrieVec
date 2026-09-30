@@ -298,7 +298,7 @@ code {
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 8vh max(6vw, var(--space-8));
+  padding: var(--welcome-padding);
   position: relative;
   overflow: hidden;
 }
@@ -316,7 +316,7 @@ code {
   pointer-events: none;
 }
 .welcome .wordmark {
-  margin-bottom: clamp(var(--space-16), 10vh, var(--space-32));
+  margin-bottom: var(--welcome-logo-gap);
 }
 .welcome h1 {
   max-width: 850px;
@@ -446,8 +446,7 @@ code {
   width: 100%;
   max-width: 1500px;
   margin: 0 auto;
-  padding: var(--space-9) clamp(var(--space-5), 4vw, var(--space-18))
-    var(--space-12);
+  padding: var(--space-9) var(--workspace-inline-padding) var(--space-12);
 }
 .research > header {
   display: flex;
@@ -519,7 +518,7 @@ code {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-5);
-  padding: clamp(var(--space-6), 4vw, var(--space-11));
+  padding: var(--panel-padding);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--surface-solid);
@@ -790,7 +789,7 @@ summary {
 }
 
 .saved-research {
-  padding: clamp(var(--space-5), 3vw, var(--space-8));
+  padding: var(--research-padding);
   animation: none;
 }
 .saved-research > form {
@@ -1369,7 +1368,7 @@ kbd {
   font-size: var(--text-sm);
 }
 .command-dialog {
-  margin: 12vh auto auto;
+  margin: var(--dialog-offset) auto auto;
   padding: 0;
   width: min(620px, calc(100vw - 2rem));
   max-height: 76vh;

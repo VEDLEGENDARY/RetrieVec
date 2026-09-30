@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react";
 const prefix = "retrievec:draft:v1:";
 const lifetime = 7 * 24 * 60 * 60 * 1000;
 const changed = "retrievec:draft-change";
-const memory = new Map<string, string>();
+const memory = new Map<string, { text: string; expires: number }>();
 const failures = new Set<string>();
 const listeners = (notify: () => void) => {
   window.addEventListener(changed, notify);
@@ -14,7 +14,13 @@ const listeners = (notify: () => void) => {
   };
 };
 function read(key: string): string {
-  if (failures.has(key) && memory.has(key)) return memory.get(key)!;
+  const fallback = () => {
+    const value = memory.get(key);
+    if (value && value.expires > Date.now()) return value.text;
+    memory.delete(key);
+    return "";
+  };
+  if (failures.has(key) && memory.has(key)) return fallback();
   try {
     const raw = localStorage.getItem(key);
     if (raw) {
@@ -22,7 +28,7 @@ function read(key: string): string {
       if (
         typeof value.text === "string" &&
         value.text.length <= 4096 &&
-        typeof value.expires === "number" &&
+        Number.isFinite(value.expires) &&
         value.expires > Date.now()
       )
         return value.text;
@@ -33,17 +39,33 @@ function read(key: string): string {
   } catch {
     failures.add(key);
   }
-  return memory.get(key) ?? "";
+  return fallback();
 }
 export function clearDrafts(principal: string) {
   const scope = prefix + encodeURIComponent(principal) + ":";
   for (const key of memory.keys())
     if (key.startsWith(scope)) memory.delete(key);
+  for (const key of failures) if (key.startsWith(scope)) failures.delete(key);
   try {
     for (const key of Object.keys(localStorage))
       if (key.startsWith(scope)) localStorage.removeItem(key);
   } catch {
     /* Storage may be disabled. */
+  }
+  window.dispatchEvent(new Event(changed));
+}
+/** A new authenticated principal must not inherit another account's device drafts. */
+export function retainPrincipalDrafts(principal: string) {
+  const scope = prefix + encodeURIComponent(principal) + ":";
+  for (const key of memory.keys())
+    if (!key.startsWith(scope)) memory.delete(key);
+  for (const key of failures) if (!key.startsWith(scope)) failures.delete(key);
+  try {
+    for (const key of Object.keys(localStorage))
+      if (key.startsWith(prefix) && !key.startsWith(scope))
+        localStorage.removeItem(key);
+  } catch {
+    /* Memory-only drafts still remain scoped. */
   }
   window.dispatchEvent(new Event(changed));
 }
@@ -57,14 +79,11 @@ export function useDraft(
   const text = useSyncExternalStore(listeners, () => read(key));
   function update(value: string) {
     const text = value.slice(0, 4096);
-    memory.set(key, text);
+    const expires = Date.now() + lifetime;
+    memory.set(key, { text, expires });
     if (memory.size > 100) memory.delete(memory.keys().next().value!);
     try {
-      if (text)
-        localStorage.setItem(
-          key,
-          JSON.stringify({ text, expires: Date.now() + lifetime }),
-        );
+      if (text) localStorage.setItem(key, JSON.stringify({ text, expires }));
       else localStorage.removeItem(key);
       failures.delete(key);
     } catch {

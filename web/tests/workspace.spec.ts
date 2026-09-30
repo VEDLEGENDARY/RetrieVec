@@ -192,6 +192,24 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   ).toBeVisible({ timeout: 30000 });
   await page
     .getByLabel("Question for cited answer")
+    .fill("invalid-answer retrieval");
+  await page
+    .getByRole("button", { name: "Generate cited answer", exact: true })
+    .click();
+  await expect(
+    page.getByText("Research run: failed", { exact: true }),
+  ).toBeVisible({ timeout: 30000 });
+  await expect(
+    page.getByText("UNVERIFIED_SENTINEL", { exact: false }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /Inspect citation/ }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /Export (json|csv|markdown)/ }),
+  ).toHaveCount(0);
+  await page
+    .getByLabel("Question for cited answer")
     .fill("provider-failure retrieval");
   await page
     .getByRole("button", { name: "Generate cited answer", exact: true })
