@@ -203,7 +203,48 @@ class ResearchWorker:
                 packet = await pack_evidence(provider, run["effective_query"], retrieved["hits"])
                 if not packet["evidence"]:
                     return packet, None
-                raw = await provider.generate(packet["prompt"], answer_schema(packet["evidence"]))
+                await asyncio.to_thread(self.verify_sources, run, packet["evidence"])
+                previews = [
+                    {key: item.get(key) for key in ("title", "text", "page_range", "evidence_id")}
+                    for item in packet["evidence"]
+                ]
+                if not await asyncio.to_thread(
+                    self.state.progress,
+                    run,
+                    "evidence_ready",
+                    {"evidence": previews, "snapshot_id": run["snapshot_id"]},
+                ):
+                    raise asyncio.CancelledError()
+                schema = answer_schema(packet["evidence"])
+                if hasattr(provider, "generate_stream"):
+                    parts, pending = [], ""
+                    first = True
+                    output_size = 0
+                    last_flush = time.perf_counter()
+                    async for delta in provider.generate_stream(packet["prompt"], schema):
+                        output_size += len(delta.encode("utf-8"))
+                        if output_size > 65536:
+                            raise ProviderError("streamed draft exceeded its display budget")
+                        parts.append(delta)
+                        pending += delta
+                        if first or len(pending) >= 256 or time.perf_counter() - last_flush >= 0.25:
+                            if first:
+                                emit(
+                                    "research.first_token",
+                                    elapsed_ms=(time.perf_counter() - started) * 1000,
+                                )
+                            if not await asyncio.to_thread(
+                                self.state.progress, run, "draft_delta", {"text": pending}
+                            ):
+                                raise asyncio.CancelledError()
+                            first, pending, last_flush = False, "", time.perf_counter()
+                    if pending and not await asyncio.to_thread(
+                        self.state.progress, run, "draft_delta", {"text": pending}
+                    ):
+                        raise asyncio.CancelledError()
+                    raw = "".join(parts)
+                else:
+                    raw = await provider.generate(packet["prompt"], schema)
                 return packet, raw
 
             with stage("generating"):

@@ -257,6 +257,21 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         state = RunState(self.registry)
         claimed = state.claim()
         self.assertEqual(str(claimed["run_id"]), first["run_id"])
+        self.assertFalse(state.progress(claimed, "draft_delta", {"text": "too early"}))
+        self.assertTrue(state.transition(claimed, "generating"))
+        with self.registry.connect() as db:
+            stage_time = db.execute(
+                "SELECT stage_started_at FROM research_runs WHERE run_id=%s", (claimed["run_id"],)
+            ).fetchone()["stage_started_at"]
+        self.assertTrue(state.progress(claimed, "draft_delta", {"text": "provisional"}))
+        with self.registry.connect() as db:
+            self.assertEqual(
+                db.execute(
+                    "SELECT stage_started_at FROM research_runs WHERE run_id=%s",
+                    (claimed["run_id"],),
+                ).fetchone()["stage_started_at"],
+                stage_time,
+            )
         replacement = {**manifest, "corpus_snapshot_id": "ss_" + "b" * 64}
         next_snapshot = self.registry.register(self.a, replacement)
         next_folder = self.app.state.settings.store / "snapshots" / next_snapshot
@@ -277,6 +292,7 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.client.post(f"/api/v1/runs/{first['run_id']}/cancel", headers=self.headers)
         self.assertFalse(state.transition(claimed, "generating"))
         self.assertFalse(state.heartbeat(claimed))
+        self.assertFalse(state.progress(claimed, "draft_delta", {"text": "late"}))
         self.user(self.b)
         self.assertEqual(self.client.get(path).status_code, 404)
         self.assertEqual(self.client.get(saved).status_code, 404)
