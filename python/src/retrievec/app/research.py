@@ -13,6 +13,7 @@ from retrievec.app.admission import lock_admission, require_capacity
 from retrievec.app.auth import principal
 from retrievec.app.errors import APIError
 from retrievec.app.generation import load_providers
+from retrievec.app.query_rewrite import rewrite_query
 from retrievec.corpus.snapshot import canonical, digest
 from retrievec.observability import carrier as trace_carrier
 from retrievec.registry.artifacts import Store
@@ -83,8 +84,11 @@ def install_research(app):
                 (run_id, after),
             ).fetchall()
         body = "retry: 1500\n\n" + "".join(
-            f"id: {row['event_id']}\nevent: {row['type']}\ndata: "
-            + json.dumps({"run_id": str(run_id), **row["payload"]})
+            f"id: {row['event_id']}\n"
+            f"event: {('redacted' if row['type'] == 'draft_delta' else row['type'])}\ndata: "
+            + json.dumps(
+                {"run_id": str(run_id), **({} if row["type"] == "draft_delta" else row["payload"])}
+            )
             + "\n\n"
             for row in rows
         )
@@ -222,6 +226,29 @@ def install_research(app):
         with registry.connect() as db:
             return run_view(policy.owned(db, principal(request), "run", run_id))
 
+    @app.post("/api/v1/runs/{run_id}/rewrite")
+    def rewrite(run_id: uuid.UUID, value: RunInput, request: Request):
+        with registry.connect() as db:
+            parent = policy.owned(db, principal(request), "run", run_id)
+            provider = app.state.providers.get(value.provider)
+            if provider is None:
+                raise APIError(409, "provider_unavailable", "Choose an available provider")
+            if (
+                provider.cloud
+                and not db.execute(
+                    "SELECT 1 FROM provider_consents WHERE collection_id=%s AND provider_hash=%s",
+                    (parent["collection_id"], provider.identity),
+                ).fetchone()
+            ):
+                raise APIError(
+                    403, "consent_required", "Collection owner must enable this provider"
+                )
+            try:
+                query = value.effective_query or rewrite_query(value.question, parent)
+            except ValueError as error:
+                raise APIError(422, "query_budget", str(error)) from None
+            return {"effective_query": query, "policy": "parent-question-context-v1"}
+
     @app.post("/api/v1/conversations/{conversation_id}/runs", status_code=202)
     def enqueue(
         conversation_id: uuid.UUID,
@@ -309,6 +336,13 @@ def install_research(app):
                 )
             config["generation"] = provider.public()
             config["provider_hash"] = provider.identity
+            try:
+                effective_query = value.effective_query or rewrite_query(value.question, parent)
+            except ValueError as error:
+                raise APIError(422, "query_budget", str(error)) from None
+            config["query_policy"] = (
+                "explicit-standalone-v1" if value.effective_query else "parent-question-context-v1"
+            )
             row = db.execute(
                 "INSERT INTO research_runs(run_id,conversation_id,owner_id,collection_id,"
                 "snapshot_id,original_question,effective_query,configuration,state,"
@@ -321,7 +355,7 @@ def install_research(app):
                     collection["collection_id"],
                     pinned,
                     value.question.strip(),
-                    (value.effective_query or value.question).strip(),
+                    effective_query.strip(),
                     Jsonb(config),
                     idempotency_key,
                     request_hash,

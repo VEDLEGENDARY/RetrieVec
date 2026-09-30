@@ -233,6 +233,21 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(response.status_code, 202, response.text)
         first = response.json()
         self.assertEqual(first["snapshot_id"], pinned)
+        rewrite_url = f"/api/v1/runs/{first['run_id']}/rewrite"
+        preview = self.client.post(rewrite_url, json={"question": "And why?"}, headers=self.headers)
+        self.assertEqual(preview.status_code, 200, preview.text)
+        self.assertEqual(
+            preview.json()["effective_query"],
+            "Previous question: What works?\nFollow-up question: And why?",
+        )
+        self.user(self.b)
+        self.assertEqual(
+            self.client.post(
+                rewrite_url, json={"question": "And why?"}, headers=self.headers
+            ).status_code,
+            404,
+        )
+        self.user(self.a)
         self.assertEqual(
             self.client.post(path, json=payload, headers=headers).json()["run_id"], first["run_id"]
         )
@@ -267,13 +282,13 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         state = RunState(self.registry)
         claimed = state.claim()
         self.assertEqual(str(claimed["run_id"]), first["run_id"])
-        self.assertFalse(state.progress(claimed, "draft_delta", {"text": "too early"}))
+        self.assertFalse(state.progress(claimed, "evidence_ready", {"evidence": []}))
         self.assertTrue(state.transition(claimed, "generating"))
         with self.registry.connect() as db:
             stage_time = db.execute(
                 "SELECT stage_started_at FROM research_runs WHERE run_id=%s", (claimed["run_id"],)
             ).fetchone()["stage_started_at"]
-        self.assertTrue(state.progress(claimed, "draft_delta", {"text": "provisional"}))
+        self.assertTrue(state.progress(claimed, "evidence_ready", {"evidence": []}))
         with self.registry.connect() as db:
             self.assertEqual(
                 db.execute(
@@ -302,7 +317,7 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.client.post(f"/api/v1/runs/{first['run_id']}/cancel", headers=self.headers)
         self.assertFalse(state.transition(claimed, "generating"))
         self.assertFalse(state.heartbeat(claimed))
-        self.assertFalse(state.progress(claimed, "draft_delta", {"text": "late"}))
+        self.assertFalse(state.progress(claimed, "evidence_ready", {"evidence": []}))
         self.user(self.b)
         self.assertEqual(self.client.get(path).status_code, 404)
         self.assertEqual(self.client.get(saved).status_code, 404)
@@ -319,6 +334,14 @@ class WorkspaceDatabaseTests(unittest.TestCase):
             "cloud", "https://example.invalid", "fixture", "test-only", cloud=True
         )
         self.app.state.providers["cloud"] = cloud
+        self.assertEqual(
+            self.client.post(
+                rewrite_url,
+                json={"question": "And why?", "provider": "cloud"},
+                headers=self.headers,
+            ).status_code,
+            403,
+        )
         cloud_payload = {**payload, "provider": "cloud"}
         cloud_headers = {**self.headers, "Idempotency-Key": "cloud"}
         self.assertEqual(
