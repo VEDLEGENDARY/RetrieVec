@@ -50,6 +50,8 @@ function App() {
   }, [loading]);
 
   const [busy, setBusy] = useState(false);
+  const [archived, setArchived] = useState<Collection | null>(null);
+  useEffect(() => setArchived(null), [session?.principal_id]);
   const [view, setView] = useState<View>("ask");
   const [askMode, setAskMode] = useState<"passages" | "answer">("passages");
   const [navigationOpen, setNavigationOpen] = useState(false);
@@ -76,21 +78,37 @@ function App() {
     }
   }
   async function archive() {
-    if (
-      !active ||
-      !window.confirm(
-        `Archive “${active.title}”? Access and pending processing will stop. Retained files are not erased.`,
-      )
-    )
-      return;
+    if (!active || busy) return;
     setBusy(true);
+    setError("");
     try {
       await api(
         `/api/v1/collections/${active.collection_id}`,
         { method: "DELETE" },
         session?.csrf_token,
       );
+      setArchived(active);
       await refresh();
+    } catch (error) {
+      fail(error);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function restoreArchived() {
+    if (!archived || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      const restored = await api<Collection>(
+        `/api/v1/collections/${archived.collection_id}/restore`,
+        { method: "POST" },
+        session?.csrf_token,
+      );
+      await refresh();
+      setSelected(restored.collection_id);
+      setView("sources");
+      setArchived(null);
     } catch (error) {
       fail(error);
     } finally {
@@ -310,11 +328,27 @@ function App() {
             )}
           </div>
           {active?.can_manage && (
-            <Button className="quiet" onClick={archive} disabled={busy}>
+            <Button
+              className="quiet"
+              onClick={archive}
+              disabled={busy}
+              title="Hide this collection and cancel active processing. Undo restores access, but does not restart cancelled work."
+            >
               <Archive size={15} /> Archive collection
             </Button>
           )}
         </header>
+        {archived && (
+          <div className="notice" role="status">
+            <p>
+              “{archived.title}” archived. Undo restores access; cancelled
+              processing stays cancelled.
+            </p>
+            <Button onClick={restoreArchived} disabled={busy}>
+              Undo archive
+            </Button>
+          </div>
+        )}
         {error && (
           <p role="alert" className="error">
             {error}

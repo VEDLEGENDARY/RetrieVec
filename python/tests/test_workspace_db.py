@@ -91,6 +91,16 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         )
         with self.registry.connect() as db, self.assertRaises(PermissionError):
             self.registry.authorize(db, self.a, collection)
+        restore_url = f"/api/v1/collections/{collection}/restore"
+        self.user(self.b)
+        self.assertEqual(self.client.post(restore_url, headers=self.headers).status_code, 404)
+        self.user(self.a)
+        for _ in range(2):
+            restored = self.client.post(restore_url, headers=self.headers)
+            self.assertEqual(restored.status_code, 200, restored.text)
+            self.assertTrue(restored.json()["can_manage"])
+        with self.registry.connect() as db:
+            self.registry.authorize(db, self.a, collection)
 
     def test_session_expiry_and_no_resurrection(self):
         token = self.tokens[self.a]
@@ -432,3 +442,10 @@ class WorkspaceDatabaseTests(unittest.TestCase):
                 "SELECT state FROM ingestion_jobs WHERE job_id=%s", (job_id,)
             ).fetchone()
             self.assertEqual(row["state"], "cancelled")
+        self.assertEqual(
+            self.client.post(
+                f"/api/v1/collections/{collection}/restore", headers=self.headers
+            ).status_code,
+            200,
+        )
+        self.assertEqual(self.client.get("/api/v1/jobs/" + job_id).json()["state"], "cancelled")
