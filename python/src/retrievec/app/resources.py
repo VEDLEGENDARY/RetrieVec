@@ -89,6 +89,21 @@ def install_resources(app):
             ).fetchone()
             return collection_view(row, user)
 
+    @app.post("/api/v1/collections/{collection_id}/restore", response_model=Collection)
+    def restore(collection_id: str, request: Request):
+        user = principal(request)
+        with registry.connect() as db:
+            # Archived collections intentionally fail the normal read policy.
+            # Restore is owner-only and never revives cancelled work or leases.
+            row = db.execute(
+                "UPDATE collections SET archived=false "
+                "WHERE collection_id=%s AND owner_id=%s RETURNING *",
+                (collection_id, user),
+            ).fetchone()
+            if row is None:
+                raise PermissionError("resource unavailable")
+            return collection_view(row, user)
+
     @app.delete("/api/v1/collections/{collection_id}", status_code=204)
     def archive(collection_id: str, request: Request):
         user = principal(request)
