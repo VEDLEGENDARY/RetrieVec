@@ -219,31 +219,20 @@ class ResearchWorker:
                 if run["configuration"].get(
                     "generation_transport"
                 ) == "llama-completion-sse-v1" and hasattr(provider, "generate_stream"):
-                    parts, pending = [], ""
+                    parts = []
                     first = True
                     output_size = 0
-                    last_flush = time.perf_counter()
                     async for delta in provider.generate_stream(packet["prompt"], schema):
                         output_size += len(delta.encode("utf-8"))
                         if output_size > 65536:
-                            raise ProviderError("streamed draft exceeded its display budget")
+                            raise ProviderError("streamed answer exceeded its output budget")
                         parts.append(delta)
-                        pending += delta
-                        if first or len(pending) >= 256 or time.perf_counter() - last_flush >= 0.25:
-                            if first:
-                                emit(
-                                    "research.first_token",
-                                    elapsed_ms=(time.perf_counter() - started) * 1000,
-                                )
-                            if not await asyncio.to_thread(
-                                self.state.progress, run, "draft_delta", {"text": pending}
-                            ):
-                                raise asyncio.CancelledError()
-                            first, pending, last_flush = False, "", time.perf_counter()
-                    if pending and not await asyncio.to_thread(
-                        self.state.progress, run, "draft_delta", {"text": pending}
-                    ):
-                        raise asyncio.CancelledError()
+                        if first:
+                            emit(
+                                "research.first_token",
+                                elapsed_ms=(time.perf_counter() - started) * 1000,
+                            )
+                            first = False
                     raw = "".join(parts)
                 else:
                     raw = await provider.generate(packet["prompt"], schema)

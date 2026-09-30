@@ -10,6 +10,23 @@ Identity = Annotated[str, StringConstraints(pattern=r"^[a-zA-Z0-9_-]{1,80}$")]
 MISSING = "not reported in retrieved evidence"
 
 
+def safe(value):
+    """Reject executable markup/links without treating scientific prose as HTML."""
+    if isinstance(value, str) and re.search(
+        r"<\s*(?:/?[a-z][\w:-]*(?:\s[^>]*|/[^>]*|)>|!|\?)"
+        r"|\b(?:https?|javascript)\s*:|\bdata\s*:\s*(?:[\w.+-]+/[\w.+-]+|;|,)",
+        value,
+        re.I,
+    ):
+        raise ValueError("answer contains markup or an untrusted link")
+    if isinstance(value, dict):
+        for item in value.values():
+            safe(item)
+    elif isinstance(value, list):
+        for item in value:
+            safe(item)
+
+
 class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
 
@@ -127,18 +144,6 @@ def validate_answer(raw: str, evidence: list[dict]) -> dict:
                 raise ValueError("quote is absent from evidence")
 
     result = answer.model_dump()
-
-    def safe(value):
-        if isinstance(value, str) and re.search(
-            r"<[^>]*>|(?:https?|javascript|data):", value, re.I
-        ):
-            raise ValueError("answer contains markup or an untrusted link")
-        if isinstance(value, dict):
-            for item in value.values():
-                safe(item)
-        elif isinstance(value, list):
-            for item in value:
-                safe(item)
 
     safe(result)
     return result

@@ -146,7 +146,7 @@ class RunState:
 
     def progress(self, run, kind, payload):
         """Publish bounded provisional events without resetting stage timing."""
-        if kind not in ("evidence_ready", "draft_delta"):
+        if kind != "evidence_ready":
             raise ValueError("unsupported progress event")
         with self.registry.connect() as db:
             self.access(db, run)
