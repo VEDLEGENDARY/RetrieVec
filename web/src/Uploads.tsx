@@ -56,6 +56,10 @@ export function Uploads({
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [removedFile, setRemovedFile] = useState<{
+    file: File;
+    index: number;
+  } | null>(null);
   const [dragging, setDragging] = useState(false);
   const requestKey = useRef(crypto.randomUUID());
   const input = useRef<HTMLInputElement>(null);
@@ -124,6 +128,7 @@ export function Uploads({
       );
       if (input.current) input.current.value = "";
       setFiles([]);
+      setRemovedFile(null);
       requestKey.current = crypto.randomUUID();
     } catch (error) {
       fail(error);
@@ -219,6 +224,7 @@ export function Uploads({
                     disabled={sending}
                     aria-label={`Remove ${file.name}`}
                     onClick={() => {
+                      setRemovedFile({ file, index });
                       setFiles((current) =>
                         current.filter((_, position) => position !== index),
                       );
@@ -255,6 +261,26 @@ export function Uploads({
           </Button>
         </div>
       </form>
+      {removedFile && (
+        <Button
+          disabled={sending || pending || files.length >= 10}
+          onClick={() => {
+            setFiles((current) => {
+              const next = [...current];
+              next.splice(
+                Math.min(removedFile.index, next.length),
+                0,
+                removedFile.file,
+              );
+              return next;
+            });
+            requestKey.current = crypto.randomUUID();
+            setRemovedFile(null);
+          }}
+        >
+          Undo remove document
+        </Button>
+      )}
       <p role="status" aria-live="polite">
         {notice}
       </p>

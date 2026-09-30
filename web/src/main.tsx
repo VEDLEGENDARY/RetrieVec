@@ -1,4 +1,4 @@
-import { Button, Input } from "./ui";
+import { Button, Input, Skeleton } from "./ui";
 import { useEffect, useState } from "react";
 import { recordTiming } from "./performance";
 import { createRoot } from "react-dom/client";
@@ -100,7 +100,7 @@ function App() {
   if (loading)
     return (
       <main className="welcome">
-        <p role="status">Opening your workspace…</p>
+        <Skeleton label="Opening your workspace…" />
       </main>
     );
   if (!session)
@@ -360,6 +360,18 @@ function App() {
               options.
             </p>
           </details>
+        )}
+        {active && view === "ask" && !active.active_snapshot && (
+          <section className="empty">
+            <h2>Add your first sources</h2>
+            <p>
+              Your collection is ready for documents. Processing makes them
+              searchable.
+            </p>
+            <Button variant="primary" onClick={() => setView("sources")}>
+              Add documents
+            </Button>
+          </section>
         )}
         {active && view === "ask" && (
           <div className="ask-modes" role="group" aria-label="Question mode">
