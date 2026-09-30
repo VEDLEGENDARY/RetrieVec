@@ -1,5 +1,6 @@
 import { EvidencePanel } from "./EvidencePanel";
 import { useDraft } from "./drafts";
+import { useRunProgress } from "./useRunProgress";
 import { Button, Input, Select, Textarea, More } from "./ui";
 import { useCallback, useEffect, useRef, useState, useId } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
@@ -200,6 +201,10 @@ export function Research({
     "follow-up",
   );
   const [run, setRun] = useState<Run | null>(null);
+  const progress = useRunProgress(
+    run?.run_id ?? null,
+    Boolean(run && activeStates.has(run.state)),
+  );
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [runRefresh, setRunRefresh] = useState(0);
   const [runConnection, setRunConnection] = useState<
@@ -683,6 +688,29 @@ export function Research({
         <article className="answer">
           <h3>{run.original_question}</h3>
           <p role="status">Research run: {run.state}</p>
+          {activeStates.has(run.state) && progress.sources.length > 0 && (
+            <More label={`${progress.sources.length} sources retrieved`} open>
+              <p>
+                Evidence selected from the pinned snapshot. The answer is still
+                being generated and checked.
+              </p>
+              {progress.sources.map((source) => (
+                <article key={source.evidence_id}>
+                  <h4>{source.title}</h4>
+                  <blockquote>{source.text}</blockquote>
+                </article>
+              ))}
+            </More>
+          )}
+          {activeStates.has(run.state) && progress.draft && (
+            <More label="Live draft — not yet checked">
+              <p>
+                Provisional model output. Only the final checked answer can be
+                cited or exported.
+              </p>
+              <pre className="stream-draft">{progress.draft}</pre>
+            </More>
+          )}
           {activeStates.has(run.state) && (
             <Button
               disabled={busy}
