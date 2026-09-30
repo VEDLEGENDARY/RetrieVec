@@ -3,7 +3,7 @@
 Date: 2026-09-29  
 Baseline: `f6e021142df2f4a4990b7b4c2b28da45bd485882`  
 Plan: **Plan 1, Step 1 only**  
-Status: **Ready for owner review before Step 2. Application code is unchanged.**
+Status: **Baseline audit approved by the owner. Implementation is underway in PR #46; the inventory below records the pre-change state.**
 
 ## Scope and method
 

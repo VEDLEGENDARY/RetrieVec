@@ -288,6 +288,7 @@ def install_research(app):
                 "candidates": 100,
                 "query_policy": "explicit-standalone-v1",
                 "evidence_policy": "typed-evidence-grounding-v1",
+                "generation_transport": "llama-completion-sse-v1",
             }
             provider = app.state.providers.get(value.provider)
             if provider is None:

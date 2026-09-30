@@ -77,4 +77,21 @@ Pending representative baseline: chosen concurrency, collection size, PDF pages/
 8. Restore drafts, selection and scroll using an identity-scoped, versioned persistence policy with expiry, clearing and quota/error handling. Never restore protected result text without authorization; disclose when browser storage is unavailable. “Never lose” is a design goal, not a guarantee against device/storage loss.
 9. Preserve existing PDF drag/drop; add accessible context menus and copy-with-citation, including text alternatives and success/failure feedback. Verify keyboard, touch, focus order and screen-reader behavior.
 
-No commits or PRs were created in this increment. Review `AUDIT.md` and approve the navigation in `CORE_FLOWS.md` before the interdependent interface redesign proceeds.
+The owner approved the audit, navigation and implementation. PR #46 contains separate commits for the design system, navigation, evidence inspection, drafts, saved research, streaming and interaction states.
+
+## Follow-up measurements — 2026-09-30
+
+Matched production builds compared baseline `f6e0211` against the implementation through `c8bad4b`. One Chromium instance alternated versions, discarded the first pair, and retained 30 samples per version at 1280×720 on the same machine. HTTP responses were synthetic. Times include browser automation observation overhead; they are not real retrieval-service latency or field INP.
+
+| Observed operation | Baseline p50 / p95 (ms) | Updated p50 / p95 (ms) |
+| --- | --- | --- |
+| Navigation to workspace heading | 119 / 153.5 | 116.6 / 138.4 |
+| Search click to results | 83.2 / 115 | 78.9 / 106.3 |
+
+No regression appeared in this workload. This is not a statistically established speedup or a benchmark of real corpus search. Local raw report: `artifacts/production-baseline-comparison.json`.
+
+The real local Qwen2.5 1.5B Q4_K_M model, llama.cpp b11064, two CPU threads and 4096-token context was also tested with alternating completion/streaming requests against one synthetic evidence passage. Fixed configuration and seed produced the same output SHA-256 across all four requests, and all passed structural validation. Non-streaming totals were 21.844 and 21.369 seconds; streaming totals were 21.025 and 21.482 seconds, with first content at 6.729 and 7.082 seconds. Two samples per mode establish transport parity only, not a resource or quality acceptance decision. Human relevance/support review remains pending.
+
+Reproduce the model comparison with `python scripts/benchmark_generation_stream.py --model <gguf-path> --endpoint http://127.0.0.1:8098 --key-file <key-file> --runs 4 --output <report.json>`. Start the same pinned server/model first. The report records model identity, output hashes and timings without credentials or raw model output. Provider timing starts at invocation; worker first-token timing includes retrieval but excludes queue wait. Local raw report: `artifacts/generation/stream-baseline.json`.
+
+Implemented safeguards include bounded provisional streaming, early authorized evidence, scoped expiring drafts, reduced motion, local removal Undo and owner-only archive restoration. Archive restoration does not resume cancelled work. Remaining gates include full PDF ingest and representative retrieval measurements, polished prose streaming, ordinary-PDF exact highlights, selection/scroll restoration, complete contextual commands, and measured caching/prefetch. These are not claimed complete by the synthetic benchmarks above.
