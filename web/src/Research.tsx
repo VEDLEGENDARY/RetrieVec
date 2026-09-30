@@ -1,7 +1,7 @@
 import { EvidencePanel } from "./EvidencePanel";
 import { useDraft } from "./drafts";
 import { useRunProgress } from "./useRunProgress";
-import { Button, Input, Select, Textarea, More } from "./ui";
+import { Button, Input, Select, Textarea, More, Skeleton } from "./ui";
 import { useCallback, useEffect, useRef, useState, useId } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
@@ -461,7 +461,7 @@ export function Research({
           }}
         />
         {savedLoading ? (
-          <p role="status">Loading saved research…</p>
+          <Skeleton label="Loading saved research…" />
         ) : savedError ? (
           <p role="alert">{savedError}</p>
         ) : (
@@ -605,6 +605,8 @@ export function Research({
         </p>
         <Button
           className="primary"
+          title="Generate cited answer (Ctrl or Command + Enter)"
+          aria-keyshortcuts="Control+Enter Meta+Enter"
           disabled={
             busy ||
             !question.trim() ||
@@ -688,6 +690,19 @@ export function Research({
         <article className="answer">
           <h3>{run.original_question}</h3>
           <p role="status">Research run: {run.state}</p>
+          {activeStates.has(run.state) && !progress.draft && (
+            <Skeleton
+              label={
+                run.state === "retrieving"
+                  ? "Finding relevant passages…"
+                  : run.state === "validating"
+                    ? "Checking citations and source integrity…"
+                    : run.state === "queued"
+                      ? "Waiting for the research worker…"
+                      : "Preparing your answer…"
+              }
+            />
+          )}
           {activeStates.has(run.state) && progress.sources.length > 0 && (
             <More label={`${progress.sources.length} sources retrieved`} open>
               <p>
@@ -751,7 +766,11 @@ export function Research({
                 </p>
               </More>
               <p className="answer-status">
-                {run.result.answer.status.replaceAll("_", " ")}
+                {run.result.answer.status === "insufficient_evidence"
+                  ? "I could not find this in your papers."
+                  : run.result.answer.status === "partial"
+                    ? "The sources support only part of this answer."
+                    : "Answer with cited evidence"}
               </p>
               {run.result.answer.claims.map((claim) => (
                 <div className="claim" key={claim.id}>

@@ -1,6 +1,6 @@
 import { EvidencePanel } from "./EvidencePanel";
 import { useDraft } from "./drafts";
-import { Button, Input, Select, Textarea, More } from "./ui";
+import { Button, Input, Select, Textarea, More, Skeleton } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { AdvancedEvidence } from "./AdvancedEvidence";
 import {
@@ -48,6 +48,19 @@ export function Search({
   const [filter, setFilter] = useState("");
   const [method, setMethod] = useState("all");
   const [shortlist, setShortlist] = useState<SavedPassage[]>([]);
+  const [removed, setRemoved] = useState<{
+    item: SavedPassage;
+    index: number;
+  } | null>(null);
+  function removePassage(key: string) {
+    const index = shortlist.findIndex((item) => passageKey(item) === key);
+    if (index < 0) return;
+    setRemoved({ item: shortlist[index], index });
+    setShortlist((current) =>
+      current.filter((item) => passageKey(item) !== key),
+    );
+    setNotice("Passage removed from the shortlist.");
+  }
   const [notice, setNotice] = useState("");
   const [recent, setRecent] = useState<
     { query: string; mode: string; retrieval: string }[]
@@ -127,10 +140,7 @@ export function Search({
         .map(([name]) => name),
     };
     if (shortlist.some((saved) => passageKey(saved) === passageKey(item))) {
-      setShortlist((current) =>
-        current.filter((saved) => passageKey(saved) !== passageKey(item)),
-      );
-      setNotice("Passage removed from the shortlist.");
+      removePassage(passageKey(item));
     } else if (shortlist.length < 6) {
       setShortlist((current) => [...current, item]);
       setNotice("Passage added to the evidence shortlist.");
@@ -217,6 +227,8 @@ export function Search({
           </More>
           <Button
             type="submit"
+            title="Search evidence (Ctrl or Command + Enter)"
+            aria-keyshortcuts="Control+Enter Meta+Enter"
             className="primary"
             disabled={busy || !collection.active_snapshot}
           >
@@ -274,15 +286,38 @@ export function Search({
       <EvidenceTray
         items={shortlist}
         collectionId={collection.collection_id}
-        remove={(key) =>
-          setShortlist((current) =>
-            current.filter((item) => passageKey(item) !== key),
-          )
-        }
+        remove={removePassage}
       />
       <p role="status" className="interaction-notice">
         {notice}
+        {removed && (
+          <Button
+            type="button"
+            disabled={
+              shortlist.length >= 6 ||
+              shortlist.some(
+                (item) => passageKey(item) === passageKey(removed.item),
+              )
+            }
+            onClick={() => {
+              setShortlist((current) => {
+                const next = [...current];
+                next.splice(
+                  Math.min(removed.index, next.length),
+                  0,
+                  removed.item,
+                );
+                return next;
+              });
+              setRemoved(null);
+              setNotice("Passage restored to the shortlist.");
+            }}
+          >
+            Undo remove passage
+          </Button>
+        )}
       </p>
+      {busy && <Skeleton label="Finding evidence in your collection…" />}
       <p role="status" aria-live="polite">
         {busy
           ? "Searching one pinned snapshot…"
