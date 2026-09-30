@@ -240,6 +240,18 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(replay.status_code, 202, replay.text)
         self.assertNotEqual(first["run_id"], replay.json()["run_id"])
         self.assertEqual(len(self.client.get(path).json()), 2)
+        saved = f"/api/v1/collections/{collection}/runs"
+        first_page = self.client.get(saved, params={"q": "works", "limit": 1}).json()
+        self.assertEqual(len(first_page["items"]), 1)
+        self.assertNotIn("result", first_page["items"][0])
+        second_page = self.client.get(
+            saved, params={"q": "works", "limit": 1, "before": first_page["next_cursor"]}
+        ).json()
+        self.assertEqual(len(second_page["items"]), 1)
+        self.assertIsNone(second_page["next_cursor"])
+        self.assertNotEqual(first_page["items"][0]["run_id"], second_page["items"][0]["run_id"])
+        self.assertEqual(self.client.get(saved, params={"q": "%"}).json()["items"], [])
+        self.assertEqual(self.client.get(saved, params={"limit": 101}).status_code, 422)
         from retrievec.app.run_state import RunState
 
         state = RunState(self.registry)
@@ -267,6 +279,7 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertFalse(state.heartbeat(claimed))
         self.user(self.b)
         self.assertEqual(self.client.get(path).status_code, 404)
+        self.assertEqual(self.client.get(saved).status_code, 404)
         self.assertEqual(self.client.get("/api/v1/runs/" + first["run_id"]).status_code, 404)
         self.assertEqual(self.client.get(f"/api/v1/runs/{first['run_id']}/events").status_code, 404)
         self.user(self.a)
