@@ -1,3 +1,4 @@
+import { Button, Input, Select, Textarea } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { AdvancedEvidence } from "./AdvancedEvidence";
 import {
@@ -154,7 +155,7 @@ export function Search({
       </div>
       <form className="search-form" onSubmit={submit}>
         <label htmlFor="question">Research question</label>
-        <textarea
+        <Textarea
           id="question"
           rows={2}
           maxLength={4096}
@@ -176,7 +177,7 @@ export function Search({
         />
         <div className="search-controls">
           <label htmlFor="parser">Query syntax</label>
-          <select
+          <Select
             id="parser"
             value={mode}
             onChange={(event) => {
@@ -186,9 +187,9 @@ export function Search({
           >
             <option value="free_text">Natural language</option>
             <option value="structured">Boolean / phrase</option>
-          </select>
+          </Select>
           <label htmlFor="retrieval">Retrieval method</label>
-          <select
+          <Select
             id="retrieval"
             value={retrieval}
             onChange={(event) => setRetrieval(event.target.value)}
@@ -203,16 +204,16 @@ export function Search({
             <option value="hybrid" disabled={mode === "structured"}>
               Hybrid
             </option>
-          </select>
-          <button
+          </Select>
+          <Button
             type="submit"
             className="primary"
             disabled={busy || !collection.active_snapshot}
           >
             {busy ? "Searching…" : "Search evidence →"}
-          </button>
+          </Button>
           {busy && (
-            <button
+            <Button
               type="button"
               onClick={() => {
                 request.current?.abort();
@@ -223,7 +224,7 @@ export function Search({
               }}
             >
               Cancel search
-            </button>
+            </Button>
           )}
         </div>
         {!collection.active_snapshot && (
@@ -240,7 +241,7 @@ export function Search({
           </summary>
           <div>
             {recent.map((item, index) => (
-              <button
+              <Button
                 key={`${item.query}-${index}`}
                 onClick={() => {
                   setQuery(item.query);
@@ -255,7 +256,7 @@ export function Search({
                     ? "Compare all methods"
                     : labels[item.retrieval]}
                 </small>
-              </button>
+              </Button>
             ))}
           </div>
         </details>
@@ -296,19 +297,19 @@ export function Search({
               <br />
               Returned from one pinned snapshot.
             </p>
-            <button
+            <Button
               type="button"
               aria-pressed={compact}
               onClick={() => setCompact((value) => !value)}
             >
               {compact ? "Show full excerpts" : "Compact results"}
-            </button>
+            </Button>
           </div>
           <div className="evidence-controls">
             <SlidersHorizontal size={18} aria-hidden="true" />
             <label>
               Filter returned passages
-              <input
+              <Input
                 type="search"
                 value={filter}
                 placeholder="Find a title or phrase…"
@@ -317,7 +318,7 @@ export function Search({
             </label>
             <label>
               Show retrieval method
-              <select
+              <Select
                 value={method}
                 onChange={(event) => setMethod(event.target.value)}
               >
@@ -327,7 +328,7 @@ export function Search({
                     {labels[name] ?? name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <small>
               Filters refine these results without running another search.
@@ -401,7 +402,7 @@ export function Search({
                         )
                         .map((hit) => (
                           <li key={hit.chunk_id} value={hit.rank}>
-                            <button
+                            <Button
                               className={
                                 selected?.chunk_id === hit.chunk_id
                                   ? "hit active"
@@ -424,8 +425,8 @@ export function Search({
                                     ? `Cosine ${hit.cosine_score?.toFixed(3)}`
                                     : `RRF ${hit.rrf_score?.toFixed(5)}`}
                               </small>
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                               className="shortlist-action"
                               aria-pressed={shortlist.some(
                                 (item) =>
@@ -444,7 +445,7 @@ export function Search({
                                 <BookmarkPlus size={15} aria-hidden="true" />
                               )}{" "}
                               Shortlist passage
-                            </button>
+                            </Button>
                           </li>
                         ))}
                     </ol>
@@ -466,12 +467,12 @@ export function Search({
               >
                 <div className="inspector-heading">
                   <h3>Evidence inspector</h3>
-                  <button
+                  <Button
                     aria-label="Close evidence inspector"
                     onClick={closeInspector}
                   >
                     <X size={18} />
-                  </button>
+                  </Button>
                 </div>
                 <h2>{selected.title}</h2>
                 <p className="eyebrow">

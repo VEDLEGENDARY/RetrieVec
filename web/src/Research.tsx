@@ -1,3 +1,4 @@
+import { Button, Input, Select, Textarea } from "./ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
@@ -329,14 +330,14 @@ export function Research({
         (value) => value.evidence_id === id,
       );
       return item ? (
-        <button
+        <Button
           className="quiet citation"
           key={id}
           onClick={(event) => inspect(item, event.currentTarget)}
           aria-label={`Inspect citation ${id}`}
         >
           {item.title}
-        </button>
+        </Button>
       ) : null;
     });
   return (
@@ -348,7 +349,7 @@ export function Research({
         scientific or semantic correctness.
       </p>
       <label htmlFor="conversation">Conversation</label>
-      <select
+      <Select
         id="conversation"
         disabled={busy}
         value={conversation}
@@ -368,7 +369,7 @@ export function Research({
             {item.title}
           </option>
         ))}
-      </select>
+      </Select>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -376,7 +377,7 @@ export function Research({
         }}
       >
         <label htmlFor="research-question">Question for cited answer</label>
-        <textarea
+        <Textarea
           id="research-question"
           disabled={busy}
           value={question}
@@ -391,7 +392,7 @@ export function Research({
         <label htmlFor="effective-query">
           Standalone query for a follow-up (optional)
         </label>
-        <input
+        <Input
           id="effective-query"
           disabled={busy}
           value={effective}
@@ -403,7 +404,7 @@ export function Research({
           placeholder="Include the method or paper your follow-up refers to"
         />
         <label htmlFor="generation-provider">Generation provider</label>
-        <select
+        <Select
           id="generation-provider"
           disabled={busy}
           value={provider}
@@ -420,8 +421,8 @@ export function Research({
               {item.model} · {item.cloud ? "Cloud" : "Local"}
             </option>
           ))}
-        </select>
-        <button
+        </Select>
+        <Button
           className="primary"
           disabled={
             busy ||
@@ -431,7 +432,7 @@ export function Research({
           }
         >
           Generate cited answer
-        </button>
+        </Button>
       </form>
       {!collection.active_snapshot && (
         <p>Upload and process a source before creating a research run.</p>
@@ -450,11 +451,11 @@ export function Research({
             provider configuration.
           </p>
           {collection.can_manage ? (
-            <button onClick={() => consent(!selectedProvider.consented)}>
+            <Button onClick={() => consent(!selectedProvider.consented)}>
               {selectedProvider.consented
                 ? "Revoke cloud consent"
                 : "Allow this cloud provider"}
-            </button>
+            </Button>
           ) : (
             <p>The collection owner manages cloud consent.</p>
           )}
@@ -463,7 +464,7 @@ export function Research({
       {!!history.length && (
         <nav aria-label="Saved research runs" className="run-history">
           {history.map((item) => (
-            <button
+            <Button
               key={item.run_id}
               disabled={busy}
               aria-pressed={selectedRunId === item.run_id}
@@ -478,7 +479,7 @@ export function Research({
               }}
             >
               {item.original_question} · {item.state}
-            </button>
+            </Button>
           ))}
         </nav>
       )}
@@ -490,7 +491,7 @@ export function Research({
               : "The saved run is unavailable right now. Retry when the service is available."}
           </p>
           {runConnection === "offline" && (
-            <button
+            <Button
               type="button"
               onClick={() => {
                 setRunConnection("retrying");
@@ -498,7 +499,7 @@ export function Research({
               }}
             >
               Reconnect to saved run
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -507,7 +508,7 @@ export function Research({
           <h3>{run.original_question}</h3>
           <p role="status">Research run: {run.state}</p>
           {activeStates.has(run.state) && (
-            <button
+            <Button
               disabled={busy}
               onClick={async () => {
                 try {
@@ -522,7 +523,7 @@ export function Research({
               }}
             >
               Cancel run
-            </button>
+            </Button>
           )}
           {run.state === "failed" && (
             <p role="alert">
@@ -575,24 +576,24 @@ export function Research({
               </p>
               <div className="export-actions">
                 {["markdown", "bibtex", "json", "csv"].map((format) => (
-                  <button key={format} onClick={() => exportRun(format)}>
+                  <Button key={format} onClick={() => exportRun(format)}>
                     Export {format}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </>
           )}
           {!activeStates.has(run.state) && (
             <div className="replay-actions">
-              <button
+              <Button
                 disabled={busy}
                 onClick={() => submit("historical", true)}
               >
                 Replay pinned snapshot
-              </button>
-              <button disabled={busy} onClick={() => submit("current", true)}>
+              </Button>
+              <Button disabled={busy} onClick={() => submit("current", true)}>
                 Replay current snapshot
-              </button>
+              </Button>
             </div>
           )}
           <details>
@@ -619,9 +620,9 @@ export function Research({
             }
           }}
         >
-          <button ref={citationClose} onClick={closeCitation}>
+          <Button ref={citationClose} onClick={closeCitation}>
             Close citation
-          </button>
+          </Button>
           <h3>{evidence.title}</h3>
           <p>
             {evidence.page_range

@@ -2,6 +2,45 @@
 
 @import "tailwindcss";
 
+.more-options {
+  margin-block: var(--space-4);
+}
+.more-body {
+  display: grid;
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+}
+.skeleton {
+  height: 1rem;
+  margin-block: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--subtle);
+}
+.skeleton.short {
+  width: 60%;
+}
+.tooltip-owner {
+  position: relative;
+  display: inline-flex;
+}
+.tooltip {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  padding: var(--space-2);
+  background: var(--ink);
+  color: var(--canvas);
+  border-radius: var(--radius-sm);
+  z-index: 40;
+  width: max-content;
+  max-width: 18rem;
+  font-size: var(--text-sm);
+}
+.tooltip-owner:hover .tooltip,
+.tooltip-owner:focus-within .tooltip {
+  display: block;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -1,3 +1,4 @@
+import { Button, Input } from "./ui";
 import { useEffect, useState } from "react";
 import { recordTiming } from "./performance";
 import { createRoot } from "react-dom/client";
@@ -145,18 +146,18 @@ function App() {
             <BookOpenText size={18} />
           </span>{" "}
           RetrieVec
-          <button
+          <Button
             className="mobile-close"
             aria-label="Close navigation"
             onClick={() => setNavigationOpen(false)}
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
         <p className="eyebrow">Collections</p>
         <label className="collection-filter">
           Find a collection
-          <input
+          <Input
             type="search"
             value={collectionFilter}
             onChange={(event) => setCollectionFilter(event.target.value)}
@@ -169,7 +170,7 @@ function App() {
               item.title.toLowerCase().includes(collectionFilter.toLowerCase()),
             )
             .map((item) => (
-              <button
+              <Button
                 key={item.collection_id}
                 className={
                   selected === item.collection_id
@@ -188,7 +189,7 @@ function App() {
                 <small>
                   {item.visibility === "curated" ? "Curated" : "Private"}
                 </small>
-              </button>
+              </Button>
             ))}
         </nav>
         {collectionFilter &&
@@ -201,7 +202,7 @@ function App() {
           )}
         <form onSubmit={create} className="new-collection">
           <label htmlFor="collection-title">New collection</label>
-          <input
+          <Input
             id="collection-title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
@@ -209,17 +210,17 @@ function App() {
             required
             placeholder="e.g. Retrieval methods"
           />
-          <button disabled={busy || !title.trim()} type="submit">
+          <Button disabled={busy || !title.trim()} type="submit">
             <Plus size={16} /> Create collection
-          </button>
+          </Button>
         </form>
         <div className="account">
           <span>
             <ShieldCheck size={14} /> Private workspace
           </span>
-          <button onClick={logout}>
+          <Button onClick={logout}>
             <LogOut size={14} /> Sign out
-          </button>
+          </Button>
         </div>
       </NavigationPanel>
       <main id="research" className="research">
@@ -265,7 +266,7 @@ function App() {
         </div>
         <header>
           <div>
-            <button
+            <Button
               className="mobile-menu"
               aria-label="Open navigation"
               aria-controls="workspace-navigation"
@@ -273,7 +274,7 @@ function App() {
               onClick={() => setNavigationOpen(true)}
             >
               <Menu size={19} />
-            </button>
+            </Button>
             <p className="eyebrow">Research workspace</p>
             <h1>{active?.title ?? "A place for your next question"}</h1>
             {active && (
@@ -288,9 +289,9 @@ function App() {
             )}
           </div>
           {active?.can_manage && (
-            <button className="quiet" onClick={archive} disabled={busy}>
+            <Button className="quiet" onClick={archive} disabled={busy}>
               <Archive size={15} /> Archive collection
-            </button>
+            </Button>
           )}
         </header>
         {error && (
@@ -308,7 +309,7 @@ function App() {
                 ["answers", MessageSquareText, "Cited answers"],
               ] as const
             ).map(([id, Icon, label]) => (
-              <button
+              <Button
                 key={id}
                 className={view === id ? "active" : ""}
                 aria-current={view === id ? "page" : undefined}
@@ -316,7 +317,7 @@ function App() {
               >
                 <Icon size={16} />
                 {label}
-              </button>
+              </Button>
             ))}
           </nav>
         )}
@@ -337,7 +338,7 @@ function App() {
                   passage.
                 </p>
               </div>
-              <button
+              <Button
                 className="primary"
                 onClick={() =>
                   setView(active.active_snapshot ? "search" : "sources")
@@ -347,7 +348,7 @@ function App() {
                   ? "Search this collection"
                   : "Add your first sources"}
                 <ArrowUpRight size={16} />
-              </button>
+              </Button>
             </div>
             <div className="stat-grid">
               <article>
