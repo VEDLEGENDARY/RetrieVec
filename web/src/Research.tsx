@@ -1,5 +1,6 @@
+import { EvidencePanel } from "./EvidencePanel";
 import { Button, Input, Select, Textarea, More } from "./ui";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useId } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
 
@@ -63,6 +64,50 @@ const activeStates = new Set([
   "generating",
   "validating",
 ]);
+function Citation({
+  item,
+  inspect,
+}: {
+  item: Evidence;
+  inspect: (item: Evidence, trigger: HTMLButtonElement) => void;
+}) {
+  const id = useId();
+  const [dismissed, setDismissed] = useState(false);
+  return (
+    <span
+      className="citation-preview-owner"
+      onMouseEnter={() => setDismissed(false)}
+      onFocus={() => setDismissed(false)}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.stopPropagation();
+          setDismissed(true);
+        }
+      }}
+    >
+      <Button
+        className="quiet citation"
+        aria-label={`Inspect citation ${item.evidence_id}`}
+        aria-describedby={dismissed ? undefined : id}
+        onClick={(event) => {
+          setDismissed(true);
+          inspect(item, event.currentTarget);
+        }}
+      >
+        {item.title}
+      </Button>
+      {!dismissed && (
+        <span id={id} role="tooltip" className="citation-preview">
+          {item.text}
+          <br />
+          {item.page_range
+            ? `Pages ${item.page_range.join("–")}`
+            : "Page unavailable"}
+        </span>
+      )}
+    </span>
+  );
+}
 const failure: Record<string, string> = {
   provider_unavailable:
     "The configured model is unavailable or changed. Check the provider setup, then retry.",
@@ -102,12 +147,8 @@ export function Research({
     "connected" | "retrying" | "offline"
   >("connected");
   const [evidence, setEvidence] = useState<Evidence | null>(null);
-  const citationClose = useRef<HTMLButtonElement>(null);
   const citationTrigger = useRef<HTMLButtonElement | null>(null);
   const inspectionVersion = useRef(0);
-  useEffect(() => {
-    if (evidence) citationClose.current?.focus();
-  }, [evidence]);
   useEffect(
     () => () => {
       inspectionVersion.current += 1;
@@ -331,16 +372,7 @@ export function Research({
       const item = run?.result?.evidence.find(
         (value) => value.evidence_id === id,
       );
-      return item ? (
-        <Button
-          className="quiet citation"
-          key={id}
-          onClick={(event) => inspect(item, event.currentTarget)}
-          aria-label={`Inspect citation ${id}`}
-        >
-          {item.title}
-        </Button>
-      ) : null;
+      return item ? <Citation key={id} item={item} inspect={inspect} /> : null;
     });
   return (
     <section className="saved-research" aria-labelledby="saved-title">
@@ -559,6 +591,16 @@ export function Research({
           )}
           {run.result && (
             <>
+              <More
+                label={`Based on ${run.result.evidence.length} retained passages`}
+              >
+                {cite(run.result.evidence.map((item) => item.evidence_id))}
+                <p>
+                  Retrieved from the pinned collection snapshot. These passages
+                  are the evidence pool; citations identify which support each
+                  claim.
+                </p>
+              </More>
               <p className="answer-status">
                 {run.result.answer.status.replaceAll("_", " ")}
               </p>
@@ -635,26 +677,13 @@ export function Research({
         </article>
       )}
       {evidence && (
-        <aside
-          className="citation-inspector"
-          aria-label="Citation evidence"
-          onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              event.preventDefault();
-              closeCitation();
-            }
-          }}
+        <EvidencePanel
+          title={evidence.title}
+          text={evidence.text}
+          pages={evidence.page_range}
+          snapshot={evidence.snapshot_id ?? run?.snapshot_id ?? "Unavailable"}
+          onClose={closeCitation}
         >
-          <Button ref={citationClose} onClick={closeCitation}>
-            Close citation
-          </Button>
-          <h3>{evidence.title}</h3>
-          <p>
-            {evidence.page_range
-              ? `Pages ${evidence.page_range.join("–")}`
-              : "Page locator unavailable"}
-          </p>
-          <blockquote>{evidence.text}</blockquote>
           {evidence.evidence_object_id && evidence.chunk_id && run && (
             <AdvancedEvidence
               collectionId={collection.collection_id}
@@ -673,7 +702,7 @@ export function Research({
           ) : (
             <p>Exact passage retained; uploaded original unavailable.</p>
           )}
-        </aside>
+        </EvidencePanel>
       )}
       {notice && <p role="status">{notice}</p>}
     </section>
