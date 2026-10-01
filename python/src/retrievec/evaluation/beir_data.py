@@ -6,6 +6,7 @@ import json
 import time
 import urllib.request
 import zipfile
+from pathlib import Path
 
 from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.importer import import_manifest
@@ -121,6 +122,23 @@ class BatchedAnalyzer(GoAnalyzer):
 
 
 def prepare(name, data, work, engine, model, protocol, document_limit=0, preflight_only=False):
+    inputs = {
+        file: digest((data / file).read_bytes()) for file in ("corpus.jsonl", "queries.jsonl")
+    }
+    checkpoint = work / "input-preflight.json"
+    if checkpoint.exists():
+        checked = json.loads(checkpoint.read_bytes())
+        if (
+            checked.get("inputs") == inputs
+            and checked.get("protocol_sha256") == digest(canonical(protocol))
+            and checked.get("document_limit") == document_limit
+            and checked.get("model") == model.config
+            and not checked.get("overflow_count", 0)
+        ):
+            manifest, _, chunks = load_snapshot(Path(checked["corpus"]))
+            if manifest["collection_id"] != name or len(chunks) != checked["chunks"]:
+                raise ValueError("preflight snapshot differs")
+            return checked if preflight_only else finish(work, engine, model, checked)
     started = time.perf_counter()
     documents = rows(data / "corpus.jsonl")
     if len({row["_id"] for row in documents}) != len(documents):
@@ -137,7 +155,9 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0, preflig
         texts.append(text)
         raw = text.encode()
         filename = digest(row["_id"].encode()) + ".txt"
-        (sources / filename).write_bytes(raw)
+        source_path = sources / filename
+        if not source_path.exists() or source_path.read_bytes() != raw:
+            source_path.write_bytes(raw)
         records.append(
             {
                 "paper_id": row["_id"],
@@ -178,6 +198,9 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0, preflig
             "protocol_sha256": digest(canonical(protocol)),
             "model": model.config,
             "import_ms": import_ms,
+            "inputs": inputs,
+            "document_limit": document_limit,
+            "chunks": len(chunks),
         }
     )
     (work / "input-preflight.json").write_bytes(canonical(checked) + b"\n")
@@ -188,6 +211,11 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0, preflig
         )
     if preflight_only:
         return checked
+    return finish(work, engine, model, checked)
+
+
+def finish(work, engine, model, checked):
+    corpus = Path(checked["corpus"])
     started = time.perf_counter()
     store = Store(work / "store")
     warm_embedding_cache = any((store.root / "embedding-cache").glob("*.f32"))
@@ -200,19 +228,17 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0, preflig
         "corpus": str(corpus.resolve()),
         "embedding_id": embedding,
         "snapshot_id": retrieval,
-        "papers": len(records),
-        "chunks": len(chunks),
-        "import_ms": import_ms,
+        "papers": checked["papers"],
+        "chunks": checked["chunks"],
+        "import_ms": checked["import_ms"],
         "embedding_ms": embedding_ms,
         "warm_embedding_cache": warm_embedding_cache,
         "sparse_build_ms": index_ms,
-        "protocol_sha256": digest(canonical(protocol)),
+        "protocol_sha256": checked["protocol_sha256"],
         "model": model.config,
-        "inputs": {
-            file: digest((data / file).read_bytes()) for file in ("corpus.jsonl", "queries.jsonl")
-        },
-        "subset": bool(document_limit),
-        "document_limit": document_limit,
+        "inputs": checked["inputs"],
+        "subset": bool(checked["document_limit"]),
+        "document_limit": checked["document_limit"],
     }
     (work / "prepared.json").write_bytes(canonical(result) + b"\n")
     return result
