@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "seed": 1729,
+  "datasets": ["scifact", "scidocs"],
+  "defaults": {"k1": 1.2, "b": 0.75, "rrf_k": 60},
+  "grid": {"k1": [0.8, 1.2, 1.6], "b": [0.4, 0.75], "rrf_k": [20, 60, 100]},
+  "development": "Lowest SHA256(seed:query_id) half of SciFact train query IDs; remainder unused. Reject train/test query-ID overlap.",
+  "selection": "Maximize mean document nDCG@10 on development only, ties by ascending k1,b,rrf_k. Sparse and hybrid selected independently.",
+  "scidocs_policy": "No train split exists: transfer SciFact-selected parameters unchanged; never tune SCIDOCS test.",
+  "chunk_token_budget": 32,
+  "input": "UTF-8 title, blank line, text; paragraph-v1 with authoritative Go analyzer; no text truncation",
+  "embedding": "Pinned shipped MiniLM; reject wordpiece overflow, never truncate; no model tuning",
+  "candidate_chunks": 100,
+  "document_ranking": "Production chunk rankings, including RRF over chunk IDs, collapsed by first occurrence of paper_id; remove query-ID self matches",
+  "metrics": ["ndcg@10", "recall@100", "mrr@10"],
+  "bootstrap_samples": 5000,
+  "latency": "Single query at a time, warm processes; sparse includes local pipe transport, dense includes query encoding/exhaustive cosine; hybrid includes both and fusion; no HTTP/auth/database overhead",
+  "subset_policy": "Smoke only: deterministically lowest document/query hashes, never presented as full benchmark quality",
+  "dataset_md5": {"scifact": "5f7d1de60b170fc8027bb7898e2efca1", "scidocs": "38121350fc3a4d2f48850f6aff52e4a9"}
+}
