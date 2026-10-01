@@ -30,7 +30,9 @@ def save(path, value):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--phase", choices=("prepare", "tune", "evaluate", "all"), default="all")
+    parser.add_argument(
+        "--phase", choices=("preflight", "prepare", "tune", "evaluate", "all"), default="all"
+    )
     parser.add_argument("--work", type=Path, default=ROOT / "artifacts/beir")
     parser.add_argument(
         "--engine",
@@ -78,6 +80,9 @@ def main():
             raise ValueError("duplicate query identity")
         work = args.work / name
         metadata = work / "prepared.json"
+        if args.phase == "preflight":
+            prepare(name, data[name], work, args.engine, model, protocol, args.documents, True)
+            continue
         if metadata.exists():
             prepared[name] = json.loads(metadata.read_bytes())
             if (
@@ -97,7 +102,7 @@ def main():
             )
         else:
             raise ValueError("run prepare first")
-    if args.phase == "prepare":
+    if args.phase in ("preflight", "prepare"):
         return
     selection_path = args.work / "selection.json"
     if not selection_path.exists():

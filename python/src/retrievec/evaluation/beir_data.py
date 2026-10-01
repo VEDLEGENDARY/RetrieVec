@@ -10,6 +10,7 @@ import zipfile
 from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.importer import import_manifest
 from retrievec.corpus.snapshot import canonical, digest, load_snapshot
+from retrievec.corpus.wordpieces import WordpieceBudget
 from retrievec.dense.artifacts import build_embeddings
 from retrievec.registry.artifacts import Store
 
@@ -68,6 +69,37 @@ def order(ids, seed):
     return sorted(ids, key=lambda key: (digest(f"{seed}:{key}".encode()), key))
 
 
+def preflight(chunks, model):
+    """Inspect all inputs before expensive encoding, without altering source text."""
+    if not hasattr(model, "tokenizer"):
+        return {"checked": False, "reason": "fixture model has no wordpiece tokenizer"}
+    lengths, overflow = [], []
+    for start in range(0, len(chunks), 64):
+        batch = chunks[start : start + 64]
+        encoded = model.tokenizer.encode_batch(
+            [model.config["document_prefix"] + chunk["text"] for chunk in batch]
+        )
+        for chunk, tokens in zip(batch, encoded, strict=True):
+            length = len(tokens.ids)
+            lengths.append(length)
+            if length > model.config["max_tokens"]:
+                overflow.append(
+                    {
+                        "chunk_id": chunk["chunk_id"],
+                        "paper_id": chunk["paper_id"],
+                        "wordpieces": length,
+                    }
+                )
+    return {
+        "checked": True,
+        "chunks": len(chunks),
+        "maximum": max(lengths, default=0),
+        "limit": model.config["max_tokens"],
+        "overflow_count": len(overflow),
+        "overflow_chunks": overflow,
+    }
+
+
 class BatchedAnalyzer(GoAnalyzer):
     """Amortize subprocess startup; returned tokens are unmodified Go responses."""
 
@@ -88,7 +120,7 @@ class BatchedAnalyzer(GoAnalyzer):
         return [self.cache[text] for text in texts]
 
 
-def prepare(name, data, work, engine, model, protocol, document_limit=0):
+def prepare(name, data, work, engine, model, protocol, document_limit=0, preflight_only=False):
     started = time.perf_counter()
     documents = rows(data / "corpus.jsonl")
     if len({row["_id"] for row in documents}) != len(documents):
@@ -128,9 +160,34 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0):
         name,
         protocol["chunk_token_budget"],
         BatchedAnalyzer(engine, texts),
+        wordpiece_budget=(
+            WordpieceBudget(model, GoAnalyzer(engine))
+            if protocol.get("wordpiece_refinement") and hasattr(model, "tokenizer")
+            else None
+        ),
     )
     import_ms = (time.perf_counter() - started) * 1000
     print(f"{name}: imported {len(records)} papers", flush=True)
+    _, _, chunks = load_snapshot(corpus)
+    checked = preflight(chunks, model)
+    checked.update(
+        {
+            "dataset": name,
+            "papers": len(records),
+            "corpus": str(corpus.resolve()),
+            "protocol_sha256": digest(canonical(protocol)),
+            "model": model.config,
+            "import_ms": import_ms,
+        }
+    )
+    (work / "input-preflight.json").write_bytes(canonical(checked) + b"\n")
+    if checked.get("overflow_count", 0):
+        raise ValueError(
+            f"{name}: {checked['overflow_count']} chunks exceed model input limit; "
+            f"see {work / 'input-preflight.json'}; no text truncated"
+        )
+    if preflight_only:
+        return checked
     started = time.perf_counter()
     store = Store(work / "store")
     embedding = build_embeddings(store, corpus, model)
@@ -138,7 +195,6 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0):
     started = time.perf_counter()
     retrieval = store.build(engine, corpus, embedding)
     index_ms = (time.perf_counter() - started) * 1000
-    _, _, chunks = load_snapshot(corpus)
     result = {
         "corpus": str(corpus.resolve()),
         "embedding_id": embedding,
