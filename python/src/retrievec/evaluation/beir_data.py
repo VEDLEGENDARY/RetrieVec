@@ -190,6 +190,7 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0, preflig
         return checked
     started = time.perf_counter()
     store = Store(work / "store")
+    warm_embedding_cache = any((store.root / "embedding-cache").glob("*.f32"))
     embedding = build_embeddings(store, corpus, model)
     embedding_ms = (time.perf_counter() - started) * 1000
     started = time.perf_counter()
@@ -203,6 +204,7 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0, preflig
         "chunks": len(chunks),
         "import_ms": import_ms,
         "embedding_ms": embedding_ms,
+        "warm_embedding_cache": warm_embedding_cache,
         "sparse_build_ms": index_ms,
         "protocol_sha256": digest(canonical(protocol)),
         "model": model.config,
