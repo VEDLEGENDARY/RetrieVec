@@ -166,6 +166,12 @@ def main():
                 ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
             ).strip(),
             "engine_sha256": digest(args.engine.read_bytes()),
+            "engine_version": subprocess.check_output(
+                [str(args.engine.resolve()), "--version"], text=True
+            ).strip(),
+            "thread_environment": {
+                key: os.environ.get(key) for key in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS")
+            },
             "source_sha256": {
                 str(path.relative_to(ROOT).as_posix()): digest(path.read_bytes())
                 for path in sorted(

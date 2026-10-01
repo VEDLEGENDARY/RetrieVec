@@ -10,6 +10,8 @@ from typing import Any
 
 SCHEMA_VERSION = 1
 MAX_FILE_BYTES = 64 * 1024 * 1024
+# Aggregate chunk records may exceed the per-source bound on research corpora.
+MAX_CHUNK_FILE_BYTES = 256 * 1024 * 1024
 PAPER_FIELDS = {
     "schema_version",
     "paper_id",
@@ -292,7 +294,8 @@ def parse_json(data: bytes) -> Any:
 def load_snapshot(directory: Path) -> tuple[dict, list[dict], list[dict]]:
     def read(name: str) -> bytes:
         path = directory / name
-        if path.is_symlink() or not path.is_file() or path.stat().st_size > MAX_FILE_BYTES:
+        limit = MAX_CHUNK_FILE_BYTES if name == "chunks.jsonl" else MAX_FILE_BYTES
+        if path.is_symlink() or not path.is_file() or path.stat().st_size > limit:
             raise CorpusError(f"{name}: missing, linked, or oversized file")
         return path.read_bytes()
 
