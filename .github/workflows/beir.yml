@@ -36,7 +36,9 @@ jobs:
           python -c "import json; r=json.load(open('artifacts/beir-smoke.json'));
           assert r['complete'] and not r['quality_evidence'];
           assert set(r['datasets']) == {'scifact', 'scidocs'};
-          assert all(d['query_count'] == 3 and len(d['runs']) == 5 for d in r['datasets'].values())"
+          assert all(d['query_count'] == 3 and len(d['runs']) == 5 for d in r['datasets'].values());
+          assert all(row['ranking'] and len(row['ranking']) == len(set(row['ranking']))
+          for d in r['datasets'].values() for run in d['runs'].values() for row in run['per_query'])"
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         if: always()
         with:
