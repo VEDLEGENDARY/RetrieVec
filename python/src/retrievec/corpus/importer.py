@@ -12,6 +12,7 @@ from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.snapshot import (
     MAX_FILE_BYTES,
     CorpusError,
+    canonical,
     digest,
     make_chunk,
     make_paper,
@@ -218,7 +219,11 @@ def import_manifest(
             "analyzer_version": analyzer.version,
             "chunker_version": chunker_version,
             "overlap": 0,
-            **({"wordpiece_budget": wordpiece_budget.configuration} if wordpiece_budget else {}),
+            **(
+                {"wordpiece_budget": canonical(wordpiece_budget.configuration).decode("utf-8")}
+                if wordpiece_budget
+                else {}
+            ),
             **extra,
         },
     )
