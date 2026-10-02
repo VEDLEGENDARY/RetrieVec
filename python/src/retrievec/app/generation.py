@@ -3,6 +3,7 @@
 import asyncio
 import json
 import os
+import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -32,6 +33,33 @@ Keep the answer concise."""
 
 class ProviderError(ValueError):
     pass
+
+
+async def completion_events(chunks):
+    """Bounded SSE framing; transport chunks need not align with UTF-8 or events."""
+    buffer = bytearray()
+    received = 0
+    async for chunk in chunks:
+        received += len(chunk)
+        if received > 1024 * 1024:
+            raise ProviderError("provider stream too large")
+        buffer.extend(chunk)
+        while match := re.search(rb"\r?\n\r?\n", buffer):
+            frame = bytes(buffer[: match.start()])
+            del buffer[: match.end()]
+            data = b"\n".join(
+                line[5:].removeprefix(b" ")
+                for line in frame.splitlines()
+                if line.startswith(b"data:")
+            )
+            if not data:
+                continue
+            value = json.loads(data)
+            if not isinstance(value, dict):
+                raise ProviderError("invalid completion event")
+            yield value
+    if buffer.strip():
+        raise ProviderError("incomplete completion event")
 
 
 @dataclass(frozen=True)
@@ -176,6 +204,44 @@ class LlamaProvider:
         if not isinstance(value.get("content"), str):
             raise ProviderError("provider returned no content")
         return value["content"]
+
+    async def generate_stream(self, text: str, schema: dict):
+        """Yield actual provider deltas; a terminal event is required for success."""
+        key = os.getenv(self.config.api_key_env, "") if self.config.api_key_env else ""
+        headers = {"Authorization": "Bearer " + key} if key else {}
+        data = {
+            "prompt": text,
+            "n_predict": self.config.output_tokens,
+            "temperature": self.config.temperature,
+            "seed": self.config.seed,
+            "stream": True,
+            "cache_prompt": False,
+            "json_schema": schema,
+            "stop": ["<|im_end|>"],
+        }
+        async with httpx.AsyncClient(
+            timeout=httpx.Timeout(self.config.timeout_seconds, connect=5),
+            trust_env=False,
+            follow_redirects=False,
+        ) as client:
+            async with client.stream(
+                "POST",
+                self.config.endpoint.rstrip("/") + "/completion",
+                json=data,
+                headers=headers,
+            ) as response:
+                response.raise_for_status()
+                async for value in completion_events(response.aiter_bytes()):
+                    if value.get("error") or value.get("truncated") or value.get("stopped_limit"):
+                        raise ProviderError("generation stream failed or exceeded its budget")
+                    content = value.get("content", "")
+                    if not isinstance(content, str):
+                        raise ProviderError("invalid completion content")
+                    if content:
+                        yield content
+                    if value.get("stop") is True:
+                        return
+        raise ProviderError("completion stream ended without confirmation")
 
 
 async def pack_evidence(provider, question: str, hits: list[dict]):

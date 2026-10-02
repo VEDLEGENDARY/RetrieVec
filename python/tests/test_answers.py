@@ -1,10 +1,44 @@
 import json
 import unittest
 
-from retrievec.app.answers import abstention, validate_answer
+from retrievec.app.answers import abstention, safe, validate_answer
 
 
 class AnswerTests(unittest.TestCase):
+    def test_scientific_prose_and_untrusted_markup_table(self):
+        accepted = [
+            "p < 0.05 and n > 30",
+            "training data: 100 passages",
+            "data: not reported",
+            "x <= 5",
+            "n >= 30",
+            "A > B",
+            "95% confidence",
+            "O(n log n)",
+            "Model A: baseline",
+            "No links in this answer.",
+        ]
+        rejected = [
+            "<script>alert(1)</script>",
+            "<img src=x onerror=alert(1)>",
+            "<svg/onload=alert(1)>",
+            "<b>bold</b>",
+            "<!-- comment -->",
+            "https://example.org",
+            "HTTP:example.org",
+            "javascript:alert(1)",
+            "data:text/html,hello",
+            "data:;base64,abc",
+            "data:,hello",
+            "<?xml?>",
+        ]
+        for text in accepted:
+            with self.subTest(text=text):
+                safe({"claims": [text]})
+        for text in rejected:
+            with self.subTest(text=text), self.assertRaises(ValueError):
+                safe({"claims": [text]})
+
     evidence = [{"evidence_id": "e_1", "text": "Method A reports 42 percent on dataset B."}]
 
     def answer(self):

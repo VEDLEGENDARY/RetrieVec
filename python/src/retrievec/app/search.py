@@ -58,6 +58,8 @@ def install_search(app):
             store = Store(settings.store)
             node = RPCClient(settings.rpc_address, settings.read_token, principal=user)
             results = {}
+            # Request-scoped reuse: immutable artifacts, never authorization decisions.
+            artifact_cache = {}
             for mode in modes:
                 client = PinnedClient(
                     registry,
@@ -69,6 +71,7 @@ def install_search(app):
                     None if mode == "sparse" else encoder(),
                     snapshot_id,
                     value.candidates,
+                    artifact_cache=artifact_cache,
                 )
                 results[mode] = client.search(value.query, value.mode, value.top_k, explain=True)
             with registry.connect() as db:

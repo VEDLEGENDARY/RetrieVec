@@ -1,61 +1,20 @@
+import { Citation } from "./Citation";
+import type {
+  Conversation,
+  SavedRun,
+  Provider,
+  Evidence,
+  Run,
+} from "./researchTypes";
+import { EvidencePanel } from "./EvidencePanel";
+import { useDraft } from "./drafts";
+import { useRunProgress } from "./useRunProgress";
+import { Button, Input, Select, Textarea, More, Skeleton } from "./ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
+import { navigate } from "./routing";
 
-type Conversation = { conversation_id: string; title: string };
-type Provider = {
-  name: string;
-  model: string;
-  cloud: boolean;
-  consented: boolean;
-};
-type Evidence = {
-  chunk_id?: string;
-  evidence_object_id?: string;
-  evidence_id: string;
-  citation_id: string;
-  title: string;
-  text: string;
-  page_range: number[] | null;
-  source_id: string | null;
-  snapshot_id?: string;
-};
-type Claim = { id: string; text: string; evidence_ids: string[] };
-type Comparison = {
-  method: string;
-  dataset: string;
-  metric: string;
-  reported_value: string;
-  experimental_conditions: string;
-  limitations: string;
-  evidence_ids: string[];
-  comparability_note: string;
-};
-type Run = {
-  run_id: string;
-  conversation_id: string;
-  original_question: string;
-  effective_query: string;
-  snapshot_id: string;
-  state: string;
-  error_code: string | null;
-  configuration: {
-    provider: string;
-    retrieval: string;
-    generation: { model: string; revision: string };
-  };
-  result: null | {
-    answer: {
-      status: string;
-      claims: Claim[];
-      comparisons: Comparison[];
-      limitations: string[];
-    };
-    evidence: Evidence[];
-    elapsed_ms: number;
-    budget: { excluded: unknown[]; input_tokens: number };
-  };
-};
 const activeStates = new Set([
   "queued",
   "retrieving",
@@ -80,7 +39,11 @@ export function Research({
   collection,
   session,
   fail,
+  showHistory = false,
+  linkedRun = "",
 }: {
+  showHistory?: boolean;
+  linkedRun?: string;
   collection: Collection;
   session: Session;
   fail: (error: unknown) => void;
@@ -88,23 +51,90 @@ export function Research({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [conversation, setConversation] = useState("");
   const [history, setHistory] = useState<Run[]>([]);
+  const [saved, setSaved] = useState<SavedRun[]>([]);
+  const [savedQuery, setSavedQuery] = useState("");
+  const [savedCursor, setSavedCursor] = useState<string | null>(null);
+  const [savedPage, setSavedPage] = useState<string | null>(null);
+  const [savedLoading, setSavedLoading] = useState(false);
+  const [savedError, setSavedError] = useState("");
+  useEffect(() => {
+    if (!showHistory) return;
+    const controller = new AbortController();
+    setSavedLoading(true);
+    setSavedError("");
+    const params = new URLSearchParams({ q: savedQuery });
+    if (savedPage) params.set("before", savedPage);
+    const timer = setTimeout(() => {
+      api<{ items: SavedRun[]; next_cursor: string | null }>(
+        `/api/v1/collections/${collection.collection_id}/runs?${params}`,
+        { signal: controller.signal },
+      )
+        .then((value) => {
+          if (!controller.signal.aborted) {
+            setSaved(value.items);
+            setSavedCursor(value.next_cursor);
+          }
+        })
+        .catch((error) => {
+          if (!controller.signal.aborted) {
+            setSaved([]);
+            setSavedCursor(null);
+            setSavedError(
+              "Saved research could not be loaded. Reopen Saved research to retry.",
+            );
+            fail(error);
+          }
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setSavedLoading(false);
+        });
+    }, 150);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [showHistory, collection.collection_id, savedQuery, savedPage, fail]);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [provider, setProvider] = useState("");
-  const [question, setQuestion] = useState("");
-  const [effective, setEffective] = useState("");
+  const [question, setQuestion, draftSaved] = useDraft(
+    session.principal_id,
+    collection.collection_id,
+    "question",
+  );
+  const [effective, setEffective] = useDraft(
+    session.principal_id,
+    collection.collection_id,
+    "follow-up",
+  );
   const [run, setRun] = useState<Run | null>(null);
-  const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
+  const [selectedRunId, setRunSelection] = useState<string | null>(
+    linkedRun || null,
+  );
+  function setSelectedRunId(run: string | null) {
+    setRunSelection(run);
+    navigate({ collection: collection.collection_id, run: run ?? "" });
+  }
+  useEffect(() => {
+    setRunSelection(linkedRun || null);
+    setRun(null);
+    setEvidence(null);
+  }, [linkedRun]);
   const [runRefresh, setRunRefresh] = useState(0);
+  const refreshFromEvent = useCallback(
+    () => setRunRefresh((value) => value + 1),
+    [],
+  );
+  const progress = useRunProgress(
+    run?.run_id ?? null,
+    Boolean(run && activeStates.has(run.state)),
+    refreshFromEvent,
+  );
   const [runConnection, setRunConnection] = useState<
     "connected" | "retrying" | "offline"
   >("connected");
   const [evidence, setEvidence] = useState<Evidence | null>(null);
-  const citationClose = useRef<HTMLButtonElement>(null);
   const citationTrigger = useRef<HTMLButtonElement | null>(null);
   const inspectionVersion = useRef(0);
-  useEffect(() => {
-    if (evidence) citationClose.current?.focus();
-  }, [evidence]);
   useEffect(
     () => () => {
       inspectionVersion.current += 1;
@@ -115,6 +145,49 @@ export function Research({
   const [notice, setNotice] = useState("");
   const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
   const selectedProvider = providers.find((item) => item.name === provider);
+  const [rewritePreview, setRewritePreview] = useState("");
+  const [rewriteError, setRewriteError] = useState("");
+  useEffect(() => {
+    setRewritePreview("");
+    setRewriteError("");
+    if (
+      !run?.run_id ||
+      !question.trim() ||
+      effective ||
+      !selectedProvider?.consented
+    )
+      return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      api<{ effective_query: string }>(
+        `/api/v1/runs/${run.run_id}/rewrite`,
+        {
+          method: "POST",
+          signal: controller.signal,
+          body: JSON.stringify({ question, provider }),
+        },
+        session.csrf_token,
+      )
+        .then((value) => {
+          if (!controller.signal.aborted)
+            setRewritePreview(value.effective_query);
+        })
+        .catch((error) => {
+          if (!controller.signal.aborted) setRewriteError(error.message);
+        });
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [
+    run?.run_id,
+    question,
+    effective,
+    provider,
+    selectedProvider?.consented,
+    session.csrf_token,
+  ]);
   const refreshProviders = useCallback(async () => {
     const rows = await api<Provider[]>(
       `/api/v1/collections/${collection.collection_id}/providers`,
@@ -174,6 +247,7 @@ export function Research({
         failures = 0;
         setRunConnection("connected");
         setRun(current);
+        setConversation(current.conversation_id);
         timer = setTimeout(
           refresh,
           activeStates.has(current.state) ? 1200 : 5000,
@@ -328,101 +402,197 @@ export function Research({
       const item = run?.result?.evidence.find(
         (value) => value.evidence_id === id,
       );
-      return item ? (
-        <button
-          className="quiet citation"
-          key={id}
-          onClick={(event) => inspect(item, event.currentTarget)}
-          aria-label={`Inspect citation ${id}`}
-        >
-          {item.title}
-        </button>
-      ) : null;
+      return item ? <Citation key={id} item={item} inspect={inspect} /> : null;
     });
   return (
     <section className="saved-research" aria-labelledby="saved-title">
-      <p className="eyebrow">SAVED RESEARCH</p>
-      <h2 id="saved-title">Ask the evidence</h2>
+      <h2 id="saved-title">
+        {showHistory ? "Saved research" : "Ask your sources"}
+      </h2>
       <p className="muted">
         Answers stay tied to their sources. Structural checks do not establish
         scientific or semantic correctness.
       </p>
-      <label htmlFor="conversation">Conversation</label>
-      <select
-        id="conversation"
-        disabled={busy}
-        value={conversation}
-        onChange={(event) => {
-          inspectionVersion.current += 1;
-          setConversation(event.target.value);
-          setRun(null);
-          setSelectedRunId(null);
-          setRunConnection("connected");
-          setEvidence(null);
-          setRequestKey(crypto.randomUUID());
-        }}
-      >
-        <option value="">New conversation</option>
-        {conversations.map((item) => (
-          <option key={item.conversation_id} value={item.conversation_id}>
-            {item.title}
-          </option>
-        ))}
-      </select>
+      <div hidden={!showHistory}>
+        <label htmlFor="saved-search">Find saved research</label>
+        <Input
+          id="saved-search"
+          type="search"
+          maxLength={256}
+          value={savedQuery}
+          onChange={(event) => {
+            setSavedQuery(event.target.value);
+            setSavedPage(null);
+            setSaved([]);
+          }}
+        />
+        {savedLoading ? (
+          <Skeleton label="Loading saved research…" />
+        ) : savedError ? (
+          <p role="alert">{savedError}</p>
+        ) : (
+          <nav aria-label="All saved research">
+            {saved.map((item) => (
+              <Button
+                key={item.run_id}
+                onClick={() => {
+                  setConversation(item.conversation_id);
+                  setRun(null);
+                  setEvidence(null);
+                  inspectionVersion.current += 1;
+                  setSelectedRunId(item.run_id);
+                  setRunRefresh((value) => value + 1);
+                }}
+              >
+                {item.original_question}
+                <small>
+                  {item.state.replaceAll("_", " ")} ·{" "}
+                  {new Date(item.created_at).toLocaleDateString()}
+                </small>
+              </Button>
+            ))}
+            {saved.length === 0 && (
+              <p>
+                No saved research matches. Ask a question to start a saved run.
+              </p>
+            )}
+          </nav>
+        )}
+        {savedPage && (
+          <Button onClick={() => setSavedPage(null)}>Newest research</Button>
+        )}
+        {savedCursor && (
+          <Button
+            disabled={savedLoading}
+            onClick={() => setSavedPage(savedCursor)}
+          >
+            Older research
+          </Button>
+        )}
+        <More label="Browse conversations">
+          <label htmlFor="conversation">Conversation</label>
+          <Select
+            id="conversation"
+            disabled={busy}
+            value={conversation}
+            onChange={(event) => {
+              inspectionVersion.current += 1;
+              setConversation(event.target.value);
+              setRun(null);
+              setSelectedRunId(null);
+              setRunConnection("connected");
+              setEvidence(null);
+              setRequestKey(crypto.randomUUID());
+            }}
+          >
+            <option value="">New conversation</option>
+            {conversations.map((item) => (
+              <option key={item.conversation_id} value={item.conversation_id}>
+                {item.title}
+              </option>
+            ))}
+          </Select>
+        </More>
+      </div>
       <form
+        hidden={showHistory}
         onSubmit={(event) => {
           event.preventDefault();
           void submit();
         }}
       >
         <label htmlFor="research-question">Question for cited answer</label>
-        <textarea
+        <Textarea
           id="research-question"
           disabled={busy}
           value={question}
           maxLength={4096}
           required
           rows={3}
+          onKeyDown={(event) => {
+            if (
+              (event.ctrlKey || event.metaKey) &&
+              event.key === "Enter" &&
+              !event.nativeEvent.isComposing
+            ) {
+              event.preventDefault();
+              event.currentTarget.form?.requestSubmit();
+            }
+          }}
           onChange={(event) => {
             setQuestion(event.target.value);
             setRequestKey(crypto.randomUUID());
           }}
         />
-        <label htmlFor="effective-query">
-          Standalone query for a follow-up (optional)
-        </label>
-        <input
-          id="effective-query"
-          disabled={busy}
-          value={effective}
-          maxLength={4096}
-          onChange={(event) => {
-            setEffective(event.target.value);
-            setRequestKey(crypto.randomUUID());
-          }}
-          placeholder="Include the method or paper your follow-up refers to"
-        />
-        <label htmlFor="generation-provider">Generation provider</label>
-        <select
-          id="generation-provider"
-          disabled={busy}
-          value={provider}
-          onChange={(event) => {
-            setProvider(event.target.value);
-            setRequestKey(crypto.randomUUID());
-          }}
-        >
-          {!providers.length && (
-            <option value="">No provider configured</option>
-          )}
-          {providers.map((item) => (
-            <option key={item.name} value={item.name}>
-              {item.model} · {item.cloud ? "Cloud" : "Local"}
-            </option>
-          ))}
-        </select>
-        <button
+        <p className="muted">
+          {draftSaved
+            ? "Draft saved on this device for 7 days. Cleared on sign out."
+            : "Device storage is unavailable. Keep this tab open to retain your draft."}
+        </p>
+        <p>
+          Searching for:{" "}
+          {effective || rewritePreview || question || "Enter a question"}
+          <Button
+            type="button"
+            className="quiet"
+            onClick={() => {
+              setEffective(effective || rewritePreview || question);
+              const input = document.getElementById(
+                "effective-query",
+              ) as HTMLInputElement | null;
+              const details = input?.closest("details");
+              if (details) details.open = true;
+              input?.focus();
+            }}
+          >
+            Edit search query
+          </Button>
+        </p>
+        {rewriteError && <p role="alert">{rewriteError}</p>}
+        <More label="Advanced question settings">
+          <label htmlFor="effective-query">
+            Standalone query for a follow-up (optional)
+          </label>
+          <Input
+            id="effective-query"
+            disabled={busy}
+            value={effective}
+            maxLength={4096}
+            onChange={(event) => {
+              setEffective(event.target.value);
+              setRequestKey(crypto.randomUUID());
+            }}
+            placeholder="Include the method or paper your follow-up refers to"
+          />
+          <label htmlFor="generation-provider">Generation provider</label>
+          <Select
+            id="generation-provider"
+            disabled={busy}
+            value={provider}
+            onChange={(event) => {
+              setProvider(event.target.value);
+              setRequestKey(crypto.randomUUID());
+            }}
+          >
+            {!providers.length && (
+              <option value="">No provider configured</option>
+            )}
+            {providers.map((item) => (
+              <option key={item.name} value={item.name}>
+                {item.model} · {item.cloud ? "Cloud" : "Local"}
+              </option>
+            ))}
+          </Select>
+        </More>
+        <p className="muted">
+          {selectedProvider
+            ? `${selectedProvider.model} · ${selectedProvider.cloud ? "Cloud" : "Local"}`
+            : "No answer provider configured. Use Find passages to search your sources."}
+        </p>
+        <Button
           className="primary"
+          title="Generate cited answer (Ctrl or Command + Enter)"
+          aria-keyshortcuts="Control+Enter Meta+Enter"
           disabled={
             busy ||
             !question.trim() ||
@@ -431,7 +601,7 @@ export function Research({
           }
         >
           Generate cited answer
-        </button>
+        </Button>
       </form>
       {!collection.active_snapshot && (
         <p>Upload and process a source before creating a research run.</p>
@@ -439,7 +609,7 @@ export function Research({
       {!providers.length && (
         <p>
           Generation is not configured. You can continue searching and
-          inspecting sources above.
+          inspecting sources in Find passages.
         </p>
       )}
       {selectedProvider?.cloud && (
@@ -450,20 +620,20 @@ export function Research({
             provider configuration.
           </p>
           {collection.can_manage ? (
-            <button onClick={() => consent(!selectedProvider.consented)}>
+            <Button onClick={() => consent(!selectedProvider.consented)}>
               {selectedProvider.consented
                 ? "Revoke cloud consent"
                 : "Allow this cloud provider"}
-            </button>
+            </Button>
           ) : (
             <p>The collection owner manages cloud consent.</p>
           )}
         </div>
       )}
-      {!!history.length && (
+      {showHistory && !!history.length && (
         <nav aria-label="Saved research runs" className="run-history">
           {history.map((item) => (
-            <button
+            <Button
               key={item.run_id}
               disabled={busy}
               aria-pressed={selectedRunId === item.run_id}
@@ -478,7 +648,7 @@ export function Research({
               }}
             >
               {item.original_question} · {item.state}
-            </button>
+            </Button>
           ))}
         </nav>
       )}
@@ -490,7 +660,7 @@ export function Research({
               : "The saved run is unavailable right now. Retry when the service is available."}
           </p>
           {runConnection === "offline" && (
-            <button
+            <Button
               type="button"
               onClick={() => {
                 setRunConnection("retrying");
@@ -498,7 +668,7 @@ export function Research({
               }}
             >
               Reconnect to saved run
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -507,7 +677,34 @@ export function Research({
           <h3>{run.original_question}</h3>
           <p role="status">Research run: {run.state}</p>
           {activeStates.has(run.state) && (
-            <button
+            <Skeleton
+              label={
+                run.state === "retrieving"
+                  ? "Finding relevant passages…"
+                  : run.state === "validating"
+                    ? "Checking citations and source integrity…"
+                    : run.state === "queued"
+                      ? "Waiting for the research worker…"
+                      : "Preparing your answer…"
+              }
+            />
+          )}
+          {activeStates.has(run.state) && progress.sources.length > 0 && (
+            <More label={`${progress.sources.length} sources retrieved`} open>
+              <p>
+                Evidence selected from the pinned snapshot. The answer is still
+                being generated and checked.
+              </p>
+              {progress.sources.map((source) => (
+                <article key={source.evidence_id}>
+                  <h4>{source.title}</h4>
+                  <blockquote>{source.text}</blockquote>
+                </article>
+              ))}
+            </More>
+          )}
+          {activeStates.has(run.state) && (
+            <Button
               disabled={busy}
               onClick={async () => {
                 try {
@@ -522,7 +719,7 @@ export function Research({
               }}
             >
               Cancel run
-            </button>
+            </Button>
           )}
           {run.state === "failed" && (
             <p role="alert">
@@ -535,8 +732,22 @@ export function Research({
           )}
           {run.result && (
             <>
+              <More
+                label={`Based on ${run.result.evidence.length} retained passages`}
+              >
+                {cite(run.result.evidence.map((item) => item.evidence_id))}
+                <p>
+                  Retrieved from the pinned collection snapshot. These passages
+                  are the evidence pool; citations identify which support each
+                  claim.
+                </p>
+              </More>
               <p className="answer-status">
-                {run.result.answer.status.replaceAll("_", " ")}
+                {run.result.answer.status === "insufficient_evidence"
+                  ? "I could not find this in your papers."
+                  : run.result.answer.status === "partial"
+                    ? "The sources support only part of this answer."
+                    : "Answer with cited evidence"}
               </p>
               {run.result.answer.claims.map((claim) => (
                 <div className="claim" key={claim.id}>
@@ -573,26 +784,28 @@ export function Research({
                 Structurally checked · Human review pending ·{" "}
                 {Math.round(run.result.elapsed_ms)} ms
               </p>
-              <div className="export-actions">
-                {["markdown", "bibtex", "json", "csv"].map((format) => (
-                  <button key={format} onClick={() => exportRun(format)}>
-                    Export {format}
-                  </button>
-                ))}
-              </div>
+              <More label="Export answer">
+                <div className="export-actions">
+                  {["markdown", "bibtex", "json", "csv"].map((format) => (
+                    <Button key={format} onClick={() => exportRun(format)}>
+                      Export {format}
+                    </Button>
+                  ))}
+                </div>
+              </More>
             </>
           )}
           {!activeStates.has(run.state) && (
             <div className="replay-actions">
-              <button
+              <Button
                 disabled={busy}
                 onClick={() => submit("historical", true)}
               >
                 Replay pinned snapshot
-              </button>
-              <button disabled={busy} onClick={() => submit("current", true)}>
+              </Button>
+              <Button disabled={busy} onClick={() => submit("current", true)}>
                 Replay current snapshot
-              </button>
+              </Button>
             </div>
           )}
           <details>
@@ -609,26 +822,13 @@ export function Research({
         </article>
       )}
       {evidence && (
-        <aside
-          className="citation-inspector"
-          aria-label="Citation evidence"
-          onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              event.preventDefault();
-              closeCitation();
-            }
-          }}
+        <EvidencePanel
+          title={evidence.title}
+          text={evidence.text}
+          pages={evidence.page_range}
+          snapshot={evidence.snapshot_id ?? run?.snapshot_id ?? "Unavailable"}
+          onClose={closeCitation}
         >
-          <button ref={citationClose} onClick={closeCitation}>
-            Close citation
-          </button>
-          <h3>{evidence.title}</h3>
-          <p>
-            {evidence.page_range
-              ? `Pages ${evidence.page_range.join("–")}`
-              : "Page locator unavailable"}
-          </p>
-          <blockquote>{evidence.text}</blockquote>
           {evidence.evidence_object_id && evidence.chunk_id && run && (
             <AdvancedEvidence
               collectionId={collection.collection_id}
@@ -647,7 +847,7 @@ export function Research({
           ) : (
             <p>Exact passage retained; uploaded original unavailable.</p>
           )}
-        </aside>
+        </EvidencePanel>
       )}
       {notice && <p role="status">{notice}</p>}
     </section>

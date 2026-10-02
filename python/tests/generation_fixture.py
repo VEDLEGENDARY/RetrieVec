@@ -17,6 +17,9 @@ class FixtureProvider:
     async def generate(self, text, schema):
         data = json.loads(text.split("<|im_start|>user\n", 1)[1].split("<|im_end|>", 1)[0])
         question = data["question"].lower()
+        question = question.rsplit("follow-up question: ", 1)[-1]
+        if "invalid-answer" in question:
+            return json.dumps({"status": "answered", "claims": [{"text": "UNVERIFIED_SENTINEL"}]})
         if "provider-failure" in question:
             raise ProviderError("test-only failure")
         if "cancel" in question:

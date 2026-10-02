@@ -143,3 +143,24 @@ class RunState:
             ).fetchone()
             if row:
                 event(db, run_id, "cancelled")
+
+    def progress(self, run, kind, payload):
+        """Publish bounded provisional events without resetting stage timing."""
+        if kind != "evidence_ready":
+            raise ValueError("unsupported progress event")
+        with self.registry.connect() as db:
+            self.access(db, run)
+            row = db.execute(
+                "UPDATE research_runs SET event_sequence=event_sequence+1 "
+                "WHERE run_id=%s AND fencing_token=%s AND state='generating' "
+                "AND lease_until>clock_timestamp() AND event_sequence<2048 "
+                "RETURNING event_sequence",
+                (run["run_id"], run["fencing_token"]),
+            ).fetchone()
+            if row is None:
+                return False
+            db.execute(
+                "INSERT INTO run_events(run_id,event_id,type,payload) VALUES(%s,%s,%s,%s)",
+                (run["run_id"], row["event_sequence"], kind, Jsonb(payload)),
+            )
+            return True

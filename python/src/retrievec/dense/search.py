@@ -35,9 +35,15 @@ def exact_search(
         scores = block @ query
         if not np.isfinite(scores).all():
             raise ValueError("nonfinite cosine scores")
-        candidates = [
-            (float(score), chunk_ids[start + offset]) for offset, score in enumerate(scores)
-        ]
+        offsets = np.arange(len(scores))
+        if len(scores) > limit:
+            cutoff = scores[np.argpartition(scores, len(scores) - limit)[len(scores) - limit]]
+            above = np.flatnonzero(scores > cutoff).tolist()
+            tied = sorted(
+                np.flatnonzero(scores == cutoff), key=lambda offset: chunk_ids[start + offset]
+            )[: limit - len(above)]
+            offsets = above + tied
+        candidates = [(float(scores[offset]), chunk_ids[start + offset]) for offset in offsets]
         best = sorted(best + candidates, key=lambda item: (-item[0], item[1]))[:limit]
     return [
         {"chunk_id": key, "cosine_score": score, "rank": rank}
