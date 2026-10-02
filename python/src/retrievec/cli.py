@@ -34,6 +34,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     ingest.add_argument("--output", required=True, type=Path)
     ingest.add_argument("--collection", default="research")
     ingest.add_argument("--token-budget", type=int, default=256)
+    ingest.add_argument(
+        "--chunker", choices=("paragraph-v1", "paragraph-v2"), default="paragraph-v1"
+    )
+    ingest.add_argument("--overlap", type=int, default=0)
     ingest.add_argument("--engine", type=Path)
     runner = subparsers.add_parser("run", help="capture query JSONL against the service")
     runner.add_argument("--url", default="http://127.0.0.1:8091")
@@ -75,6 +79,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.collection,
                 args.token_budget,
                 GoAnalyzer(args.engine),
+                chunker=args.chunker,
+                overlap=args.overlap,
             )
         except (CorpusError, OSError) as error:
             parser.error(str(error))
