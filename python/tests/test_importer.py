@@ -5,6 +5,7 @@ from pathlib import Path
 
 from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
+
 from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.importer import chunk_page, extract_pages, import_manifest
 from retrievec.corpus.section_chunks import chunk_page_v2
@@ -36,6 +37,10 @@ def pdf_bytes(texts: list[str]) -> bytes:
 class ImportTests(unittest.TestCase):
     def test_section_windows_repeat_title_and_bound_overlap(self) -> None:
         analyzer = GoAnalyzer()
+        title_only, _ = chunk_page_v2(
+            "10 Internet Addiction and Its Cognitive Behavioral Therapy", analyzer, 32, 4
+        )
+        self.assertEqual(title_only, ["10 Internet Addiction and Its Cognitive Behavioral Therapy"])
         first, current = chunk_page_v2(
             "1 Methods\nalpha beta gamma delta epsilon zeta eta theta.\n\n"
             "2 Results\niota kappa lambda mu nu xi omicron pi.",
