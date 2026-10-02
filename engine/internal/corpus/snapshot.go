@@ -17,6 +17,7 @@ import (
 )
 
 const maxFileBytes = 64 * 1024 * 1024
+const maxChunkFileBytes = 256 * 1024 * 1024
 
 // Paper records the identity and provenance of an extracted source version.
 type Paper struct {
@@ -101,12 +102,16 @@ func validHash(s string) bool {
 }
 
 func readFile(directory, name string) ([]byte, error) {
+	limit := int64(maxFileBytes)
+	if name == "chunks.jsonl" {
+		limit = maxChunkFileBytes
+	}
 	path := filepath.Join(directory, name)
 	info, err := os.Lstat(path)
 	if err != nil {
 		return nil, err
 	}
-	if !info.Mode().IsRegular() || info.Size() > maxFileBytes {
+	if !info.Mode().IsRegular() || info.Size() > limit {
 		return nil, fmt.Errorf("%s: linked, nonregular, or oversized file", name)
 	}
 	file, err := os.Open(path)
@@ -114,11 +119,11 @@ func readFile(directory, name string) ([]byte, error) {
 		return nil, err
 	}
 	defer file.Close()
-	data, err := io.ReadAll(io.LimitReader(file, maxFileBytes+1))
+	data, err := io.ReadAll(io.LimitReader(file, limit+1))
 	if err != nil {
 		return nil, err
 	}
-	if len(data) > maxFileBytes || !utf8.Valid(data) {
+	if int64(len(data)) > limit || !utf8.Valid(data) {
 		return nil, fmt.Errorf("%s: oversized or invalid UTF-8", name)
 	}
 	return data, nil

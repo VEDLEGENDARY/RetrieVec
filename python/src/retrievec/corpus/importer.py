@@ -12,6 +12,7 @@ from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.snapshot import (
     MAX_FILE_BYTES,
     CorpusError,
+    canonical,
     digest,
     make_chunk,
     make_paper,
@@ -103,6 +104,7 @@ def import_manifest(
     max_pages: int = 500,
     evidence_bundles: dict[str, str] | None = None,
     evidence_root: Path | None = None,
+    wordpiece_budget=None,
 ) -> Path:
     if type(token_budget) is not int or not 1 <= token_budget <= 4096:
         raise CorpusError("token budget must be between 1 and 4096")
@@ -119,6 +121,8 @@ def import_manifest(
     analyzer = analyzer or GoAnalyzer()
     analyzer.analyze([])
     chunker_version = f"paragraph-v1-{token_budget}-{analyzer.version}"
+    if wordpiece_budget is not None:
+        chunker_version += "-" + wordpiece_budget.version
     papers, chunks = [], []
     evidence_mapping = {}
     source_root = source_root.resolve(strict=True)
@@ -174,7 +178,12 @@ def import_manifest(
         ordinal = 0
         for page_index, (page_number, text) in enumerate(pages):
             tokens = analyzer.analyze([text])[0]
-            for chunk_text in chunk_page(text, tokens, token_budget):
+            page_chunks = chunk_page(text, tokens, token_budget)
+            if wordpiece_budget is not None:
+                page_chunks = [
+                    part for chunk in page_chunks for part in wordpiece_budget.split(chunk)
+                ]
+            for chunk_text in page_chunks:
                 chunks.append(
                     make_chunk(
                         paper,
@@ -210,6 +219,11 @@ def import_manifest(
             "analyzer_version": analyzer.version,
             "chunker_version": chunker_version,
             "overlap": 0,
+            **(
+                {"wordpiece_budget": canonical(wordpiece_budget.configuration).decode("utf-8")}
+                if wordpiece_budget
+                else {}
+            ),
             **extra,
         },
     )

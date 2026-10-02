@@ -6,6 +6,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from retrievec.corpus.snapshot import (
+    MAX_CHUNK_FILE_BYTES,
+    MAX_FILE_BYTES,
     CorpusError,
     canonical,
     encode_snapshot,
@@ -21,6 +23,21 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SnapshotTests(unittest.TestCase):
+    def test_oversized_aggregate_chunk_file_is_rejected_before_read(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "manifest.json").write_bytes(canonical({}) + b"\n")
+            # Use a valid manifest so the loader reaches the chunk-file size check.
+            source = ROOT / "datasets/fixtures/snapshots"
+            fixture = next(source.glob("ss_*"))
+            for name in ("manifest.json", "papers.jsonl"):
+                (root / name).write_bytes((fixture / name).read_bytes())
+            with (root / "chunks.jsonl").open("wb") as output:
+                output.truncate(MAX_CHUNK_FILE_BYTES + 1)
+            with self.assertRaisesRegex(CorpusError, "chunks.jsonl:.*oversized"):
+                load_snapshot(root)
+            self.assertLess(MAX_FILE_BYTES, MAX_CHUNK_FILE_BYTES)
+
     def setUp(self) -> None:
         self.paper = make_paper(
             paper_id="p",

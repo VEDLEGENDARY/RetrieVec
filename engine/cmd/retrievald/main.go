@@ -16,6 +16,9 @@ func main() {
 }
 
 func run(args []string, stdout, stderr io.Writer) int {
+	if len(args) > 0 && args[0] == "benchmark" {
+		return benchmarkCommand(args[1:], os.Stdin, stdout, stderr)
+	}
 	if len(args) > 0 && args[0] == "rpc" {
 		return rpcCommand(args[1:], stdout, stderr)
 	}
