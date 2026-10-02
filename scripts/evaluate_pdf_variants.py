@@ -30,23 +30,16 @@ def main():
     )
     parser.add_argument("--baseline", type=Path, required=True)
     parser.add_argument("--paragraph", type=Path, required=True)
-    parser.add_argument(
-        "--layout", type=Path, help="optional independently pinned layout snapshot"
-    )
-    parser.add_argument(
-        "--engine", type=Path, default=ROOT / "artifacts/bin/retrievald.exe"
-    )
+    parser.add_argument("--layout", type=Path, help="optional independently pinned layout snapshot")
+    parser.add_argument("--engine", type=Path, default=ROOT / "artifacts/bin/retrievald.exe")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     packet = json.loads(args.packet.read_bytes())
     validate_review(packet, args.manifest, args.baseline)
     questions = [
-        {"_id": item["candidate_id"], "text": item["question"]}
-        for item in packet["candidates"]
+        {"_id": item["candidate_id"], "text": item["question"]} for item in packet["candidates"]
     ]
-    judgments = {
-        item["candidate_id"]: {item["paper_id"]: 1} for item in packet["candidates"]
-    }
+    judgments = {item["candidate_id"]: {item["paper_id"]: 1} for item in packet["candidates"]}
     if len(judgments) != len(questions):
         raise ValueError("duplicate PDF question identity")
     snapshots = {"baseline": args.baseline, "paragraph": args.paragraph}
@@ -58,7 +51,9 @@ def main():
         "packet_sha256": digest(args.packet.read_bytes()),
         "manifest_sha256": digest(args.manifest.read_bytes()),
         "question_count": len(questions),
-        "metric_limit": "Paper-level relevance only; extraction and passage support need separate human review.",
+        "metric_limit": (
+            "Paper-level relevance only; extraction and passage support need separate human review."
+        ),
         "variants": {},
     }
     for name, path in snapshots.items():

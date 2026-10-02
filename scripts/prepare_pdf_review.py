@@ -75,9 +75,7 @@ def prepare(manifest_path: Path, snapshot_path: Path) -> dict:
 
 
 def validate_review(packet: dict, manifest_path: Path, snapshot_path: Path) -> None:
-    if packet.get("kind") != "pdf-passage-review-packet" or packet.get(
-        "quality_evidence"
-    ):
+    if packet.get("kind") != "pdf-passage-review-packet" or packet.get("quality_evidence"):
         raise ValueError("invalid PDF review packet")
     snapshot, papers, chunks = load_snapshot(snapshot_path)
     if (
@@ -108,11 +106,7 @@ def validate_review(packet: dict, manifest_path: Path, snapshot_path: Path) -> N
             or paper["title"] != item["paper_title"]
             or item["candidate_id"]
             != "pq_"
-            + digest(
-                canonical(
-                    {"snapshot": snapshot["snapshot_id"], "chunk": chunk["chunk_id"]}
-                )
-            )
+            + digest(canonical({"snapshot": snapshot["snapshot_id"], "chunk": chunk["chunk_id"]}))
         ):
             raise ValueError("PDF review passage provenance differs")
         if not item["question"].strip() or not item["expected_answer"].strip():

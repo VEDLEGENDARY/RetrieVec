@@ -17,9 +17,7 @@ ID = re.compile(r"^[0-9]{4}\.[a-z0-9-]+\.[0-9]+$")
 
 def fetch(manifest_path: Path, destination: Path) -> list[str]:
     manifest = parse_json(manifest_path.read_bytes())
-    if manifest.get("schema_version") != 1 or not isinstance(
-        manifest.get("sources"), list
-    ):
+    if manifest.get("schema_version") != 1 or not isinstance(manifest.get("sources"), list):
         raise ValueError("invalid PDF evaluation manifest")
     destination.mkdir(parents=True, exist_ok=True)
     acquired = []
@@ -47,9 +45,7 @@ def fetch(manifest_path: Path, destination: Path) -> list[str]:
             with urllib.request.urlopen(url, timeout=60) as response:
                 if urlparse(response.url).hostname != "aclanthology.org":
                     raise ValueError("PDF download redirected outside ACL Anthology")
-                with tempfile.NamedTemporaryFile(
-                    dir=destination, delete=False
-                ) as output:
+                with tempfile.NamedTemporaryFile(dir=destination, delete=False) as output:
                     temporary = Path(output.name)
                     checksum = hashlib.sha256()
                     size = 0
