@@ -14,9 +14,11 @@ def sections(text: str, current: str = "") -> tuple[list[tuple[str, str]], str]:
     """Split on explicit headings; carry a section title across PDF pages."""
     parts: list[tuple[str, str]] = []
     body: list[str] = []
+    saw_heading = False
     for line in text.splitlines(keepends=True):
         candidate = line.strip()
         if HEADING.fullmatch(candidate):
+            saw_heading = True
             if body:
                 parts.append((current, "".join(body)))
                 body = []
@@ -25,6 +27,9 @@ def sections(text: str, current: str = "") -> tuple[list[tuple[str, str]], str]:
             body.append(line)
     if body:
         parts.append((current, "".join(body)))
+    elif not parts and saw_heading:
+        # A title-only record still needs an indexable passage.
+        parts.append(("", current))
     return parts, current
 
 
