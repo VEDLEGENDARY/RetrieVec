@@ -38,7 +38,7 @@ class ImportTests(unittest.TestCase):
     def test_section_windows_repeat_title_and_bound_overlap(self) -> None:
         analyzer = GoAnalyzer()
         title_only, _ = chunk_page_v2(
-            "10 Internet Addiction and Its Cognitive Behavioral Therapy", analyzer, 32, 4
+            "10 Internet Addiction and Its Cognitive Behavioral Therapy\n\n", analyzer, 32, 4
         )
         self.assertEqual(title_only, ["10 Internet Addiction and Its Cognitive Behavioral Therapy"])
         first, current = chunk_page_v2(
