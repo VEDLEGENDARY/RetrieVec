@@ -13,6 +13,7 @@ from pathlib import Path
 
 from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.importer import import_manifest
+from retrievec.corpus.section_chunks import sections
 from retrievec.corpus.snapshot import canonical, digest, load_snapshot
 from retrievec.corpus.wordpieces import WordpieceBudget
 from retrievec.dense.model import adapter
@@ -23,6 +24,21 @@ from retrievec.evaluation.paired import compare
 
 ROOT = Path(__file__).resolve().parents[1]
 VARIANTS = ("baseline", "stemmed", "paragraph", "combined")
+
+
+def preflight_paragraph_sources(manifest_path, source_root):
+    """Fail fast on title/heading layouts that would yield no indexable body."""
+    manifest = json.loads(manifest_path.read_bytes())
+    failures = []
+    for record in manifest["sources"]:
+        text = (source_root / record["path"]).read_text(encoding="utf-8")
+        found, _ = sections(text)
+        if not any(any(character.isalnum() for character in body) for _, body in found):
+            failures.append(record["paper_id"])
+    if failures:
+        raise ValueError(
+            f"paragraph-v2 has no tokens for {len(failures)} sources: {failures[:5]}"
+        )
 
 
 def report(worker, name, query_rows, judgments, chunk_papers, *, limit=0):
@@ -98,6 +114,9 @@ def main():
     parser.add_argument(
         "--queries", type=int, default=0, help="smoke subset; 0 runs all"
     )
+    parser.add_argument(
+        "--paragraph-snapshot", type=Path, help="reuse a pinned v2 corpus"
+    )
     args = parser.parse_args()
     if args.queries < 0:
         parser.error("--queries must be nonnegative")
@@ -105,7 +124,7 @@ def main():
     source = args.work / "downloads" / args.dataset
     prepared = json.loads((dataset / "prepared.json").read_bytes())
     baseline = Path(prepared["corpus"])
-    manifest, _, _ = load_snapshot(baseline)
+    manifest, baseline_papers, _ = load_snapshot(baseline)
     if manifest["collection_id"] != args.dataset or prepared["subset"]:
         raise ValueError("expected the full frozen BEIR corpus")
     for filename, expected in prepared["inputs"].items():
@@ -115,23 +134,34 @@ def main():
     judgments = qrels(source / "qrels/test.tsv")
     alternate = args.work / "sparse-variants" / args.dataset
     alternate.mkdir(parents=True, exist_ok=True)
-    model = adapter("minilm")
     reference_analyzer = GoAnalyzer(args.engine)
     reference_analyzer.analyze([])
     stemmed_version = reference_analyzer.version.replace(
         "analyzer-v1-unicode-", "analyzer-v2-snowball-en-0.10.0-unicode-", 1
     )
-    paragraph = import_manifest(
-        dataset / "sources.json",
-        dataset / "sources",
-        alternate / "corpora",
-        args.dataset,
-        32,
-        GoAnalyzer(args.engine),
-        wordpiece_budget=WordpieceBudget(model, GoAnalyzer(args.engine)),
-        chunker="paragraph-v2",
-        overlap=8,
-    )
+    if args.paragraph_snapshot:
+        paragraph = args.paragraph_snapshot
+    else:
+        model = adapter("minilm")
+        preflight_paragraph_sources(dataset / "sources.json", dataset / "sources")
+        paragraph = import_manifest(
+            dataset / "sources.json",
+            dataset / "sources",
+            alternate / "corpora",
+            args.dataset,
+            32,
+            GoAnalyzer(args.engine),
+            wordpiece_budget=WordpieceBudget(model, GoAnalyzer(args.engine)),
+            chunker="paragraph-v2",
+            overlap=8,
+        )
+    paragraph_manifest, paragraph_papers, _ = load_snapshot(paragraph)
+    if not paragraph_manifest["configuration"]["chunker_version"].startswith(
+        "paragraph-v2-32-"
+    ) or {p["paper_id"]: p["source_sha256"] for p in paragraph_papers} != {
+        p["paper_id"]: p["source_sha256"] for p in baseline_papers
+    }:
+        raise ValueError("paragraph corpus does not match the baseline sources")
     snapshots = {
         "baseline": baseline,
         "stemmed": baseline,
