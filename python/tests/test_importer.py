@@ -5,7 +5,6 @@ from pathlib import Path
 
 from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
-
 from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.importer import chunk_page, extract_pages, import_manifest
 from retrievec.corpus.section_chunks import chunk_page_v2

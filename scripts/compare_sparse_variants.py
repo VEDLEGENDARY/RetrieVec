@@ -36,9 +36,7 @@ def preflight_paragraph_sources(manifest_path, source_root):
         if not any(any(character.isalnum() for character in body) for _, body in found):
             failures.append(record["paper_id"])
     if failures:
-        raise ValueError(
-            f"paragraph-v2 has no tokens for {len(failures)} sources: {failures[:5]}"
-        )
+        raise ValueError(f"paragraph-v2 has no tokens for {len(failures)} sources: {failures[:5]}")
 
 
 def report(worker, name, query_rows, judgments, chunk_papers, *, limit=0):
@@ -60,8 +58,7 @@ def report(worker, name, query_rows, judgments, chunk_papers, *, limit=0):
     for qid in ids:
         try:
             worker.stdin.write(
-                json.dumps({"query": queries[qid], "top_k": 100, "k1": 1.2, "b": 0.75})
-                + "\n"
+                json.dumps({"query": queries[qid], "top_k": 100, "k1": 1.2, "b": 0.75}) + "\n"
             )
             worker.stdin.flush()
             result = json.loads(worker.stdout.readline())
@@ -93,9 +90,7 @@ def report(worker, name, query_rows, judgments, chunk_papers, *, limit=0):
         "missing_queries": [],
         "results_sha256": digest(canonical(outcomes)),
         "metrics": {
-            metric: statistics.mean(row[metric] for row in outcomes)
-            if outcomes
-            else None
+            metric: statistics.mean(row[metric] for row in outcomes) if outcomes else None
             for metric in ("ndcg", "mrr", "recall", "coverage")
         },
         "latency_ms": {"p50": percentile(times, 0.5), "p95": percentile(times, 0.95)},
@@ -106,17 +101,11 @@ def report(worker, name, query_rows, judgments, chunk_papers, *, limit=0):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", choices=("scifact", "scidocs"), required=True)
-    parser.add_argument(
-        "--engine", type=Path, default=ROOT / "artifacts/bin/retrievald.exe"
-    )
+    parser.add_argument("--engine", type=Path, default=ROOT / "artifacts/bin/retrievald.exe")
     parser.add_argument("--work", type=Path, default=ROOT / "artifacts/beir")
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument(
-        "--queries", type=int, default=0, help="smoke subset; 0 runs all"
-    )
-    parser.add_argument(
-        "--paragraph-snapshot", type=Path, help="reuse a pinned v2 corpus"
-    )
+    parser.add_argument("--queries", type=int, default=0, help="smoke subset; 0 runs all")
+    parser.add_argument("--paragraph-snapshot", type=Path, help="reuse a pinned v2 corpus")
     args = parser.parse_args()
     if args.queries < 0:
         parser.error("--queries must be nonnegative")
@@ -190,9 +179,7 @@ def main():
         if analyzer:
             command += ["--analyzer", analyzer]
         started = time.perf_counter()
-        with (alternate / f"{variant}.stderr.log").open(
-            "w", encoding="utf-8"
-        ) as errors:
+        with (alternate / f"{variant}.stderr.log").open("w", encoding="utf-8") as errors:
             worker = subprocess.Popen(
                 command,
                 stdin=subprocess.PIPE,
@@ -221,14 +208,10 @@ def main():
         print(f"{variant}: {measured['metrics']['ndcg']:.4f} nDCG@10", flush=True)
     baseline_report = result["variants"]["baseline"]
     result["paired"] = {
-        variant: compare(
-            baseline_report, result["variants"][variant], samples=5000, seed=1729
-        )
+        variant: compare(baseline_report, result["variants"][variant], samples=5000, seed=1729)
         for variant in VARIANTS[1:]
     }
-    result["decision"] = (
-        "No default change; review paired quality, cost, and PDF judgments first."
-    )
+    result["decision"] = "No default change; review paired quality, cost, and PDF judgments first."
     args.output.parent.mkdir(parents=True, exist_ok=True)
     temporary = args.output.with_suffix(".tmp")
     temporary.write_bytes(canonical(result) + b"\n")
