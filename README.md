@@ -19,7 +19,7 @@
 
 Source: [docs/results/benchmark-2026-10-01.json](docs/results/benchmark-2026-10-01.json). [Protocol and limitations](BENCHMARKS.md).
 
-These are paper-level rankings collapsed from the production top-100 chunk pool, so fewer than 100 papers can be returned. Latency covers warm local retrieval and query embedding, excluding HTTP, authentication and database work. SCIDOCS uses SciFact-selected parameters because it has no training split; no model was trained. The opt-in lossless wordpiece refinement is recorded in snapshot provenance. This does not evaluate PDF extraction, answers, private-scope isolation, or concurrency.
+These are paper-level rankings collapsed from the production top-100 chunk pool, so fewer than 100 papers can be returned. Latency covers warm local retrieval and query embedding, excluding HTTP, authentication and database work. SCIDOCS uses SciFact-selected parameters because it has no training split; no model was trained. The benchmark's opt-in lossless wordpiece refinement differs from the product's default PDF upload chunking and is recorded in snapshot provenance. This does not evaluate PDF extraction, answers, private-scope isolation, or concurrency.
 
 After [native setup](#native-setup), replace `python` below with `.\.venv\Scripts\python.exe` on Windows or `.venv/bin/python` on Linux:
 
