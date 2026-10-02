@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"retrievec/engine/internal/analysis"
 	"retrievec/engine/internal/corpus"
 	"retrievec/engine/internal/index"
 	"retrievec/engine/internal/scoring"
@@ -20,6 +21,7 @@ func benchmarkCommand(args []string, input io.Reader, output, stderr io.Writer) 
 	flags := flag.NewFlagSet("benchmark", flag.ContinueOnError)
 	flags.SetOutput(stderr)
 	directory := flags.String("corpus", "", "validated corpus snapshot")
+	analyzerVersion := flags.String("analyzer", analysis.Version, "versioned analyzer (default v1)")
 	if flags.Parse(args) != nil || *directory == "" || flags.NArg() != 0 {
 		return 2
 	}
@@ -29,13 +31,13 @@ func benchmarkCommand(args []string, input io.Reader, output, stderr io.Writer) 
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
-	idx, err := index.Build(snapshot.Documents)
+	idx, err := index.BuildVersion(snapshot.Documents, *analyzerVersion)
 	if err != nil {
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
 	encoder := json.NewEncoder(output)
-	if encoder.Encode(map[string]any{"snapshot_id": snapshot.Manifest.SnapshotID, "build_ms": float64(time.Since(started).Microseconds()) / 1000}) != nil {
+	if encoder.Encode(map[string]any{"snapshot_id": snapshot.Manifest.SnapshotID, "analyzer_version": idx.Stats().AnalyzerVersion, "build_ms": float64(time.Since(started).Microseconds()) / 1000}) != nil {
 		return 1
 	}
 	scanner := bufio.NewScanner(input)
