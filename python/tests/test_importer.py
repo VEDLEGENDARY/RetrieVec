@@ -7,6 +7,7 @@ from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.importer import chunk_page, extract_pages, import_manifest
+from retrievec.corpus.section_chunks import chunk_page_v2
 from retrievec.corpus.snapshot import CorpusError, canonical, digest, load_snapshot
 
 
@@ -33,6 +34,32 @@ def pdf_bytes(texts: list[str]) -> bytes:
 
 
 class ImportTests(unittest.TestCase):
+    def test_section_windows_repeat_title_and_bound_overlap(self) -> None:
+        analyzer = GoAnalyzer()
+        first, current = chunk_page_v2(
+            "1 Methods\nalpha beta gamma delta epsilon zeta eta theta.\n\n"
+            "2 Results\niota kappa lambda mu nu xi omicron pi.",
+            analyzer,
+            8,
+            1,
+        )
+        second, carried = chunk_page_v2("rho sigma tau upsilon", analyzer, 8, 1, current)
+        self.assertEqual(carried, "2 Results")
+        self.assertTrue(any(chunk.startswith("Section: 1 Methods") for chunk in first))
+        self.assertTrue(all(chunk.startswith("Section: 2 Results") for chunk in second))
+        self.assertTrue(all(len(tokens) <= 8 for tokens in analyzer.analyze(first + second)))
+        self.assertIn("gamma", " ".join(first))
+        self.assertIn("upsilon", " ".join(second))
+        high_overlap, _ = chunk_page_v2(
+            "alpha beta gamma delta epsilon zeta eta theta iota kappa",
+            analyzer,
+            8,
+            7,
+        )
+        self.assertEqual(len(high_overlap), 3)
+        with self.assertRaises(CorpusError):
+            chunk_page_v2("1 Heading\ntext", analyzer, 3, 2)
+
     def test_paragraph_pack_and_oversize_split(self) -> None:
         analyzer = GoAnalyzer()
         for text, budget, expected in (

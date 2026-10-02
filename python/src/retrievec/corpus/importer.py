@@ -105,9 +105,17 @@ def import_manifest(
     evidence_bundles: dict[str, str] | None = None,
     evidence_root: Path | None = None,
     wordpiece_budget=None,
+    chunker: str = "paragraph-v1",
+    overlap: int = 0,
 ) -> Path:
     if type(token_budget) is not int or not 1 <= token_budget <= 4096:
         raise CorpusError("token budget must be between 1 and 4096")
+    if chunker not in ("paragraph-v1", "paragraph-v2"):
+        raise CorpusError("unsupported chunker version")
+    if type(overlap) is not int or not 0 <= overlap < token_budget:
+        raise CorpusError("overlap must be smaller than token budget")
+    if chunker == "paragraph-v1" and overlap:
+        raise CorpusError("paragraph-v1 does not support overlap")
     manifest = parse_json(manifest_path.read_bytes())
     if (
         not isinstance(manifest, dict)
@@ -120,7 +128,9 @@ def import_manifest(
         raise CorpusError("invalid source manifest schema")
     analyzer = analyzer or GoAnalyzer()
     analyzer.analyze([])
-    chunker_version = f"paragraph-v1-{token_budget}-{analyzer.version}"
+    chunker_version = f"{chunker}-{token_budget}-{analyzer.version}"
+    if chunker == "paragraph-v2":
+        chunker_version += f"-overlap-{overlap}"
     if wordpiece_budget is not None:
         chunker_version += "-" + wordpiece_budget.version
     papers, chunks = [], []
@@ -176,9 +186,17 @@ def import_manifest(
         )
         papers.append(paper)
         ordinal = 0
+        current_section = ""
         for page_index, (page_number, text) in enumerate(pages):
-            tokens = analyzer.analyze([text])[0]
-            page_chunks = chunk_page(text, tokens, token_budget)
+            if chunker == "paragraph-v2":
+                from retrievec.corpus.section_chunks import chunk_page_v2
+
+                page_chunks, current_section = chunk_page_v2(
+                    text, analyzer, token_budget, overlap, current_section
+                )
+            else:
+                tokens = analyzer.analyze([text])[0]
+                page_chunks = chunk_page(text, tokens, token_budget)
             if wordpiece_budget is not None:
                 page_chunks = [
                     part for chunk in page_chunks for part in wordpiece_budget.split(chunk)
@@ -218,7 +236,7 @@ def import_manifest(
             "token_budget": token_budget,
             "analyzer_version": analyzer.version,
             "chunker_version": chunker_version,
-            "overlap": 0,
+            "overlap": overlap,
             **(
                 {"wordpiece_budget": canonical(wordpiece_budget.configuration).decode("utf-8")}
                 if wordpiece_budget
