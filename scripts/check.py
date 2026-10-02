@@ -22,6 +22,7 @@ def main() -> int:
         "--race", action="store_true", help="enable Go race checks (requires C compiler)"
     )
     args = parser.parse_args()
+    run(sys.executable, "scripts/check_design_tokens.py")
 
     # Make the installed console entry point available without shell activation.
     os.environ["PATH"] = sysconfig.get_path("scripts") + os.pathsep + os.environ.get("PATH", "")

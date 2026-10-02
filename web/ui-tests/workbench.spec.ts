@@ -59,7 +59,10 @@ async function openWorkbench(page: Page, view: "Search" | "Sources") {
   await page.goto("/");
   await page
     .getByRole("navigation", { name: "Workspace sections" })
-    .getByRole("button", { name: view, exact: true })
+    .getByRole("button", {
+      name: view === "Search" ? "Ask" : view,
+      exact: true,
+    })
     .click();
 }
 
@@ -100,6 +103,12 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     "Compare lexical and dense retrieval",
   );
   expect(exported.passages[0].methods).toEqual(["sparse", "dense", "hybrid"]);
+  await page
+    .getByRole("button", { name: "Remove Lexical baselines from shortlist" })
+    .click();
+  await expect(page.locator(".passage-board article")).toHaveCount(0);
+  await page.getByRole("button", { name: "Undo remove passage" }).click();
+  await expect(page.locator(".passage-board article")).toHaveCount(1);
   await page.getByLabel("Filter returned passages").fill("");
   await ranking
     .getByRole("button", { name: "Shortlist passage" })
@@ -194,7 +203,7 @@ test("recent searches restore drafts and collection changes clear the shortlist"
     .click();
   await page
     .getByRole("navigation", { name: "Workspace sections" })
-    .getByRole("button", { name: "Search", exact: true })
+    .getByRole("button", { name: "Ask", exact: true })
     .click();
   await expect(page.locator(".count-pill")).toHaveText("0/6");
   await expect(page.getByLabel("Research question")).toHaveValue("");
@@ -227,6 +236,9 @@ test("upload review rejects unsupported files and keeps the retry key for an unc
   ).toBeVisible();
   await page.getByRole("button", { name: "Remove program.exe" }).click();
   await expect(upload).toBeEnabled();
+  await page.getByRole("button", { name: "Undo remove document" }).click();
+  await expect(upload).toBeDisabled();
+  await page.getByRole("button", { name: "Remove program.exe" }).click();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "test-results/upload-review.png",

@@ -1,3 +1,4 @@
+import { Button, Input } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { api, type Collection, type Job, type Session } from "./api";
 import { FileText, UploadCloud, X, CheckCircle2 } from "lucide-react";
@@ -55,6 +56,10 @@ export function Uploads({
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState("");
   const [files, setFiles] = useState<File[]>([]);
+  const [removedFile, setRemovedFile] = useState<{
+    file: File;
+    index: number;
+  } | null>(null);
   const [dragging, setDragging] = useState(false);
   const requestKey = useRef(crypto.randomUUID());
   const input = useRef<HTMLInputElement>(null);
@@ -123,6 +128,7 @@ export function Uploads({
       );
       if (input.current) input.current.value = "";
       setFiles([]);
+      setRemovedFile(null);
       requestKey.current = crypto.randomUUID();
     } catch (error) {
       fail(error);
@@ -181,7 +187,7 @@ export function Uploads({
             Drop documents here, or choose files to review before uploading.
           </p>
           <label htmlFor="documents">Choose documents</label>
-          <input
+          <Input
             id="documents"
             ref={input}
             type="file"
@@ -213,11 +219,12 @@ export function Uploads({
                       {fileProblem(file) ?? fileSize(file.size)}
                     </small>
                   </div>
-                  <button
+                  <Button
                     type="button"
                     disabled={sending}
                     aria-label={`Remove ${file.name}`}
                     onClick={() => {
+                      setRemovedFile({ file, index });
                       setFiles((current) =>
                         current.filter((_, position) => position !== index),
                       );
@@ -225,7 +232,7 @@ export function Uploads({
                     }}
                   >
                     <X size={17} />
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -236,7 +243,7 @@ export function Uploads({
             <CheckCircle2 size={16} aria-hidden="true" /> Files stay in your
             private collection.
           </span>
-          <button
+          <Button
             className="primary"
             type="submit"
             disabled={
@@ -251,9 +258,29 @@ export function Uploads({
               : pending
                 ? "Processing current upload…"
                 : "Upload documents"}
-          </button>
+          </Button>
         </div>
       </form>
+      {removedFile && (
+        <Button
+          disabled={sending || pending || files.length >= 10}
+          onClick={() => {
+            setFiles((current) => {
+              const next = [...current];
+              next.splice(
+                Math.min(removedFile.index, next.length),
+                0,
+                removedFile.file,
+              );
+              return next;
+            });
+            requestKey.current = crypto.randomUUID();
+            setRemovedFile(null);
+          }}
+        >
+          Undo remove document
+        </Button>
+      )}
       <p role="status" aria-live="polite">
         {notice}
       </p>

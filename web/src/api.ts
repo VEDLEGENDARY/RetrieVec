@@ -1,3 +1,5 @@
+import { recordTiming } from "./performance";
+
 export type Session = { principal_id: string; csrf_token: string };
 export type Job = {
   job_id: string;
@@ -53,6 +55,23 @@ export class APIError extends Error {
   }
 }
 export async function api<T>(
+  path: string,
+  options: RequestInit = {},
+  csrf?: string,
+): Promise<T> {
+  if (path !== "/api/v1/search") return request<T>(path, options, csrf);
+  const started = performance.now();
+  let outcome: "ok" | "error" = "error";
+  try {
+    const result = await request<T>(path, options, csrf);
+    outcome = "ok";
+    return result;
+  } finally {
+    recordTiming("retrieval.response", performance.now() - started, outcome);
+  }
+}
+
+async function request<T>(
   path: string,
   options: RequestInit = {},
   csrf?: string,

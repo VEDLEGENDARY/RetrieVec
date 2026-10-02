@@ -35,7 +35,7 @@ test("quick actions announce keyboard selection and reset on reopen", async ({
     name: "Find actions and collections",
   });
   await expect(input).toBeFocused();
-  await input.press("ArrowDown");
+  await input.fill("Sources");
   const sources = page.getByRole("option", { name: /Sources/ });
   await expect(sources).toHaveAttribute("aria-selected", "true");
   await expect(input).toHaveAttribute(

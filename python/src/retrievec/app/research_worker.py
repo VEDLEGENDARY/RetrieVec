@@ -203,7 +203,39 @@ class ResearchWorker:
                 packet = await pack_evidence(provider, run["effective_query"], retrieved["hits"])
                 if not packet["evidence"]:
                     return packet, None
-                raw = await provider.generate(packet["prompt"], answer_schema(packet["evidence"]))
+                await asyncio.to_thread(self.verify_sources, run, packet["evidence"])
+                previews = [
+                    {key: item.get(key) for key in ("title", "text", "page_range", "evidence_id")}
+                    for item in packet["evidence"]
+                ]
+                if not await asyncio.to_thread(
+                    self.state.progress,
+                    run,
+                    "evidence_ready",
+                    {"evidence": previews, "snapshot_id": run["snapshot_id"]},
+                ):
+                    raise asyncio.CancelledError()
+                schema = answer_schema(packet["evidence"])
+                if run["configuration"].get(
+                    "generation_transport"
+                ) == "llama-completion-sse-v1" and hasattr(provider, "generate_stream"):
+                    parts = []
+                    first = True
+                    output_size = 0
+                    async for delta in provider.generate_stream(packet["prompt"], schema):
+                        output_size += len(delta.encode("utf-8"))
+                        if output_size > 65536:
+                            raise ProviderError("streamed answer exceeded its output budget")
+                        parts.append(delta)
+                        if first:
+                            emit(
+                                "research.first_token",
+                                elapsed_ms=(time.perf_counter() - started) * 1000,
+                            )
+                            first = False
+                    raw = "".join(parts)
+                else:
+                    raw = await provider.generate(packet["prompt"], schema)
                 return packet, raw
 
             with stage("generating"):

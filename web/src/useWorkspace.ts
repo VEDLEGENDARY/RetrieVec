@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
+import { clearDrafts, retainPrincipalDrafts } from "./drafts";
+import { navigate, readRoute } from "./routing";
 
 /** Own session lifetime here so late refreshes cannot restore signed-out data. */
 export function useWorkspace() {
@@ -9,16 +11,20 @@ export function useWorkspace() {
   const [selected, setSelected] = useState("");
   const [error, setError] = useState("");
   const epoch = useRef(0);
+  const principal = useRef<string | null>(null);
   const latestRefresh = useRef(0);
   const activeRequests = useRef(new Set<AbortController>());
 
   const clearSession = useCallback(() => {
+    if (principal.current) clearDrafts(principal.current);
+    principal.current = null;
     epoch.current += 1;
     activeRequests.current.forEach((request) => request.abort());
     activeRequests.current.clear();
     setSession(null);
     setCollections([]);
     setSelected("");
+    navigate({ collection: "", run: "", view: "ask" }, true);
   }, []);
 
   const fail = useCallback(
@@ -51,7 +57,11 @@ export function useWorkspace() {
       setSelected((current) =>
         values.some((item) => item.collection_id === current)
           ? current
-          : (values[0]?.collection_id ?? ""),
+          : (values.find(
+              (item) => item.collection_id === readRoute().collection,
+            )?.collection_id ??
+            values[0]?.collection_id ??
+            ""),
       );
     } finally {
       activeRequests.current.delete(controller);
@@ -64,6 +74,8 @@ export function useWorkspace() {
     api<Session>("/api/v1/me", { signal: controller.signal })
       .then(async (value) => {
         if (controller.signal.aborted || generation !== epoch.current) return;
+        principal.current = value.principal_id;
+        retainPrincipalDrafts(value.principal_id);
         setSession(value);
         await refresh();
       })

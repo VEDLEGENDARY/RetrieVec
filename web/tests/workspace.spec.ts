@@ -4,17 +4,24 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: /Sign in to your workspace/ }).click();
-  await page.getByRole("link", { name: "Sign in as a", exact: true }).click();
+  await page
+    .getByRole("link", { name: /Sign in to your workspace/ })
+    .press("Enter");
+  await page
+    .getByRole("link", { name: "Sign in as a", exact: true })
+    .press("Enter");
   await page.getByLabel("New collection").fill("Retrieval experiments");
   await page
     .getByRole("button", { name: "Create collection", exact: true })
-    .click();
+    .first()
+    .press("Enter");
   await expect(
     page.getByRole("heading", { name: "Retrieval experiments", exact: true }),
   ).toBeVisible();
   const sections = page.getByRole("navigation", { name: "Workspace sections" });
-  await sections.getByRole("button", { name: "Sources", exact: true }).click();
+  await sections
+    .getByRole("button", { name: "Sources", exact: true })
+    .press("Enter");
   await page.getByLabel("Choose documents").setInputFiles({
     name: "private-evidence.txt",
     mimeType: "text/plain",
@@ -24,15 +31,17 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   });
   await page
     .getByRole("button", { name: "Upload documents", exact: true })
-    .click();
+    .press("Enter");
   await expect(
     page.getByText("Snapshot activated. Ready to search."),
   ).toBeVisible({ timeout: 90000 });
-  await sections.getByRole("button", { name: "Search", exact: true }).click();
+  await sections
+    .getByRole("button", { name: "Ask", exact: true })
+    .press("Enter");
   await page.getByLabel("Research question").fill("retrieval evidence");
   await page
     .getByRole("button", { name: "Search evidence →", exact: true })
-    .click();
+    .press("Enter");
   await expect(
     page.getByRole("heading", { name: "Hybrid · RRF" }),
   ).toBeVisible();
@@ -40,7 +49,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .getByRole("region", { name: "Hybrid · RRF" })
     .getByRole("button")
     .first()
-    .click();
+    .press("Enter");
   await expect(
     page.getByRole("complementary", { name: "Evidence inspector" }),
   ).toBeVisible();
@@ -53,31 +62,31 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   });
   expect(authorized.status()).toBe(206);
   expect(await authorized.text()).toBe("Dense");
-  await sections
-    .getByRole("button", { name: "Cited answers", exact: true })
-    .click();
+  await page
+    .getByRole("button", { name: "Answer", exact: true })
+    .press("Enter");
   await page
     .getByLabel("Question for cited answer")
     .fill("What does dense retrieval match?");
   await page
     .getByRole("button", { name: "Generate cited answer", exact: true })
-    .click();
+    .press("Enter");
   await expect(
     page.getByText("Research run: completed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
   await page
     .getByRole("button", { name: /Inspect citation/ })
     .first()
-    .click();
+    .press("Enter");
   await expect(
-    page.getByRole("complementary", { name: "Citation evidence" }),
+    page.getByRole("complementary", { name: "Evidence inspector" }),
   ).toContainText("Dense retrieval");
   await expect(
-    page.getByRole("button", { name: "Close citation" }),
+    page.getByRole("complementary", { name: "Evidence inspector" }),
   ).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(
-    page.getByRole("complementary", { name: "Citation evidence" }),
+    page.getByRole("complementary", { name: "Evidence inspector" }),
   ).toBeHidden();
   await expect(
     page.getByRole("button", { name: /Inspect citation/ }).first(),
@@ -146,13 +155,19 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
       await page.request.get(`/api/v1/runs/${saved.run.run_id}/events?after=5`)
     ).status(),
   ).toBe(200);
+  await page.getByText("Export answer", { exact: true }).press("Enter");
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export csv", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Export csv", exact: true })
+    .press("Enter");
   expect((await downloadPromise).suggestedFilename()).toMatch(/\.csv$/);
   await page
     .getByRole("button", { name: "Replay pinned snapshot", exact: true })
     .focus();
   await page.keyboard.press("Enter");
+  await page
+    .getByRole("button", { name: "Saved research", exact: true })
+    .press("Enter");
   await expect(
     page
       .getByRole("navigation", { name: "Saved research runs" })
@@ -161,19 +176,24 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await expect(
     page.getByText("Research run: completed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
+  await sections
+    .getByRole("button", { name: "Ask", exact: true })
+    .press("Enter");
   await page
     .getByLabel("Question for cited answer")
     .fill("cancel this retrieval answer");
   await page
     .getByRole("button", { name: "Generate cited answer", exact: true })
-    .click();
+    .press("Enter");
   await expect(
     page.getByRole("heading", {
       name: "cancel this retrieval answer",
       exact: true,
     }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Cancel run", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Cancel run", exact: true })
+    .press("Enter");
   await expect(
     page.getByText("Research run: cancelled", { exact: true }),
   ).toBeVisible();
@@ -182,24 +202,45 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .fill("no-evidence for quantum banana engines");
   await page
     .getByRole("button", { name: "Generate cited answer", exact: true })
-    .click();
+    .press("Enter");
   await expect(
-    page.getByText("insufficient evidence", { exact: true }),
+    page.getByText("I could not find this in your papers.", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
+  await page
+    .getByLabel("Question for cited answer")
+    .fill("invalid-answer retrieval");
+  await page
+    .getByRole("button", { name: "Generate cited answer", exact: true })
+    .press("Enter");
+  await expect(
+    page.getByText("Research run: failed", { exact: true }),
+  ).toBeVisible({ timeout: 30000 });
+  await expect(
+    page.getByText("UNVERIFIED_SENTINEL", { exact: false }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /Inspect citation/ }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /Export (json|csv|markdown)/ }),
+  ).toHaveCount(0);
   await page
     .getByLabel("Question for cited answer")
     .fill("provider-failure retrieval");
   await page
     .getByRole("button", { name: "Generate cited answer", exact: true })
-    .click();
+    .press("Enter");
   await expect(
     page.getByText("Research run: failed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
+  await sections
+    .getByRole("button", { name: "Saved research", exact: true })
+    .press("Enter");
   await page
     .getByRole("navigation", { name: "Saved research runs" })
     .getByRole("button", { name: /What does dense retrieval match/ })
     .last()
-    .click();
+    .press("Enter");
   await page.setViewportSize({ width: 390, height: 844 });
   expect(
     await page.evaluate(
@@ -215,9 +256,15 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     path: "test-results/workspace-desktop.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Sign out", exact: true }).click();
-  await page.getByRole("link", { name: /Sign in to your workspace/ }).click();
-  await page.getByRole("link", { name: "Sign in as b", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Sign out", exact: true })
+    .press("Enter");
+  await page
+    .getByRole("link", { name: /Sign in to your workspace/ })
+    .press("Enter");
+  await page
+    .getByRole("link", { name: "Sign in as b", exact: true })
+    .press("Enter");
   await expect(
     page.getByRole("heading", { name: "Start with a collection" }),
   ).toBeVisible();

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { Button, Input, Skeleton } from "./ui";
+import { useEffect, useState } from "react";
+import { recordTiming } from "./performance";
 import { createRoot } from "react-dom/client";
 import { api, type Collection } from "./api";
 import "./style.css";
@@ -8,16 +10,14 @@ import { Research } from "./Research";
 import { CommandMenu } from "./CommandMenu";
 import { useWorkspace } from "./useWorkspace";
 import { NavigationPanel } from "./NavigationPanel";
+import { navigate, readRoute, useWorkspaceRoute } from "./routing";
 import {
   Archive,
   ArrowUpRight,
   BookOpenText,
-  Database,
   FileText,
-  LayoutDashboard,
   LogOut,
   Menu,
-  MessageSquareText,
   Plus,
   Search as SearchIcon,
   ShieldCheck,
@@ -25,7 +25,12 @@ import {
   X,
 } from "lucide-react";
 
-type View = "overview" | "sources" | "search" | "answers";
+type View = "ask" | "sources" | "saved";
+const viewLabels: Record<View, string> = {
+  ask: "Ask",
+  sources: "Sources",
+  saved: "Saved research",
+};
 
 function App() {
   const {
@@ -33,7 +38,7 @@ function App() {
     loading,
     collections,
     selected,
-    setSelected,
+    setSelected: setWorkspaceSelected,
     error,
     setError,
     refresh,
@@ -41,9 +46,31 @@ function App() {
     logout,
   } = useWorkspace();
   const [title, setTitle] = useState("");
+  useEffect(() => {
+    if (!loading) recordTiming("app.ready", performance.now());
+  }, [loading]);
 
   const [busy, setBusy] = useState(false);
-  const [view, setView] = useState<View>("overview");
+  const [archived, setArchived] = useState<Collection | null>(null);
+  useEffect(() => setArchived(null), [session?.principal_id]);
+  const route = useWorkspaceRoute();
+  const view = route.view;
+  const setView = (view: View) =>
+    navigate({ view, collection: readRoute().collection || selected });
+  const setSelected = (collection: string) => {
+    setWorkspaceSelected(collection);
+    navigate({ collection, view: "ask", run: "" });
+  };
+  useEffect(() => {
+    if (
+      route.collection &&
+      collections.some((item) => item.collection_id === route.collection)
+    )
+      setWorkspaceSelected(route.collection);
+  }, [route.collection, collections, setWorkspaceSelected]);
+  const [askMode, setAskMode] = useState<"passages" | "answer">(
+    route.run ? "answer" : "passages",
+  );
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [collectionFilter, setCollectionFilter] = useState("");
   const active = collections.find((item) => item.collection_id === selected);
@@ -60,7 +87,7 @@ function App() {
       setTitle("");
       await refresh();
       setSelected(result.collection_id);
-      setView("overview");
+      setView("ask");
     } catch (error) {
       fail(error);
     } finally {
@@ -68,21 +95,37 @@ function App() {
     }
   }
   async function archive() {
-    if (
-      !active ||
-      !window.confirm(
-        `Archive “${active.title}”? Access and pending processing will stop. Retained files are not erased.`,
-      )
-    )
-      return;
+    if (!active || busy) return;
     setBusy(true);
+    setError("");
     try {
       await api(
         `/api/v1/collections/${active.collection_id}`,
         { method: "DELETE" },
         session?.csrf_token,
       );
+      setArchived(active);
       await refresh();
+    } catch (error) {
+      fail(error);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function restoreArchived() {
+    if (!archived || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      const restored = await api<Collection>(
+        `/api/v1/collections/${archived.collection_id}/restore`,
+        { method: "POST" },
+        session?.csrf_token,
+      );
+      await refresh();
+      setSelected(restored.collection_id);
+      setView("sources");
+      setArchived(null);
     } catch (error) {
       fail(error);
     } finally {
@@ -92,7 +135,7 @@ function App() {
   if (loading)
     return (
       <main className="welcome">
-        <p role="status">Opening your workspace…</p>
+        <Skeleton label="Opening your workspace…" />
       </main>
     );
   if (!session)
@@ -141,18 +184,18 @@ function App() {
             <BookOpenText size={18} />
           </span>{" "}
           RetrieVec
-          <button
+          <Button
             className="mobile-close"
             aria-label="Close navigation"
             onClick={() => setNavigationOpen(false)}
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
         <p className="eyebrow">Collections</p>
         <label className="collection-filter">
           Find a collection
-          <input
+          <Input
             type="search"
             value={collectionFilter}
             onChange={(event) => setCollectionFilter(event.target.value)}
@@ -165,7 +208,7 @@ function App() {
               item.title.toLowerCase().includes(collectionFilter.toLowerCase()),
             )
             .map((item) => (
-              <button
+              <Button
                 key={item.collection_id}
                 className={
                   selected === item.collection_id
@@ -176,7 +219,7 @@ function App() {
                 onClick={() => {
                   setSelected(item.collection_id);
                   setError("");
-                  setView("overview");
+                  setView("ask");
                   setNavigationOpen(false);
                 }}
               >
@@ -184,7 +227,7 @@ function App() {
                 <small>
                   {item.visibility === "curated" ? "Curated" : "Private"}
                 </small>
-              </button>
+              </Button>
             ))}
         </nav>
         {collectionFilter &&
@@ -197,7 +240,7 @@ function App() {
           )}
         <form onSubmit={create} className="new-collection">
           <label htmlFor="collection-title">New collection</label>
-          <input
+          <Input
             id="collection-title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
@@ -205,36 +248,54 @@ function App() {
             required
             placeholder="e.g. Retrieval methods"
           />
-          <button disabled={busy || !title.trim()} type="submit">
+          <Button disabled={busy || !title.trim()} type="submit">
             <Plus size={16} /> Create collection
-          </button>
+          </Button>
         </form>
         <div className="account">
           <span>
             <ShieldCheck size={14} /> Private workspace
           </span>
-          <button onClick={logout}>
+          <Button onClick={logout}>
             <LogOut size={14} /> Sign out
-          </button>
+          </Button>
         </div>
       </NavigationPanel>
       <main id="research" className="research">
         <div className="workspace-toolbar">
-          <span>Library / {view === "answers" ? "Cited answers" : view}</span>
+          <span>Collection / {viewLabels[view]}</span>
           <CommandMenu
             actions={[
               ...(active
-                ? (["overview", "sources", "search", "answers"] as const)
-                : []
-              ).map((id) => ({
-                id,
-                label:
-                  id === "answers"
-                    ? "Cited answers"
-                    : id.charAt(0).toUpperCase() + id.slice(1),
-                detail: active?.title ?? "Workspace",
-                run: () => setView(id),
-              })),
+                ? [
+                    {
+                      id: "find-passages",
+                      label: "Find passages",
+                      detail: "Search evidence and compare retrieval methods",
+                      run: () => {
+                        setView("ask");
+                        setAskMode("passages");
+                      },
+                    },
+                    {
+                      id: "answer",
+                      label: "Answer a question",
+                      detail: "Generate a cited answer",
+                      run: () => {
+                        setView("ask");
+                        setAskMode("answer");
+                      },
+                    },
+                  ]
+                : []),
+              ...(active ? (["ask", "sources", "saved"] as const) : []).map(
+                (id) => ({
+                  id,
+                  label: viewLabels[id],
+                  detail: active?.title ?? "Workspace",
+                  run: () => setView(id),
+                }),
+              ),
               {
                 id: "create",
                 label: "Create a collection",
@@ -252,7 +313,7 @@ function App() {
                 detail: "Open collection",
                 run: () => {
                   setSelected(item.collection_id);
-                  setView("overview");
+                  setView("ask");
                   setError("");
                 },
               })),
@@ -261,7 +322,7 @@ function App() {
         </div>
         <header>
           <div>
-            <button
+            <Button
               className="mobile-menu"
               aria-label="Open navigation"
               aria-controls="workspace-navigation"
@@ -269,7 +330,7 @@ function App() {
               onClick={() => setNavigationOpen(true)}
             >
               <Menu size={19} />
-            </button>
+            </Button>
             <p className="eyebrow">Research workspace</p>
             <h1>{active?.title ?? "A place for your next question"}</h1>
             {active && (
@@ -284,11 +345,27 @@ function App() {
             )}
           </div>
           {active?.can_manage && (
-            <button className="quiet" onClick={archive} disabled={busy}>
+            <Button
+              className="quiet"
+              onClick={archive}
+              disabled={busy}
+              title="Hide this collection and cancel active processing. Undo restores access, but does not restart cancelled work."
+            >
               <Archive size={15} /> Archive collection
-            </button>
+            </Button>
           )}
         </header>
+        {archived && (
+          <div className="notice" role="status">
+            <p>
+              “{archived.title}” archived. Undo restores access; cancelled
+              processing stays cancelled.
+            </p>
+            <Button onClick={restoreArchived} disabled={busy}>
+              Undo archive
+            </Button>
+          </div>
+        )}
         {error && (
           <p role="alert" className="error">
             {error}
@@ -298,13 +375,12 @@ function App() {
           <nav className="view-tabs" aria-label="Workspace sections">
             {(
               [
-                ["overview", LayoutDashboard, "Overview"],
+                ["ask", SearchIcon, "Ask"],
                 ["sources", FileText, "Sources"],
-                ["search", SearchIcon, "Search"],
-                ["answers", MessageSquareText, "Cited answers"],
+                ["saved", BookOpenText, "Saved research"],
               ] as const
             ).map(([id, Icon, label]) => (
-              <button
+              <Button
                 key={id}
                 className={view === id ? "active" : ""}
                 aria-current={view === id ? "page" : undefined}
@@ -312,103 +388,57 @@ function App() {
               >
                 <Icon size={16} />
                 {label}
-              </button>
+              </Button>
             ))}
           </nav>
         )}
-        {active && view === "overview" && (
-          <section className="dashboard" aria-labelledby="overview-title">
-            <div className="hero-card">
-              <span className="hero-icon">
-                <Sparkles size={24} />
-              </span>
-              <div>
-                <p className="eyebrow">Collection overview</p>
-                <h2 id="overview-title">
-                  Turn papers into traceable evidence.
-                </h2>
-                <p>
-                  Upload your source material, compare retrieval methods, and
-                  build answers where every claim leads back to the original
-                  passage.
-                </p>
-              </div>
-              <button
-                className="primary"
-                onClick={() =>
-                  setView(active.active_snapshot ? "search" : "sources")
-                }
-              >
-                {active.active_snapshot
-                  ? "Search this collection"
-                  : "Add your first sources"}
-                <ArrowUpRight size={16} />
-              </button>
-            </div>
-            <div className="stat-grid">
-              <article>
-                <span>
-                  <Database size={18} />
-                </span>
-                <small>Snapshot</small>
-                <strong>
-                  {active.active_snapshot ? "Active" : "Not created"}
-                </strong>
-                <p>
-                  {active.active_snapshot
-                    ? active.active_snapshot.slice(0, 16) + "…"
-                    : "Upload sources to build one"}
-                </p>
-              </article>
-              <article>
-                <span>
-                  <SearchIcon size={18} />
-                </span>
-                <small>Retrieval</small>
-                <strong>3 modes</strong>
-                <p>Sparse, dense and hybrid comparison</p>
-              </article>
-              <article>
-                <span>
-                  <ShieldCheck size={18} />
-                </span>
-                <small>Access</small>
-                <strong>
-                  {active.visibility === "curated" ? "Curated" : "Private"}
-                </strong>
-                <p>Identity-scoped sources and results</p>
-              </article>
-            </div>
-            <div className="workflow-card">
-              <div>
-                <p className="eyebrow">Research flow</p>
-                <h2>A clear path from document to answer</h2>
-              </div>
-              <ol>
-                <li>
-                  <span>01</span>
-                  <div>
-                    <strong>Add sources</strong>
-                    <p>Import PDFs, Markdown, or text.</p>
-                  </div>
-                </li>
-                <li>
-                  <span>02</span>
-                  <div>
-                    <strong>Find evidence</strong>
-                    <p>Compare exact retrieval methods.</p>
-                  </div>
-                </li>
-                <li>
-                  <span>03</span>
-                  <div>
-                    <strong>Build cited answers</strong>
-                    <p>Save reproducible research runs.</p>
-                  </div>
-                </li>
-              </ol>
-            </div>
+        {active && view === "sources" && (
+          <details className="diagnostics">
+            <summary>Collection details</summary>
+            <p>
+              {active.visibility === "curated" ? "Curated" : "Private"}{" "}
+              collection
+            </p>
+            <p>
+              Snapshot:{" "}
+              <code>
+                {active.active_snapshot ??
+                  "Add sources to create a searchable snapshot"}
+              </code>
+            </p>
+            <p>
+              Sparse, dense and hybrid retrieval remain available in Ask → More
+              options.
+            </p>
+          </details>
+        )}
+        {active && view === "ask" && !active.active_snapshot && (
+          <section className="empty">
+            <h2>Add your first sources</h2>
+            <p>
+              Your collection is ready for documents. Processing makes them
+              searchable.
+            </p>
+            <Button variant="primary" onClick={() => setView("sources")}>
+              Add documents
+            </Button>
           </section>
+        )}
+        {active && view === "ask" && (
+          <div className="ask-modes" role="group" aria-label="Question mode">
+            <Button
+              aria-pressed={askMode === "answer"}
+              onClick={() => setAskMode("answer")}
+            >
+              Answer
+            </Button>
+            <Button
+              aria-pressed={askMode === "passages"}
+              onClick={() => setAskMode("passages")}
+            >
+              Find passages
+            </Button>
+          </div>
         )}
         {active && (
           <div hidden={view !== "sources"}>
@@ -422,7 +452,7 @@ function App() {
           </div>
         )}
         {active && (
-          <div hidden={view !== "search"}>
+          <div hidden={view !== "ask" || askMode !== "passages"}>
             <Search
               key={`search-${active.collection_id}`}
               collection={active}
@@ -438,15 +468,33 @@ function App() {
             </span>
             <h2>Start with a collection</h2>
             <p>
-              Give your research a home. Create a private collection, then add
-              your source documents.
+              Create a collection for your research, then add your documents.
             </p>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setNavigationOpen(true);
+                requestAnimationFrame(() =>
+                  document.getElementById("collection-title")?.focus(),
+                );
+              }}
+            >
+              Create collection
+            </Button>
           </section>
         ) : null}
         {active && (
-          <div hidden={view !== "answers"}>
+          <div
+            hidden={
+              view !== "saved" && (view !== "ask" || askMode !== "answer")
+            }
+          >
             <Research
               key={`research-${active.collection_id}`}
+              showHistory={view === "saved"}
+              linkedRun={
+                route.collection === active.collection_id ? route.run : ""
+              }
               collection={active}
               session={session}
               fail={fail}

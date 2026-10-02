@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Skeleton } from "./ui";
 import { api } from "./api";
 
 type Cell = {
@@ -185,7 +186,11 @@ export function AdvancedEvidence({
     };
   }, [path]);
   if (!value)
-    return <p role="status">{error || "Loading retained source region…"}</p>;
+    return error ? (
+      <p role="alert">{error}</p>
+    ) : (
+      <Skeleton label="Loading retained source region…" />
+    );
   const [x0, y0, x1, y1] = value.locator.display_box;
   const [width, height] = value.locator.display_size;
   return (
@@ -220,7 +225,7 @@ export function AdvancedEvidence({
             width={x1 - x0}
             height={y1 - y0}
             fill="none"
-            stroke="#b04416"
+            stroke="var(--brand)"
             strokeWidth="2"
           />
         </svg>

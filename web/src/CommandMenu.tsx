@@ -1,3 +1,4 @@
+import { Button, Input } from "./ui";
 import { useEffect, useId, useRef, useState } from "react";
 import { Command, Search, X } from "lucide-react";
 
@@ -52,10 +53,10 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
   }, []);
   return (
     <>
-      <button className="command-trigger" onClick={open}>
+      <Button className="command-trigger" onClick={open}>
         <Command size={16} />
         Quick actions<kbd>Ctrl / ⌘ K</kbd>
-      </button>
+      </Button>
       <dialog
         ref={dialog}
         className="command-dialog"
@@ -68,16 +69,16 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
         <div className="command-body">
           <div className="command-heading">
             <h2 id="command-title">Find your next action</h2>
-            <button
+            <Button
               aria-label="Close quick actions"
               onClick={() => dialog.current?.close()}
             >
               <X size={18} />
-            </button>
+            </Button>
           </div>
           <label className="command-input">
             <Search size={18} />
-            <input
+            <Input
               autoFocus
               ref={input}
               role="combobox"
@@ -127,7 +128,7 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
             aria-label="Matching actions"
           >
             {matches.map((action, index) => (
-              <button
+              <Button
                 key={action.id}
                 id={`${listId}-${index}`}
                 role="option"
@@ -146,7 +147,7 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
                   <small>{action.detail}</small>
                 </span>
                 <span aria-hidden="true">↵</span>
-              </button>
+              </Button>
             ))}
           </div>
           {!matches.length && (

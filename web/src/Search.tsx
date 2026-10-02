@@ -1,13 +1,10 @@
+import { SearchRankings, labels } from "./SearchRankings";
+import { EvidencePanel } from "./EvidencePanel";
+import { useDraft } from "./drafts";
+import { Button, Input, Select, Textarea, More, Skeleton } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { AdvancedEvidence } from "./AdvancedEvidence";
-import {
-  BookmarkPlus,
-  BookmarkCheck,
-  SlidersHorizontal,
-  History,
-  Search as SearchIcon,
-  X,
-} from "lucide-react";
+import { SlidersHorizontal, History, Search as SearchIcon } from "lucide-react";
 import { EvidenceTray, passageKey, type SavedPassage } from "./EvidenceTray";
 import {
   api,
@@ -17,11 +14,6 @@ import {
   type Session,
 } from "./api";
 
-const labels: Record<string, string> = {
-  sparse: "Sparse · BM25",
-  dense: "Dense · Cosine",
-  hybrid: "Hybrid · RRF",
-};
 export function Search({
   collection,
   session,
@@ -31,9 +23,13 @@ export function Search({
   session: Session;
   fail: (error: unknown) => void;
 }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery, draftSaved] = useDraft(
+    session.principal_id,
+    collection.collection_id,
+    "question",
+  );
   const [mode, setMode] = useState("free_text");
-  const [retrieval, setRetrieval] = useState("compare");
+  const [retrieval, setRetrieval] = useState("hybrid");
   const [result, setResult] = useState<SearchResult | null>(null);
   const [selected, setSelected] = useState<Hit | null>(null);
   const [busy, setBusy] = useState(false);
@@ -42,13 +38,25 @@ export function Search({
   const [filter, setFilter] = useState("");
   const [method, setMethod] = useState("all");
   const [shortlist, setShortlist] = useState<SavedPassage[]>([]);
+  const [removed, setRemoved] = useState<{
+    item: SavedPassage;
+    index: number;
+  } | null>(null);
+  function removePassage(key: string) {
+    const index = shortlist.findIndex((item) => passageKey(item) === key);
+    if (index < 0) return;
+    setRemoved({ item: shortlist[index], index });
+    setShortlist((current) =>
+      current.filter((item) => passageKey(item) !== key),
+    );
+    setNotice("Passage removed from the shortlist.");
+  }
   const [notice, setNotice] = useState("");
   const [recent, setRecent] = useState<
     { query: string; mode: string; retrieval: string }[]
   >([]);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const request = useRef<AbortController | null>(null);
-  const inspector = useRef<HTMLElement>(null);
   useEffect(
     () => () => {
       request.current?.abort();
@@ -104,7 +112,6 @@ export function Search({
     trigger.current = button;
     setSelected(hit);
     setSourceError("");
-    setTimeout(() => inspector.current?.focus(), 0);
   }
   function closeInspector() {
     setSelected(null);
@@ -123,10 +130,7 @@ export function Search({
         .map(([name]) => name),
     };
     if (shortlist.some((saved) => passageKey(saved) === passageKey(item))) {
-      setShortlist((current) =>
-        current.filter((saved) => passageKey(saved) !== passageKey(item)),
-      );
-      setNotice("Passage removed from the shortlist.");
+      removePassage(passageKey(item));
     } else if (shortlist.length < 6) {
       setShortlist((current) => [...current, item]);
       setNotice("Passage added to the evidence shortlist.");
@@ -154,7 +158,7 @@ export function Search({
       </div>
       <form className="search-form" onSubmit={submit}>
         <label htmlFor="question">Research question</label>
-        <textarea
+        <Textarea
           id="question"
           rows={2}
           maxLength={4096}
@@ -174,45 +178,54 @@ export function Search({
           }}
           placeholder="How does dense retrieval compare with lexical matching?"
         />
+        <p className="muted">
+          {draftSaved
+            ? "Draft saved on this device for 7 days. Cleared on sign out."
+            : "Device storage is unavailable. Keep this tab open to retain your draft."}
+        </p>
         <div className="search-controls">
-          <label htmlFor="parser">Query syntax</label>
-          <select
-            id="parser"
-            value={mode}
-            onChange={(event) => {
-              setMode(event.target.value);
-              if (event.target.value === "structured") setRetrieval("sparse");
-            }}
-          >
-            <option value="free_text">Natural language</option>
-            <option value="structured">Boolean / phrase</option>
-          </select>
-          <label htmlFor="retrieval">Retrieval method</label>
-          <select
-            id="retrieval"
-            value={retrieval}
-            onChange={(event) => setRetrieval(event.target.value)}
-          >
-            <option value="compare" disabled={mode === "structured"}>
-              Compare all three
-            </option>
-            <option value="sparse">Sparse</option>
-            <option value="dense" disabled={mode === "structured"}>
-              Dense
-            </option>
-            <option value="hybrid" disabled={mode === "structured"}>
-              Hybrid
-            </option>
-          </select>
-          <button
+          <More label="Evaluate retrieval">
+            <label htmlFor="parser">Query syntax</label>
+            <Select
+              id="parser"
+              value={mode}
+              onChange={(event) => {
+                setMode(event.target.value);
+                if (event.target.value === "structured") setRetrieval("sparse");
+              }}
+            >
+              <option value="free_text">Natural language</option>
+              <option value="structured">Boolean / phrase</option>
+            </Select>
+            <label htmlFor="retrieval">Retrieval method</label>
+            <Select
+              id="retrieval"
+              value={retrieval}
+              onChange={(event) => setRetrieval(event.target.value)}
+            >
+              <option value="compare" disabled={mode === "structured"}>
+                Compare all three
+              </option>
+              <option value="sparse">Sparse</option>
+              <option value="dense" disabled={mode === "structured"}>
+                Dense
+              </option>
+              <option value="hybrid" disabled={mode === "structured"}>
+                Hybrid
+              </option>
+            </Select>
+          </More>
+          <Button
             type="submit"
+            title="Search evidence (Ctrl or Command + Enter)"
+            aria-keyshortcuts="Control+Enter Meta+Enter"
             className="primary"
             disabled={busy || !collection.active_snapshot}
           >
             {busy ? "Searching…" : "Search evidence →"}
-          </button>
+          </Button>
           {busy && (
-            <button
+            <Button
               type="button"
               onClick={() => {
                 request.current?.abort();
@@ -223,7 +236,7 @@ export function Search({
               }}
             >
               Cancel search
-            </button>
+            </Button>
           )}
         </div>
         {!collection.active_snapshot && (
@@ -240,7 +253,7 @@ export function Search({
           </summary>
           <div>
             {recent.map((item, index) => (
-              <button
+              <Button
                 key={`${item.query}-${index}`}
                 onClick={() => {
                   setQuery(item.query);
@@ -255,7 +268,7 @@ export function Search({
                     ? "Compare all methods"
                     : labels[item.retrieval]}
                 </small>
-              </button>
+              </Button>
             ))}
           </div>
         </details>
@@ -263,15 +276,38 @@ export function Search({
       <EvidenceTray
         items={shortlist}
         collectionId={collection.collection_id}
-        remove={(key) =>
-          setShortlist((current) =>
-            current.filter((item) => passageKey(item) !== key),
-          )
-        }
+        remove={removePassage}
       />
       <p role="status" className="interaction-notice">
         {notice}
+        {removed && (
+          <Button
+            type="button"
+            disabled={
+              shortlist.length >= 6 ||
+              shortlist.some(
+                (item) => passageKey(item) === passageKey(removed.item),
+              )
+            }
+            onClick={() => {
+              setShortlist((current) => {
+                const next = [...current];
+                next.splice(
+                  Math.min(removed.index, next.length),
+                  0,
+                  removed.item,
+                );
+                return next;
+              });
+              setRemoved(null);
+              setNotice("Passage restored to the shortlist.");
+            }}
+          >
+            Undo remove passage
+          </Button>
+        )}
       </p>
+      {busy && <Skeleton label="Finding evidence in your collection…" />}
       <p role="status" aria-live="polite">
         {busy
           ? "Searching one pinned snapshot…"
@@ -296,19 +332,19 @@ export function Search({
               <br />
               Returned from one pinned snapshot.
             </p>
-            <button
+            <Button
               type="button"
               aria-pressed={compact}
               onClick={() => setCompact((value) => !value)}
             >
               {compact ? "Show full excerpts" : "Compact results"}
-            </button>
+            </Button>
           </div>
           <div className="evidence-controls">
             <SlidersHorizontal size={18} aria-hidden="true" />
             <label>
               Filter returned passages
-              <input
+              <Input
                 type="search"
                 value={filter}
                 placeholder="Find a title or phrase…"
@@ -317,7 +353,7 @@ export function Search({
             </label>
             <label>
               Show retrieval method
-              <select
+              <Select
                 value={method}
                 onChange={(event) => setMethod(event.target.value)}
               >
@@ -327,7 +363,7 @@ export function Search({
                     {labels[name] ?? name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <small>
               Filters refine these results without running another search.
@@ -360,126 +396,24 @@ export function Search({
               selected ? "evidence-layout inspecting" : "evidence-layout"
             }
           >
-            <div className={compact ? "rankings compact" : "rankings"}>
-              {Object.entries(result.results)
-                .filter(([name]) => method === "all" || name === method)
-                .map(([mode, value]) => (
-                  <section
-                    key={mode}
-                    className="ranking"
-                    aria-label={labels[mode]}
-                  >
-                    <h3>{labels[mode]}</h3>
-                    <small>
-                      {
-                        value.hits.filter((hit) =>
-                          `${hit.title} ${hit.text}`
-                            .toLowerCase()
-                            .includes(filter.toLowerCase()),
-                        ).length
-                      }{" "}
-                      shown / {value.hits.length} returned ·{" "}
-                      {value.total_matches} candidates
-                    </small>
-                    {!value.hits.some((hit) =>
-                      `${hit.title} ${hit.text}`
-                        .toLowerCase()
-                        .includes(filter.toLowerCase()),
-                    ) && (
-                      <p className="no-results">
-                        {filter
-                          ? "No returned passages match this filter. Clear it or try another phrase."
-                          : "No matching passages. Try a different question."}
-                      </p>
-                    )}
-                    <ol>
-                      {value.hits
-                        .filter((hit) =>
-                          `${hit.title} ${hit.text}`
-                            .toLowerCase()
-                            .includes(filter.toLowerCase()),
-                        )
-                        .map((hit) => (
-                          <li key={hit.chunk_id} value={hit.rank}>
-                            <button
-                              className={
-                                selected?.chunk_id === hit.chunk_id
-                                  ? "hit active"
-                                  : "hit"
-                              }
-                              onClick={(event) =>
-                                inspect(hit, event.currentTarget)
-                              }
-                            >
-                              <span className="hit-title">{hit.title}</span>
-                              <span className="excerpt">{hit.text}</span>
-                              <small>
-                                {hit.page_range
-                                  ? `Page ${hit.page_range[0]}`
-                                  : "Page unavailable"}{" "}
-                                ·{" "}
-                                {mode === "sparse"
-                                  ? `BM25 ${hit.bm25_score?.toFixed(3)}`
-                                  : mode === "dense"
-                                    ? `Cosine ${hit.cosine_score?.toFixed(3)}`
-                                    : `RRF ${hit.rrf_score?.toFixed(5)}`}
-                              </small>
-                            </button>
-                            <button
-                              className="shortlist-action"
-                              aria-pressed={shortlist.some(
-                                (item) =>
-                                  item.snapshot_id === result.snapshot_id &&
-                                  item.hit.chunk_id === hit.chunk_id,
-                              )}
-                              onClick={() => save(hit)}
-                            >
-                              {shortlist.some(
-                                (item) =>
-                                  item.snapshot_id === result.snapshot_id &&
-                                  item.hit.chunk_id === hit.chunk_id,
-                              ) ? (
-                                <BookmarkCheck size={15} aria-hidden="true" />
-                              ) : (
-                                <BookmarkPlus size={15} aria-hidden="true" />
-                              )}{" "}
-                              Shortlist passage
-                            </button>
-                          </li>
-                        ))}
-                    </ol>
-                  </section>
-                ))}
-            </div>
+            <SearchRankings
+              result={result}
+              compact={compact}
+              method={method}
+              filter={filter}
+              selected={selected}
+              shortlist={shortlist}
+              inspect={inspect}
+              save={save}
+            />
             {selected && (
-              <aside
-                ref={inspector}
-                tabIndex={-1}
-                className="inspector"
-                aria-label="Evidence inspector"
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    event.stopPropagation();
-                    closeInspector();
-                  }
-                }}
+              <EvidencePanel
+                title={selected.title}
+                text={selected.text}
+                pages={selected.page_range}
+                snapshot={result.snapshot_id}
+                onClose={closeInspector}
               >
-                <div className="inspector-heading">
-                  <h3>Evidence inspector</h3>
-                  <button
-                    aria-label="Close evidence inspector"
-                    onClick={closeInspector}
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-                <h2>{selected.title}</h2>
-                <p className="eyebrow">
-                  PAPER EVIDENCE
-                  {selected.page_range && ` · PAGE ${selected.page_range[0]}`}
-                </p>
-                <blockquote>{selected.text}</blockquote>
-                <small>Chunk {selected.chunk_id}</small>
                 {selected.evidence_object_id ? (
                   <AdvancedEvidence
                     key={selected.chunk_id}
@@ -518,7 +452,7 @@ export function Search({
                     pinned extracted passage is shown above.
                   </p>
                 )}
-              </aside>
+              </EvidencePanel>
             )}
           </div>
         </>

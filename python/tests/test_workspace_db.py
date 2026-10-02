@@ -91,6 +91,16 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         )
         with self.registry.connect() as db, self.assertRaises(PermissionError):
             self.registry.authorize(db, self.a, collection)
+        restore_url = f"/api/v1/collections/{collection}/restore"
+        self.user(self.b)
+        self.assertEqual(self.client.post(restore_url, headers=self.headers).status_code, 404)
+        self.user(self.a)
+        for _ in range(2):
+            restored = self.client.post(restore_url, headers=self.headers)
+            self.assertEqual(restored.status_code, 200, restored.text)
+            self.assertTrue(restored.json()["can_manage"])
+        with self.registry.connect() as db:
+            self.registry.authorize(db, self.a, collection)
 
     def test_session_expiry_and_no_resurrection(self):
         token = self.tokens[self.a]
@@ -223,6 +233,21 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(response.status_code, 202, response.text)
         first = response.json()
         self.assertEqual(first["snapshot_id"], pinned)
+        rewrite_url = f"/api/v1/runs/{first['run_id']}/rewrite"
+        preview = self.client.post(rewrite_url, json={"question": "And why?"}, headers=self.headers)
+        self.assertEqual(preview.status_code, 200, preview.text)
+        self.assertEqual(
+            preview.json()["effective_query"],
+            "Previous question: What works?\nFollow-up question: And why?",
+        )
+        self.user(self.b)
+        self.assertEqual(
+            self.client.post(
+                rewrite_url, json={"question": "And why?"}, headers=self.headers
+            ).status_code,
+            404,
+        )
+        self.user(self.a)
         self.assertEqual(
             self.client.post(path, json=payload, headers=headers).json()["run_id"], first["run_id"]
         )
@@ -240,11 +265,38 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.assertEqual(replay.status_code, 202, replay.text)
         self.assertNotEqual(first["run_id"], replay.json()["run_id"])
         self.assertEqual(len(self.client.get(path).json()), 2)
+        saved = f"/api/v1/collections/{collection}/runs"
+        first_page = self.client.get(saved, params={"q": "works", "limit": 1}).json()
+        self.assertEqual(len(first_page["items"]), 1)
+        self.assertNotIn("result", first_page["items"][0])
+        second_page = self.client.get(
+            saved, params={"q": "works", "limit": 1, "before": first_page["next_cursor"]}
+        ).json()
+        self.assertEqual(len(second_page["items"]), 1)
+        self.assertIsNone(second_page["next_cursor"])
+        self.assertNotEqual(first_page["items"][0]["run_id"], second_page["items"][0]["run_id"])
+        self.assertEqual(self.client.get(saved, params={"q": "%"}).json()["items"], [])
+        self.assertEqual(self.client.get(saved, params={"limit": 101}).status_code, 422)
         from retrievec.app.run_state import RunState
 
         state = RunState(self.registry)
         claimed = state.claim()
         self.assertEqual(str(claimed["run_id"]), first["run_id"])
+        self.assertFalse(state.progress(claimed, "evidence_ready", {"evidence": []}))
+        self.assertTrue(state.transition(claimed, "generating"))
+        with self.registry.connect() as db:
+            stage_time = db.execute(
+                "SELECT stage_started_at FROM research_runs WHERE run_id=%s", (claimed["run_id"],)
+            ).fetchone()["stage_started_at"]
+        self.assertTrue(state.progress(claimed, "evidence_ready", {"evidence": []}))
+        with self.registry.connect() as db:
+            self.assertEqual(
+                db.execute(
+                    "SELECT stage_started_at FROM research_runs WHERE run_id=%s",
+                    (claimed["run_id"],),
+                ).fetchone()["stage_started_at"],
+                stage_time,
+            )
         replacement = {**manifest, "corpus_snapshot_id": "ss_" + "b" * 64}
         next_snapshot = self.registry.register(self.a, replacement)
         next_folder = self.app.state.settings.store / "snapshots" / next_snapshot
@@ -265,8 +317,10 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.client.post(f"/api/v1/runs/{first['run_id']}/cancel", headers=self.headers)
         self.assertFalse(state.transition(claimed, "generating"))
         self.assertFalse(state.heartbeat(claimed))
+        self.assertFalse(state.progress(claimed, "evidence_ready", {"evidence": []}))
         self.user(self.b)
         self.assertEqual(self.client.get(path).status_code, 404)
+        self.assertEqual(self.client.get(saved).status_code, 404)
         self.assertEqual(self.client.get("/api/v1/runs/" + first["run_id"]).status_code, 404)
         self.assertEqual(self.client.get(f"/api/v1/runs/{first['run_id']}/events").status_code, 404)
         self.user(self.a)
@@ -280,6 +334,14 @@ class WorkspaceDatabaseTests(unittest.TestCase):
             "cloud", "https://example.invalid", "fixture", "test-only", cloud=True
         )
         self.app.state.providers["cloud"] = cloud
+        self.assertEqual(
+            self.client.post(
+                rewrite_url,
+                json={"question": "And why?", "provider": "cloud"},
+                headers=self.headers,
+            ).status_code,
+            403,
+        )
         cloud_payload = {**payload, "provider": "cloud"}
         cloud_headers = {**self.headers, "Idempotency-Key": "cloud"}
         self.assertEqual(
@@ -403,3 +465,10 @@ class WorkspaceDatabaseTests(unittest.TestCase):
                 "SELECT state FROM ingestion_jobs WHERE job_id=%s", (job_id,)
             ).fetchone()
             self.assertEqual(row["state"], "cancelled")
+        self.assertEqual(
+            self.client.post(
+                f"/api/v1/collections/{collection}/restore", headers=self.headers
+            ).status_code,
+            200,
+        )
+        self.assertEqual(self.client.get("/api/v1/jobs/" + job_id).json()["state"], "cancelled")
