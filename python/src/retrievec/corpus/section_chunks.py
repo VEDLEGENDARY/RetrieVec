@@ -25,7 +25,7 @@ def sections(text: str, current: str = "") -> tuple[list[tuple[str, str]], str]:
             current = candidate.lstrip("# ").strip()
         else:
             body.append(line)
-    if body:
+    if body and "".join(body).strip():
         parts.append((current, "".join(body)))
     elif not parts and saw_heading:
         # A title-only record still needs an indexable passage.
