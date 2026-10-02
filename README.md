@@ -392,8 +392,11 @@ The deployment creates three PVCs, resource budgets, a nonroot/read-only workspa
 startup/readiness/liveness probes, and default-deny network policies. HTTPS egress
 is allowed for the configured identity provider and model downloads; tighten it
 with your CNI's domain policy or preloaded models where required. No RPC port is
-exposed. Back up both PostgreSQL and artifact storage before upgrades. Local-path
-volumes stay on their node; replacing that node requires a restore.
+exposed. PostgreSQL requests half a CPU and has no CPU limit, allowing it to use
+spare node capacity during query bursts; benchmark your workload before changing
+the request or memory limit. Back up both PostgreSQL and artifact storage before
+upgrades. Local-path volumes stay on their node; replacing that node requires a
+restore.
 
 For HTTPS, install a maintained Gateway API controller and TLS certificate separately.
 Create a Gateway named `retrievec` in `gateway-system` with an `https` listener,
