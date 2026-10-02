@@ -20,7 +20,8 @@ def tables(report):
         "| Dataset | Pipeline | nDCG@10 | Recall@100 | MRR@10 | p50 ms | p95 ms |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
     ]
-    for name, dataset in report["datasets"].items():
+    for name in ("scifact", "scidocs"):
+        dataset = report["datasets"][name]
         for label, run in dataset["runs"].items():
             if run["failures"] or len(run["per_query"]) != dataset["query_count"]:
                 raise ValueError("incomplete query accounting")
@@ -56,10 +57,11 @@ def main():
         "This does not evaluate PDF extraction, answers, private-scope isolation, or concurrency."
     )
     section = (
-        f"{START}\n## Measured retrieval results\n\n{table}\n\n"
+        f"{START}\n\n## Measured retrieval results\n\n{table}\n\n"
         f"Source: [{relative}]({relative}). [Protocol and limitations](BENCHMARKS.md).\n\n"
-        f"{limitations}\n\nReproduce after installing the documented dependencies and building "
-        f"the engine:\n\n```sh\n{command}\n```\n{END}"
+        f"{limitations}\n\nAfter [native setup](#native-setup), replace `python` below with "
+        f"`.\\.venv\\Scripts\\python.exe` on Windows or `.venv/bin/python` on Linux:\n\n"
+        f"```sh\n{command}\n```\n{END}"
     )
     readme_path = ROOT / "README.md"
     readme = readme_path.read_text(encoding="utf-8")
@@ -70,12 +72,54 @@ def main():
     else:
         title, remainder = readme.split("\n", 1)
         readme = title + "\n\n" + section + "\n" + remainder
+    effects = {}
+    for name in ("scifact", "scidocs"):
+        effects[name] = report["datasets"][name]["paired_bootstrap"][
+            "default_hybrid_vs_tuned_hybrid"
+        ]["metrics"]["ndcg"]
+    selected = report["selection"]["selected"]
+    findings = [
+        "## Decision",
+        "",
+        "The SciFact development split selected hybrid "
+        f"`k1={selected['hybrid']['k1']}`, `b={selected['hybrid']['b']}`, "
+        f"`rrf_k={selected['hybrid']['rrf_k']}`. Sparse selection retained "
+        f"`k1={selected['sparse']['k1']}`, `b={selected['sparse']['b']}`.",
+        "",
+    ]
+    for name in ("scifact", "scidocs"):
+        effect = effects[name]
+        low, high = effect["percentile_interval_95"]
+        findings.append(
+            f"Tuned minus unchanged hybrid nDCG@10 on {name}: "
+            f"{effect['mean_delta_right_minus_left']:+.4f} "
+            f"(paired 95% interval [{low:+.4f}, {high:+.4f}]; "
+            f"{effect['paired_count']} queries)."
+        )
+    findings.append("")
+    if (
+        effects["scifact"]["percentile_interval_95"][0] > 0
+        and effects["scidocs"]["percentile_interval_95"][1] < 0
+    ):
+        findings.append(
+            "The transfer reverses direction across the two tasks. Reject the SciFact-tuned "
+            "hybrid configuration as a global default. Keep product defaults unchanged; "
+            "consider a scope-specific change only after representative application-corpus "
+            "evaluation and owner review."
+        )
+    else:
+        findings.append(
+            "The two tasks do not establish a consistent quality gain. Keep product defaults "
+            "unchanged pending representative application-corpus evaluation and owner review."
+        )
     detail = [
         "# BEIR retrieval benchmark",
         "",
         f"Measured source: [{relative}]({relative}).",
         "",
         table,
+        "",
+        *findings,
         "",
         "## Protocol",
         "",
@@ -86,6 +130,10 @@ def main():
         "hybrid select their configurations independently by development nDCG@10. "
         "The JSON retains query IDs, per-query rankings, failures, corpus and input hashes, "
         "model/tokenizer revision and hashes, source hashes, and paired confidence intervals.",
+        "SciFact development and test questions search the same SciFact corpus. "
+        "Query-ID overlap is rejected, but paraphrase-level leakage and near-duplicate "
+        "paper versions were not audited; "
+        "these results do not establish broader-domain generalization.",
         "",
         "## Build measurements",
         "",
@@ -93,7 +141,8 @@ def main():
         "Sparse segment build ms | Warm embedding cache |",
         "| --- | ---: | ---: | ---: | ---: | ---: | --- |",
     ]
-    for name, dataset in report["datasets"].items():
+    for name in ("scifact", "scidocs"):
+        dataset = report["datasets"][name]
         p = dataset["prepared"]
         detail.append(
             f"| {name} | {p['papers']} | {p['chunks']} | {p['import_ms']:.2f} | "
@@ -120,7 +169,8 @@ def main():
             "| --- | --- | --- | ---: | --- | ---: |",
         ]
     )
-    for name, dataset in report["datasets"].items():
+    for name in ("scifact", "scidocs"):
+        dataset = report["datasets"][name]
         for comparison, paired in dataset["paired_bootstrap"].items():
             for metric in ("ndcg", "mrr", "recall"):
                 item = paired["metrics"][metric]
@@ -148,6 +198,9 @@ def main():
             "",
             "## Reproduce",
             "",
+            "Complete the README native setup first. Replace `python` with "
+            "`.\\.venv\\Scripts\\python.exe` on Windows or `.venv/bin/python` on Linux.",
+            "",
             "```sh",
             command,
             "```",
@@ -158,6 +211,16 @@ def main():
             "Windows users can pre-download the official archives with `Invoke-WebRequest` into "
             "`artifacts/beir/downloads/` if Python cannot validate the host certificate chain; "
             "do not disable TLS verification. The runner still verifies the published checksums.",
+            "",
+            "```powershell",
+            "New-Item -ItemType Directory -Force artifacts/beir/downloads | Out-Null",
+            "Invoke-WebRequest -Uri "
+            "'https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets/scifact.zip' "
+            "-OutFile artifacts/beir/downloads/scifact.zip",
+            "Invoke-WebRequest -Uri "
+            "'https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets/scidocs.zip' "
+            "-OutFile artifacts/beir/downloads/scidocs.zip",
+            "```",
             "",
             "CI runs a deliberately small real-model subset as a pipeline regression only. "
             "It is never evidence of MiniLM quality or full-corpus speed.",

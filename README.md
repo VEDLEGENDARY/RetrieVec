@@ -1,5 +1,37 @@
 # RetrieVec
 
+<!-- BEIR RESULTS START -->
+
+## Measured retrieval results
+
+| Dataset | Pipeline | nDCG@10 | Recall@100 | MRR@10 | p50 ms | p95 ms |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| scifact | default dense | 0.6735 | 0.9283 | 0.6337 | 265.59 | 293.07 |
+| scifact | default hybrid | 0.6670 | 0.9487 | 0.6299 | 375.84 | 485.07 |
+| scifact | default sparse | 0.5880 | 0.8489 | 0.5514 | 107.00 | 207.89 |
+| scifact | tuned hybrid | 0.6847 | 0.9487 | 0.6456 | 369.92 | 465.03 |
+| scifact | tuned sparse | 0.5880 | 0.8489 | 0.5514 | 110.71 | 216.22 |
+| scidocs | default dense | 0.2128 | 0.4313 | 0.3553 | 983.72 | 1187.32 |
+| scidocs | default hybrid | 0.1928 | 0.3997 | 0.3326 | 1190.16 | 1817.72 |
+| scidocs | default sparse | 0.1389 | 0.2967 | 0.2506 | 263.33 | 706.41 |
+| scidocs | tuned hybrid | 0.1866 | 0.3977 | 0.3216 | 1198.68 | 1818.79 |
+| scidocs | tuned sparse | 0.1389 | 0.2967 | 0.2506 | 263.64 | 701.95 |
+
+Source: [docs/results/benchmark-2026-10-01.json](docs/results/benchmark-2026-10-01.json). [Protocol and limitations](BENCHMARKS.md).
+
+These are paper-level rankings collapsed from the production top-100 chunk pool, so fewer than 100 papers can be returned. Latency covers warm local retrieval and query embedding, excluding HTTP, authentication and database work. SCIDOCS uses SciFact-selected parameters because it has no training split; no model was trained. The opt-in lossless wordpiece refinement is recorded in snapshot provenance. This does not evaluate PDF extraction, answers, private-scope isolation, or concurrency.
+
+After [native setup](#native-setup), replace `python` below with `.\.venv\Scripts\python.exe` on Windows or `.venv/bin/python` on Linux:
+
+```sh
+python scripts/benchmark_beir.py --phase preflight
+python scripts/benchmark_beir.py --phase prepare
+python scripts/benchmark_beir.py --phase tune
+python scripts/benchmark_beir.py --phase evaluate --output docs/results/benchmark-2026-10-01.json
+python scripts/render_beir_report.py docs/results/benchmark-2026-10-01.json
+```
+<!-- BEIR RESULTS END -->
+
 > A private research workspace for turning local papers into searchable, citable evidence.
 
 [![Go](https://img.shields.io/badge/Go-1.26-00ADD8?logo=go)](https://go.dev/)
