@@ -12,6 +12,7 @@ dependencies = ["pypdf==6.18.1", "psycopg[binary]==3.3.5", "grpcio==1.84.0", "gr
 [project.optional-dependencies]
 telemetry = ["opentelemetry-sdk==1.45.0", "opentelemetry-exporter-otlp-proto-http==1.45.0"]
 extraction = ["pydantic==2.13.5"]
+layout = ["docling==2.129.0"]
 app = ["fastapi==0.141.1", "uvicorn==0.53.0", "authlib==1.8.0", "httpx==0.28.1", "python-multipart==0.0.32"]
 
 [tool.setuptools.package-data]
@@ -20,6 +21,7 @@ app = ["fastapi==0.141.1", "uvicorn==0.53.0", "authlib==1.8.0", "httpx==0.28.1",
 [project.scripts]
 retrievec = "retrievec.cli:main"
 retrievec-api = "retrievec.app.main:main"
+retrievec-docling-adapter = "retrievec.extraction.docling_adapter:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
