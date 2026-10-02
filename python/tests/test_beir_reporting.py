@@ -1,4 +1,5 @@
 import runpy
+import json
 import unittest
 from pathlib import Path
 
@@ -8,6 +9,15 @@ TABLES = runpy.run_path(str(Path(__file__).resolve().parents[2] / "scripts/rende
 
 
 class BeirReportingTests(unittest.TestCase):
+    def test_published_tables_match_complete_json(self):
+        root = Path(__file__).resolve().parents[2]
+        report = json.loads((root / "docs/results/benchmark-2026-10-01.json").read_bytes())
+        expected = TABLES(report)
+        for path in (root / "README.md", root / "BENCHMARKS.md"):
+            published = path.read_text(encoding="utf-8")
+            self.assertIn(expected, published)
+            self.assertIn("differs from the product's default PDF upload chunking", published)
+
     def test_partial_and_subset_results_cannot_be_published_as_quality(self):
         for report in (
             {"complete": False},

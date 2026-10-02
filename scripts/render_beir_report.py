@@ -53,7 +53,8 @@ def main():
         "so fewer than 100 papers can be returned. Latency covers warm local retrieval and "
         "query embedding, excluding HTTP, authentication and database work. SCIDOCS uses "
         "SciFact-selected parameters because it has no training split; no model was trained. "
-        "The opt-in lossless wordpiece refinement is recorded in snapshot provenance. "
+        "The benchmark's opt-in lossless wordpiece refinement differs from the product's "
+        "default PDF upload chunking and is recorded in snapshot provenance. "
         "This does not evaluate PDF extraction, answers, private-scope isolation, or concurrency."
     )
     section = (
