@@ -90,6 +90,8 @@ def validate_review(packet: dict, manifest_path: Path, snapshot_path: Path) -> N
     candidates = packet.get("candidates")
     if not isinstance(candidates, list) or not 50 <= len(candidates) <= 100:
         raise ValueError("PDF review requires 50-100 passage-linked questions")
+    if packet.get("question_count") != len(candidates):
+        raise ValueError("PDF review question count differs from reviewed candidates")
     if len({item["candidate_id"] for item in candidates}) != len(candidates):
         raise ValueError("duplicate PDF review candidate")
     for item in candidates:
@@ -103,6 +105,14 @@ def validate_review(packet: dict, manifest_path: Path, snapshot_path: Path) -> N
             or chunk["text"] != item["passage"]
             or chunk["page_range"] != item["page_range"]
             or paper["source_sha256"] != item["source_sha256"]
+            or paper["title"] != item["paper_title"]
+            or item["candidate_id"]
+            != "pq_"
+            + digest(
+                canonical(
+                    {"snapshot": snapshot["snapshot_id"], "chunk": chunk["chunk_id"]}
+                )
+            )
         ):
             raise ValueError("PDF review passage provenance differs")
         if not item["question"].strip() or not item["expected_answer"].strip():
