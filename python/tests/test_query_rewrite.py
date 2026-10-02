@@ -13,6 +13,14 @@ class RewriteTests(unittest.TestCase):
             rewrite_query("And dense retrieval?", parent),
             "Previous question: How does BM25 rank?\nFollow-up question: And dense retrieval?",
         )
+        self.assertEqual(
+            rewrite_query(
+                "What about their dataset?",
+                {"original_question": "Which dataset did the authors use?"},
+            ),
+            "Previous question: Which dataset did the authors use?\n"
+            "Follow-up question: What about their dataset?",
+        )
         self.assertEqual(rewrite_query("How does BM25 rank?", parent), "How does BM25 rank?")
         self.assertEqual(rewrite_query("New question", None), "New question")
         with self.assertRaises(ValueError):

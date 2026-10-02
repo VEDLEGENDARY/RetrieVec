@@ -218,6 +218,19 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await expect(
     page.getByText("UNVERIFIED_SENTINEL", { exact: false }),
   ).toHaveCount(0);
+  const invalidEvents = await page.evaluate(async (collectionId) => {
+    const listing = await (
+      await fetch(`/api/v1/collections/${collectionId}/runs`)
+    ).json();
+    const failed = listing.items.find(
+      (item: { original_question: string }) =>
+        item.original_question === "invalid-answer retrieval",
+    );
+    return (await fetch(`/api/v1/runs/${failed.run_id}/events`)).text();
+  }, saved.run.collection_id);
+  expect(invalidEvents).toContain("event: evidence_ready");
+  expect(invalidEvents).toContain("event: failed");
+  expect(invalidEvents).not.toContain("UNVERIFIED_SENTINEL");
   await expect(
     page.getByRole("button", { name: /Inspect citation/ }),
   ).toHaveCount(0);
