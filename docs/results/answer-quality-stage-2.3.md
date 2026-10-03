@@ -52,6 +52,40 @@ millisecond is negative. Preserve the unchanged hybrid reference and the opt-in
 adapter for further study. This decision covers SciFact paper ranking, not answer
 faithfulness or the pending reviewed PDF question set.
 
+### Reranker diagnosis and opt-in blend
+
+The tested model was `cross-encoder/ms-marco-MiniLM-L6-v2` at the pinned revision
+above. Its maximum sequence length was 512 tokens, including query, passage and
+special tokens. Across all 30,000 candidate occurrences, the longest pair had
+206 tokens: **no candidate text was truncated**. The adapter passed `(query,
+chunk.text)`; it did **not** concatenate the paper title with every chunk. A full
+title happened to occur in 3,496 chunk texts (11.65%), so title coverage was
+inconsistent. Missing title context is a possible explanation, not a tested cause.
+
+One fixed blend was evaluated on the same 300 queries and top-50 candidate pools:
+`0.5 * minmax(hybrid_rrf_score) + 0.5 * minmax(reranker_logit)`, normalizing each
+score vector within its query pool (constant vectors map to zero). Ties use
+ascending chunk ID; paper IDs are then deduplicated and the query paper excluded.
+Actual hybrid scores were recovered by replaying the pinned retrieval pipeline;
+all 300 candidate orders matched the saved pools exactly. No blend-weight search
+was performed.
+
+| Top-50 ranking | nDCG@10 | MRR@10 |
+| --- | ---: | ---: |
+| Plain hybrid | 0.6847 | 0.6456 |
+| Reranker replaces hybrid order | 0.6694 | 0.6300 |
+| Equal-weight score blend | 0.7016 | 0.6639 |
+
+The blend improved nDCG@10 by **+0.01694 versus plain hybrid**, with a paired 95%
+bootstrap interval **[+0.00004, +0.03474]**, and by +0.03219 versus replacement
+([+0.01270, +0.05243]); 5,000 resamples, seed 1729, 300 pairs, zero exclusions.
+This is recorded as the new **opt-in experimental variant
+`hybrid-minilm-minmax-blend-50`**. This is a post-hoc result on an already-inspected
+test set, with a lower interval endpoint very close to zero; fresh held-out
+validation is needed. It still requires cross-encoder inference; blend latency
+was not independently measured. This report records an offline variant, not a
+new runtime switch. **No default or runtime ranking behavior changed.**
+
 Reproduce with an already prepared `artifacts/beir` benchmark and the pinned
 model files cached locally:
 

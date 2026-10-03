@@ -329,6 +329,75 @@
           "interpretation": "Query-paired descriptive bootstrap; failed, missing and undefined queries are counted separately, never silently scored as success. Small or repeatedly inspected sets do not establish general superiority. Draft labels are not human review."
         }
       }
+    },
+    "diagnosis": {
+      "model": "cross-encoder/ms-marco-MiniLM-L6-v2",
+      "max_sequence_tokens": 512,
+      "max_observed_pair_tokens": 206,
+      "candidate_occurrences": 30000,
+      "truncated_candidate_count": 0,
+      "inputs": "query and chunk.text; no separate title concatenation",
+      "full_title_present_in_chunk_text_count": 3496,
+      "title_context_interpretation": "Possible cause only; no title ablation was run.",
+      "opt_in_variant": {
+        "name": "hybrid-minilm-minmax-blend-50",
+        "enabled_by_default": false,
+        "candidate_limit": 50,
+        "formula": "0.5 * per-query minmax(hybrid RRF score) + 0.5 * per-query minmax(cross-encoder logit)",
+        "constant_score_policy": "normalize a constant score vector to zero",
+        "tie_break": "chunk_id ascending; then deduplicate paper_id, excluding query_id",
+        "selection": "One fixed equal-weight blend; no weight search. Post-hoc diagnostic on already inspected test set.",
+        "query_count": 300,
+        "metrics": {
+          "hybrid": {
+            "ndcg": 0.6846998003117114,
+            "mrr": 0.6455515873015873,
+            "recall": 0.9213333333333332,
+            "coverage": 0.034074813220268556
+          },
+          "replacement": {
+            "ndcg": 0.6694459045208496,
+            "mrr": 0.629989417989418,
+            "recall": 0.9213333333333332,
+            "coverage": 0.034074813220268556
+          },
+          "blend": {
+            "ndcg": 0.7016367110571051,
+            "mrr": 0.6639497354497355,
+            "recall": 0.9213333333333332,
+            "coverage": 0.034074813220268556
+          }
+        },
+        "artifacts_sha256": {
+          "reranker-pools-full.json": "19ae3c13624adf9ec8e78891f7733f421c4faddedb403318d3b55f693b65f3c3",
+          "reranker-score-cache.json": "7c7de788f03f87b9a03e2094ed52d2d0f3cd39065bd7911f740a4f776371080c",
+          "hybrid-score-cache.json": "50bfbc9d3bce9f17ec93d7d6d631df7ac06258def55251b0a0bdc0c1a848466d"
+        },
+        "scope": "Offline report-only variant; no runtime switch or default change",
+        "latency": "Not independently measured; requires cross-encoder inference",
+        "bootstrap_samples": 5000,
+        "bootstrap_seed": 1729,
+        "ndcg_paired_vs_plain_hybrid": {
+          "paired_count": 300,
+          "excluded_count": 0,
+          "excluded_query_ids": [],
+          "mean_delta_right_minus_left": 0.016936910745393777,
+          "percentile_interval_95": [
+            4.3494992640270695e-05,
+            0.0347390984994544
+          ]
+        },
+        "ndcg_paired_vs_replacement": {
+          "paired_count": 300,
+          "excluded_count": 0,
+          "excluded_query_ids": [],
+          "mean_delta_right_minus_left": 0.03219080653625554,
+          "percentile_interval_95": [
+            0.012696076746863476,
+            0.05242522491131162
+          ]
+        }
+      }
     }
   },
   "generation": {
