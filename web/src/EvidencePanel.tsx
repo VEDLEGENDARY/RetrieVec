@@ -1,7 +1,6 @@
+import { Button, IconButton, Notice, Disclosure } from "./ui";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Copy, X } from "lucide-react";
-import { Button, Notice } from "./ui";
-
 /** Both passage search and cited answers use the same verification surface. */
 export function EvidencePanel({
   title,
@@ -49,9 +48,9 @@ export function EvidencePanel({
     >
       <div className="inspector-heading">
         <h3>Evidence</h3>
-        <Button aria-label="Close evidence inspector" onClick={onClose}>
+        <IconButton aria-label="Close evidence inspector" onClick={onClose}>
           <X size={20} aria-hidden="true" />
-        </Button>
+        </IconButton>
       </div>
       <h2>{title}</h2>
       <p className="muted">
@@ -63,12 +62,12 @@ export function EvidencePanel({
         Copy with citation
       </Button>
       {notice && <Notice>{notice}</Notice>}
-      <details>
+      <Disclosure>
         <summary>Evidence provenance</summary>
         <p>
           Snapshot <code>{snapshot}</code>
         </p>
-      </details>
+      </Disclosure>
       {children}
     </aside>
   );

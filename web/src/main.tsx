@@ -1,4 +1,14 @@
-import { Button, Input, Skeleton } from "./ui";
+import {
+  Button,
+  ActionLink,
+  IconButton,
+  Field,
+  Input,
+  Notice,
+  LoadingState,
+  Disclosure,
+  EmptyState,
+} from "./ui";
 import { useEffect, useState } from "react";
 import { recordTiming } from "./performance";
 import { createRoot } from "react-dom/client";
@@ -135,7 +145,7 @@ function App() {
   if (loading)
     return (
       <main className="welcome">
-        <Skeleton label="Opening your workspace…" />
+        <LoadingState label="Opening your workspace…" />
       </main>
     );
   if (!session)
@@ -157,14 +167,10 @@ function App() {
           A private workspace to collect papers, compare retrieval methods, and
           inspect the evidence behind every result.
         </p>
-        <a className="button primary" href="/auth/login">
+        <ActionLink variant="primary" href="/auth/login">
           Sign in to your workspace <ArrowUpRight size={17} />
-        </a>
-        {error && (
-          <p role="alert" className="error">
-            {error}
-          </p>
-        )}
+        </ActionLink>
+        {error && <Notice error>{error}</Notice>}
         <p className="muted">
           Private collections · Snapshot-pinned search · Original sources
         </p>
@@ -184,24 +190,23 @@ function App() {
             <BookOpenText size={18} />
           </span>{" "}
           RetrieVec
-          <Button
+          <IconButton
             className="mobile-close"
             aria-label="Close navigation"
             onClick={() => setNavigationOpen(false)}
           >
             <X size={18} />
-          </Button>
+          </IconButton>
         </div>
         <p className="eyebrow">Collections</p>
-        <label className="collection-filter">
-          Find a collection
+        <Field className="collection-filter" label="Find a collection">
           <Input
             type="search"
             value={collectionFilter}
             onChange={(event) => setCollectionFilter(event.target.value)}
             placeholder="Filter collections…"
           />
-        </label>
+        </Field>
         <nav aria-label="Collections">
           {collections
             .filter((item) =>
@@ -239,15 +244,16 @@ function App() {
             </p>
           )}
         <form onSubmit={create} className="new-collection">
-          <label htmlFor="collection-title">New collection</label>
-          <Input
-            id="collection-title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            maxLength={120}
-            required
-            placeholder="e.g. Retrieval methods"
-          />
+          <Field label="New collection">
+            <Input
+              id="collection-title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              maxLength={120}
+              required
+              placeholder="e.g. Retrieval methods"
+            />
+          </Field>
           <Button disabled={busy || !title.trim()} type="submit">
             <Plus size={16} /> Create collection
           </Button>
@@ -322,7 +328,7 @@ function App() {
         </div>
         <header>
           <div>
-            <Button
+            <IconButton
               className="mobile-menu"
               aria-label="Open navigation"
               aria-controls="workspace-navigation"
@@ -330,7 +336,7 @@ function App() {
               onClick={() => setNavigationOpen(true)}
             >
               <Menu size={19} />
-            </Button>
+            </IconButton>
             <p className="eyebrow">Research workspace</p>
             <h1>{active?.title ?? "A place for your next question"}</h1>
             {active && (
@@ -366,11 +372,7 @@ function App() {
             </Button>
           </div>
         )}
-        {error && (
-          <p role="alert" className="error">
-            {error}
-          </p>
-        )}
+        {error && <Notice error>{error}</Notice>}
         {active && (
           <nav className="view-tabs" aria-label="Workspace sections">
             {(
@@ -393,7 +395,7 @@ function App() {
           </nav>
         )}
         {active && view === "sources" && (
-          <details className="diagnostics">
+          <Disclosure className="diagnostics">
             <summary>Collection details</summary>
             <p>
               {active.visibility === "curated" ? "Curated" : "Private"}{" "}
@@ -410,19 +412,20 @@ function App() {
               Sparse, dense and hybrid retrieval remain available in Ask → More
               options.
             </p>
-          </details>
+          </Disclosure>
         )}
         {active && view === "ask" && !active.active_snapshot && (
-          <section className="empty">
-            <h2>Add your first sources</h2>
-            <p>
-              Your collection is ready for documents. Processing makes them
-              searchable.
-            </p>
-            <Button variant="primary" onClick={() => setView("sources")}>
-              Add documents
-            </Button>
-          </section>
+          <EmptyState
+            title="Add your first sources"
+            action={
+              <Button variant="primary" onClick={() => setView("sources")}>
+                Add documents
+              </Button>
+            }
+          >
+            Your collection is ready for documents. Processing makes them
+            searchable.
+          </EmptyState>
         )}
         {active && view === "ask" && (
           <div className="ask-modes" role="group" aria-label="Question mode">
@@ -462,26 +465,25 @@ function App() {
           </div>
         )}
         {!active ? (
-          <section className="empty">
-            <span className="empty-symbol">
-              <Sparkles size={30} />
-            </span>
-            <h2>Start with a collection</h2>
-            <p>
-              Create a collection for your research, then add your documents.
-            </p>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setNavigationOpen(true);
-                requestAnimationFrame(() =>
-                  document.getElementById("collection-title")?.focus(),
-                );
-              }}
-            >
-              Create collection
-            </Button>
-          </section>
+          <EmptyState
+            title="Start with a collection"
+            icon={<Sparkles size={30} />}
+            action={
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setNavigationOpen(true);
+                  requestAnimationFrame(() =>
+                    document.getElementById("collection-title")?.focus(),
+                  );
+                }}
+              >
+                Create collection
+              </Button>
+            }
+          >
+            Create a collection for your research, then add your documents.
+          </EmptyState>
         ) : null}
         {active && (
           <div

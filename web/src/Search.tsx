@@ -1,7 +1,17 @@
+import {
+  Button,
+  ActionLink,
+  Field,
+  Input,
+  Select,
+  Textarea,
+  LoadingState,
+  Disclosure,
+  More,
+} from "./ui";
 import { SearchRankings, labels } from "./SearchRankings";
 import { EvidencePanel } from "./EvidencePanel";
 import { useDraft } from "./drafts";
-import { Button, Input, Select, Textarea, More, Skeleton } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { AdvancedEvidence } from "./AdvancedEvidence";
 import { SlidersHorizontal, History, Search as SearchIcon } from "lucide-react";
@@ -157,27 +167,28 @@ export function Search({
         <SearchIcon size={28} aria-hidden="true" />
       </div>
       <form className="search-form" onSubmit={submit}>
-        <label htmlFor="question">Research question</label>
-        <Textarea
-          id="question"
-          rows={2}
-          maxLength={4096}
-          required
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          onKeyDown={(event) => {
-            if (
-              (event.ctrlKey || event.metaKey) &&
-              event.key === "Enter" &&
-              !busy &&
-              collection.active_snapshot
-            ) {
-              event.preventDefault();
-              event.currentTarget.form?.requestSubmit();
-            }
-          }}
-          placeholder="How does dense retrieval compare with lexical matching?"
-        />
+        <Field label="Research question">
+          <Textarea
+            id="question"
+            rows={2}
+            maxLength={4096}
+            required
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (
+                (event.ctrlKey || event.metaKey) &&
+                event.key === "Enter" &&
+                !busy &&
+                collection.active_snapshot
+              ) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
+            placeholder="How does dense retrieval compare with lexical matching?"
+          />
+        </Field>
         <p className="muted">
           {draftSaved
             ? "Draft saved on this device for 7 days. Cleared on sign out."
@@ -185,35 +196,38 @@ export function Search({
         </p>
         <div className="search-controls">
           <More label="Evaluate retrieval">
-            <label htmlFor="parser">Query syntax</label>
-            <Select
-              id="parser"
-              value={mode}
-              onChange={(event) => {
-                setMode(event.target.value);
-                if (event.target.value === "structured") setRetrieval("sparse");
-              }}
-            >
-              <option value="free_text">Natural language</option>
-              <option value="structured">Boolean / phrase</option>
-            </Select>
-            <label htmlFor="retrieval">Retrieval method</label>
-            <Select
-              id="retrieval"
-              value={retrieval}
-              onChange={(event) => setRetrieval(event.target.value)}
-            >
-              <option value="compare" disabled={mode === "structured"}>
-                Compare all three
-              </option>
-              <option value="sparse">Sparse</option>
-              <option value="dense" disabled={mode === "structured"}>
-                Dense
-              </option>
-              <option value="hybrid" disabled={mode === "structured"}>
-                Hybrid
-              </option>
-            </Select>
+            <Field label="Query syntax">
+              <Select
+                id="parser"
+                value={mode}
+                onChange={(event) => {
+                  setMode(event.target.value);
+                  if (event.target.value === "structured")
+                    setRetrieval("sparse");
+                }}
+              >
+                <option value="free_text">Natural language</option>
+                <option value="structured">Boolean / phrase</option>
+              </Select>
+            </Field>
+            <Field label="Retrieval method">
+              <Select
+                id="retrieval"
+                value={retrieval}
+                onChange={(event) => setRetrieval(event.target.value)}
+              >
+                <option value="compare" disabled={mode === "structured"}>
+                  Compare all three
+                </option>
+                <option value="sparse">Sparse</option>
+                <option value="dense" disabled={mode === "structured"}>
+                  Dense
+                </option>
+                <option value="hybrid" disabled={mode === "structured"}>
+                  Hybrid
+                </option>
+              </Select>
+            </Field>
           </More>
           <Button
             type="submit"
@@ -246,7 +260,7 @@ export function Search({
         )}
       </form>
       {recent.length > 0 && (
-        <details className="recent-searches">
+        <Disclosure className="recent-searches">
           <summary>
             <History size={16} aria-hidden="true" /> Recent searches in this
             collection
@@ -271,7 +285,7 @@ export function Search({
               </Button>
             ))}
           </div>
-        </details>
+        </Disclosure>
       )}
       <EvidenceTray
         items={shortlist}
@@ -307,7 +321,7 @@ export function Search({
           </Button>
         )}
       </p>
-      {busy && <Skeleton label="Finding evidence in your collection…" />}
+      {busy && <LoadingState label="Finding evidence in your collection…" />}
       <p role="status" aria-live="polite">
         {busy
           ? "Searching one pinned snapshot…"
@@ -342,17 +356,15 @@ export function Search({
           </div>
           <div className="evidence-controls">
             <SlidersHorizontal size={18} aria-hidden="true" />
-            <label>
-              Filter returned passages
+            <Field label="Filter returned passages">
               <Input
                 type="search"
                 value={filter}
                 placeholder="Find a title or phrase…"
                 onChange={(event) => setFilter(event.target.value)}
               />
-            </label>
-            <label>
-              Show retrieval method
+            </Field>
+            <Field label="Show retrieval method">
               <Select
                 value={method}
                 onChange={(event) => setMethod(event.target.value)}
@@ -364,12 +376,12 @@ export function Search({
                   </option>
                 ))}
               </Select>
-            </label>
+            </Field>
             <small>
               Filters refine these results without running another search.
             </small>
           </div>
-          <details className="diagnostics">
+          <Disclosure className="diagnostics">
             <summary>Snapshot and search diagnostics</summary>
             <p>
               Snapshot <code>{result.snapshot_id}</code>
@@ -390,7 +402,7 @@ export function Search({
                 2,
               )}
             </pre>
-          </details>
+          </Disclosure>
           <div
             className={
               selected ? "evidence-layout inspecting" : "evidence-layout"
@@ -423,14 +435,14 @@ export function Search({
                   />
                 ) : sourceURL ? (
                   <>
-                    <a
-                      className="button source-link"
+                    <ActionLink
+                      className="source-link"
                       target="_blank"
                       rel="noreferrer"
                       href={`${sourceURL}#page=${selected.page_range?.[0] ?? 1}`}
                     >
                       Open original source ↗
-                    </a>
+                    </ActionLink>
                     <iframe
                       title="Original source preview"
                       src={`${sourceURL}#page=${selected.page_range?.[0] ?? 1}`}

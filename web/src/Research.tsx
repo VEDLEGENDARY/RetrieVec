@@ -1,3 +1,15 @@
+import {
+  Button,
+  ActionLink,
+  Field,
+  Input,
+  Select,
+  Textarea,
+  Notice,
+  LoadingState,
+  Disclosure,
+  More,
+} from "./ui";
 import { Citation } from "./Citation";
 import type {
   Conversation,
@@ -9,7 +21,6 @@ import type {
 import { EvidencePanel } from "./EvidencePanel";
 import { useDraft } from "./drafts";
 import { useRunProgress } from "./useRunProgress";
-import { Button, Input, Select, Textarea, More, Skeleton } from "./ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
@@ -414,22 +425,23 @@ export function Research({
         scientific or semantic correctness.
       </p>
       <div hidden={!showHistory}>
-        <label htmlFor="saved-search">Find saved research</label>
-        <Input
-          id="saved-search"
-          type="search"
-          maxLength={256}
-          value={savedQuery}
-          onChange={(event) => {
-            setSavedQuery(event.target.value);
-            setSavedPage(null);
-            setSaved([]);
-          }}
-        />
+        <Field label="Find saved research">
+          <Input
+            id="saved-search"
+            type="search"
+            maxLength={256}
+            value={savedQuery}
+            onChange={(event) => {
+              setSavedQuery(event.target.value);
+              setSavedPage(null);
+              setSaved([]);
+            }}
+          />
+        </Field>
         {savedLoading ? (
-          <Skeleton label="Loading saved research…" />
+          <LoadingState label="Loading saved research…" />
         ) : savedError ? (
-          <p role="alert">{savedError}</p>
+          <Notice error>{savedError}</Notice>
         ) : (
           <nav aria-label="All saved research">
             {saved.map((item) => (
@@ -470,28 +482,29 @@ export function Research({
           </Button>
         )}
         <More label="Browse conversations">
-          <label htmlFor="conversation">Conversation</label>
-          <Select
-            id="conversation"
-            disabled={busy}
-            value={conversation}
-            onChange={(event) => {
-              inspectionVersion.current += 1;
-              setConversation(event.target.value);
-              setRun(null);
-              setSelectedRunId(null);
-              setRunConnection("connected");
-              setEvidence(null);
-              setRequestKey(crypto.randomUUID());
-            }}
-          >
-            <option value="">New conversation</option>
-            {conversations.map((item) => (
-              <option key={item.conversation_id} value={item.conversation_id}>
-                {item.title}
-              </option>
-            ))}
-          </Select>
+          <Field label="Conversation">
+            <Select
+              id="conversation"
+              disabled={busy}
+              value={conversation}
+              onChange={(event) => {
+                inspectionVersion.current += 1;
+                setConversation(event.target.value);
+                setRun(null);
+                setSelectedRunId(null);
+                setRunConnection("connected");
+                setEvidence(null);
+                setRequestKey(crypto.randomUUID());
+              }}
+            >
+              <option value="">New conversation</option>
+              {conversations.map((item) => (
+                <option key={item.conversation_id} value={item.conversation_id}>
+                  {item.title}
+                </option>
+              ))}
+            </Select>
+          </Field>
         </More>
       </div>
       <form
@@ -501,29 +514,30 @@ export function Research({
           void submit();
         }}
       >
-        <label htmlFor="research-question">Question for cited answer</label>
-        <Textarea
-          id="research-question"
-          disabled={busy}
-          value={question}
-          maxLength={4096}
-          required
-          rows={3}
-          onKeyDown={(event) => {
-            if (
-              (event.ctrlKey || event.metaKey) &&
-              event.key === "Enter" &&
-              !event.nativeEvent.isComposing
-            ) {
-              event.preventDefault();
-              event.currentTarget.form?.requestSubmit();
-            }
-          }}
-          onChange={(event) => {
-            setQuestion(event.target.value);
-            setRequestKey(crypto.randomUUID());
-          }}
-        />
+        <Field label="Question for cited answer">
+          <Textarea
+            id="research-question"
+            disabled={busy}
+            value={question}
+            maxLength={4096}
+            required
+            rows={3}
+            onKeyDown={(event) => {
+              if (
+                (event.ctrlKey || event.metaKey) &&
+                event.key === "Enter" &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
+            onChange={(event) => {
+              setQuestion(event.target.value);
+              setRequestKey(crypto.randomUUID());
+            }}
+          />
+        </Field>
         <p className="muted">
           {draftSaved
             ? "Draft saved on this device for 7 days. Cleared on sign out."
@@ -548,41 +562,41 @@ export function Research({
             Edit search query
           </Button>
         </p>
-        {rewriteError && <p role="alert">{rewriteError}</p>}
+        {rewriteError && <Notice error>{rewriteError}</Notice>}
         <More label="Advanced question settings">
-          <label htmlFor="effective-query">
-            Standalone query for a follow-up (optional)
-          </label>
-          <Input
-            id="effective-query"
-            disabled={busy}
-            value={effective}
-            maxLength={4096}
-            onChange={(event) => {
-              setEffective(event.target.value);
-              setRequestKey(crypto.randomUUID());
-            }}
-            placeholder="Include the method or paper your follow-up refers to"
-          />
-          <label htmlFor="generation-provider">Generation provider</label>
-          <Select
-            id="generation-provider"
-            disabled={busy}
-            value={provider}
-            onChange={(event) => {
-              setProvider(event.target.value);
-              setRequestKey(crypto.randomUUID());
-            }}
-          >
-            {!providers.length && (
-              <option value="">No provider configured</option>
-            )}
-            {providers.map((item) => (
-              <option key={item.name} value={item.name}>
-                {item.model} · {item.cloud ? "Cloud" : "Local"}
-              </option>
-            ))}
-          </Select>
+          <Field label="Standalone query for a follow-up (optional)">
+            <Input
+              id="effective-query"
+              disabled={busy}
+              value={effective}
+              maxLength={4096}
+              onChange={(event) => {
+                setEffective(event.target.value);
+                setRequestKey(crypto.randomUUID());
+              }}
+              placeholder="Include the method or paper your follow-up refers to"
+            />
+          </Field>
+          <Field label="Generation provider">
+            <Select
+              id="generation-provider"
+              disabled={busy}
+              value={provider}
+              onChange={(event) => {
+                setProvider(event.target.value);
+                setRequestKey(crypto.randomUUID());
+              }}
+            >
+              {!providers.length && (
+                <option value="">No provider configured</option>
+              )}
+              {providers.map((item) => (
+                <option key={item.name} value={item.name}>
+                  {item.model} · {item.cloud ? "Cloud" : "Local"}
+                </option>
+              ))}
+            </Select>
+          </Field>
         </More>
         <p className="muted">
           {selectedProvider
@@ -677,7 +691,7 @@ export function Research({
           <h3>{run.original_question}</h3>
           <p role="status">Research run: {run.state}</p>
           {activeStates.has(run.state) && (
-            <Skeleton
+            <LoadingState
               label={
                 run.state === "retrieving"
                   ? "Finding relevant passages…"
@@ -722,10 +736,10 @@ export function Research({
             </Button>
           )}
           {run.state === "failed" && (
-            <p role="alert">
+            <Notice error>
               {failure[run.error_code ?? ""] ??
                 "Run failed. Check the services and retry."}
-            </p>
+            </Notice>
           )}
           {run.state === "cancelled" && (
             <p>This run was cancelled. No late answer will be published.</p>
@@ -808,7 +822,7 @@ export function Research({
               </Button>
             </div>
           )}
-          <details>
+          <Disclosure>
             <summary>Run provenance</summary>
             <dl>
               <dt>Effective query</dt>
@@ -818,7 +832,7 @@ export function Research({
               <dt>Model revision</dt>
               <dd>{run.configuration.generation.revision}</dd>
             </dl>
-          </details>
+          </Disclosure>
         </article>
       )}
       {evidence && (
@@ -837,13 +851,13 @@ export function Research({
             />
           )}
           {evidence.source_id ? (
-            <a
+            <ActionLink
               target="_blank"
               rel="noreferrer"
               href={`/api/v1/sources/${evidence.source_id}?snapshot_id=${evidence.snapshot_id}#page=${evidence.page_range?.[0] ?? 1}`}
             >
               Open original source
-            </a>
+            </ActionLink>
           ) : (
             <p>Exact passage retained; uploaded original unavailable.</p>
           )}

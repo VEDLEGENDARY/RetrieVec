@@ -1,4 +1,4 @@
-import { Button } from "./ui";
+import { Button, IconButton, Disclosure } from "./ui";
 import { Download, BookmarkCheck, X } from "lucide-react";
 import type { Hit } from "./api";
 
@@ -47,7 +47,7 @@ export function EvidenceTray({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   return (
-    <details className="evidence-tray">
+    <Disclosure className="evidence-tray">
       <summary>
         <BookmarkCheck size={18} aria-hidden="true" /> Evidence shortlist{" "}
         <span className="count-pill">{items.length}/6</span>
@@ -74,12 +74,12 @@ export function EvidenceTray({
               <article key={passageKey(item)}>
                 <div className="passage-heading">
                   <h3>{item.hit.title}</h3>
-                  <Button
+                  <IconButton
                     aria-label={`Remove ${item.hit.title} from shortlist`}
                     onClick={() => remove(passageKey(item))}
                   >
                     <X size={16} />
-                  </Button>
+                  </IconButton>
                 </div>
                 <p className="passage-meta">
                   {item.hit.page_range
@@ -90,7 +90,7 @@ export function EvidenceTray({
                   · {item.methods.join(", ")}
                 </p>
                 <blockquote>{item.hit.text}</blockquote>
-                <details>
+                <Disclosure>
                   <summary>Evidence provenance</summary>
                   <dl>
                     <dt>Question</dt>
@@ -100,7 +100,7 @@ export function EvidenceTray({
                     <dt>Passage</dt>
                     <dd>{item.hit.chunk_id}</dd>
                   </dl>
-                </details>
+                </Disclosure>
               </article>
             ))}
           </div>
@@ -110,6 +110,6 @@ export function EvidenceTray({
           Retrieval scores are not evidence of scientific validity.
         </small>
       </div>
-    </details>
+    </Disclosure>
   );
 }
