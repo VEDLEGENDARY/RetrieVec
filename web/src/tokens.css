@@ -13,16 +13,17 @@
   background: var(--canvas);
   line-height: var(--leading-normal);
   color-scheme: light;
-  --canvas: #f5f7f5;
-  --ink: #18221f;
-  --muted: #52635b;
-  --subtle: #edf2ef;
+  --canvas: #f4f6f8;
+  --ink: #192b37;
+  --muted: #526371;
+  --subtle: #eaf0f3;
   --surface: #ffffff;
   --surface-solid: #ffffff;
-  --line: #c9d6cf;
-  --brand: #076454;
-  --brand-dark: #064f43;
-  --brand-soft: #dff7ef;
+  --line: #c8d3da;
+  --brand: #09665e;
+  --brand-dark: #074e49;
+  --brand-soft: #e0f2ee;
+  --guide-surface: #e8f0f4;
   --violet: #5846ae;
   --violet-soft: #eeeafa;
   --danger: #972f25;
@@ -33,8 +34,8 @@
   --overlay: #10251f88;
   --transparent: transparent;
   --font-ui:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+    "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, sans-serif;
   --font-evidence: Georgia, "Times New Roman", serif;
   --font-code: ui-monospace, Consolas, monospace;
   --text-xs: 0.75rem;
@@ -56,7 +57,7 @@
   --radius-lg: 1rem;
   --radius-round: 999px;
   --shadow-sm: 0 1px 2px #11231d0d;
-  --shadow: 0 8px 24px #203b3114;
+  --shadow: 0 8px 24px #19394b0d;
   --shadow-overlay: 0 16px 48px #0004;
   --ring: 0 0 0 4px #087f6a2b;
   --motion-fast: 150ms;
@@ -79,6 +80,7 @@
     --brand: #68dfc1;
     --brand-dark: #8be9d0;
     --brand-soft: #173f35;
+    --guide-surface: #1a2c34;
     --violet: #c8baff;
     --violet-soft: #302946;
     --danger: #ffb1a5;
