@@ -1,5 +1,15 @@
 /* Single source of truth. Media-query breakpoints remain literal CSS conditions. */
 :root {
+  --radius-circle: 50%;
+  --border-width: 1px;
+  --focus-width: 2px;
+  --focus-offset: 3px;
+  --accent-width: 3px;
+  --control-size: 44px;
+  --icon-size: 20px;
+  --backdrop-blur: 4px;
+  --evidence-highlight: #972f25;
+  --evidence-highlight-halo: #ffffff;
   --dialog-offset: 12vh;
   --welcome-padding: 8vh max(6vw, var(--space-8));
   --welcome-logo-gap: clamp(var(--space-16), 10vh, var(--space-32));
@@ -7,7 +17,7 @@
   --panel-padding: clamp(var(--space-6), 4vw, var(--space-11));
   --research-padding: clamp(var(--space-5), 3vw, var(--space-8));
   font-family: var(--font-ui);
-  font-size: var(--text-base);
+  font-size: var(--type-body);
   font-synthesis: none;
   color: var(--ink);
   background: var(--canvas);
@@ -37,12 +47,12 @@
     sans-serif;
   --font-evidence: Georgia, "Times New Roman", serif;
   --font-code: ui-monospace, Consolas, monospace;
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.75rem;
-  --text-display: clamp(2rem, 4vw, 3.5rem);
+  --type-metadata: 0.75rem;
+  --type-supporting: 0.875rem;
+  --type-body: 1rem;
+  --type-subheading: 1.25rem;
+  --type-section-heading: 1.75rem;
+  --type-page-heading: clamp(2rem, 4vw, 3.5rem);
   --leading-tight: 1.2;
   --leading-normal: 1.5;
   --leading-reading: 1.75;
@@ -51,10 +61,10 @@
   --weight-bold: 700;
   --tracking-tight: -0.025em;
   --tracking-normal: 0;
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-round: 999px;
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+  --radius-overlay: 1rem;
+  --radius-pill: 999px;
   --shadow-sm: 0 1px 2px #11231d0d;
   --shadow: 0 8px 24px #203b3114;
   --shadow-overlay: 0 16px 48px #0004;
@@ -69,6 +79,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
+    --evidence-highlight: #972f25; /* Original source images retain their own light surface. */
     --canvas: #101713;
     --ink: #e7eeea;
     --muted: #b4c4bb;
