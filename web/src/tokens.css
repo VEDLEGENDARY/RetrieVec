@@ -40,6 +40,9 @@
   --action-background: #076454;
   --action-hover: #064f43;
   --on-action: #ffffff;
+  --disabled-ink: #52635b;
+  --disabled-surface: #edf2ef;
+  --disabled-line: #c9d6cf;
   --overlay: #10251f88;
   --transparent: transparent;
   --font-ui:
@@ -94,6 +97,9 @@
     --violet-soft: #302946;
     --danger: #ffb1a5;
     --danger-soft: #482820;
+    --disabled-ink: #b4c4bb;
+    --disabled-surface: #22312b;
+    --disabled-line: #53685f;
     --overlay: #0009;
     --ring: 0 0 0 4px #68dfc133;
   }

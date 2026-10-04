@@ -74,7 +74,7 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     .getByLabel("Research question")
     .fill("Compare lexical and dense retrieval");
   await page
-    .getByRole("button", { name: "Search evidence →", exact: true })
+    .getByRole("button", { name: "Search evidence", exact: true })
     .click();
   await expect(page.getByText("2 unique passages")).toBeVisible();
   await page.getByLabel("Show retrieval method").selectOption("hybrid");
@@ -163,7 +163,7 @@ test("shortlist enforces its comparison limit and frees slots on removal", async
   );
   await page.getByLabel("Research question").fill("Evidence");
   await page
-    .getByRole("button", { name: "Search evidence →", exact: true })
+    .getByRole("button", { name: "Search evidence", exact: true })
     .click();
   const controls = page.getByRole("button", { name: "Shortlist passage" });
   for (let index = 0; index < 7; index++) await controls.nth(index).click();
@@ -184,7 +184,7 @@ test("recent searches restore drafts and collection changes clear the shortlist"
   await openWorkbench(page, "Search");
   await page.getByLabel("Research question").fill("Original question");
   await page
-    .getByRole("button", { name: "Search evidence →", exact: true })
+    .getByRole("button", { name: "Search evidence", exact: true })
     .click();
   await page
     .getByRole("region", { name: "Sparse · BM25" })

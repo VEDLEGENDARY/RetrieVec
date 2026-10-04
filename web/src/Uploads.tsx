@@ -251,7 +251,7 @@ export function Uploads({
                       requestKey.current = crypto.randomUUID();
                     }}
                   >
-                    <X size={17} />
+                    <X size={17} aria-hidden="true" />
                   </IconButton>
                 </li>
               ))}
@@ -265,6 +265,7 @@ export function Uploads({
           </span>
           <Button
             className="primary"
+            loading={sending}
             type="submit"
             disabled={
               sending ||

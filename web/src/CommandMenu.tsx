@@ -54,7 +54,7 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
   return (
     <>
       <Button className="command-trigger" onClick={open}>
-        <Command size={16} />
+        <Command size={16} aria-hidden="true" />
         Quick actions<kbd>Ctrl / ⌘ K</kbd>
       </Button>
       <NativeDialog
@@ -73,7 +73,7 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
               aria-label="Close quick actions"
               onClick={() => dialog.current?.close()}
             >
-              <X size={18} />
+              <X size={18} aria-hidden="true" />
             </IconButton>
           </div>
           <Field
