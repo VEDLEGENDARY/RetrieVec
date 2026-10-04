@@ -1,3 +1,4 @@
+import { stateLabel, exportLabels, errorMessage } from "./presentation";
 import {
   Button,
   ActionLink,
@@ -6,6 +7,7 @@ import {
   Select,
   Textarea,
   Notice,
+  StatusBadge,
   LoadingState,
   Disclosure,
   More,
@@ -36,12 +38,13 @@ const failure: Record<string, string> = {
   provider_unavailable:
     "The configured model is unavailable or changed. Check the provider setup, then retry.",
   provider_failed:
-    "The provider failed or exceeded its budget. Search is still available. A remote request may have been billed.",
+    "The provider failed or exceeded its budget. Search is still available. A remote request may have been billed. Check the provider before starting another run.",
   invalid_answer:
-    "The answer failed citation or structure checks. No unverified answer was published.",
+    "The answer failed citation or structure checks. No unverified answer was published. Review the passages or try a more focused question.",
   retrieval_unavailable:
-    "The pinned retrieval snapshot or search service is unavailable.",
-  source_unavailable: "Retained evidence or an original source is unavailable.",
+    "The pinned retrieval snapshot or search service is unavailable. Contact the workspace operator before retrying.",
+  source_unavailable:
+    "Retained evidence or an original source is unavailable. Inspect the available passages or contact the collection owner.",
   worker_interrupted:
     "The worker stopped before confirming completion. Retry creates a new run; remote billing may be uncertain.",
 };
@@ -184,7 +187,7 @@ export function Research({
             setRewritePreview(value.effective_query);
         })
         .catch((error) => {
-          if (!controller.signal.aborted) setRewriteError(error.message);
+          if (!controller.signal.aborted) setRewriteError(errorMessage(error));
         });
     }, 250);
     return () => {
@@ -418,7 +421,7 @@ export function Research({
   return (
     <section className="saved-research" aria-labelledby="saved-title">
       <h2 id="saved-title">
-        {showHistory ? "Saved research" : "Ask your sources"}
+        {showHistory ? "Saved research" : "Cited answers"}
       </h2>
       <p className="muted">
         Answers stay tied to their sources. Structural checks do not establish
@@ -458,7 +461,7 @@ export function Research({
               >
                 {item.original_question}
                 <small>
-                  {item.state.replaceAll("_", " ")} ·{" "}
+                  {stateLabel(item.state)} ·{" "}
                   {new Date(item.created_at).toLocaleDateString()}
                 </small>
               </Button>
@@ -661,7 +664,7 @@ export function Research({
                 setEvidence(null);
               }}
             >
-              {item.original_question} · {item.state}
+              {item.original_question} · {stateLabel(item.state)}
             </Button>
           ))}
         </nav>
@@ -689,7 +692,7 @@ export function Research({
       {run && (
         <article className="answer">
           <h3>{run.original_question}</h3>
-          <p role="status">Research run: {run.state}</p>
+          <p role="status">Research run: {stateLabel(run.state)}</p>
           {activeStates.has(run.state) && (
             <LoadingState
               label={
@@ -756,13 +759,13 @@ export function Research({
                   claim.
                 </p>
               </More>
-              <p className="answer-status">
+              <StatusBadge className="answer-status">
                 {run.result.answer.status === "insufficient_evidence"
                   ? "I could not find this in your papers."
                   : run.result.answer.status === "partial"
                     ? "The sources support only part of this answer."
                     : "Answer with cited evidence"}
-              </p>
+              </StatusBadge>
               {run.result.answer.claims.map((claim) => (
                 <div className="claim" key={claim.id}>
                   <p>{claim.text}</p>
@@ -802,7 +805,7 @@ export function Research({
                 <div className="export-actions">
                   {["markdown", "bibtex", "json", "csv"].map((format) => (
                     <Button key={format} onClick={() => exportRun(format)}>
-                      Export {format}
+                      Export {exportLabels[format] ?? format}
                     </Button>
                   ))}
                 </div>

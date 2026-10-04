@@ -441,7 +441,7 @@ export function Search({
                       rel="noreferrer"
                       href={`${sourceURL}#page=${selected.page_range?.[0] ?? 1}`}
                     >
-                      Open original source ↗
+                      Open original source
                     </ActionLink>
                     <iframe
                       title="Original source preview"

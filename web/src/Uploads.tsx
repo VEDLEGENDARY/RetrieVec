@@ -1,3 +1,4 @@
+import { stateLabel } from "./presentation";
 import {
   Button,
   IconButton,
@@ -14,8 +15,10 @@ import { FileText, UploadCloud, X, CheckCircle2 } from "lucide-react";
 function fileProblem(file: File) {
   if (!/\.(pdf|txt|md)$/i.test(file.name))
     return "Use a PDF, text, or Markdown file.";
-  if (file.size === 0) return "This file is empty.";
-  if (file.size > 25 * 1024 * 1024) return "Exceeds the 25 MiB file limit.";
+  if (file.size === 0)
+    return "This file is empty. Choose a file containing text.";
+  if (file.size > 25 * 1024 * 1024)
+    return "This file exceeds 25 MiB. Split it into smaller files.";
   return null;
 }
 function fileSize(bytes: number) {
@@ -46,7 +49,7 @@ const failures: Record<string, string> = {
     "Text extraction exceeded its time limit. Try a smaller document.",
   encrypted_pdf: "This PDF is encrypted. Upload an unencrypted copy.",
   ocr_required:
-    "No readable text was found. Scanned PDFs require OCR, which is not supported yet.",
+    "No readable text was found. This upload path requires a PDF with readable text. Apply OCR before uploading, or ask the operator about configured advanced extraction.",
 };
 
 export function Uploads({
@@ -316,9 +319,7 @@ export function Uploads({
                         : "info"
                   }
                 >
-                  {job.state === "succeeded"
-                    ? "Searchable"
-                    : job.state.replaceAll("_", " ")}
+                  {stateLabel(job.state)}
                 </StatusBadge>
                 <span>
                   {job.state === "succeeded"
@@ -328,7 +329,7 @@ export function Uploads({
                         "Processing failed. Check the worker and retry the upload.")
                       : job.state === "cancelled"
                         ? "Processing cancelled."
-                        : (stages[job.stage] ?? job.stage)}
+                        : (stages[job.stage] ?? "Processing source")}
                 </span>
                 {job.state === "retry_wait" && (
                   <small>Waiting before an automatic retry.</small>
