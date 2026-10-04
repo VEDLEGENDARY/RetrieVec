@@ -1,4 +1,12 @@
-import { Button, Input } from "./ui";
+import {
+  Button,
+  IconButton,
+  Field,
+  Input,
+  Disclosure,
+  StatusBadge,
+  Surface,
+} from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { api, type Collection, type Job, type Session } from "./api";
 import { FileText, UploadCloud, X, CheckCircle2 } from "lucide-react";
@@ -159,7 +167,7 @@ export function Uploads({
     setNotice("");
   }
   return (
-    <section className="uploads" aria-labelledby="upload-heading">
+    <Surface className="uploads" aria-labelledby="upload-heading">
       <div>
         <h2 id="upload-heading">Add to your sources</h2>
         <p>
@@ -186,19 +194,28 @@ export function Uploads({
           <p>
             Drop documents here, or choose files to review before uploading.
           </p>
-          <label htmlFor="documents">Choose documents</label>
-          <Input
-            id="documents"
-            ref={input}
-            type="file"
-            accept=".pdf,.txt,.md"
-            multiple
-            disabled={sending || pending}
-            onChange={(event) => {
-              addFiles(Array.from(event.target.files ?? []));
-              event.target.value = "";
-            }}
-          />
+          <Field
+            label="Choose documents"
+            description="PDF with readable text, text, or Markdown. Up to 10 files; 25 MiB per file."
+            error={
+              files.some((file) => fileProblem(file))
+                ? "Some selected files cannot be uploaded. Remove or replace the files marked below."
+                : undefined
+            }
+          >
+            <Input
+              id="documents"
+              ref={input}
+              type="file"
+              accept=".pdf,.txt,.md"
+              multiple
+              disabled={sending || pending}
+              onChange={(event) => {
+                addFiles(Array.from(event.target.files ?? []));
+                event.target.value = "";
+              }}
+            />
+          </Field>
         </div>
         {files.length > 0 && (
           <div className="upload-queue">
@@ -219,7 +236,7 @@ export function Uploads({
                       {fileProblem(file) ?? fileSize(file.size)}
                     </small>
                   </div>
-                  <Button
+                  <IconButton
                     type="button"
                     disabled={sending}
                     aria-label={`Remove ${file.name}`}
@@ -232,7 +249,7 @@ export function Uploads({
                     }}
                   >
                     <X size={17} />
-                  </Button>
+                  </IconButton>
                 </li>
               ))}
             </ul>
@@ -285,16 +302,24 @@ export function Uploads({
         {notice}
       </p>
       {jobs.length > 0 && (
-        <details open>
+        <Disclosure open>
           <summary>Processing activity</summary>
           <ul className="jobs">
             {jobs.map((job) => (
               <li key={job.job_id}>
-                <span className={`status ${job.state}`}>
+                <StatusBadge
+                  tone={
+                    job.state === "failed"
+                      ? "error"
+                      : job.state === "succeeded"
+                        ? "success"
+                        : "info"
+                  }
+                >
                   {job.state === "succeeded"
                     ? "Searchable"
                     : job.state.replaceAll("_", " ")}
-                </span>
+                </StatusBadge>
                 <span>
                   {job.state === "succeeded"
                     ? "Snapshot activated. Ready to search."
@@ -316,8 +341,8 @@ export function Uploads({
               </li>
             ))}
           </ul>
-        </details>
+        </Disclosure>
       )}
-    </section>
+    </Surface>
   );
 }
