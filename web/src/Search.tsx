@@ -1,3 +1,4 @@
+import { BasedOn } from "./BasedOn";
 import {
   Button,
   ActionLink,
@@ -179,6 +180,7 @@ export function Search({
               if (
                 (event.ctrlKey || event.metaKey) &&
                 event.key === "Enter" &&
+                !event.nativeEvent.isComposing &&
                 !busy &&
                 collection.active_snapshot
               ) {
@@ -195,7 +197,17 @@ export function Search({
             : "Device storage is unavailable. Keep this tab open to retain your draft."}
         </p>
         <div className="search-controls">
-          <More label="Evaluate retrieval">
+          <More label="More search options">
+            <Button
+              id="compare-methods"
+              type="button"
+              onClick={() => {
+                setMode("free_text");
+                setRetrieval("compare");
+              }}
+            >
+              Compare methods
+            </Button>
             <Field label="Query syntax">
               <Select
                 id="parser"
@@ -260,39 +272,41 @@ export function Search({
           </p>
         )}
       </form>
-      {recent.length > 0 && (
-        <Disclosure className="recent-searches">
-          <summary>
-            <History size={16} aria-hidden="true" /> Recent searches in this
-            collection
-          </summary>
-          <div>
-            {recent.map((item, index) => (
-              <Button
-                key={`${item.query}-${index}`}
-                onClick={() => {
-                  setQuery(item.query);
-                  setMode(item.mode);
-                  setRetrieval(item.retrieval);
-                  document.getElementById("question")?.focus();
-                }}
-              >
-                <span>{item.query}</span>
-                <small>
-                  {item.retrieval === "compare"
-                    ? "Compare all methods"
-                    : labels[item.retrieval]}
-                </small>
-              </Button>
-            ))}
-          </div>
-        </Disclosure>
-      )}
-      <EvidenceTray
-        items={shortlist}
-        collectionId={collection.collection_id}
-        remove={removePassage}
-      />
+      <More label="More evidence options">
+        {recent.length > 0 && (
+          <Disclosure id="recent-searches" className="recent-searches">
+            <summary>
+              <History size={16} aria-hidden="true" /> Recent searches in this
+              collection
+            </summary>
+            <div>
+              {recent.map((item, index) => (
+                <Button
+                  key={`${item.query}-${index}`}
+                  onClick={() => {
+                    setQuery(item.query);
+                    setMode(item.mode);
+                    setRetrieval(item.retrieval);
+                    document.getElementById("question")?.focus();
+                  }}
+                >
+                  <span>{item.query}</span>
+                  <small>
+                    {item.retrieval === "compare"
+                      ? "Compare all methods"
+                      : labels[item.retrieval]}
+                  </small>
+                </Button>
+              ))}
+            </div>
+          </Disclosure>
+        )}
+        <EvidenceTray
+          items={shortlist}
+          collectionId={collection.collection_id}
+          remove={removePassage}
+        />
+      </More>
       <p role="status" className="interaction-notice">
         {notice}
         {removed && (
@@ -332,6 +346,22 @@ export function Search({
       </p>
       {result && (
         <>
+          <BasedOn
+            kind="search"
+            snapshot={result.snapshot_id}
+            candidates={Object.values(result.results)
+              .flatMap((value) => value.hits)
+              .map((hit) => ({
+                id: hit.chunk_id,
+                content: (
+                  <Button
+                    onClick={(event) => inspect(hit, event.currentTarget)}
+                  >
+                    {hit.title}
+                  </Button>
+                ),
+              }))}
+          />
           <div className="result-toolbar">
             <p>
               <strong>
@@ -348,6 +378,7 @@ export function Search({
               Returned from one pinned snapshot.
             </p>
             <Button
+              id="excerpt-display"
               type="button"
               aria-pressed={compact}
               onClick={() => setCompact((value) => !value)}
@@ -355,55 +386,58 @@ export function Search({
               {compact ? "Show full excerpts" : "Compact results"}
             </Button>
           </div>
-          <div className="evidence-controls">
-            <SlidersHorizontal size={18} aria-hidden="true" />
-            <Field label="Filter returned passages">
-              <Input
-                type="search"
-                value={filter}
-                placeholder="Find a title or phrase…"
-                onChange={(event) => setFilter(event.target.value)}
-              />
-            </Field>
-            <Field label="Show retrieval method">
-              <Select
-                value={method}
-                onChange={(event) => setMethod(event.target.value)}
-              >
-                <option value="all">All returned methods</option>
-                {Object.keys(result.results).map((name) => (
-                  <option key={name} value={name}>
-                    {labels[name] ?? name}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <small>
-              Filters refine these results without running another search.
-            </small>
-          </div>
-          <Disclosure className="diagnostics">
-            <summary>Snapshot and search diagnostics</summary>
-            <p>
-              Snapshot <code>{result.snapshot_id}</code>
-            </p>
-            <p>
-              All methods below use this same snapshot. Scores have different
-              meanings and are not a shared scale.
-            </p>
-            <pre>
-              {JSON.stringify(
-                Object.fromEntries(
-                  Object.entries(result.results).map(([mode, value]) => [
-                    mode,
-                    value.configuration,
-                  ]),
-                ),
-                null,
-                2,
-              )}
-            </pre>
-          </Disclosure>
+          <More label="More result options">
+            <div className="evidence-controls">
+              <SlidersHorizontal size={18} aria-hidden="true" />
+              <Field label="Filter returned passages">
+                <Input
+                  type="search"
+                  value={filter}
+                  id="passage-filter"
+                  placeholder="Find a title or phrase…"
+                  onChange={(event) => setFilter(event.target.value)}
+                />
+              </Field>
+              <Field label="Show retrieval method">
+                <Select
+                  value={method}
+                  onChange={(event) => setMethod(event.target.value)}
+                >
+                  <option value="all">All returned methods</option>
+                  {Object.keys(result.results).map((name) => (
+                    <option key={name} value={name}>
+                      {labels[name] ?? name}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <small>
+                Filters refine these results without running another search.
+              </small>
+            </div>
+            <Disclosure id="search-diagnostics" className="diagnostics">
+              <summary>Snapshot and search diagnostics</summary>
+              <p>
+                Snapshot <code>{result.snapshot_id}</code>
+              </p>
+              <p>
+                All methods below use this same snapshot. Scores have different
+                meanings and are not a shared scale.
+              </p>
+              <pre>
+                {JSON.stringify(
+                  Object.fromEntries(
+                    Object.entries(result.results).map(([mode, value]) => [
+                      mode,
+                      value.configuration,
+                    ]),
+                  ),
+                  null,
+                  2,
+                )}
+              </pre>
+            </Disclosure>
+          </More>
           <div
             className={
               selected ? "evidence-layout inspecting" : "evidence-layout"
