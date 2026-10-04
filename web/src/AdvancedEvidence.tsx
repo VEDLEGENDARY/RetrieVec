@@ -220,13 +220,20 @@ export function AdvancedEvidence({
           aria-label="Highlighted evidence region"
         >
           <rect
+            className="evidence-region-halo"
             x={x0}
             y={y0}
             width={x1 - x0}
             height={y1 - y0}
             fill="none"
-            stroke="var(--brand)"
-            strokeWidth="2"
+          />
+          <rect
+            className="evidence-region"
+            x={x0}
+            y={y0}
+            width={x1 - x0}
+            height={y1 - y0}
+            fill="none"
           />
         </svg>
       </div>
