@@ -1,3 +1,4 @@
+import { BasedOn } from "./BasedOn";
 import { stateLabel, exportLabels, errorMessage } from "./presentation";
 import {
   Button,
@@ -55,7 +56,15 @@ export function Research({
   fail,
   showHistory = false,
   linkedRun = "",
+  providers,
+  provider,
+  setProvider,
+  refreshProviders,
 }: {
+  providers: Provider[];
+  provider: string;
+  setProvider: (name: string) => void;
+  refreshProviders: () => Promise<void>;
   showHistory?: boolean;
   linkedRun?: string;
   collection: Collection;
@@ -108,8 +117,6 @@ export function Research({
       controller.abort();
     };
   }, [showHistory, collection.collection_id, savedQuery, savedPage, fail]);
-  const [providers, setProviders] = useState<Provider[]>([]);
-  const [provider, setProvider] = useState("");
   const [question, setQuestion, draftSaved] = useDraft(
     session.principal_id,
     collection.collection_id,
@@ -202,17 +209,6 @@ export function Research({
     selectedProvider?.consented,
     session.csrf_token,
   ]);
-  const refreshProviders = useCallback(async () => {
-    const rows = await api<Provider[]>(
-      `/api/v1/collections/${collection.collection_id}/providers`,
-    );
-    setProviders(rows);
-    setProvider((current) =>
-      rows.some((item) => item.name === current)
-        ? current
-        : (rows[0]?.name ?? ""),
-    );
-  }, [collection.collection_id]);
   useEffect(() => {
     const controller = new AbortController();
     api<Conversation[]>(
@@ -223,9 +219,8 @@ export function Research({
       .catch((error) => {
         if (error.name !== "AbortError") fail(error);
       });
-    refreshProviders().catch(fail);
     return () => controller.abort();
-  }, [collection.collection_id, refreshProviders, fail]);
+  }, [collection.collection_id, fail]);
   useEffect(() => {
     if (!conversation) {
       setHistory([]);
@@ -302,6 +297,14 @@ export function Research({
     snapshot: "current" | "historical" = "current",
     replay = false,
   ) {
+    if (
+      busy ||
+      (!replay &&
+        (!question.trim() ||
+          !collection.active_snapshot ||
+          !selectedProvider?.consented))
+    )
+      return;
     inspectionVersion.current += 1;
     setBusy(true);
     setNotice("");
@@ -566,7 +569,7 @@ export function Research({
           </Button>
         </p>
         {rewriteError && <Notice error>{rewriteError}</Notice>}
-        <More label="Advanced question settings">
+        <More label="More answer options">
           <Field label="Standalone query for a follow-up (optional)">
             <Input
               id="effective-query"
@@ -749,16 +752,27 @@ export function Research({
           )}
           {run.result && (
             <>
-              <More
-                label={`Based on ${run.result.evidence.length} retained passages`}
-              >
-                {cite(run.result.evidence.map((item) => item.evidence_id))}
-                <p>
-                  Retrieved from the pinned collection snapshot. These passages
-                  are the evidence pool; citations identify which support each
-                  claim.
-                </p>
-              </More>
+              <BasedOn
+                kind="answer"
+                snapshot={run.snapshot_id}
+                model={
+                  run.configuration.generation.model +
+                  " · " +
+                  run.configuration.generation.revision
+                }
+                candidates={run.result.evidence.map((item) => ({
+                  id: item.evidence_id,
+                  content: cite([item.evidence_id]),
+                }))}
+                usedIds={[
+                  ...run.result.answer.claims.flatMap(
+                    (claim) => claim.evidence_ids,
+                  ),
+                  ...run.result.answer.comparisons.flatMap(
+                    (row) => row.evidence_ids,
+                  ),
+                ]}
+              />
               <StatusBadge className="answer-status">
                 {run.result.answer.status === "insufficient_evidence"
                   ? "I could not find this in your papers."
@@ -804,7 +818,11 @@ export function Research({
               <More label="Export answer">
                 <div className="export-actions">
                   {["markdown", "bibtex", "json", "csv"].map((format) => (
-                    <Button key={format} onClick={() => exportRun(format)}>
+                    <Button
+                      id={`run-export-${format}`}
+                      key={format}
+                      onClick={() => exportRun(format)}
+                    >
                       Export {exportLabels[format] ?? format}
                     </Button>
                   ))}
@@ -812,30 +830,37 @@ export function Research({
               </More>
             </>
           )}
-          {!activeStates.has(run.state) && (
-            <div className="replay-actions">
-              <Button
-                disabled={busy}
-                onClick={() => submit("historical", true)}
-              >
-                Replay pinned snapshot
-              </Button>
-              <Button disabled={busy} onClick={() => submit("current", true)}>
-                Replay current snapshot
-              </Button>
-            </div>
-          )}
-          <Disclosure>
-            <summary>Run provenance</summary>
-            <dl>
-              <dt>Effective query</dt>
-              <dd>{run.effective_query}</dd>
-              <dt>Snapshot</dt>
-              <dd>{run.snapshot_id}</dd>
-              <dt>Model revision</dt>
-              <dd>{run.configuration.generation.revision}</dd>
-            </dl>
-          </Disclosure>
+          <More label="More run options">
+            {!activeStates.has(run.state) && (
+              <div className="replay-actions">
+                <Button
+                  id="replay-pinned"
+                  disabled={busy}
+                  onClick={() => submit("historical", true)}
+                >
+                  Replay pinned snapshot
+                </Button>
+                <Button
+                  id="replay-current"
+                  disabled={busy}
+                  onClick={() => submit("current", true)}
+                >
+                  Replay current snapshot
+                </Button>
+              </div>
+            )}
+            <Disclosure id="run-provenance">
+              <summary>Run provenance</summary>
+              <dl>
+                <dt>Effective query</dt>
+                <dd>{run.effective_query}</dd>
+                <dt>Snapshot</dt>
+                <dd>{run.snapshot_id}</dd>
+                <dt>Model revision</dt>
+                <dd>{run.configuration.generation.revision}</dd>
+              </dl>
+            </Disclosure>
+          </More>
         </article>
       )}
       {evidence && (

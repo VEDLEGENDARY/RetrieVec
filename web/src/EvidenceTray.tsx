@@ -47,7 +47,7 @@ export function EvidenceTray({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   return (
-    <Disclosure className="evidence-tray">
+    <Disclosure id="passage-shortlist" className="evidence-tray">
       <summary>
         <BookmarkCheck size={18} aria-hidden="true" /> Evidence shortlist{" "}
         <span className="count-pill">{items.length}/6</span>
@@ -59,7 +59,11 @@ export function EvidenceTray({
             browser session; changing collections or reloading clears the
             shortlist.
           </p>
-          <Button onClick={download} disabled={!items.length}>
+          <Button
+            id="export-shortlist"
+            onClick={download}
+            disabled={!items.length}
+          >
             <Download size={16} aria-hidden="true" /> Export evidence
           </Button>
         </div>
