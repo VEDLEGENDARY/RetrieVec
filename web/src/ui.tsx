@@ -1,4 +1,4 @@
-import { useId, type ComponentProps, type ReactNode } from "react";
+import { type ComponentProps, type ReactNode } from "react";
 
 export function Button({
   variant,
@@ -70,39 +70,5 @@ export function Notice({
       {children}
       {action}
     </div>
-  );
-}
-export function EmptyState({
-  title,
-  children,
-  action,
-}: {
-  title: string;
-  children: ReactNode;
-  action?: ReactNode;
-}) {
-  return (
-    <section className="empty">
-      <h2>{title}</h2>
-      <p>{children}</p>
-      {action}
-    </section>
-  );
-}
-export function Tooltip({
-  text,
-  children,
-}: {
-  text: string;
-  children: ReactNode;
-}) {
-  const id = useId();
-  return (
-    <span className="tooltip-owner">
-      <span aria-describedby={id}>{children}</span>
-      <span id={id} role="tooltip" className="tooltip">
-        {text}
-      </span>
-    </span>
   );
 }
