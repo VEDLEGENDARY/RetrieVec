@@ -21,6 +21,20 @@ See [the design-system contract](docs/DESIGN_SYSTEM.md) for the shared APIs, tok
 | DS-21–28 | Cited answers and Saved research are distinct; consistent source actions and sentence case; explicit readable state mapping; recovery-oriented errors; readable-text/OCR wording; named export formats. Backend enums and error codes are unchanged. |
 | DS-29 | Generated favicon palette and browser chrome colors come from the token source. Structured evidence uses a tokenized highlight with a contrasting halo; ordinary PDF exact highlighting is not claimed. |
 
+### Phase 2 navigation — 2026-10-04
+
+The three destinations are **Ask, Sources, and Saved research**. Overview capabilities remain in onboarding, collection readiness/access, and collection details. Ask chooses Answer automatically only after the collection's authorized provider response confirms a consented provider; otherwise Find passages explains the missing setup/consent. An explicit mode choice survives late provider responses. Provider requests abort on collection/session changes. Opening an existing run is an explicit history action, not permission to generate.
+
+More disclosures contain search configuration, answer options, result filters/diagnostics, shortlist, and run provenance/replay. The model and Local/Cloud indicator remain visible in Ask. Cmd/Ctrl+Enter works in both modes, ignores IME composition, and checks readiness/consent before submitting. No consent is granted by navigation, provider selection or a shortcut.
+
+Quick actions index destinations, upload/composer focus, comparison and syntax, filters, recent queries, excerpt display, passage inspection, shortlist/export, provider/follow-up, saved lookup/conversations, four answer exports, replay and provenance. Selecting an action opens enclosing native disclosures and focuses the relevant control; it does not trigger export or paid generation. Missing prerequisites produce an explanation. [Current activation counts](CORE_FLOWS.md#current-feature-map-and-click-counts) include native-select steps and identify quick-action alternatives to deeper paths.
+
+The shared **Based on** control distinguishes actual claim/comparison citations from other retained retrieved candidates. Search results are explicitly identified as retrieved passages, not generated-answer evidence; shortlist membership never becomes a citation.
+
+Saved lookup reuses the existing collection-authorized, owner-filtered, cursor-paginated endpoint (default 50, maximum 100). No backend authorization/storage/API changes were made. UI fixtures cover collection scope, pagination, no per-conversation fanout, and denied responses; real database policy execution remains unverified on this host.
+
+The phase-2 verification record is [navigation-phase-2-2026-10-04.json](docs/results/navigation-phase-2-2026-10-04.json): `scripts/check.py` passed (106 Python tests executed; 19 existing PostgreSQL skips; Go checks passed), `npm run build` passed, and `npm run test:ui -- --workers=2` passed all 29 tests. The inventory produced 144 captures across 1280/390px and light/dark, including the new disclosure/evidence states. Shortlist feedback, cancellation messages and Undo remain outside collapsed disclosures. The phase-1 results below remain historical. Manual screen-reader, real-service, non-Chromium, and human visual-approval gates remain open.
+
 ### Current screen coverage
 
 `web/ui-tests/design-system.spec.ts` captures the current equivalents of every application-owned inventory row at **1280px and 390px, light and dark**, including errors, empty/loading states, disabled/selected controls, all four structured-evidence bodies, processing/run states, provider consent, source previews, and overlays. PNGs and `screen-and-contrast-report.json` are saved under `web/test-results/design-system-screen-inventory-<width>-<theme>/` and attached to Playwright results. Fixtures are explicitly synthetic, not model-quality evidence. They are captures, not approved golden-image baselines.

@@ -1,8 +1,8 @@
-# RetrieVec core flows and navigation proposal
+# RetrieVec core flows and navigation
 
 Date: 2026-09-29. **Navigation and implementation approved by the owner.** This document preserves the original flow inventory and proposal. The 2026-10-04 UI-unification phase builds on the navigation already merged into `main`; see [current audit status](AUDIT.md#implementation-update--2026-10-04) and [shared component contracts](docs/DESIGN_SYSTEM.md).
 
-Current presentation uses Ask → Answer / Find passages, Sources, and Saved research. Answer composition is headed **Cited answers**. Collection details/readiness replace the old overview, and archive uses the existing Undo flow. UI unification retains the existing shortcuts, focus/Escape behavior, retry keys, session cleanup, consent rules, and research state machine; this phase does not approve or introduce further navigation or retrieval-default changes. The audit lists actual automated coverage and remaining manual/integration gates.
+Current presentation uses Ask → Answer / Find passages, Sources, and Saved research. Answer composition is headed **Cited answers**. Collection details/readiness replace the old overview, and archive uses the existing Undo flow. UI unification retains the existing shortcuts, focus/Escape behavior, retry keys, session cleanup, consent rules, and research state machine; Phase 2 completes consent-aware initial mode selection, contextual quick actions, More disclosures, and shared evidence context. Retrieval defaults are unchanged. The audit lists actual automated coverage and remaining manual/integration gates.
 
 ## One mental model
 
@@ -18,71 +18,65 @@ These are inferred from the implemented product and the brief, not user-research
 
 ## Current feature map and click counts
 
-Source inspection: `web/src/main.tsx`, `Search.tsx`, `Research.tsx`, `Uploads.tsx`, `EvidenceTray.tsx`, `AdvancedEvidence.tsx`, and `CommandMenu.tsx`. Counts are source-derived, not measured usability sessions.
+Updated 2026-10-04 for phase 2. Start in a signed-in collection; prerequisites are listed below. Count actual navigation, disclosure and action activations, excluding typing, scrolling, waiting and OS file-picker interaction. A native select takes two activations (open, choose). A quick action takes two (open palette, choose match); its target receives focus and enclosing disclosures open. Activating an export, replay or comparison is a separate third action. Keyboard equivalents do not require mouse clicks.
 
-Starting point is the signed-in desktop Overview with an active collection. Count navigation/disclosure/action activations; exclude text entry, scrolling, waiting, and operating-system file-picker steps. Native select selection counts as opening plus choosing (2). Prerequisites are explicit: a result must exist before inspecting it. Mobile adds one activation for controls inside the collapsed collection navigation; workspace section tabs remain outside it. Counts describe reaching/using a feature, not the entire prerequisite workflow.
+The desktop and mobile quick-action paths are exercised by web/ui-tests/phase2.spec.ts, with a JSON attachment recording the two executed activations for each target. Existing interaction tests exercise source upload, shortlist/export, collection switching, archive/Undo, dialogs and keyboard behavior. Direct-path counts below count the current controls; they are not timing measurements or usability-study results. A path longer than three retains a discoverable quick-action alternative instead of hiding its extra steps.
 
-| Feature | Current path | Clicks | Prerequisite / caveat |
+| Feature | Current path | Activations | Prerequisite / alternative |
 | --- | --- | ---: | --- |
-| Sign in | Welcome → Sign in | 1 | External identity-provider steps excluded |
-| Switch collection | Collection button | 1 | Mobile: 2 |
-| Filter collections | Sidebar filter | 1 focus | Typing filters immediately; mobile: 2 |
-| Create collection | Title field → Create | 2 | Mobile: 3; creation returns to Overview |
-| Sign out | Sidebar → Sign out | 1 | Mobile: 2 |
-| Archive collection | Archive → browser confirmation | 2 | Owner only; cancels active work; no restore UI |
-| Overview / snapshot and access summary | Overview | 0 | Already on destination |
-| Add sources | Sources → Choose documents | 2 | File selection excluded; drop is alternative |
-| Submit selected documents | Sources → Upload documents | 2 | Valid files already selected |
-| Remove queued file | Sources → Remove file | 2 | Local queue only; not uploaded-source deletion |
-| Inspect file validation | Sources | 1 | Selected files show errors inline |
-| Processing stages / automatic retries | Sources | 1 | Processing activity initially expanded |
-| Retry unconfirmed upload | Sources → Upload documents | 2 | Same unchanged batch retains its request key; not a dedicated retry control |
-| Search passages | Search → Search evidence | 2 | Enter question; active snapshot |
-| Boolean/phrase query | Search → Query syntax → option | 3 | Forces sparse retrieval |
-| Retrieval mode / compare all three | Search → Retrieval method → option | 3 | Comparison is current initial default |
-| Cancel search | Search → Cancel search | 2 | Request in progress |
-| Restore recent query | Search → Recent searches → query | 3 | Restores fields only; submit adds 1 |
-| Compact/full excerpts | Search → Compact results | 2 | Results exist |
-| Filter returned text | Search → filter field | 2 | Local filtering; no new search |
-| Filter returned methods | Search → method select → option | 3 | Results exist |
-| Ranking, scores, candidate counts | Search | 1 | Results exist; scores have different meanings |
-| Snapshot/search configuration | Search → diagnostics | 2 | Results exist |
-| Inspect a passage | Search → result | 2 | Opens evidence inspector |
-| Open original source | Search → result → source link | 3 | Original retained and authorized |
-| Embedded source preview | Search → result | 2 | Ordinary sources use iframe; no exact text highlight |
-| Structured evidence and highlighted region | Search → result | 2 | Only sources with retained evidence-object locators |
-| Raw structured extraction | Search → result → Raw extraction output | 3 | Structured evidence available |
-| Shortlist / unshortlist passage | Search → Shortlist passage | 2 | Six-item limit; temporary collection session |
-| Compare shortlisted passages | Search → Evidence shortlist | 2 | Add passages first |
-| Remove shortlist item | Search → Evidence shortlist → Remove | 3 | No undo |
-| Export shortlist JSON | Search → Evidence shortlist → Export | 3 | Includes original question and snapshot |
-| Shortlist item provenance | Search → Evidence shortlist → provenance | 3 | Preserves per-item origin |
-| Generate cited answer | Cited answers → Generate | 2 | Question, snapshot, configured/consented provider |
-| Standalone follow-up query | Cited answers → query field | 2 | Separate from displayed question |
-| Select model/provider | Cited answers → provider select → option | 3 | Configured providers only |
-| Grant/revoke cloud consent | Cited answers → consent action | 2 | Selected cloud provider; owner only |
-| Select existing/new conversation | Cited answers → conversation select → option | 3 | New conversation created on submission |
-| Open saved run | Cited answers → conversation select → option → run | 4 | 2 if correct conversation is already selected |
-| Inspect answer citation | Cited answers → citation | 2 | Run already displayed; citation reauthorized |
-| Open citation's original source | Cited answers → citation → source link | 3 | Run already displayed |
-| Comparison tables / limitations / support status | Cited answers | 1 | Completed run displayed |
-| Cancel generation | Cited answers → Cancel run | 2 | Active run |
-| Reconnect saved run | Cited answers → Reconnect | 2 | Retry budget exhausted |
-| Export Markdown/BibTeX/JSON/CSV | Cited answers → export format | 2 | Completed run; authorization checked |
-| Replay pinned/current snapshot | Cited answers → replay choice | 2 | Inactive run; may invoke paid provider |
-| Run provenance | Cited answers → Run provenance | 2 | Effective query, snapshot, model revision |
-| Find actions/collections | Quick actions → match | 2 | Cmd/Ctrl+K then typing/Enter alternative |
-| Navigate sections via command palette | Quick actions → destination | 2 | Current palette lacks most contextual actions |
-| Close inspector / citation / dialog | Close or Escape | 1 / key | Returns focus where supported |
-| Keyboard search submission | Cmd/Ctrl+Enter in search field | key | Cited-answer composer lacks equivalent shortcut |
-| Skip navigation | Keyboard skip link | key | Focuses main research area |
-| System dark mode / reduced motion | OS preference | 0 in app | No manual in-app selector |
+| Sign in / out | Welcome → Sign in; sidebar → Sign out | 1 | Identity-provider steps excluded; mobile sign out adds navigation open |
+| Switch / filter collections | Collection button / filter field | 1 | Mobile adds navigation open; collection matches also in quick actions |
+| Create collection | Title field → Create | 2 | Mobile 3; returns to Ask |
+| Archive / restore | Archive collection / Undo | 1 each | Owner; Undo does not restart cancelled work |
+| Readiness and access | Collection header | 0 | Visible context, no Overview destination |
+| Snapshot details | Sources → Collection details | 2 | Disclosure under header |
+| Three destinations | Ask / Sources / Saved research | 1 | Tabs stay visible on mobile; quick-action equivalent 2 |
+| Choose question mode | Answer / Find passages | 1 | In Ask; Answer defaults only with a configured, consented provider |
+| Add sources | Sources → Choose documents | 2 | Quick action focuses file input in 2; activate picker adds 1 |
+| Submit / retry upload | Sources → Upload documents | 2 | Files already selected; unchanged retry batch keeps its key |
+| Remove queued file | Sources → Remove file | 2 | Local queue only |
+| Validation, stages and automatic retries | Sources | 1 | Current source/processing state exists |
+| Focus composer | Quick actions → Focus question composer | 2 | Chooses current Ask mode; does not submit |
+| Search / generate | Ask → mode if needed → submit | 2–3 | Question entered; snapshot; generation also needs consented provider |
+| Keyboard submission | Cmd/Ctrl+Enter | 1 shortcut | Both modes; disabled readiness/consent and IME composition respected |
+| Compare methods | Quick actions → Compare retrieval methods → Compare methods | 3 | Prepares comparison; submit separately when question ready |
+| Boolean syntax / retrieval selector | Ask passage mode → More search options → select | 3 within mode | Native select counts 2; mode/destination adds steps. Indexed in quick actions |
+| Restore recent query | Quick actions → Restore a recent query → query | 3 | Restores fields; does not submit |
+| Compact/full excerpts | Compact results | 1 within mode | Results exist |
+| Text filter | Quick actions → Filter returned passages | 2 | Results exist; local filter, no retrieval request |
+| Returned method filter | More result options → select | 3 within mode | Results exist; discoverable via filter command |
+| Search diagnostics | Quick actions → Search snapshot and provenance | 2 | Results exist; opens both enclosing disclosures |
+| Ranking / candidate counts | Ask → Find passages if needed | 1–2 | Search results exist; scores are not a common scale |
+| Inspect passage / original source | Result → source link | 1 / 2 within mode | Retained, authorized original required; source not available for every result |
+| Structured region / raw extraction | Result → Raw extraction output | 1 / 2 within mode | Evidence object exists; ordinary PDF exact highlighting is not promised |
+| Add/remove shortlist selection | Shortlist passage | 1 within mode | Result exists; six-item cap; temporary collection session |
+| Compare shortlist | Quick actions → Evidence shortlist | 2 | Opens nested shortlist; adding passages is a prerequisite |
+| Remove shortlist item / Undo | Shortlist command → Remove; Undo | 3 / 1 | Shortlisted item exists |
+| Export shortlist | Quick actions → Export evidence shortlist → Export evidence | 3 | Nonempty shortlist; preserves question, snapshot and methods |
+| Per-item shortlist provenance | Shortlist command → provenance | 3 | Item exists |
+| Provider / standalone follow-up | Quick actions → named control | 2 to focus | Native provider choice adds 2; remains discoverable in palette |
+| Grant / revoke cloud consent | Ask → Answer if needed → consent action | 2–3 | Owner only; explicit action; selecting mode/provider never grants consent |
+| Active model and local/cloud | Ask context | 0 | Visible with More collapsed; absence explained |
+| Search saved questions | Quick actions → Find saved research | 2 | One collection-scoped, debounced paginated endpoint |
+| Open saved answer | Saved research → run | 2 | Run listed; no conversation enumeration needed |
+| Older saved results | Saved research → Older research | 2 | Cursor available; bounded page |
+| Conversation selector | Saved research → Browse conversations → select | 4 | Indexed: Quick actions → Browse conversations focuses selector in 2; native choice adds 2 |
+| Inspect citation / original | Citation → source link | 1 / 2 within displayed run | Citation reauthorized; original may be unavailable |
+| Used versus retrieved evidence | Quick actions → Based on — used and retrieved evidence | 2 | Completed answer displayed; actual claim/comparison IDs, not shortlist membership |
+| Cancel / reconnect run | Cancel run / Reconnect | 1 within run | Active / disconnected run respectively |
+| Four answer exports | Quick actions → Export saved answer as format → Export | 3 | Completed run selected; authorization retained |
+| Replay pinned/current | Quick actions → replay choice → Replay | 3 | Inactive run selected; may invoke provider; command only reveals control |
+| Run provenance | Quick actions → Saved run provenance | 2 | Run selected; More run options opens automatically |
+| Close overlay / focus return | Close or Escape | 1 | Existing native dialogs/nonmodal inspector behavior retained |
+| Dark mode / reduced motion | OS preference | 0 in app | No new preference storage |
+
+Quick actions remain discoverable even when a result/run is missing. Choosing one explains the prerequisite rather than silently submitting a request. These counts describe reaching a capability with its data available, not generating missing evidence, finding a run across arbitrary pages, or completing external sign-in.
 
 Backend experiments, deployment, ingestion administration, and training commands are developer/operator facilities, not hidden browser destinations. This plan preserves them and does not invent UI controls for all CLI operations.
 
 ## Approved navigation
 
-**Three top-level destinations: Ask · Sources · Saved research.** Collection selection remains global context, not a fourth destination. Settings are a sheet reached from a persistent toolbar button; quick actions remain globally accessible. On mobile, keep all three destination controls visible.
+**Three top-level destinations: Ask · Sources · Saved research.** Collection selection remains global context, not a fourth destination. Quick actions remain globally accessible. The Settings-sheet sketch below is historical; a new settings system is outside this implementation. On mobile, keep all three destination controls visible.
 
 | Destination | Visible by default | Progressively disclosed |
 | --- | --- | --- |
@@ -92,7 +86,7 @@ Backend experiments, deployment, ingestion administration, and training commands
 
 Use Answer initially only when generation is configured and permitted; otherwise clearly select Find passages and explain how to enable answers. Never grant cloud consent implicitly. Keep the active model and cloud/local indication visible even when the selector is in More. Preserve comparison mode and exact retrieval references; proposal is natural-language hybrid for new passage searches, with explicit Compare methods available in More. This changes the initial UI selection, not server/experimental defaults, and is part of the approval decision.
 
-Overview is proposed for **removal as a standalone destination**, not removal of its capabilities: onboarding and next action move into the current task, readiness/access into the collection header and Sources, technical metadata into collection details. Separate Search and Cited answers destinations merge into Ask modes. No feature, export format, research history, comparison method, provenance field, consent control, or replay capability is proposed for removal.
+Overview is **removed as a standalone destination**, not removal of its capabilities: onboarding and next action move into the current task, readiness/access into the collection header and Sources, technical metadata into collection details. Separate Search and Cited answers destinations are merged into Ask modes. No feature, export format, research history, comparison method, provenance field, consent control, or replay capability is proposed for removal.
 
 ```text
 Collection selector                         Quick actions   Settings
@@ -111,7 +105,9 @@ From any destination in the selected collection: destination (1), More/disclosur
 
 Quick actions must include destinations, collection selection/creation, upload focus, composer focus, passage search, comparison, filters, shortlist, saved-run lookup, exports, provenance, and applicable recovery actions. Context-dependent actions disclose their required state instead of silently disappearing. Search of saved research must be authorized and collection-scoped; existing conversation-only run retrieval needs a scoped listing/search facility for direct access. Do not implement this with unbounded requests to every conversation.
 
-## Core loop and implementation requirements
+## Original core loop and implementation requirements
+
+The remaining requirements preserve the 2026-09-29 design rationale. They are not a claim that every proposed backend or keyboard-help feature was introduced by phase 2. Current navigation paths and verified coverage are recorded above and in AUDIT.md.
 
 1. Enter question and submit. Preserve typed input on failure. Snapshot, provider identity, and consent are fixed for the run.
 2. Show named phases immediately: queued, retrieving evidence, generating, checking citations. Skeletons reserve layout; status text remains available to assistive technology.
@@ -146,7 +142,7 @@ Keep Cmd/Ctrl+K and Escape. Add Cmd/Ctrl+Enter to both composer modes. All commo
 
 For local shortlist/queued-file removal, retain the removed value and position for an Undo action; never persist raw files to browser storage just for undo. Announce feedback without stealing focus.
 
-Archive currently immediately marks the collection archived and fences/cancels ingestion and research work (`app/resources.py`); there is no owner-facing unarchive endpoint. Replacing confirmation with a toast alone would be incorrect. Proposed design: server-backed pending archive with an undo interval, recoverable after reload, then atomic final archive/cancellation. The message must say when access/processing actually stops. Alternatively implement explicit restore with accurately limited semantics; restoring visibility cannot resume cancelled jobs automatically. Choose and validate one lifecycle before removing the existing confirmation. Cloud-consent revocation and cancellation must remain immediate; undo must never silently restart paid generation or restore consent.
+The original proposal considered delayed archive versus explicit restore. The inherited implementation uses immediate archive and explicit Undo restore: access returns, but cancelled processing does not restart. Phase 2 preserves that lifecycle and its tests. Cloud-consent revocation and cancellation remain immediate; Undo never silently restarts paid generation or restores consent.
 
 ## Delivery boundaries and acceptance
 
@@ -154,4 +150,4 @@ After navigation approval, finish the shared tokens/components from Plan 1, then
 
 Acceptance: preserve all mapped capabilities; at most three top-level destinations as proposed; every feature within three activations given prerequisites or discoverable through quick actions; keyboard/touch parity; deterministic focus return; no unreviewed experimental default changes; no loss of snapshot isolation or consent; no fabricated progress/highlights; verify desktop/mobile/light/dark and error states after implementation. Plans 1 and 2 remain separate commit-sized work; no implementation begins merely because this document exists. Plan 3 has not yet been supplied.
 
-**Approval requested:** Ask / Sources / Saved research navigation, unified Ask modes, progressive disclosure, and natural-language hybrid as the initial passage-search selection. No application code or Git commits were changed for this proposal.
+**Approval recorded:** Ask / Sources / Saved research navigation, unified Ask modes and progressive disclosure were approved by the owner. Phase 2 completes their browser implementation on the phase-1 branch from main. Natural-language hybrid was already the initial passage-search selection in that base; this phase does not change retrieval defaults. See AUDIT.md for actual checks and unverified integration/manual gates.
