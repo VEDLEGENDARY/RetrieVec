@@ -13,6 +13,7 @@ from typing import Protocol
 import numpy as np
 
 from retrievec.corpus.snapshot import canonical, digest
+from retrievec.evaluation.beir_eval import score as paper_metrics
 from retrievec.evaluation.metrics import aggregate, metrics
 from retrievec.evaluation.paired import compare
 
@@ -108,9 +109,13 @@ class OnnxCrossEncoder:
         options = ort.SessionOptions()
         options.intra_op_num_threads = 2
         options.inter_op_num_threads = 1
-        self.session = ort.InferenceSession(
-            model_path, sess_options=options, providers=["CPUExecutionProvider"]
-        )
+        try:
+            self.session = ort.InferenceSession(
+                model_path, sess_options=options, providers=["CPUExecutionProvider"]
+            )
+        except Exception as error:
+            # Native ONNX exceptions do not share Python's RuntimeError base.
+            raise RuntimeError("reranker model could not be loaded") from error
         names = {item.name for item in self.session.get_inputs()}
         if (
             not names <= {"input_ids", "attention_mask", "token_type_ids"}
@@ -161,9 +166,12 @@ class OnnxCrossEncoder:
                 masks[index, : len(row.ids)] = row.attention_mask
                 types[index, : len(row.ids)] = row.type_ids
             inputs = {"input_ids": ids, "attention_mask": masks, "token_type_ids": types}
-            logits = np.asarray(
-                self.session.run(None, {name: inputs[name] for name in self.input_names})[0]
-            )
+            try:
+                output = self.session.run(None, {name: inputs[name] for name in self.input_names})
+            except Exception as error:
+                # Normalize only the external runtime call; preserve its cause for diagnosis.
+                raise RuntimeError("reranker inference failed") from error
+            logits = np.asarray(output[0])
             if logits.shape not in ((len(batch),), (len(batch), 1)):
                 raise ValueError("unexpected reranker score shape")
             values = logits.reshape(-1)
@@ -188,8 +196,12 @@ def pretrained_config() -> RerankerConfig:
 def rerank(
     query: str, candidates: list[dict], model: Reranker, *, top_k: int
 ) -> tuple[list[dict], float]:
-    if not 1 <= top_k <= len(candidates) <= 1000:
+    if type(top_k) is not int or not 1 <= top_k <= len(candidates) <= 1000:
         raise ValueError("invalid reranker candidate bounds")
+    if not isinstance(query, str) or not query.strip():
+        raise ValueError("reranker query cannot be empty")
+    if any(not isinstance(row.get("text"), str) or not row["text"].strip() for row in candidates):
+        raise ValueError("candidate text cannot be empty")
     ids = [row.get("chunk_id") for row in candidates]
     if any(not isinstance(identity, str) or not identity for identity in ids) or len(
         set(ids)
@@ -197,6 +209,10 @@ def rerank(
         raise ValueError("candidate IDs must be unique")
     start = time.perf_counter()
     scores = model.score([(query, row["text"]) for row in candidates])
+    if len(scores) != len(candidates) or any(
+        not isinstance(value, (int, float)) or not math.isfinite(value) for value in scores
+    ):
+        raise ValueError("reranker returned invalid scores")
     ranked = [
         dict(row, reranker_score=score) for row, score in zip(candidates, scores, strict=True)
     ]
@@ -223,7 +239,7 @@ def evaluate_baseline(
                 metrics([row["chunk_id"] for row in ranked], judgments.get(query_id, {}), top_k)
             )
             elapsed.append(latency)
-        except Exception as error:
+        except (ValueError, OSError, RuntimeError) as error:
             failures.append({"query_id": query_id, "error": type(error).__name__})
     ordered = sorted(elapsed)
 
@@ -238,7 +254,41 @@ def evaluate_baseline(
         "metrics": aggregate(rows),
         "latency_ms": {"p50": percentile(0.50), "p95": percentile(0.95), "samples": len(elapsed)},
         "failures": failures,
-        "quality_evidence": bool(rows) and not failures,
+        "quality_evidence": bool(rows)
+        and not failures
+        and all(row["ndcg"] is not None for row in rows),
+    }
+
+
+def _candidate_metrics(candidates, query_id, judgments, judgment_unit, top_k):
+    if judgment_unit == "paper_id":
+        documents = list(
+            dict.fromkeys(row["paper_id"] for row in candidates if row["paper_id"] != query_id)
+        )
+        return paper_metrics(documents, judgments)
+    return metrics([row["chunk_id"] for row in candidates], judgments, top_k)
+
+
+def _paired_report(rows, failures, dataset_id, cutoff):
+    return {
+        "schema_version": 1,
+        "dataset_id": dataset_id,
+        "split": "candidate_pool",
+        "cutoff": cutoff,
+        "includes_drafts": False,
+        "per_query": rows,
+        "failures": failures,
+        "missing_queries": [],
+        "results_sha256": digest(canonical(rows)),
+    }
+
+
+def _summary(rows, judgment_unit):
+    if judgment_unit == "chunk_id":
+        return aggregate(rows)
+    return {
+        key: {"mean": sum(row[key] for row in rows) / len(rows) if rows else None}
+        for key in ("ndcg", "mrr", "recall", "coverage")
     }
 
 
@@ -251,110 +301,78 @@ def evaluate_pool_sweep(
     top_k: int = 10,
     judgment_unit: str = "chunk_id",
 ) -> dict:
-    """Measure reranking over identical pinned candidate prefixes at each size."""
+    """Compare each reranker run with its independently measured hybrid baseline."""
     if (
         sizes != (20, 50, 100)
+        or type(top_k) is not int
         or not 1 <= top_k <= 20
         or judgment_unit not in ("chunk_id", "paper_id")
+        or (judgment_unit == "paper_id" and top_k != 10)
     ):
         raise ValueError("unsupported reranker sweep")
     pools = list(pools)
-    if not pools or len({pool.get("query_id") for pool in pools}) != len(pools):
+    ids = [pool.get("query_id") for pool in pools]
+    if not pools or any(not isinstance(qid, str) or not qid.strip() for qid in ids):
+        raise ValueError("candidate pools require nonempty query IDs")
+    if len(set(ids)) != len(ids):
         raise ValueError("candidate pools require distinct query IDs")
     outputs = {}
     pool_hashes = [digest(canonical(pool)) for pool in pools]
+    dataset_id = digest(canonical(pool_hashes))
     for size in sizes:
-        base_rows, ranked_rows, latencies, recalls, failures = [], [], [], [], []
-        paired_ids = []
+        base_rows, ranked_rows, latencies, recalls = [], [], [], []
+        base_failures, failures = [], []
         for pool in pools:
             query_id = pool["query_id"]
             candidates = pool["candidates"][:size]
-            if not candidates:
-                failures.append({"query_id": query_id, "error": "empty_pool"})
-                continue
             qrels = judgments.get(query_id, {})
+            try:
+                if not candidates:
+                    raise ValueError("empty_pool")
+                before = _candidate_metrics(candidates, query_id, qrels, judgment_unit, top_k)
+                base_rows.append(dict(before, query_id=query_id))
+            except ValueError as error:
+                failure = {"query_id": query_id, "error": type(error).__name__}
+                base_failures.append(failure)
+                failures.append(failure)
+                continue
             positives = {
                 identity
                 for identity, grade in qrels.items()
                 if grade >= (1 if judgment_unit == "paper_id" else 2)
             }
-            recalls.append(
-                len(positives & {row[judgment_unit] for row in candidates}) / len(positives)
-                if positives
-                else None
-            )
+            available = {row[judgment_unit] for row in candidates}
+            if judgment_unit == "paper_id":
+                available.discard(query_id)
+            recalls.append(len(positives & available) / len(positives) if positives else None)
             try:
-                ranked, elapsed = rerank(
-                    pool["query"],
-                    candidates,
-                    model,
-                    top_k=len(candidates)
-                    if judgment_unit == "paper_id"
-                    else min(top_k, len(candidates)),
-                )
-                if judgment_unit == "paper_id":
-                    from retrievec.evaluation.beir_eval import score
-
-                    def documents(rows, excluded=query_id):
-                        return list(
-                            dict.fromkeys(
-                                row["paper_id"] for row in rows if row["paper_id"] != excluded
-                            )
-                        )
-
-                    base_rows.append(score(documents(candidates), qrels))
-                    ranked_rows.append(score(documents(ranked), qrels))
-                else:
-                    base_rows.append(metrics([row["chunk_id"] for row in candidates], qrels, top_k))
-                    ranked_rows.append(metrics([row["chunk_id"] for row in ranked], qrels, top_k))
+                ranked, elapsed = rerank(pool["query"], candidates, model, top_k=len(candidates))
+                after = _candidate_metrics(ranked, query_id, qrels, judgment_unit, top_k)
+                ranked_rows.append(dict(after, query_id=query_id))
                 latencies.append(elapsed)
-                paired_ids.append(query_id)
             except (ValueError, OSError, RuntimeError) as error:
                 failures.append({"query_id": query_id, "error": type(error).__name__})
+        baseline = _summary(base_rows, judgment_unit)
+        reranked = _summary(ranked_rows, judgment_unit)
+        paired = compare(
+            _paired_report(base_rows, base_failures, dataset_id, top_k),
+            _paired_report(ranked_rows, failures, dataset_id, top_k),
+        )
         ordered = sorted(latencies)
-        if judgment_unit == "paper_id":
-
-            def paper_summary(rows):
-                return {
-                    key: {"mean": sum(row[key] for row in rows) / len(rows) if rows else None}
-                    for key in ("ndcg", "mrr", "recall", "coverage")
-                }
-
-            baseline = paper_summary(base_rows)
-            reranked = paper_summary(ranked_rows)
-        else:
-            baseline = aggregate(base_rows)
-            reranked = aggregate(ranked_rows)
-        before, after = baseline["ndcg"]["mean"], reranked["ndcg"]["mean"]
         p50 = ordered[len(ordered) // 2] if ordered else None
-        p95 = ordered[min(len(ordered) - 1, int((len(ordered) - 1) * 0.95))] if ordered else None
-
-        def paired_report(rows, ids=paired_ids, errors=failures):
-            per_query = [dict(row, query_id=qid) for qid, row in zip(ids, rows, strict=True)]
-            return {
-                "schema_version": 1,
-                "dataset_id": digest(canonical(pool_hashes)),
-                "split": "candidate_pool",
-                "cutoff": 10 if judgment_unit == "paper_id" else top_k,
-                "includes_drafts": False,
-                "per_query": per_query,
-                "failures": errors,
-                "missing_queries": [],
-                "results_sha256": digest(canonical(per_query)),
-            }
-
+        p95 = ordered[int((len(ordered) - 1) * 0.95)] if ordered else None
+        gain = paired["metrics"]["ndcg"]["mean_delta_right_minus_left"]
+        defined_recalls = [value for value in recalls if value is not None]
         outputs[str(size)] = {
             "baseline": baseline,
             "reranked": reranked,
-            "paired_vs_plain_hybrid": compare(paired_report(base_rows), paired_report(ranked_rows)),
-            "candidate_recall": sum(value for value in recalls if value is not None)
-            / sum(value is not None for value in recalls)
-            if any(value is not None for value in recalls)
+            "paired_vs_plain_hybrid": paired,
+            "candidate_recall": sum(defined_recalls) / len(defined_recalls)
+            if defined_recalls
             else None,
             "rerank_latency_ms": {"p50": p50, "p95": p95, "samples": len(ordered)},
-            "ndcg_gain_per_ms_p50": (after - before) / p50
-            if before is not None and after is not None and p50
-            else None,
+            "ndcg_gain_per_ms_p50": gain / p50 if gain is not None and p50 else None,
+            "baseline_failures": base_failures,
             "failures": failures,
         }
     return {
@@ -362,7 +380,7 @@ def evaluate_pool_sweep(
         "kind": "candidate-pool-reranker-sweep",
         "model": asdict(model.config),
         "model_artifacts": getattr(model, "artifacts", None),
-        "pool_hashes": [digest(canonical(pool)) for pool in pools],
+        "pool_hashes": pool_hashes,
         "judgment_unit": judgment_unit,
         "sizes": outputs,
         "default_changed": False,

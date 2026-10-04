@@ -7,6 +7,7 @@ import statistics
 from pathlib import Path
 
 from retrievec.evaluation.answer_signals import automatic_signals
+from retrievec.evaluation.files import validate_outputs, write_json
 
 
 def compare(paths: list[Path]) -> dict:
@@ -85,11 +86,12 @@ def main() -> None:
     parser.add_argument("--run", type=Path, action="append", required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    try:
+        validate_outputs([args.output], args.run)
+    except ValueError as error:
+        parser.error(str(error))
     report = compare(args.run)
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    write_json(args.output, report)
 
 
 if __name__ == "__main__":
