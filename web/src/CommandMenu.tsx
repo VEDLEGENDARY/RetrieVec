@@ -1,4 +1,4 @@
-import { Button, Input } from "./ui";
+import { Button, IconButton, Input, NativeDialog, Field } from "./ui";
 import { useEffect, useId, useRef, useState } from "react";
 import { Command, Search, X } from "lucide-react";
 
@@ -57,7 +57,7 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
         <Command size={16} />
         Quick actions<kbd>Ctrl / ⌘ K</kbd>
       </Button>
-      <dialog
+      <NativeDialog
         ref={dialog}
         className="command-dialog"
         aria-labelledby="command-title"
@@ -69,15 +69,22 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
         <div className="command-body">
           <div className="command-heading">
             <h2 id="command-title">Find your next action</h2>
-            <Button
+            <IconButton
               aria-label="Close quick actions"
               onClick={() => dialog.current?.close()}
             >
               <X size={18} />
-            </Button>
+            </IconButton>
           </div>
-          <label className="command-input">
-            <Search size={18} />
+          <Field
+            className="command-input"
+            label={
+              <>
+                <Search size={18} aria-hidden="true" /> Find actions and
+                collections
+              </>
+            }
+          >
             <Input
               autoFocus
               ref={input}
@@ -120,7 +127,7 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
                 }
               }}
             />
-          </label>
+          </Field>
           <div
             id={listId}
             role="listbox"
@@ -159,7 +166,7 @@ export function CommandMenu({ actions }: { actions: CommandAction[] }) {
             Use ↑ ↓ to browse and Enter to choose. Escape closes this menu.
           </p>
         </div>
-      </dialog>
+      </NativeDialog>
     </>
   );
 }
