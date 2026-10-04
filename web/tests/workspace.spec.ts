@@ -38,6 +38,9 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await sections
     .getByRole("button", { name: "Ask", exact: true })
     .press("Enter");
+  await page
+    .getByRole("button", { name: "Find passages", exact: true })
+    .press("Enter");
   await page.getByLabel("Research question").fill("retrieval evidence");
   await page
     .getByRole("button", { name: "Search evidence", exact: true })
@@ -54,7 +57,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     page.getByRole("complementary", { name: "Evidence inspector" }),
   ).toBeVisible();
   const source = await page
-    .getByRole("link", { name: "Open original source ↗" })
+    .getByRole("link", { name: "Open original source", exact: true })
     .getAttribute("href");
   expect(source).toBeTruthy();
   const authorized = await page.request.get(source!, {
@@ -72,7 +75,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .getByRole("button", { name: "Generate cited answer", exact: true })
     .press("Enter");
   await expect(
-    page.getByText("Research run: completed", { exact: true }),
+    page.getByText("Research run: Completed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
   await page
     .getByRole("button", { name: /Inspect citation/ })
@@ -138,10 +141,10 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     timeout: 10000,
   });
   await expect(
-    page.getByRole("button", { name: "Export json", exact: true }),
+    page.getByRole("button", { name: "Export JSON", exact: true }),
   ).toBeHidden();
   await expect(
-    page.getByText("Research run: completed", { exact: true }),
+    page.getByText("Research run: Completed", { exact: true }),
   ).toBeVisible();
   expect((await page.request.get(saved.exported.download_url)).status()).toBe(
     200,
@@ -158,9 +161,10 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await page.getByText("Export answer", { exact: true }).press("Enter");
   const downloadPromise = page.waitForEvent("download");
   await page
-    .getByRole("button", { name: "Export csv", exact: true })
+    .getByRole("button", { name: "Export CSV", exact: true })
     .press("Enter");
   expect((await downloadPromise).suggestedFilename()).toMatch(/\.csv$/);
+  await page.getByText("More run options", { exact: true }).click();
   await page
     .getByRole("button", { name: "Replay pinned snapshot", exact: true })
     .focus();
@@ -174,7 +178,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
       .getByRole("button", { name: /What does dense retrieval match/ }),
   ).toHaveCount(2);
   await expect(
-    page.getByText("Research run: completed", { exact: true }),
+    page.getByText("Research run: Completed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
   await sections
     .getByRole("button", { name: "Ask", exact: true })
@@ -195,7 +199,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .getByRole("button", { name: "Cancel run", exact: true })
     .press("Enter");
   await expect(
-    page.getByText("Research run: cancelled", { exact: true }),
+    page.getByText("Research run: Cancelled", { exact: true }),
   ).toBeVisible();
   await page
     .getByLabel("Question for cited answer")
@@ -213,7 +217,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .getByRole("button", { name: "Generate cited answer", exact: true })
     .press("Enter");
   await expect(
-    page.getByText("Research run: failed", { exact: true }),
+    page.getByText("Research run: Failed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
   await expect(
     page.getByText("UNVERIFIED_SENTINEL", { exact: false }),
@@ -235,7 +239,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     page.getByRole("button", { name: /Inspect citation/ }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: /Export (json|csv|markdown)/ }),
+    page.getByRole("button", { name: /Export (JSON|CSV|Markdown)/ }),
   ).toHaveCount(0);
   await page
     .getByLabel("Question for cited answer")
@@ -244,7 +248,7 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .getByRole("button", { name: "Generate cited answer", exact: true })
     .press("Enter");
   await expect(
-    page.getByText("Research run: failed", { exact: true }),
+    page.getByText("Research run: Failed", { exact: true }),
   ).toBeVisible({ timeout: 30000 });
   await sections
     .getByRole("button", { name: "Saved research", exact: true })

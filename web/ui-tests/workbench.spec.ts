@@ -77,6 +77,7 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     .getByRole("button", { name: "Search evidence", exact: true })
     .click();
   await expect(page.getByText("2 unique passages")).toBeVisible();
+  await page.getByText("More result options", { exact: true }).click();
   await page.getByLabel("Show retrieval method").selectOption("hybrid");
   await page.getByLabel("Filter returned passages").fill("Lexical baselines");
   const ranking = page.getByRole("region", { name: "Hybrid · RRF" });
@@ -90,7 +91,13 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
   await page.keyboard.press("Escape");
   await expect(hit).toBeFocused();
   await ranking.getByRole("button", { name: "Shortlist passage" }).click();
-  await page.getByText("Evidence shortlist", { exact: false }).first().click();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "Passage added to the evidence shortlist." }),
+  ).toBeVisible();
+  await page.getByText("More evidence options", { exact: true }).click();
+  await page.locator("#passage-shortlist > summary").click();
   await expect(page.locator(".passage-board article")).toHaveCount(1);
   const downloadEvent = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export evidence" }).click();
@@ -165,6 +172,7 @@ test("shortlist enforces its comparison limit and frees slots on removal", async
   await page
     .getByRole("button", { name: "Search evidence", exact: true })
     .click();
+  await page.getByText("More evidence options", { exact: true }).click();
   const controls = page.getByRole("button", { name: "Shortlist passage" });
   for (let index = 0; index < 7; index++) await controls.nth(index).click();
   await expect(page.locator(".count-pill")).toHaveText("6/6");
@@ -192,7 +200,8 @@ test("recent searches restore drafts and collection changes clear the shortlist"
     .first()
     .click();
   await page.getByLabel("Research question").fill("Unsaved draft");
-  await page.getByText("Recent searches in this collection").click();
+  await page.getByText("More evidence options", { exact: true }).click();
+  await page.locator("#recent-searches > summary").click();
   await page.getByRole("button", { name: /Original question/ }).click();
   await expect(page.getByLabel("Research question")).toHaveValue(
     "Original question",
