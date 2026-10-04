@@ -376,6 +376,9 @@ for (const width of [1280, 390])
       await page.reload();
       await ready();
       await capture("workspace-search");
+      await page.getByText("More search options", { exact: true }).click();
+      await capture("search-options");
+      await page.getByText("More search options", { exact: true }).click();
       await page.locator(".skip").focus();
       await measure("skip-link", page.locator(".skip"));
       await measure("footer", page.locator("footer"));
@@ -405,6 +408,10 @@ for (const width of [1280, 390])
         .click();
       await expect(page.getByText("2 unique passages")).toBeVisible();
       await capture("search-results");
+      await page.locator("#search-based-on > summary").click();
+      await capture("search-based-on");
+      await page.locator("#search-based-on > summary").click();
+      await page.getByText("More evidence options", { exact: true }).click();
       await page.locator(".recent-searches > summary").click();
       await capture("recent-searches");
       await page
@@ -447,6 +454,7 @@ for (const width of [1280, 390])
       await expect(page.getByTitle("Original source preview")).toBeVisible();
       await capture("original-source-preview");
       await page.keyboard.press("Escape");
+      await page.getByText("More result options", { exact: true }).click();
       await page.getByLabel("Filter returned passages").fill("no-match");
       await capture("search-no-matches");
       await section("Sources");
@@ -515,6 +523,8 @@ for (const width of [1280, 390])
         page.getByRole("button", { name: /Allow this cloud provider/ }),
       ).toBeVisible();
       await capture("cited-answers-cloud-consent");
+      await page.getByText("More answer options", { exact: true }).click();
+      await capture("answer-options");
       await section("Saved research");
       await expect(
         page.getByRole("button", { name: /Synthetic review question/ }).first(),
@@ -528,6 +538,12 @@ for (const width of [1280, 390])
         page.getByText("Synthetic claim for layout review only."),
       ).toBeVisible();
       await capture("saved-answer");
+      await page.locator("#answer-based-on > summary").click();
+      await capture("answer-based-on");
+      await page.locator("#answer-based-on > summary").click();
+      await page.getByText("More run options", { exact: true }).click();
+      await page.locator("#run-provenance > summary").click();
+      await capture("run-options-and-provenance");
       await measure("answer-status", page.locator(".answer-status"));
       await page
         .getByRole("button", { name: "Inspect citation e1", exact: true })
