@@ -153,7 +153,7 @@ function App() {
       <main className="welcome">
         <div className="wordmark">
           <span className="logo-mark">
-            <BookOpenText size={19} />
+            <BookOpenText size={19} aria-hidden="true" />
           </span>{" "}
           RetrieVec
         </div>
@@ -168,7 +168,8 @@ function App() {
           inspect the evidence behind every result.
         </p>
         <ActionLink variant="primary" href="/auth/login">
-          Sign in to your workspace <ArrowUpRight size={17} />
+          Sign in to your workspace{" "}
+          <ArrowUpRight size={17} aria-hidden="true" />
         </ActionLink>
         {error && <Notice error>{error}</Notice>}
         <p className="muted">
@@ -187,7 +188,7 @@ function App() {
       >
         <div className="wordmark">
           <span className="logo-mark">
-            <BookOpenText size={18} />
+            <BookOpenText size={18} aria-hidden="true" />
           </span>{" "}
           RetrieVec
           <IconButton
@@ -195,7 +196,7 @@ function App() {
             aria-label="Close navigation"
             onClick={() => setNavigationOpen(false)}
           >
-            <X size={18} />
+            <X size={18} aria-hidden="true" />
           </IconButton>
         </div>
         <p className="eyebrow">Collections</p>
@@ -255,15 +256,15 @@ function App() {
             />
           </Field>
           <Button disabled={busy || !title.trim()} type="submit">
-            <Plus size={16} /> Create collection
+            <Plus size={16} aria-hidden="true" /> Create collection
           </Button>
         </form>
         <div className="account">
           <span>
-            <ShieldCheck size={14} /> Private workspace
+            <ShieldCheck size={14} aria-hidden="true" /> Private workspace
           </span>
           <Button onClick={logout}>
-            <LogOut size={14} /> Sign out
+            <LogOut size={14} aria-hidden="true" /> Sign out
           </Button>
         </div>
       </NavigationPanel>
@@ -335,13 +336,13 @@ function App() {
               aria-expanded={navigationOpen}
               onClick={() => setNavigationOpen(true)}
             >
-              <Menu size={19} />
+              <Menu size={19} aria-hidden="true" />
             </IconButton>
             <p className="eyebrow">Research workspace</p>
             <h1>{active?.title ?? "A place for your next question"}</h1>
             {active && (
               <p className="header-meta">
-                <ShieldCheck size={14} />{" "}
+                <ShieldCheck size={14} aria-hidden="true" />{" "}
                 {active.visibility === "curated"
                   ? "Curated collection"
                   : "Private collection"}
@@ -357,7 +358,7 @@ function App() {
               disabled={busy}
               title="Hide this collection and cancel active processing. Undo restores access, but does not restart cancelled work."
             >
-              <Archive size={15} /> Archive collection
+              <Archive size={15} aria-hidden="true" /> Archive collection
             </Button>
           )}
         </header>
@@ -467,7 +468,7 @@ function App() {
         {!active ? (
           <EmptyState
             title="Start with a collection"
-            icon={<Sparkles size={30} />}
+            icon={<Sparkles size={30} aria-hidden="true" />}
             action={
               <Button
                 variant="primary"

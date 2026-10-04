@@ -231,12 +231,13 @@ export function Search({
           </More>
           <Button
             type="submit"
+            loading={busy}
             title="Search evidence (Ctrl or Command + Enter)"
             aria-keyshortcuts="Control+Enter Meta+Enter"
             className="primary"
             disabled={busy || !collection.active_snapshot}
           >
-            {busy ? "Searching…" : "Search evidence →"}
+            {busy ? "Searching…" : "Search evidence"}
           </Button>
           {busy && (
             <Button

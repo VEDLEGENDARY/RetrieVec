@@ -78,7 +78,7 @@ export function EvidenceTray({
                     aria-label={`Remove ${item.hit.title} from shortlist`}
                     onClick={() => remove(passageKey(item))}
                   >
-                    <X size={16} />
+                    <X size={16} aria-hidden="true" />
                   </IconButton>
                 </div>
                 <p className="passage-meta">
