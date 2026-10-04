@@ -1,6 +1,8 @@
 # RetrieVec core flows and navigation proposal
 
-Date: 2026-09-29. **Navigation and implementation approved by the owner.** This document preserves the original flow inventory and proposal; implementation is underway in PR #46.
+Date: 2026-09-29. **Navigation and implementation approved by the owner.** This document preserves the original flow inventory and proposal. The 2026-10-04 UI-unification phase builds on the navigation already merged into `main`; see [current audit status](AUDIT.md#implementation-update--2026-10-04) and [shared component contracts](docs/DESIGN_SYSTEM.md).
+
+Current presentation uses Ask → Answer / Find passages, Sources, and Saved research. Answer composition is headed **Cited answers**. Collection details/readiness replace the old overview, and archive uses the existing Undo flow. UI unification retains the existing shortcuts, focus/Escape behavior, retry keys, session cleanup, consent rules, and research state machine; this phase does not approve or introduce further navigation or retrieval-default changes. The audit lists actual automated coverage and remaining manual/integration gates.
 
 ## One mental model
 

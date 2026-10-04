@@ -3,7 +3,57 @@
 Date: 2026-09-29  
 Baseline: `f6e021142df2f4a4990b7b4c2b28da45bd485882`  
 Plan: **Plan 1, Step 1 only**  
-Status: **Baseline audit approved by the owner. Implementation is underway in PR #46; the inventory below records the pre-change state.**
+Status: **UI unification implemented on `codex/ui-unification`, based on `origin/main` (`8384565`). The original inventory below is historical; the implementation update records current coverage and remaining verification limits.**
+
+## Implementation update — 2026-10-04
+
+See [the design-system contract](docs/DESIGN_SYSTEM.md) for the shared APIs, token roles, static asset generation, and reproduction commands. This phase changes presentation and browser tests only; retrieval defaults, storage, authorization, consent, snapshot immutability, and API error codes are unchanged.
+
+| Findings | Current implementation |
+| --- | --- |
+| DS-01–06 | One token source, complete semantic light/dark roles, six named type sizes, 4px spacing scale, five radius roles, shared elevation and explicit disabled colors. |
+| DS-07–08, DS-30 | Native `color-scheme`, generated theme-color metadata, supported system/serif/monospace font stacks, explicit small/heading/code/placeholder roles. Inter is not assumed. |
+| DS-09–10 | Standard control icons and icon-button sizes, accessible icon-only names, decorative icons hidden; trailing action-arrow copy removed. Source SVG geometry and keyboard notation are retained. |
+| DS-11–12 | Focus outlines remain visible; disabled controls do not receive enabled hover styles. Rendered input-focus and disabled-hover assertions cover both themes. |
+| DS-13–15 | Shared loading/busy controls, persistent Notices, and Fields with label/help/error associations. Upload queue errors now associate with the file control; retry keys and validation limits are unchanged. |
+| DS-16–17, DS-20 | Shared Button/ActionLink/IconButton, Surface, EmptyState/LoadingState, StatusBadge, Disclosure, and native-dialog base. Native control sites are centralized in `ui.tsx`; domain workflows and nonmodal inspectors retain their behavior. |
+| DS-18–19 | Removed obsolete overview/hero/stat/workflow, tooltip, old citation-inspector, navigation-open, status, and `rise` rules; merged repeated eyebrow/inspector/excerpt declarations. Shared 150–250ms motion and reduced-motion override remain. |
+| DS-21–28 | Cited answers and Saved research are distinct; consistent source actions and sentence case; explicit readable state mapping; recovery-oriented errors; readable-text/OCR wording; named export formats. Backend enums and error codes are unchanged. |
+| DS-29 | Generated favicon palette and browser chrome colors come from the token source. Structured evidence uses a tokenized highlight with a contrasting halo; ordinary PDF exact highlighting is not claimed. |
+
+### Current screen coverage
+
+`web/ui-tests/design-system.spec.ts` captures the current equivalents of every application-owned inventory row at **1280px and 390px, light and dark**, including errors, empty/loading states, disabled/selected controls, all four structured-evidence bodies, processing/run states, provider consent, source previews, and overlays. PNGs and `screen-and-contrast-report.json` are saved under `web/test-results/design-system-screen-inventory-<width>-<theme>/` and attached to Playwright results. Fixtures are explicitly synthetic, not model-quality evidence. They are captures, not approved golden-image baselines.
+
+The standalone overview and browser archive-confirmation screen had already been replaced on `main`; captures cover Collection details/readiness and archive Undo. Mobile navigation is captured at 390px; its desktop equivalent is the persistent sidebar. External OIDC-provider pages are outside this repository's UI and are not represented as tested screens.
+
+The suite runs WCAG-tagged axe scans against each settled fixture screen in both themes. It also measures computed foreground and composited background colors for answer/status badges, file errors, diagnostic code, footer, focused skip links, and input focus. The historical stat-detail surface was removed with the obsolete overview. The measurement helper rejects gradient/image/opacity text surfaces instead of guessing a passing ratio. Source images use their own retained colors; no arbitrary-image highlight contrast certification is claimed.
+
+Supplemental checks cover forced-colors focus, reduced motion, and 640px reflow. Existing tests cover shortcuts, focus return, Escape, upload retry keys, drafts, session cleanup, and streaming revocation. Manual screen-reader testing, actual browser zoom, other browser engines, and real-service/OIDC integration remain unverified. PostgreSQL integration tests require an isolated PostgreSQL 18 service; Docker's Linux-engine pipe is unavailable on this machine, including outside the sandbox. Do not treat automatic database-test skips as passed integration gates.
+
+The remaining sections preserve the original source audit and its exact baseline values for comparison. Historical statements such as “no shared library” or “not applied” below describe `f6e0211`, not the current implementation.
+
+### Verification results — 2026-10-04
+
+Measured records: [UI screen/contrast report](docs/results/ui-unification-2026-10-04.json). Both viewport sizes produced the same ratios below; values are rounded to two decimals only for this table.
+
+| Rendered surface | Light | Dark | Minimum |
+| --- | ---: | ---: | ---: |
+| Answer/status badge | 6.31:1 | 7.18:1 | 4.5:1 |
+| Upload file error | 7.64:1 | 8.89:1 | 4.5:1 |
+| Diagnostic code | 6.37:1 | 8.50:1 | 4.5:1 |
+| Footer | 5.92:1 | 10.01:1 | 4.5:1 |
+| Focused skip link | 7.09:1 | 7.09:1 | 4.5:1 |
+| Input focus outline against field surface | 7.09:1 | 9.50:1 | 3:1 |
+
+The new skip-link assertion first failed at **1.43:1** in dark mode; using the shared action background fixed it. Historical stat-detail styles are removed, so there is no surviving stat-detail surface to certify.
+
+- `python scripts/check.py`: exit 0; Go vet/tests/build and Python dependency/lint/format/token checks passed. Python reported 125 tests, with **106 executed and 19 automatically skipped** for the unavailable isolated PostgreSQL service.
+- `cd web && npm run build`: exit 0; generated-brand consistency and TypeScript checks passed. Dependency-level Lucide `use client` warnings remain.
+- `cd web && npm run test:ui -- --workers=2`: **19 passed**, including all four screen matrices, with **124 PNG captures**. Settled inventory fixtures have no violations from the selected WCAG axe rules. Loading, forced-colors and supplemental reflow captures have their explicitly scoped assertions rather than a claim of full axe certification.
+- `docker info --format '{{.ServerVersion}}'`: failed because the Docker Desktop Linux engine pipe does not exist, including on the escalated retry. Database/integration checks remain unverified; no test skip conditions were changed.
+
+On this Windows host, Python used `.venv/Scripts/python.exe`; npm used `node C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js`. Generated screenshots/logs remain local and ignored. These checks establish fixture behavior and measured contrast, not full WCAG conformance or release performance.
 
 ## Scope and method
 
@@ -181,7 +231,7 @@ Acceptance checks for later steps:
 - Keep all existing UI, database/RPC/OIDC integration and API contract checks; update selectors only for intentional glossary/semantic changes.
 - Use a separate small commit per plan step. Do not modify retrieval, storage, generation, authorization or deployment behavior as part of visual unification.
 
-## Step 1 completion
+## Step 1 completion (historical)
 
 The audit and exact inventories are the only deliverable in this step. No tokens, components, behavior, copy, or application styling have been changed. Plans 2 and 3 have not yet been supplied. **Stop here for owner review before Step 2.**
 
