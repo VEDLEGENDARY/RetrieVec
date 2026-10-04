@@ -242,7 +242,7 @@ export function AdvancedEvidence({
         target="_blank"
         rel="noreferrer"
       >
-        Compare original PDF page
+        Open original source
       </ActionLink>
       <Structure content={value.content} />
       {value.warnings.length > 0 && (
