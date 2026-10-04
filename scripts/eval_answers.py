@@ -14,6 +14,7 @@ import httpx
 from retrievec.app.answers import abstention, answer_schema
 from retrievec.app.generation import LlamaProvider, load_providers, pack_evidence
 from retrievec.evaluation.answer_signals import automatic_signals
+from retrievec.evaluation.files import validate_outputs, write_json
 from retrievec.evaluation.nli_proxy import NliConfig, NliProxy
 
 
@@ -22,28 +23,47 @@ def _digest(path: Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def load_cases(path: Path) -> tuple[dict, list[dict]]:
+def load_cases(path: Path) -> tuple[dict, list[tuple[dict, list[dict]]]]:
     dataset = json.loads(path.read_text(encoding="utf-8"))
-    if dataset.get("schema_version") != 1 or not isinstance(dataset.get("questions"), list):
+    if (
+        not isinstance(dataset, dict)
+        or dataset.get("schema_version") != 1
+        or not isinstance(dataset.get("questions"), list)
+        or not dataset["questions"]
+    ):
         raise ValueError("expected versioned questions dataset")
     global_evidence = dataset.get("evidence", [])
     cases = []
     seen = set()
     for item in dataset["questions"]:
+        if not isinstance(item, dict):
+            raise ValueError("each question must be an object")
+        if any(
+            field in item and type(item[field]) is not bool for field in ("empty", "unanswerable")
+        ):
+            raise ValueError("question flags must be booleans")
         case_id, question = item.get("id"), item.get("question")
         if not isinstance(case_id, str) or not case_id or case_id in seen:
             raise ValueError("question IDs must be unique nonempty strings")
         seen.add(case_id)
         if not isinstance(question, str) or not question.strip():
             raise ValueError(f"question {case_id} has no text")
+        if "effective_query" in item and (
+            not isinstance(item["effective_query"], str) or not item["effective_query"].strip()
+        ):
+            raise ValueError(f"question {case_id} has invalid effective query")
         evidence = [] if item.get("empty") else item.get("evidence", global_evidence)
         if not isinstance(evidence, list) or any(
             not isinstance(row, dict)
             or not isinstance(row.get("chunk_id"), str)
+            or not row["chunk_id"].strip()
             or not isinstance(row.get("text"), str)
+            or not row["text"].strip()
             for row in evidence
         ):
             raise ValueError(f"question {case_id} has invalid evidence")
+        if len({row["chunk_id"] for row in evidence}) != len(evidence):
+            raise ValueError(f"question {case_id} has duplicate evidence")
         cases.append((item, evidence))
     return dataset, cases
 
@@ -54,15 +74,18 @@ async def run_case(provider: LlamaProvider, case: dict, evidence: list[dict], nl
     try:
         query = case.get("effective_query", case["question"])
         packet = await pack_evidence(provider, query, evidence)
+        # Save exactly what was packed, including evidence IDs, before generation can fail.
+        row["evidence"] = packet["evidence"]
+        row["effective_query"] = query
+        row["evidence_ids"] = [item["evidence_id"] for item in packet["evidence"]]
+        row["input_tokens"] = packet["input_tokens"]
+        row["excluded"] = packet["excluded"]
         raw = (
             await provider.generate(packet["prompt"], answer_schema(packet["evidence"]))
             if packet["evidence"]
             else json.dumps(abstention())
         )
         row["answer"] = raw
-        row["evidence_ids"] = [item["evidence_id"] for item in packet["evidence"]]
-        row["input_tokens"] = packet["input_tokens"]
-        row["excluded"] = packet["excluded"]
         row["automatic"] = automatic_signals(
             raw,
             packet["evidence"],
@@ -140,6 +163,9 @@ def export_reviews(report: dict, cases: list[dict]) -> dict:
                 "reference_answer": by_id[result["question_id"]].get("expected_answer"),
                 "provider_id": run["provider_id"],
                 "answer": result.get("answer"),
+                "effective_query": result.get("effective_query"),
+                "evidence": result.get("evidence"),
+                "failure": result.get("failure"),
                 "automatic": result.get("automatic"),
                 "human_claim_support": None,
                 "human_citation_precision": None,
@@ -163,14 +189,18 @@ def main() -> None:
     parser.add_argument("--review-output", type=Path, required=True)
     parser.add_argument("--nli-config", type=Path)
     args = parser.parse_args()
+    inputs = [args.dataset, args.providers, *([args.nli_config] if args.nli_config else [])]
+    try:
+        validate_outputs([args.output, args.review_output], inputs)
+    except ValueError as error:
+        parser.error(str(error))
     report = asyncio.run(evaluate(args))
     _, cases = load_cases(args.dataset)
     for path, data in (
         (args.output, report),
         (args.review_output, export_reviews(report, [case for case, _ in cases])),
     ):
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        write_json(path, data)
 
 
 if __name__ == "__main__":

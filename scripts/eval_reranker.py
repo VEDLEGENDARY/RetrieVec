@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 
+from retrievec.evaluation.files import validate_outputs, write_json
 from retrievec.experiments.reranker import (
     OnnxCrossEncoder,
     evaluate_pool_sweep,
@@ -17,6 +18,10 @@ def main() -> None:
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    try:
+        validate_outputs([args.output], [args.input])
+    except ValueError as error:
+        parser.error(str(error))
     raw = args.input.read_bytes()
     data = json.loads(raw)
     if data.get("schema_version") != 1 or data.get("retrieval") != "hybrid":
@@ -41,12 +46,14 @@ def main() -> None:
         judgment_provenance=data["judgment_provenance"],
         subset=data.get("subset", False),
         quality_evidence=not data.get("subset", False)
-        and all(not run["failures"] for run in report["sizes"].values()),
+        and all(
+            not run["failures"]
+            and run["paired_vs_plain_hybrid"]["metrics"]["ndcg"]["paired_count"]
+            == len(data["pools"])
+            for run in report["sizes"].values()
+        ),
     )
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    write_json(args.output, report)
 
 
 if __name__ == "__main__":
