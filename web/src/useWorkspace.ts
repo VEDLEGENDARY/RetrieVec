@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { clearDrafts, retainPrincipalDrafts } from "./drafts";
 import { navigate, readRoute } from "./routing";
+import { errorMessage } from "./presentation";
 
 /** Own session lifetime here so late refreshes cannot restore signed-out data. */
 export function useWorkspace() {
@@ -35,9 +36,7 @@ export function useWorkspace() {
         setSelected("");
         setCollections([]);
       }
-      setError(
-        cause instanceof Error ? cause.message : "Request failed. Try again.",
-      );
+      setError(errorMessage(cause));
     },
     [clearSession],
   );
