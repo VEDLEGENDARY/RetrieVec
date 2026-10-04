@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-START, END = "<!-- BEIR RESULTS START -->", "<!-- BEIR RESULTS END -->"
 
 
 def tables(report):
@@ -57,22 +56,6 @@ def main():
         "default PDF upload chunking and is recorded in snapshot provenance. "
         "This does not evaluate PDF extraction, answers, private-scope isolation, or concurrency."
     )
-    section = (
-        f"{START}\n\n## Measured retrieval results\n\n{table}\n\n"
-        f"Source: [{relative}]({relative}). [Protocol and limitations](BENCHMARKS.md).\n\n"
-        f"{limitations}\n\nAfter [native setup](#native-setup), replace `python` below with "
-        f"`.\\.venv\\Scripts\\python.exe` on Windows or `.venv/bin/python` on Linux:\n\n"
-        f"```sh\n{command}\n```\n{END}"
-    )
-    readme_path = ROOT / "README.md"
-    readme = readme_path.read_text(encoding="utf-8")
-    if START in readme:
-        before, remainder = readme.split(START, 1)
-        _, after = remainder.split(END, 1)
-        readme = before + section + after
-    else:
-        title, remainder = readme.split("\n", 1)
-        readme = title + "\n\n" + section + "\n" + remainder
     effects = {}
     for name in ("scifact", "scidocs"):
         effects[name] = report["datasets"][name]["paired_bootstrap"][
@@ -199,7 +182,8 @@ def main():
             "",
             "## Reproduce",
             "",
-            "Complete the README native setup first. Replace `python` with "
+            "Complete the [native setup](docs/DEVELOPMENT.md#native-setup) first. "
+            "Replace `python` with "
             "`.\\.venv\\Scripts\\python.exe` on Windows or `.venv/bin/python` on Linux.",
             "",
             "```sh",
@@ -229,7 +213,6 @@ def main():
         ]
     )
     (ROOT / "BENCHMARKS.md").write_text("\n".join(detail), encoding="utf-8")
-    readme_path.write_text(readme, encoding="utf-8")
 
 
 if __name__ == "__main__":
