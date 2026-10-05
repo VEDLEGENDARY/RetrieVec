@@ -6,6 +6,7 @@ import uuid
 
 from retrievec.corpus.snapshot import load_snapshot
 from retrievec.dense.artifacts import load_embeddings
+from retrievec.dense.parallel import run_legs
 from retrievec.dense.search import exact_search
 
 
@@ -42,16 +43,19 @@ class PinnedClient:
         snapshot_id: str | None = None,
         candidates: int = 100,
         artifact_cache: dict | None = None,
+        concurrent_legs: bool = False,
     ):
         if (
             retrieval not in ("sparse", "dense", "hybrid")
             or type(candidates) is not int
             or not 1 <= candidates <= 1000
+            or type(concurrent_legs) is not bool
         ):
             raise ValueError("invalid retrieval mode or candidate count")
         self.registry, self.store, self.node = registry, store, node
         self.principal, self.collection = principal, collection
         self.retrieval, self.model, self.candidates = retrieval, model, candidates
+        self.concurrent_legs = concurrent_legs
         registered = registry.resolve(principal, collection, snapshot_id)
         self.snapshot_id = registered["snapshot_id"]
         self.manifest = store.manifest(self.snapshot_id)
@@ -130,10 +134,32 @@ class PinnedClient:
         start = time.perf_counter()
         sparse, dense, timings = [], [], {}
         total = 0
-        if self.retrieval != "dense":
-            response = self.node.search(
+
+        def sparse_leg():
+            return self.node.search(
                 self.collection, self.snapshot_id, query, mode, self.candidates, explain
             )
+
+        def dense_leg():
+            dense_start = time.perf_counter()
+            vector = self.model.encode([self.model.config["query_prefix"] + query])[0]
+            hits = exact_search(
+                self.vectors,
+                [c["chunk_id"] for c in self.embedding["chunks"]],
+                vector,
+                self.candidates,
+            )
+            return hits, (time.perf_counter() - dense_start) * 1000
+
+        if self.retrieval == "hybrid":
+            response, (dense, timings["dense_ms"]) = run_legs(
+                sparse_leg, dense_leg, concurrent=self.concurrent_legs
+            )
+        elif self.retrieval == "sparse":
+            response = sparse_leg()
+        else:
+            dense, timings["dense_ms"] = dense_leg()
+        if self.retrieval != "dense":
             if response.corpus_snapshot_id != self.manifest["corpus_snapshot_id"]:
                 raise ValueError("cannot combine different corpus snapshots")
             sparse = [
@@ -150,15 +176,6 @@ class PinnedClient:
             timings["sparse_ms"] = response.search_ms
             total = response.total_matches
         if self.retrieval != "sparse":
-            dense_start = time.perf_counter()
-            vector = self.model.encode([self.model.config["query_prefix"] + query])[0]
-            dense = exact_search(
-                self.vectors,
-                [c["chunk_id"] for c in self.embedding["chunks"]],
-                vector,
-                self.candidates,
-            )
-            timings["dense_ms"] = (time.perf_counter() - dense_start) * 1000
             total = len(self.chunks)
         if self.retrieval == "hybrid":
             ranked = fuse([sparse, dense])
