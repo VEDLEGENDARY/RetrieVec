@@ -1,5 +1,20 @@
 # Performance baseline and measurement contract
 
+## Phase 3 hybrid diagnostic profile
+
+The sequential offline hybrid path was profiled on 10 queries from the frozen SciFact
+development split, using the complete legacy corpus and cached pinned MiniLM model.
+[Per-query observations](docs/results/hybrid-profile-development-2026-10-04.json)
+retain sparse, dense, fusion and wall-clock durations. Under cProfile, the run took
+2.311 seconds: exact dense search accounted for 1.568 seconds cumulatively, sparse
+retrieval for 0.604 seconds, and query-encoder ONNX execution for 0.128 seconds.
+These are instrumented diagnostic observations, not held-out latency percentiles.
+Dense scoring includes validation of vector IDs, finiteness and normalization;
+this phase preserves those checks. The profile motivates overlapping the two legs,
+with exact ranking/score parity and separate alternating-order wall-clock measurements
+required before changing the scheduling default. See BENCHMARKS.md for published
+held-out measurements when available.
+
 2026-09-29. Plan 3, measurement increment only. Source base: `f6e021142df2f4a4990b7b4c2b28da45bd485882` plus the uncommitted browser recorder/test. Plans 1 and 2 remain at their review gates. No motion, navigation, cache, persistence, or streaming behavior has changed.
 
 ## Measured baseline
