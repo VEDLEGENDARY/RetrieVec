@@ -7,6 +7,7 @@ import time
 from retrievec.corpus.snapshot import load_snapshot
 from retrievec.dense.artifacts import load_embeddings
 from retrievec.dense.hybrid import fuse
+from retrievec.dense.parallel import run_legs
 from retrievec.dense.search import exact_search
 from retrievec.registry.artifacts import Store
 
@@ -86,3 +87,21 @@ class Pipeline:
         result = fuse([sparse, dense], k)
         # PinnedClient also slices the fused chunk list before returning it.
         return result[: self.candidates], (time.perf_counter() - started) * 1000
+
+    def retrieve_hybrid(self, query, config, *, concurrent):
+        started = time.perf_counter()
+        (sparse, sparse_ms), (dense, dense_ms) = run_legs(
+            lambda: self.sparse(query, config),
+            lambda: self.dense(query),
+            concurrent=concurrent,
+        )
+        hits, fusion_ms = self.hybrid(sparse, dense, config["rrf_k"])
+        return (
+            hits,
+            (time.perf_counter() - started) * 1000,
+            {
+                "sparse_ms": sparse_ms,
+                "dense_ms": dense_ms,
+                "fusion_ms": fusion_ms,
+            },
+        )
