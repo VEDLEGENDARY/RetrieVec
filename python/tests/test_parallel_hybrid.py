@@ -111,9 +111,9 @@ class ParallelHybridTests(unittest.TestCase):
         ):
             clients = [
                 PinnedClient(
-                    registry, store, node, "owner", "collection", model=model, concurrent_legs=value
-                )
-                for value in (False, True)
+                    registry, store, node, "owner", "collection", model=model, concurrent_legs=False
+                ),
+                PinnedClient(registry, store, node, "owner", "collection", model=model),
             ]
             for query in ("lexical", "dense retrieval", "unseen query"):
                 for cutoff in (1, 3):
