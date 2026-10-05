@@ -34,7 +34,8 @@ def render(root, report, relative, table):
         *(
             [
                 "The measured parity and paired latency evidence enable bounded concurrent "
-                "scheduling by default. Ranking, analyzer, chunking and reranker defaults are preserved.",
+                "scheduling by default. Ranking, analyzer, chunking and reranker defaults "
+                "are preserved.",
                 "",
             ]
             if report.get("post_measurement_decision", {}).get("concurrent_legs_enabled_by_default")
