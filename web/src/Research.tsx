@@ -1,4 +1,5 @@
 import { BasedOn } from "./BasedOn";
+import { SectionField } from "./SectionField";
 import { stateLabel, exportLabels, errorMessage } from "./presentation";
 import {
   Button,
@@ -163,6 +164,7 @@ export function Research({
     [],
   );
   const [busy, setBusy] = useState(false);
+  const [section, setSection] = useState("");
   const [notice, setNotice] = useState("");
   const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
   const selectedProvider = providers.find((item) => item.name === provider);
@@ -340,6 +342,10 @@ export function Research({
               replay && run ? run.effective_query : effective || null,
             provider: replay && run ? run.configuration.provider : provider,
             retrieval: replay && run ? run.configuration.retrieval : "hybrid",
+            section:
+              replay && run
+                ? (run.configuration.section ?? null)
+                : section || null,
             parent_run: run?.run_id ?? null,
             snapshot,
           }),
@@ -570,6 +576,14 @@ export function Research({
         </p>
         {rewriteError && <Notice error>{rewriteError}</Notice>}
         <More label="More answer options">
+          <SectionField
+            value={section}
+            disabled={busy}
+            onChange={(value) => {
+              setSection(value);
+              setRequestKey(crypto.randomUUID());
+            }}
+          />
           <Field label="Standalone query for a follow-up (optional)">
             <Input
               id="effective-query"
