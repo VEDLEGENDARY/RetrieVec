@@ -176,6 +176,7 @@ class ResearchWorker:
         thread = threading.Thread(target=heartbeat, daemon=True)
         thread.start()
         started = time.perf_counter()
+        first_token_ms = None
         error = "provider_unavailable"
         try:
             if not self.state.heartbeat(run):
@@ -192,6 +193,7 @@ class ResearchWorker:
             error = "provider_failed"
 
             async def generate():
+                nonlocal first_token_ms
                 if not retrieved["hits"]:
                     return {
                         "evidence": [],
@@ -227,10 +229,11 @@ class ResearchWorker:
                         if output_size > 65536:
                             raise ProviderError("streamed answer exceeded its output budget")
                         parts.append(delta)
-                        if first:
+                        if first and delta:
+                            first_token_ms = (time.perf_counter() - started) * 1000
                             emit(
                                 "research.first_token",
-                                elapsed_ms=(time.perf_counter() - started) * 1000,
+                                elapsed_ms=first_token_ms,
                             )
                             first = False
                     raw = "".join(parts)
@@ -259,6 +262,10 @@ class ResearchWorker:
                 "budget": {k: v for k, v in packet.items() if k not in ("evidence", "prompt")},
                 "retrieval": retrieved["configuration"],
                 "elapsed_ms": round((time.perf_counter() - started) * 1000, 2),
+                "timing": {
+                    "worker_start_to_first_token_ms": first_token_ms,
+                    "definition": "Worker start to first nonempty content token; excludes queue.",
+                },
                 "validation": "structural_only",
                 "human_review": "pending",
             }
