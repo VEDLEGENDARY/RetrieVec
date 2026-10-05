@@ -18,7 +18,9 @@ class Pipeline:
         store = Store(work / "store")
         manifest = store.manifest(prepared["snapshot_id"])
         corpus = store.path("corpora", manifest["corpus_snapshot_id"], "ss_")
-        _, _, chunks = load_snapshot(corpus)
+        _, papers, chunks = load_snapshot(corpus)
+        self.chunks = {row["chunk_id"]: row for row in chunks}
+        self.titles = {row["paper_version_id"]: row["title"] for row in papers}
         self.papers = {row["chunk_id"]: row["paper_id"] for row in chunks}
         embedding, self.vectors = load_embeddings(
             store, prepared["embedding_id"], manifest["corpus_snapshot_id"]
@@ -26,6 +28,7 @@ class Pipeline:
         if embedding["configuration"] != model.config:
             raise ValueError("model configuration changed")
         self.ids = [row["chunk_id"] for row in embedding["chunks"]]
+        self.offsets = {key: index for index, key in enumerate(self.ids)}
         self.log = (work / "sparse-worker.log").open("w", encoding="utf-8")
         self.process = subprocess.Popen(
             [str(engine.resolve()), "benchmark", "--corpus", str(corpus)],
@@ -105,3 +108,51 @@ class Pipeline:
                 "fusion_ms": fusion_ms,
             },
         )
+
+    def sparse_then_dense(self, query, config):
+        started = time.perf_counter()
+        sparse, _ = self.sparse(query, config)
+        vector = self.model.encode([self.model.config["query_prefix"] + query])[0]
+        ids = [row["chunk_id"] for row in sparse]
+        hits = (
+            exact_search(
+                self.vectors[[self.offsets[key] for key in ids]], ids, vector, self.candidates
+            )
+            if ids
+            else []
+        )
+        return hits, (time.perf_counter() - started) * 1000
+
+
+class SparseControl(Pipeline):
+    """The same offline Go scoring transport with either chunks or whole records."""
+
+    def __init__(self, engine, work, *, corpus=None, documents=None, analyzer="unicode"):
+        if (corpus is None) == (documents is None):
+            raise ValueError("choose exactly one sparse control input")
+        self.candidates = 100
+        if corpus is not None:
+            _, _, chunks = load_snapshot(corpus)
+            self.papers = {row["chunk_id"]: row["paper_id"] for row in chunks}
+            flags = ["--corpus", str(corpus)]
+        else:
+            from retrievec.evaluation.beir_data import rows
+
+            self.papers = {row["_id"]: row["_id"] for row in rows(documents)}
+            flags = ["--documents", str(documents), "--analyzer", analyzer]
+        work.mkdir(parents=True, exist_ok=True)
+        self.log = (work / "worker.log").open("w", encoding="utf-8")
+        self.process = subprocess.Popen(
+            [str(engine.resolve()), "benchmark", *flags],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=self.log,
+            text=True,
+            encoding="utf-8",
+            bufsize=1,
+        )
+        try:
+            self.startup = json.loads(self.process.stdout.readline())
+        except (ValueError, KeyError, OSError):
+            self.close()
+            raise
