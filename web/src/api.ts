@@ -11,6 +11,14 @@ export type Job = {
   output_snapshot: string | null;
 };
 export type Hit = {
+  section?: string;
+  section_heading?: string | null;
+  text_offsets?: {
+    unit: string;
+    page: number | null;
+    start: number;
+    end: number;
+  } | null;
   evidence_object_id?: string;
   evidence_type?: "prose" | "table" | "equation" | "figure";
   rank: number;

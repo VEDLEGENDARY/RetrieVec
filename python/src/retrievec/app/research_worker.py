@@ -63,7 +63,9 @@ class ResearchWorker:
                 run["snapshot_id"],
                 config["candidates"],
             )
-            result = client.search(run["effective_query"], top_k=config["top_k"])
+            result = client.search(
+                run["effective_query"], top_k=config["top_k"], section=config.get("section")
+            )
             _, papers, _ = load_snapshot(
                 store.path("corpora", client.manifest["corpus_snapshot_id"], "ss_")
             )
@@ -98,12 +100,19 @@ class ResearchWorker:
 
             typed_index = EvidenceIndex(store.root, corpus)
         retained = {chunk["chunk_id"]: chunk for chunk in chunks}
+        from retrievec.corpus.sections import PassageProvenance
+
+        provenance = PassageProvenance(store.root, corpus)
         with self.registry.connect() as db:
             self.state.access(db, run)
             for item in evidence:
                 chunk = retained.get(item["chunk_id"])
                 if not chunk or chunk["text"] != item["text"]:
                     raise ProviderError("retained evidence unavailable")
+                if corpus["configuration"].get("passage_provenance_id"):
+                    attributes = provenance.attributes(chunk)
+                    if any(item.get(key) != value for key, value in attributes.items()):
+                        raise ProviderError("passage provenance changed")
                 if typed_index is not None:
                     attributes = typed_index.attributes(chunk)
                     if any(item.get(key) != value for key, value in attributes.items()):

@@ -1,4 +1,5 @@
 import { BasedOn } from "./BasedOn";
+import { SectionField } from "./SectionField";
 import {
   Button,
   ActionLink,
@@ -40,6 +41,7 @@ export function Search({
     "question",
   );
   const [mode, setMode] = useState("free_text");
+  const [section, setSection] = useState("");
   const [retrieval, setRetrieval] = useState("hybrid");
   const [result, setResult] = useState<SearchResult | null>(null);
   const [selected, setSelected] = useState<Hit | null>(null);
@@ -91,6 +93,7 @@ export function Search({
             query,
             mode,
             retrieval,
+            ...(section ? { section } : {}),
           }),
         },
         session.csrf_token,
@@ -240,6 +243,13 @@ export function Search({
                 </option>
               </Select>
             </Field>
+          </More>
+          <More label="More section filters">
+            <SectionField
+              value={section}
+              onChange={setSection}
+              disabled={busy}
+            />
           </More>
           <Button
             type="submit"

@@ -46,6 +46,7 @@ def main():
             max_pages=100,
             evidence_bundles=bundles,
             evidence_root=root,
+            section_aware=configuration.get("section_aware", False),
         )
     except Exception as error:
         # Original text and parser diagnostics must not enter worker logs.

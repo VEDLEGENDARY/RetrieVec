@@ -71,6 +71,9 @@ class PinnedClient:
             )
         corpus, papers, chunks = cache[corpus_key]
         self.chunks = {chunk["chunk_id"]: chunk for chunk in chunks}
+        from retrievec.corpus.sections import PassageProvenance
+
+        self.passage_provenance = PassageProvenance(store.root, corpus)
         self.evidence_index = None
         if corpus["configuration"].get("evidence_map_id"):
             from retrievec.extraction.indexing import EvidenceIndex
@@ -117,8 +120,18 @@ class PinnedClient:
         }
 
     def search(
-        self, query: str, mode: str = "free_text", top_k: int = 10, explain: bool = False
+        self,
+        query: str,
+        mode: str = "free_text",
+        top_k: int = 10,
+        explain: bool = False,
+        *,
+        section: str | None = None,
     ) -> dict:
+        from retrievec.corpus.sections import SECTIONS
+
+        if section is not None and section not in SECTIONS:
+            raise ValueError("unknown section")
         if (
             not isinstance(query, str)
             or not query.strip()
@@ -183,6 +196,14 @@ class PinnedClient:
         else:
             ranked = sparse if self.retrieval == "sparse" else dense
         sparse_scores = {item["chunk_id"]: item for item in sparse}
+        if section is not None:
+            ranked = [
+                item
+                for item in ranked
+                if self.passage_provenance.attributes(self.chunks[item["chunk_id"]])["section"]
+                == section
+            ]
+            total = len(ranked)
         dense_scores = {item["chunk_id"]: item["cosine_score"] for item in dense}
         hits = []
         for rank, item in enumerate(ranked[:top_k], 1):
@@ -215,9 +236,15 @@ class PinnedClient:
             else:
                 hit.update(evidence_type="prose", source_locator=None)
             hits.append(hit)
+            hit.update(self.passage_provenance.attributes(chunk))
         timings["search_ms"] = (time.perf_counter() - start) * 1000
         return {
             **self.stats(),
+            **(
+                {"section_filter": section, "section_filter_scope": "retrieved candidate pool"}
+                if section is not None
+                else {}
+            ),
             "request_id": uuid.uuid4().hex,
             "total_matches": total,
             "hits": hits,

@@ -43,6 +43,7 @@ export type Run = {
   state: string;
   error_code: string | null;
   configuration: {
+    section?: string | null;
     provider: string;
     retrieval: string;
     generation: { model: string; revision: string };
