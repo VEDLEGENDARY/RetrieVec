@@ -41,6 +41,11 @@ def main():
     report = json.loads(args.report.read_bytes())
     table = tables(report)
     relative = args.report.resolve().relative_to(ROOT).as_posix()
+    if report.get("study") == "phase3":
+        from render_beir_phase3 import render
+
+        render(ROOT, report, relative, table)
+        return
     command = (
         "python scripts/benchmark_beir.py --phase preflight\n"
         "python scripts/benchmark_beir.py --phase prepare\n"
