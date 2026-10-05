@@ -1,6 +1,7 @@
 """Render phase-three measurements while retaining the historical baseline."""
 
 import json
+import statistics
 
 START = "<!-- PHASE3 RESULTS START -->"
 END = "<!-- PHASE3 RESULTS END -->"
@@ -25,6 +26,11 @@ def render(root, report, relative, table):
         "Fusion and cross-encoder totals are component sums using shared measured retrieval "
         "plus incremental scoring, not independently measured end-to-end requests. "
         "No concurrent-user load test is represented by these numbers.",
+        "",
+        "The run was interrupted after 172 SciFact queries and resumed from validated "
+        "checkpoints. A long host interruption was observed during the first session. "
+        "All completed observations are retained without outlier filtering; timing "
+        "results span sessions and should not be treated as controlled release benchmarks.",
         "",
         "## Concurrent scheduling",
         "",
@@ -64,6 +70,12 @@ def render(root, report, relative, table):
         "",
         "## Analyzer and chunk controls",
         "",
+        "The [BEIR paper, sections 4–5](https://arxiv.org/abs/2104.08663) reports BM25 "
+        "nDCG@10 of 0.665 on SciFact and 0.158 on SCIDOCS using Anserini/Lucene "
+        "with k1=0.9 and b=0.4 and separate title/passage fields. These published "
+        "reference values are not new measurements or exact replicas of this control, "
+        "which retains RetrieVec's k1=1.2 and b=0.75.",
+        "",
         "The shipped analyzer lowercases Unicode letter/digit runs, without stemming or "
         "stopword removal. Offline English controls isolate an explicit stopword list and "
         "Snowball stemming. They do not reproduce Elasticsearch/Lucene byte for byte: "
@@ -90,6 +102,23 @@ def render(root, report, relative, table):
             lines.append(
                 f"| {name} | {label} | {metadata['chunks']} | {metadata.get('overflow_count', 0)} |"
             )
+    lines += ["", "Measured decomposition of the sparse comparison:", ""]
+    for name, dataset in report["datasets"].items():
+        runs = dataset["runs"]
+        sparse = runs["default_sparse"]
+        document = runs["document_bm25_unicode"]
+        stemmed = runs["document_bm25_snowball_english"]
+        papers = statistics.mean(len(row["ranking"]) for row in sparse["per_query"])
+        document_papers = statistics.mean(len(row["ranking"]) for row in document["per_query"])
+        lines.append(
+            f"- {name}: chunk-collapsed sparse nDCG@10 {sparse['metrics']['ndcg']:.4f}; "
+            f"whole-record Unicode BM25 {document['metrics']['ndcg']:.4f}; "
+            f"whole-record stemmed BM25 {stemmed['metrics']['ndcg']:.4f}. "
+            f"The top-100 chunk pool yields a mean {papers:.1f} unique papers, "
+            f"versus {document_papers:.1f} for the document control. "
+            "The paired intervals above quantify these differences; they do not "
+            "establish an implementation bug or justify changing product defaults."
+        )
     reranker = report["reranker"]
     lines += [
         "",
@@ -135,8 +164,10 @@ def render(root, report, relative, table):
         "Use a new work directory if source, protocol or model hashes change.",
         "",
         "```sh",
-        "python scripts/benchmark_beir.py --study phase3 --phase tune",
-        f"python scripts/benchmark_beir.py --study phase3 --phase evaluate --output {relative}",
+        "python scripts/benchmark_beir.py --study phase3 --phase tune "
+        "--work artifacts/beir-phase3-reproduction",
+        "python scripts/benchmark_beir.py --study phase3 --phase evaluate "
+        f"--work artifacts/beir-phase3-reproduction --output {relative}",
         f"python scripts/render_beir_report.py {relative}",
         "```",
         "",
