@@ -4,7 +4,7 @@
   "base_protocol": "experiments/beir-grid-v1.json",
   "base_selection": "artifacts/beir/selection.json",
   "datasets": ["scifact", "scidocs"],
-  "development": "Reuse exactly the frozen SciFact development query IDs and selected BM25/RRF parameters. Never select or amend configurations using test judgments. Transfer unchanged to SCIDOCS.",
+  "development": "Reuse exactly the frozen SciFact development query IDs. Preserve prior selected BM25/RRF parameters as an untuned reference; new fusion controls use unchanged default sparse/dense legs and k=60. Never select or amend configurations using test judgments. Transfer unchanged to SCIDOCS.",
   "candidate_chunks": 100,
   "document_cutoff": 100,
   "fusion_grid": {
@@ -41,6 +41,6 @@
     "report": "paired bootstrap versus plain hybrid; end-to-end and incremental rerank latency; no weights blended or selected on test queries"
   },
   "bootstrap_samples": 5000,
-  "latency": "One query at a time, warm loaded artifacts and models. Measure wall clock, not sum of overlapping leg durations. Alternate sequential/concurrent ordering by query index. Record leg timings and parity. Exclude HTTP/auth/database and model startup; report them as outside scope.",
+  "latency": "One query at a time, warm loaded artifacts and models. Measure wall clock, not sum of overlapping leg durations. Alternate sequential/concurrent ordering by query index. Record leg timings and parity. Fusion and cross-encoder variants reuse the unchanged frozen candidate legs: their totals are measured shared-leg wall time plus separately measured fusion/reranking, labeled component sums rather than independent end-to-end measurements. Exclude HTTP/auth/database and model startup; report them as outside scope.",
   "default_policy": "Keep retrieval, analyzer, chunking, candidate limits, fusion parameters and reranker defaults unchanged. Concurrent scheduling may replace sequential scheduling only with exact ranking/score parity tests and measured latency evidence."
 }
