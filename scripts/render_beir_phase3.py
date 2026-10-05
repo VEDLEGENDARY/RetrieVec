@@ -10,7 +10,7 @@ END = "<!-- PHASE3 RESULTS END -->"
 def render(root, report, relative, table):
     lines = [
         START,
-        "# Phase 3 retrieval controls",
+        "# BEIR retrieval benchmark",
         "",
         f"Measured source: [{relative}]({relative}). Product ranking defaults unchanged.",
         "",
@@ -27,13 +27,19 @@ def render(root, report, relative, table):
         "plus incremental scoring, not independently measured end-to-end requests. "
         "No concurrent-user load test is represented by these numbers.",
         "",
-        "The run was interrupted after 172 SciFact queries and resumed from validated "
-        "checkpoints. A long host interruption was observed during the first session. "
-        "All completed observations are retained without outlier filtering; timing "
-        "results span sessions and should not be treated as controlled release benchmarks.",
+        *report.get("measurement_notes", []),
         "",
         "## Concurrent scheduling",
         "",
+        *(
+            [
+                "The measured parity and paired latency evidence enable bounded concurrent "
+                "scheduling by default. Ranking, analyzer, chunking and reranker defaults are preserved.",
+                "",
+            ]
+            if report.get("post_measurement_decision", {}).get("concurrent_legs_enabled_by_default")
+            else []
+        ),
     ]
     for name, dataset in report["datasets"].items():
         item = dataset["paired_latency"]
@@ -156,6 +162,20 @@ def render(root, report, relative, table):
         lines.append(
             f"| {config['family']} | {config['sparse_weight']} | {row['ndcg']:.4f} | {decision} |"
         )
+    lines += ["", "Held-out decisions (no quality defaults promoted):", ""]
+    for variant in ("weighted_rrf", "normalized_score", "sparse_then_dense", "cross_encoder_top50"):
+        effects = {
+            name: dataset["paired_bootstrap"]["default_hybrid_vs_" + variant]["metrics"]["ndcg"]
+            for name, dataset in report["datasets"].items()
+        }
+        losses = [name for name, item in effects.items() if item["percentile_interval_95"][1] < 0]
+        if losses:
+            decision = "Reject as a global default: paired degradation on " + ", ".join(losses)
+        elif all(item["mean_delta_right_minus_left"] == 0 for item in effects.values()):
+            decision = "Selected weights reproduce the baseline ordering; no quality change"
+        else:
+            decision = "Retain as an opt-in control; these tasks do not establish broad superiority"
+        lines.append(f"- {variant}: {decision}.")
     lines += [
         "",
         "## Reproduce",
@@ -188,4 +208,8 @@ def render(root, report, relative, table):
     previous = path.read_text(encoding="utf-8")
     if START in previous:
         previous = previous.split(END, 1)[1].lstrip()
+    if previous.startswith("# BEIR retrieval benchmark"):
+        previous = previous.replace(
+            "# BEIR retrieval benchmark", "## Historical baseline (2026-10-01)", 1
+        )
     path.write_text("\n".join(lines) + "\n" + previous, encoding="utf-8")
