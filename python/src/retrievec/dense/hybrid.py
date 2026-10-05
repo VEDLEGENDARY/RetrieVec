@@ -43,7 +43,7 @@ class PinnedClient:
         snapshot_id: str | None = None,
         candidates: int = 100,
         artifact_cache: dict | None = None,
-        concurrent_legs: bool = False,
+        concurrent_legs: bool = True,
     ):
         if (
             retrieval not in ("sparse", "dense", "hybrid")

@@ -12,8 +12,9 @@ These are instrumented diagnostic observations, not held-out latency percentiles
 Dense scoring includes validation of vector IDs, finiteness and normalization;
 this phase preserves those checks. The profile motivates overlapping the two legs,
 with exact ranking/score parity and separate alternating-order wall-clock measurements
-required before changing the scheduling default. See BENCHMARKS.md for published
-held-out measurements when available.
+required before changing the scheduling default. The completed 1,300-query study
+verified exact parity and lower paired latency on both tasks; bounded concurrent
+scheduling is now enabled. See BENCHMARKS.md for measurements and session limitations.
 
 2026-09-29. Plan 3, measurement increment only. Source base: `f6e021142df2f4a4990b7b4c2b28da45bd485882` plus the uncommitted browser recorder/test. Plans 1 and 2 remain at their review gates. No motion, navigation, cache, persistence, or streaming behavior has changed.
 
