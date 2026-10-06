@@ -8,7 +8,10 @@ class ContractTests(unittest.TestCase):
     def test_committed_contract_matches_routes_and_pdf_response(self):
         path = Path(__file__).resolve().parents[2] / "contracts/openapi.json"
         self.assertEqual(path.read_bytes(), encoded())
-        route = "/api/v1/collections/{collection_id}/snapshots/{snapshot_id}/evidence/{chunk_id}/pdf-page"
+        route = (
+            "/api/v1/collections/{collection_id}/snapshots/{snapshot_id}"
+            "/evidence/{chunk_id}/pdf-page"
+        )
         response = specification()["paths"][route]["get"]["responses"]["200"]
         self.assertEqual(set(response["content"]), {"image/png"})
 
