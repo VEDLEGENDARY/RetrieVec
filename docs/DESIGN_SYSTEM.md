@@ -2,6 +2,11 @@
 
 The workspace uses `web/src/tokens.css` for presentation decisions and `web/src/ui.tsx` for shared controls. Search ranking, source geometry, upload retry keys, research transitions, authorization, consent, and snapshot semantics remain in their domain modules.
 
+The [material contract](design/MATERIALS.md) documents the 2026-10-06 refinement:
+optional glass chrome, solid reading surfaces, sampled spring easing and explicit
+reduced-transparency/forced-color fallbacks. `WorkspaceChrome.tsx` owns presentation
+for the collection header and three destinations; domain state remains in the app.
+
 ## Tokens
 
 | Category | Contract |
@@ -25,7 +30,7 @@ Native controls inherit `color-scheme`. `web/scripts/sync-brand.mjs` generates t
 | `ActionLink` | Navigation actions remain anchors with original destinations, target and rel attributes. |
 | `IconButton` | Requires an accessible name; consistent control size. Decorative Lucide icons are hidden from the accessibility tree. |
 | `Field` + `Input` / `Select` / `Textarea` | One label and control; preserves explicit IDs/refs and existing descriptions. Optional description/error IDs are combined in `aria-describedby`; errors set `aria-invalid` and announce through an alert. Native required/limits remain unchanged. |
-| `Surface` | Shared border, background, radius and elevation; domain classes retain intentional layout and presentation differences. |
+| `Surface` | Shared border, background, radius and elevation; solid by default. Optional glass adds a bounded pointer-responsive rim with accessibility-preference guards. Domain classes retain layout differences. |
 | `Notice` | Persistent error alert or polite informational status; supports an optional action. Routine field help and progress text are not automatically alerts. |
 | `EmptyState` / `LoadingState` | Composable empty-state action; one announced loading label and decorative skeleton bars. No invented percentages. |
 | `StatusBadge` | Info/success/error presentation. `presentation.ts` maps API states to public labels without altering enum values. Unknown states display “Status unavailable”. |
