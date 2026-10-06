@@ -1,6 +1,6 @@
 # RetrieVec core flows and navigation
 
-Date: 2026-09-29. **Navigation and implementation approved by the owner.** This document preserves the original flow inventory and proposal. The 2026-10-04 UI-unification phase builds on the navigation already merged into `main`; see [current audit status](AUDIT.md#implementation-update--2026-10-04) and [shared component contracts](docs/DESIGN_SYSTEM.md).
+Date: 2026-09-29. **Navigation and implementation approved by the owner.** This document preserves the original flow inventory and proposal. The 2026-10-04 UI-unification phase builds on the navigation already merged into `main`; see [current audit status](AUDIT.md#implementation-update--2026-10-04) and [shared component contracts](../DESIGN_SYSTEM.md).
 
 Current presentation uses Ask → Answer / Find passages, Sources, and Saved research. Answer composition is headed **Cited answers**. Collection details/readiness replace the old overview, and archive uses the existing Undo flow. UI unification retains the existing shortcuts, focus/Escape behavior, retry keys, session cleanup, consent rules, and research state machine; Phase 2 completes consent-aware initial mode selection, contextual quick actions, More disclosures, and shared evidence context. Retrieval defaults are unchanged. The audit lists actual automated coverage and remaining manual/integration gates.
 
@@ -48,9 +48,11 @@ The desktop and mobile quick-action paths are exercised by web/ui-tests/phase2.s
 | Search diagnostics | Quick actions → Search snapshot and provenance | 2 | Results exist; opens both enclosing disclosures |
 | Ranking / candidate counts | Ask → Find passages if needed | 1–2 | Search results exist; scores are not a common scale |
 | Inspect passage / original source | Result → source link | 1 / 2 within mode | Retained, authorized original required; source not available for every result |
-| Structured region / raw extraction | Result → Raw extraction output | 1 / 2 within mode | Evidence object exists; ordinary PDF exact highlighting is not promised |
+| Structured region / raw extraction | Result → Raw extraction output | 1 / 2 within mode | Typed evidence object exists |
+| Ordinary PDF highlight | Result → Passage on original page | 2 within mode | Exact retained glyph/text alignment; otherwise an explicit limitation |
 | Add/remove shortlist selection | Shortlist passage | 1 within mode | Result exists; six-item cap; temporary collection session |
 | Compare shortlist | Quick actions → Evidence shortlist | 2 | Opens nested shortlist; adding passages is a prerequisite |
+| Inspect comparison-table citation | Shortlist command → citation | 3 | Table cell links focus retained passage with its own snapshot |
 | Remove shortlist item / Undo | Shortlist command → Remove; Undo | 3 / 1 | Shortlisted item exists |
 | Export shortlist | Quick actions → Export evidence shortlist → Export evidence | 3 | Nonempty shortlist; preserves question, snapshot and methods |
 | Per-item shortlist provenance | Shortlist command → provenance | 3 | Item exists |

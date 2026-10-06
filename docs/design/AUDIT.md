@@ -1,5 +1,21 @@
 # RetrieVec UI/UX consistency audit
 
+## Current verification — 2026-10-05
+
+Phase 5 adds opt-in section filters, retained source metadata, verified ordinary
+PDF highlights with explicit missing-locator limitations, and comparison tables
+with citations in every data cell. The full repository check passed 145 Python
+tests with PostgreSQL and pgvector enabled and no skips. The 30-test UI suite
+passed after PDF locations; five targeted comparison/saved-research tests then
+passed, including 390px reflow. A real Docker demo exercised Keycloak registration,
+OIDC sign-in, default hybrid retrieval and sign-out. Final clean-checkout results
+are recorded in [release verification](../releases/verification.md).
+
+Manual screen-reader, non-Chromium, production identity/deployment, representative
+PDF-ingest/load and human visual-approval gates remain open. Historical audit
+findings below preserve their original dates and baseline; they are not current
+failure claims. No synthetic answer scores are labeled human review.
+
 Date: 2026-09-29  
 Baseline: `f6e021142df2f4a4990b7b4c2b28da45bd485882`  
 Plan: **Plan 1, Step 1 only**  
@@ -7,7 +23,7 @@ Status: **UI unification implemented on `codex/ui-unification`, based on `origin
 
 ## Implementation update — 2026-10-04
 
-See [the design-system contract](docs/DESIGN_SYSTEM.md) for the shared APIs, token roles, static asset generation, and reproduction commands. This phase changes presentation and browser tests only; retrieval defaults, storage, authorization, consent, snapshot immutability, and API error codes are unchanged.
+See [the design-system contract](../DESIGN_SYSTEM.md) for the shared APIs, token roles, static asset generation, and reproduction commands. This phase changes presentation and browser tests only; retrieval defaults, storage, authorization, consent, snapshot immutability, and API error codes are unchanged.
 
 | Findings | Current implementation |
 | --- | --- |
@@ -33,7 +49,7 @@ The shared **Based on** control distinguishes actual claim/comparison citations 
 
 Saved lookup reuses the existing collection-authorized, owner-filtered, cursor-paginated endpoint (default 50, maximum 100). No backend authorization/storage/API changes were made. UI fixtures cover collection scope, pagination, no per-conversation fanout, and denied responses; real database policy execution remains unverified on this host.
 
-The phase-2 verification record is [navigation-phase-2-2026-10-04.json](docs/results/navigation-phase-2-2026-10-04.json): `scripts/check.py` passed (106 Python tests executed; 19 existing PostgreSQL skips; Go checks passed), `npm run build` passed, and `npm run test:ui -- --workers=2` passed all 29 tests. The inventory produced 144 captures across 1280/390px and light/dark, including the new disclosure/evidence states. Shortlist feedback, cancellation messages and Undo remain outside collapsed disclosures. The phase-1 results below remain historical. Manual screen-reader, real-service, non-Chromium, and human visual-approval gates remain open.
+The phase-2 verification record is [navigation-phase-2-2026-10-04.json](../results/navigation-phase-2-2026-10-04.json): `scripts/check.py` passed (106 Python tests executed; 19 existing PostgreSQL skips; Go checks passed), `npm run build` passed, and `npm run test:ui -- --workers=2` passed all 29 tests. The inventory produced 144 captures across 1280/390px and light/dark, including the new disclosure/evidence states. Shortlist feedback, cancellation messages and Undo remain outside collapsed disclosures. The phase-1 results below remain historical. Manual screen-reader, non-Chromium, and human visual-approval gates remain open; real local service checks are recorded below.
 
 ### Current screen coverage
 
@@ -43,13 +59,13 @@ The standalone overview and browser archive-confirmation screen had already been
 
 The suite runs WCAG-tagged axe scans against each settled fixture screen in both themes. It also measures computed foreground and composited background colors for answer/status badges, file errors, diagnostic code, footer, focused skip links, and input focus. The historical stat-detail surface was removed with the obsolete overview. The measurement helper rejects gradient/image/opacity text surfaces instead of guessing a passing ratio. Source images use their own retained colors; no arbitrary-image highlight contrast certification is claimed.
 
-Supplemental checks cover forced-colors focus, reduced motion, and 640px reflow. Existing tests cover shortcuts, focus return, Escape, upload retry keys, drafts, session cleanup, and streaming revocation. Manual screen-reader testing, actual browser zoom, other browser engines, and real-service/OIDC integration remain unverified. PostgreSQL integration tests require an isolated PostgreSQL 18 service; Docker's Linux-engine pipe is unavailable on this machine, including outside the sandbox. Do not treat automatic database-test skips as passed integration gates.
+Supplemental checks cover forced-colors focus, reduced motion, and 640px reflow. Existing tests cover shortcuts, focus return, Escape, upload retry keys, drafts, session cleanup, and streaming revocation. Manual screen-reader testing, actual browser zoom, other browser engines, and production identity/deployment integration remain unverified. PostgreSQL and pgvector integrations were subsequently exercised on isolated Docker services: the current repository check passed 145 tests without skips. Real Keycloak demo sign-in and hybrid search were also exercised. These checks do not close manual screen-reader, other-browser or production-load gates.
 
 The remaining sections preserve the original source audit and its exact baseline values for comparison. Historical statements such as “no shared library” or “not applied” below describe `f6e0211`, not the current implementation.
 
 ### Verification results — 2026-10-04
 
-Measured records: [UI screen/contrast report](docs/results/ui-unification-2026-10-04.json). Both viewport sizes produced the same ratios below; values are rounded to two decimals only for this table.
+Measured records: [UI screen/contrast report](../results/ui-unification-2026-10-04.json). Both viewport sizes produced the same ratios below; values are rounded to two decimals only for this table.
 
 | Rendered surface | Light | Dark | Minimum |
 | --- | ---: | ---: | ---: |
