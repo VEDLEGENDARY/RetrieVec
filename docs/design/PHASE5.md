@@ -75,3 +75,18 @@ extraction failure leave an explicit limitation instead of guessed coordinates.
 Older snapshots and text imports also explain when a PDF location is absent.
 Geometry is excluded from generation prompts. Exact-box, repeated-text,
 source/text binding and mismatch tests passed against the real extractor.
+
+## Cited comparison tables
+
+The collection's session shortlist groups passages by retained paper ID and
+compares title, reported metadata, section and exact passage text. Every data
+cell carries a citation to the retained passage, snapshot and question. Missing
+paper identities stay separate rather than being inferred from titles. Cited
+answer comparisons also use tables with citations in every value cell; model
+comparability notes and missing-field wording remain visible. No scientific
+winner is inferred from retrieval scores.
+
+Verification: the web build and five workbench/saved-research UI tests passed.
+Citation links move focus to their retained evidence; export, removal/Undo,
+collection cleanup and 390px dark-mode reflow remain covered. A mobile overflow
+failure was reproduced and fixed by constraining the table's layout.

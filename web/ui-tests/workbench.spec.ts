@@ -5,6 +5,7 @@ const hits = [
   {
     rank: 1,
     chunk_id: "passage-a",
+    paper_id: "paper-a",
     title: "Learning dense representations",
     text: "Dense retrieval learns semantic representations from paired questions and passages.",
     source_id: null,
@@ -16,6 +17,7 @@ const hits = [
   {
     rank: 2,
     chunk_id: "passage-b",
+    paper_id: "paper-b",
     title: "Lexical baselines",
     authors: ["Synthetic Author"],
     year: 2020,
@@ -156,6 +158,20 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     .getByRole("button", { name: "Shortlist passage" })
     .first()
     .click();
+  const comparison = page.getByRole("table", {
+    name: /Compare selected papers/,
+  });
+  await expect(comparison.locator("tbody tr")).toHaveCount(2);
+  for (const cell of await comparison.locator("td").all()) {
+    await expect(
+      cell.getByRole("link", { name: /Inspect citation/ }).first(),
+    ).toBeVisible();
+  }
+  await comparison
+    .getByRole("link", { name: "Inspect citation 1" })
+    .first()
+    .click();
+  await expect(page.locator("#shortlist-citation-0")).toBeFocused();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "test-results/evidence-workbench.png",
