@@ -86,6 +86,14 @@ for (const width of [1280, 390])
       page.setDefaultTimeout(10000);
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      const materialMedia = await page.context().newCDPSession(page);
+      await materialMedia.send("Emulation.setEmulatedMedia", {
+        features: [
+          { name: "prefers-color-scheme", value: colorScheme },
+          { name: "prefers-reduced-motion", value: "reduce" },
+          { name: "prefers-reduced-transparency", value: "no-preference" },
+        ],
+      });
       let signedIn = true,
         empty = false,
         snapshot = true,
