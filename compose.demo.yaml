@@ -9,6 +9,7 @@ services:
       - ./demo/init.py:/demo/init.py:ro
       - settings:/settings
       - store:/store
+      - cache:/cache
   postgres:
     profiles: [demo]
     image: postgres:18.3
@@ -38,11 +39,11 @@ services:
       RETRIEVEC_OIDC_ISSUER: http://127.0.0.1:8080/realms/retrievec
       RETRIEVEC_OIDC_CLIENT: retrievec
       RETRIEVEC_PRINCIPAL: "*"
-      HF_HOME: /app/artifacts/store/cache/huggingface
     ports: ["127.0.0.1:8000:8000", "127.0.0.1:8080:8080"]
     volumes:
       - settings:/settings:ro
       - store:/app/artifacts/store
+      - cache:/app/artifacts/cache
     stop_grace_period: 40s
   identity:
     profiles: [demo]
@@ -60,5 +61,6 @@ services:
 volumes:
   settings:
   store:
+  cache:
   database:
   identity:

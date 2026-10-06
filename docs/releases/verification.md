@@ -51,6 +51,12 @@ cleared its shared output folder. The demo now has a separate ignored output
 directory. The complete clean UI rerun passed all 30 tests without overlap; the
 real clean-demo registration/search/sign-out test also passed.
 
+Final demo packaging separates the Hugging Face model cache from the immutable
+artifact store and excludes all browser-test output directories from Docker
+builds. Its image rebuilt, the real demo test passed again, and the unchanged
+backup inventory/retained-graph audit passed (two ready snapshots, no uploaded
+sources or pending inputs). This is an artifact audit, not a full restore rehearsal.
+
 No weights, credentials, .env files, paper PDFs, local skills or AGENTS.md appear
 in the branch's changed-file list. The demo and evaluation private artifacts stay
 outside Git. Release notes are a candidate; no tag or release has been published.

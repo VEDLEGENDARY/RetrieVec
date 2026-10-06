@@ -15,6 +15,7 @@ if not config.exists():
     os.chown(config, 10001, 10001)
     (root / "postgres-password").write_text(values["database"])
     (root / "postgres-password").chmod(0o644)
-store = Path("/store")
-store.mkdir(exist_ok=True)
-os.chown(store, 10001, 10001)
+for directory in ("/store", "/cache"):
+    path = Path(directory)
+    path.mkdir(exist_ok=True)
+    os.chown(path, 10001, 10001)
