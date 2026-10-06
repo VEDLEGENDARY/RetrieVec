@@ -1,5 +1,6 @@
 import { BasedOn } from "./BasedOn";
 import { SectionField } from "./SectionField";
+import { PaperDetails } from "./PaperDetails";
 import {
   Button,
   ActionLink,
@@ -471,6 +472,7 @@ export function Search({
                 snapshot={result.snapshot_id}
                 onClose={closeInspector}
               >
+                <PaperDetails paper={selected} />
                 {selected.evidence_object_id ? (
                   <AdvancedEvidence
                     key={selected.chunk_id}

@@ -47,6 +47,7 @@ def main():
             evidence_bundles=bundles,
             evidence_root=root,
             section_aware=configuration.get("section_aware", False),
+            metadata_enrichment=configuration.get("metadata_enrichment"),
         )
     except Exception as error:
         # Original text and parser diagnostics must not enter worker logs.

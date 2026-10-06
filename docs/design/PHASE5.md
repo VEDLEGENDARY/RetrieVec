@@ -36,3 +36,25 @@ Full rankings, metrics and paired intervals:
 Verification: lossless boundaries, cross-page context, offsets, immutable
 provenance and tamper rejection passed unit tests. The section UI test and the
 complete 30-test UI suite passed with two browser workers. The web build passed.
+
+## Identifier imports and metadata
+
+`scripts/import_paper.py --arxiv ID --work artifacts/import --output artifacts/store/corpora`
+resolves official arXiv metadata and downloads the resolved PDF version. DOI
+imports use `--doi DOI --source LOCAL.pdf`: Crossref supplies metadata, while
+the explicit local source association is recorded as unverified. Arbitrary
+publisher URLs are never followed. Network responses and source sizes are bounded.
+
+Title, authors, publication year and DOI retain field paths, response hashes,
+lookup time and source hash in an immutable metadata sidecar. Unknown fields
+stay blank. Existing imports do not acquire metadata automatically. Original
+files and metadata responses remain in the requested work directory; offline
+imports do not create upload records or alter original-source access rules.
+Ask passage and answer inspectors show the retained metadata and provenance.
+
+Verification: parser/source-binding tests passed; the four workbench UI tests
+and web build passed. A real import of arXiv `2104.08663` resolved version v4,
+retained its PDF, title, five authors and publication year 2021, and produced
+an immutable sparse corpus. DOI import was checked with deterministic Crossref
+fixtures, not a live publisher PDF. Full repository checks passed with both
+PostgreSQL and pgvector integrations enabled (142 tests, no skips).

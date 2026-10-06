@@ -74,6 +74,12 @@ class PinnedClient:
         from retrievec.corpus.sections import PassageProvenance
 
         self.passage_provenance = PassageProvenance(store.root, corpus)
+        self.paper_metadata = None
+        self.papers = {paper["paper_version_id"]: paper for paper in papers}
+        if corpus["configuration"].get("paper_metadata_id"):
+            from retrievec.corpus.metadata import PaperMetadata
+
+            self.paper_metadata = PaperMetadata(store.root, corpus)
         self.evidence_index = None
         if corpus["configuration"].get("evidence_map_id"):
             from retrievec.extraction.indexing import EvidenceIndex
@@ -237,6 +243,8 @@ class PinnedClient:
                 hit.update(evidence_type="prose", source_locator=None)
             hits.append(hit)
             hit.update(self.passage_provenance.attributes(chunk))
+            if self.paper_metadata is not None:
+                hit.update(self.paper_metadata.attributes(self.papers[chunk["paper_version_id"]]))
         timings["search_ms"] = (time.perf_counter() - start) * 1000
         return {
             **self.stats(),
