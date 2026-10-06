@@ -1,0 +1,2793 @@
+{
+  "schema_version": 1,
+  "dataset_sha256": "8286eda6ae8a6e38eced6a2ca162edc746c41e0b78657b6ddf2c4ed1df77a6f7",
+  "dataset_id": "answer-quality-scifact-v1",
+  "split": "test",
+  "snapshot_id": "rs_769ad9994fc328276af3dcef3de0dc7c2c51cfd23337b1726c33dbcc32727f87",
+  "collection_id": "answer-eval-scifact-v1",
+  "question_provenance": "synthetic-question",
+  "assessment": "automatic-only",
+  "providers": {
+    "local-qwen-1-5b": {
+      "name": "local-qwen-1-5b",
+      "endpoint": "http://127.0.0.1:8097",
+      "model": "Qwen2.5-1.5B-Instruct-Q4_K_M",
+      "revision": "sha256:6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+      "cloud": false,
+      "context_tokens": 4096,
+      "output_tokens": 1024,
+      "timeout_seconds": 180,
+      "prompt_version": "grounded-chatml-v2",
+      "tokenizer_policy": "llama-server-tokenize-add-special-v1",
+      "temperature": 0.0,
+      "seed": 42,
+      "identity": "f60da159c1a11f7b51fdb4988b47c3db01746b15c8a07c35b7aecb0d7de87596",
+      "consented": true
+    }
+  },
+  "cases": [
+    {
+      "case_id": "local-qwen-1-5b/aq-05-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'SOD1 Integrates Signals from Oxygen and Glucose to Repress Respiration' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "11fe67c5-2dfb-44b4-adc5-a5adb3693e11",
+      "error": "run ended as failed",
+      "elapsed_ms": 57671.940899999754,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-05-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'SOD1 Integrates Signals from Oxygen and Glucose to Repress Respiration' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "d2de0347-5796-4051-bf7e-ff7b2a1cb127",
+      "error": "run ended as failed",
+      "elapsed_ms": 130054.19460000121,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-05-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'SOD1 Integrates Signals from Oxygen and Glucose to Repress Respiration'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "a3180542-097b-4e27-b54e-8f718ecd0928",
+      "error": "run ended as failed",
+      "elapsed_ms": 46250.88300000061,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-06-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "be6d28d6-3886-49d6-addb-75dd04fe432e",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "claim_1",
+              "text": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.",
+              "quotes": [
+                {
+                  "text": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.\n\n",
+                  "evidence_id": "e_b25071f32d6d604770476cec"
+                },
+                {
+                  "text": "CD4(+) T follicular helper (Tfh) cells provide the required signals to B cells for germinal center reactions that are necessary for long-lived antibody responses. However, it remains unclear whether there are CD4(+) memory T cells committed to the Tfh cell lineage after antigen clearance. By using adoptive transfer of antigen-specific memory CD4(+) T cell subpopulations in the lymphocytic choriomeningitis virus infection model, we found that there are distinct memory CD4(+) T cell populations with commitment to either Tfh- or Th1-cell lineages. Our conclusions are based on gene expression profiles, epigenetic studies, and phenotypic ",
+                  "evidence_id": "e_9febb981cc1c9098075df020"
+                },
+                {
+                  "text": "and functional analyses. Our findings indicate that CD4(+) memory T cells \"remember\" their previous effector lineage after antigen clearance, being poised to reacquire their lineage-specific effector functions upon antigen reencounter. These findings have important implications for rational vaccine design, where improving the generation and engagement of memory Tfh cells could be used to enhance vaccine-induced protective immunity.",
+                  "evidence_id": "e_67f3b1e127818b463412e5f5"
+                },
+                {
+                  "text": "The TCR:CD3 complex transduces signals that are critical for optimal T cell development and adaptive immunity. In resting T cells, the CD3\u03b5 cytoplasmic tail associates with the plasma membrane via a proximal basic-rich stretch (BRS). In this study, we show that mice lacking a functional CD3\u03b5-BRS exhibited substantial reductions in thymic cellularity and limited CD4- CD8- double-negative (DN) 3 to DN4 thymocyte transition, because of enhanced DN4 TCR signaling resulting in increased cell death and TCR downregulation in all subsequent populations. Furthermore, positive, but not negative, T cell selection was affected in ",
+                  "evidence_id": "e_193e9eca0e31881f737be30d"
+                },
+                {
+                  "text": "mice lacking a functional CD3\u03b5-BRS, which led to limited peripheral T cell function and substantially reduced responsiveness to influenza infection. Collectively, these results indicate that membrane association of the CD3\u03b5 signaling domain is required for optimal thymocyte development and peripheral T cell function.",
+                  "evidence_id": "e_e82955d7cf809ed0f590d1d3"
+                }
+              ],
+              "evidence_ids": [
+                "e_b25071f32d6d604770476cec",
+                "e_9febb981cc1c9098075df020",
+                "e_67f3b1e127818b463412e5f5",
+                "e_193e9eca0e31881f737be30d",
+                "e_e82955d7cf809ed0f590d1d3"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": []
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_128cdaa87970e02294c68a6ce721d62fad2f50011f25184702f76fad719bb7c0"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_9b81e1f057a748afa59750995953b988d9114a0f54ee283f163534ebd2410d80"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_5ede90861d0a57aadf50fc975889be092957dbe4c7d396e677e7fc356cd12cb4"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2849,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 37524.23850000196
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.\n\n",
+            "score": 0.03278688524590164,
+            "title": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.",
+            "authors": [],
+            "chunk_id": "ch_9289044cbf68d9cd0d2c58438e62ad8b48dcb3318c619d90d41c24d2aebc18b6",
+            "paper_id": "scifact-24879055",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 67.66273645459226,
+            "page_range": null,
+            "citation_id": "bc67059a-6c8b-59c1-a2ed-d7605003358d",
+            "evidence_id": "e_b25071f32d6d604770476cec",
+            "cosine_score": 0.8922104239463806,
+            "evidence_type": "prose",
+            "source_sha256": "2d1dcc18fa05fbb5094e208306cb48ad898bae4e9150e4af3e36e0a6415de5cb",
+            "source_locator": null,
+            "paper_version_id": "pv_29808c87e592745b6d9e82b44b0826fe50923b748b3d3e5249326146dc8b11ef",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "CD4(+) T follicular helper (Tfh) cells provide the required signals to B cells for germinal center reactions that are necessary for long-lived antibody responses. However, it remains unclear whether there are CD4(+) memory T cells committed to the Tfh cell lineage after antigen clearance. By using adoptive transfer of antigen-specific memory CD4(+) T cell subpopulations in the lymphocytic choriomeningitis virus infection model, we found that there are distinct memory CD4(+) T cell populations with commitment to either Tfh- or Th1-cell lineages. Our conclusions are based on gene expression profiles, epigenetic studies, and phenotypic ",
+            "score": 0.03225806451612903,
+            "title": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.",
+            "authors": [],
+            "chunk_id": "ch_5e125aa389865684b4bf70ff53b76b2e93c9d16015fe2869bf27edaed1128323",
+            "paper_id": "scifact-24879055",
+            "rrf_score": 0.03225806451612903,
+            "source_id": null,
+            "bm25_score": 41.2298251823964,
+            "page_range": null,
+            "citation_id": "b40b2e0f-305d-561c-919a-c5132ef56532",
+            "evidence_id": "e_9febb981cc1c9098075df020",
+            "cosine_score": 0.7317144870758057,
+            "evidence_type": "prose",
+            "source_sha256": "2d1dcc18fa05fbb5094e208306cb48ad898bae4e9150e4af3e36e0a6415de5cb",
+            "source_locator": null,
+            "paper_version_id": "pv_29808c87e592745b6d9e82b44b0826fe50923b748b3d3e5249326146dc8b11ef",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "and functional analyses. Our findings indicate that CD4(+) memory T cells \"remember\" their previous effector lineage after antigen clearance, being poised to reacquire their lineage-specific effector functions upon antigen reencounter. These findings have important implications for rational vaccine design, where improving the generation and engagement of memory Tfh cells could be used to enhance vaccine-induced protective immunity.",
+            "score": 0.031746031746031744,
+            "title": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.",
+            "authors": [],
+            "chunk_id": "ch_ca8c3f39417f65364f703bc4a006ac46de93b1a105d94b2c6e4b32f4c4743411",
+            "paper_id": "scifact-24879055",
+            "rrf_score": 0.031746031746031744,
+            "source_id": null,
+            "bm25_score": 15.77747040401517,
+            "page_range": null,
+            "citation_id": "b32d28fe-6c4f-57d2-861c-244522ed1134",
+            "evidence_id": "e_67f3b1e127818b463412e5f5",
+            "cosine_score": 0.6453343629837036,
+            "evidence_type": "prose",
+            "source_sha256": "2d1dcc18fa05fbb5094e208306cb48ad898bae4e9150e4af3e36e0a6415de5cb",
+            "source_locator": null,
+            "paper_version_id": "pv_29808c87e592745b6d9e82b44b0826fe50923b748b3d3e5249326146dc8b11ef",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "The TCR:CD3 complex transduces signals that are critical for optimal T cell development and adaptive immunity. In resting T cells, the CD3\u03b5 cytoplasmic tail associates with the plasma membrane via a proximal basic-rich stretch (BRS). In this study, we show that mice lacking a functional CD3\u03b5-BRS exhibited substantial reductions in thymic cellularity and limited CD4- CD8- double-negative (DN) 3 to DN4 thymocyte transition, because of enhanced DN4 TCR signaling resulting in increased cell death and TCR downregulation in all subsequent populations. Furthermore, positive, but not negative, T cell selection was affected in ",
+            "score": 0.031009615384615385,
+            "title": "Membrane association of the CD3\u03b5 signaling domain is required for optimal T cell development and function.",
+            "authors": [],
+            "chunk_id": "ch_c07633c186680392d93eac7bbd893b895145a683b5a50af4ce553ecb2dc4b01a",
+            "paper_id": "scifact-34905328",
+            "rrf_score": 0.031009615384615385,
+            "source_id": null,
+            "bm25_score": 14.849324106881134,
+            "page_range": null,
+            "citation_id": "b5c1673c-3075-54ff-b643-dd1ffb959f63",
+            "evidence_id": "e_193e9eca0e31881f737be30d",
+            "cosine_score": 0.4580264091491699,
+            "evidence_type": "prose",
+            "source_sha256": "8f9823119c03c9afab5edb64381b08f982ca4d3ab51f5fee399fd941d7ed82f5",
+            "source_locator": null,
+            "paper_version_id": "pv_017aff511dec01fb9345db29c7ff650c6b892d1d78f070a7cf2791529446dca2",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "mice lacking a functional CD3\u03b5-BRS, which led to limited peripheral T cell function and substantially reduced responsiveness to influenza infection. Collectively, these results indicate that membrane association of the CD3\u03b5 signaling domain is required for optimal thymocyte development and peripheral T cell function.",
+            "score": 0.030776515151515152,
+            "title": "Membrane association of the CD3\u03b5 signaling domain is required for optimal T cell development and function.",
+            "authors": [],
+            "chunk_id": "ch_49c568694ee2b3690faf299ba4b86961064d592d3e6af13f56f5df6e8b389594",
+            "paper_id": "scifact-34905328",
+            "rrf_score": 0.030776515151515152,
+            "source_id": null,
+            "bm25_score": 10.49652496958183,
+            "page_range": null,
+            "citation_id": "3b6a501c-eb35-5bbd-ac57-297c60787bad",
+            "evidence_id": "e_e82955d7cf809ed0f590d1d3",
+            "cosine_score": 0.47998711466789246,
+            "evidence_type": "prose",
+            "source_sha256": "8f9823119c03c9afab5edb64381b08f982ca4d3ab51f5fee399fd941d7ed82f5",
+            "source_locator": null,
+            "paper_version_id": "pv_017aff511dec01fb9345db29c7ff650c6b892d1d78f070a7cf2791529446dca2",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 92456.13,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 92810.15879999904
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-06-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "77312357-20f5-4d28-b105-50b784f6bb0a",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "claim_1",
+              "text": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.",
+              "quotes": [
+                {
+                  "text": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.\n\n",
+                  "evidence_id": "e_b25071f32d6d604770476cec"
+                },
+                {
+                  "text": "CD4(+) T follicular helper (Tfh) cells provide the required signals to B cells for germinal center reactions that are necessary for long-lived antibody responses. However, it remains unclear whether there are CD4(+) memory T cells committed to the Tfh cell lineage after antigen clearance. By using adoptive transfer of antigen-specific memory CD4(+) T cell subpopulations in the lymphocytic choriomeningitis virus infection model, we found that there are distinct memory CD4(+) T cell populations with commitment to either Tfh- or Th1-cell lineages. Our conclusions are based on gene expression profiles, epigenetic studies, and phenotypic ",
+                  "evidence_id": "e_9febb981cc1c9098075df020"
+                },
+                {
+                  "text": "and functional analyses. Our findings indicate that CD4(+) memory T cells \"remember\" their previous effector lineage after antigen clearance, being poised to reacquire their lineage-specific effector functions upon antigen reencounter. These findings have important implications for rational vaccine design, where improving the generation and engagement of memory Tfh cells could be used to enhance vaccine-induced protective immunity.",
+                  "evidence_id": "e_67f3b1e127818b463412e5f5"
+                },
+                {
+                  "text": "The TCR:CD3 complex transduces signals that are critical for optimal T cell development and adaptive immunity. In resting T cells, the CD3\u03b5 cytoplasmic tail associates with the plasma membrane via a proximal basic-rich stretch (BRS). In this study, we show that mice lacking a functional CD3\u03b5-BRS exhibited substantial reductions in thymic cellularity and limited CD4- CD8- double-negative (DN) 3 to DN4 thymocyte transition, because of enhanced DN4 TCR signaling resulting in increased cell death and TCR downregulation in all subsequent populations. Furthermore, positive, but not negative, T cell selection was affected in ",
+                  "evidence_id": "e_193e9eca0e31881f737be30d"
+                },
+                {
+                  "text": "mice lacking a functional CD3\u03b5-BRS, which led to limited peripheral T cell function and substantially reduced responsiveness to influenza infection. Collectively, these results indicate that membrane association of the CD3\u03b5 signaling domain is required for optimal thymocyte development and peripheral T cell function.",
+                  "evidence_id": "e_e82955d7cf809ed0f590d1d3"
+                }
+              ],
+              "evidence_ids": [
+                "e_b25071f32d6d604770476cec",
+                "e_9febb981cc1c9098075df020",
+                "e_67f3b1e127818b463412e5f5",
+                "e_193e9eca0e31881f737be30d",
+                "e_e82955d7cf809ed0f590d1d3"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": [
+            "The evidence provided does not explicitly state the authors' exact travel budget for the study."
+          ]
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_128cdaa87970e02294c68a6ce721d62fad2f50011f25184702f76fad719bb7c0"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_2435add091c8247d2beafea1588fad2653fae264f33e9a1cb6082b3a54e46583"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_9b81e1f057a748afa59750995953b988d9114a0f54ee283f163534ebd2410d80"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2860,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 34987.000799999805
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.\n\n",
+            "score": 0.03278688524590164,
+            "title": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.",
+            "authors": [],
+            "chunk_id": "ch_9289044cbf68d9cd0d2c58438e62ad8b48dcb3318c619d90d41c24d2aebc18b6",
+            "paper_id": "scifact-24879055",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 67.66273645459226,
+            "page_range": null,
+            "citation_id": "1d284497-6a5d-53d1-ae64-eccbdffff1a8",
+            "evidence_id": "e_b25071f32d6d604770476cec",
+            "cosine_score": 0.9374277591705322,
+            "evidence_type": "prose",
+            "source_sha256": "2d1dcc18fa05fbb5094e208306cb48ad898bae4e9150e4af3e36e0a6415de5cb",
+            "source_locator": null,
+            "paper_version_id": "pv_29808c87e592745b6d9e82b44b0826fe50923b748b3d3e5249326146dc8b11ef",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "CD4(+) T follicular helper (Tfh) cells provide the required signals to B cells for germinal center reactions that are necessary for long-lived antibody responses. However, it remains unclear whether there are CD4(+) memory T cells committed to the Tfh cell lineage after antigen clearance. By using adoptive transfer of antigen-specific memory CD4(+) T cell subpopulations in the lymphocytic choriomeningitis virus infection model, we found that there are distinct memory CD4(+) T cell populations with commitment to either Tfh- or Th1-cell lineages. Our conclusions are based on gene expression profiles, epigenetic studies, and phenotypic ",
+            "score": 0.03225806451612903,
+            "title": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.",
+            "authors": [],
+            "chunk_id": "ch_5e125aa389865684b4bf70ff53b76b2e93c9d16015fe2869bf27edaed1128323",
+            "paper_id": "scifact-24879055",
+            "rrf_score": 0.03225806451612903,
+            "source_id": null,
+            "bm25_score": 42.48314487239978,
+            "page_range": null,
+            "citation_id": "aa7fe2d9-0724-555b-97c3-6c7013b22daa",
+            "evidence_id": "e_9febb981cc1c9098075df020",
+            "cosine_score": 0.7672343254089355,
+            "evidence_type": "prose",
+            "source_sha256": "2d1dcc18fa05fbb5094e208306cb48ad898bae4e9150e4af3e36e0a6415de5cb",
+            "source_locator": null,
+            "paper_version_id": "pv_29808c87e592745b6d9e82b44b0826fe50923b748b3d3e5249326146dc8b11ef",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "and functional analyses. Our findings indicate that CD4(+) memory T cells \"remember\" their previous effector lineage after antigen clearance, being poised to reacquire their lineage-specific effector functions upon antigen reencounter. These findings have important implications for rational vaccine design, where improving the generation and engagement of memory Tfh cells could be used to enhance vaccine-induced protective immunity.",
+            "score": 0.031746031746031744,
+            "title": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.",
+            "authors": [],
+            "chunk_id": "ch_ca8c3f39417f65364f703bc4a006ac46de93b1a105d94b2c6e4b32f4c4743411",
+            "paper_id": "scifact-24879055",
+            "rrf_score": 0.031746031746031744,
+            "source_id": null,
+            "bm25_score": 20.053497895940918,
+            "page_range": null,
+            "citation_id": "6ee39514-ad76-52ff-9000-841c8998a869",
+            "evidence_id": "e_67f3b1e127818b463412e5f5",
+            "cosine_score": 0.6607860922813416,
+            "evidence_type": "prose",
+            "source_sha256": "2d1dcc18fa05fbb5094e208306cb48ad898bae4e9150e4af3e36e0a6415de5cb",
+            "source_locator": null,
+            "paper_version_id": "pv_29808c87e592745b6d9e82b44b0826fe50923b748b3d3e5249326146dc8b11ef",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "The TCR:CD3 complex transduces signals that are critical for optimal T cell development and adaptive immunity. In resting T cells, the CD3\u03b5 cytoplasmic tail associates with the plasma membrane via a proximal basic-rich stretch (BRS). In this study, we show that mice lacking a functional CD3\u03b5-BRS exhibited substantial reductions in thymic cellularity and limited CD4- CD8- double-negative (DN) 3 to DN4 thymocyte transition, because of enhanced DN4 TCR signaling resulting in increased cell death and TCR downregulation in all subsequent populations. Furthermore, positive, but not negative, T cell selection was affected in ",
+            "score": 0.031009615384615385,
+            "title": "Membrane association of the CD3\u03b5 signaling domain is required for optimal T cell development and function.",
+            "authors": [],
+            "chunk_id": "ch_c07633c186680392d93eac7bbd893b895145a683b5a50af4ce553ecb2dc4b01a",
+            "paper_id": "scifact-34905328",
+            "rrf_score": 0.031009615384615385,
+            "source_id": null,
+            "bm25_score": 15.750076353048618,
+            "page_range": null,
+            "citation_id": "6fbf28ce-d70d-5e84-a77f-1ee865b4875f",
+            "evidence_id": "e_193e9eca0e31881f737be30d",
+            "cosine_score": 0.4678565561771393,
+            "evidence_type": "prose",
+            "source_sha256": "8f9823119c03c9afab5edb64381b08f982ca4d3ab51f5fee399fd941d7ed82f5",
+            "source_locator": null,
+            "paper_version_id": "pv_017aff511dec01fb9345db29c7ff650c6b892d1d78f070a7cf2791529446dca2",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "mice lacking a functional CD3\u03b5-BRS, which led to limited peripheral T cell function and substantially reduced responsiveness to influenza infection. Collectively, these results indicate that membrane association of the CD3\u03b5 signaling domain is required for optimal thymocyte development and peripheral T cell function.",
+            "score": 0.030776515151515152,
+            "title": "Membrane association of the CD3\u03b5 signaling domain is required for optimal T cell development and function.",
+            "authors": [],
+            "chunk_id": "ch_49c568694ee2b3690faf299ba4b86961064d592d3e6af13f56f5df6e8b389594",
+            "paper_id": "scifact-34905328",
+            "rrf_score": 0.030776515151515152,
+            "source_id": null,
+            "bm25_score": 11.747607184341007,
+            "page_range": null,
+            "citation_id": "fb47593f-7bac-5a0b-8e9b-bd19b2fb6da5",
+            "evidence_id": "e_e82955d7cf809ed0f590d1d3",
+            "cosine_score": 0.5253364443778992,
+            "evidence_type": "prose",
+            "source_sha256": "8f9823119c03c9afab5edb64381b08f982ca4d3ab51f5fee399fd941d7ed82f5",
+            "source_locator": null,
+            "paper_version_id": "pv_017aff511dec01fb9345db29c7ff650c6b892d1d78f070a7cf2791529446dca2",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 87411.78,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 87853.64249999839
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-06-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "277f2d39-bf05-4408-af7b-688efbe4847d",
+      "error": "run ended as failed",
+      "elapsed_ms": 35534.78790000372,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-07-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "40044e90-c855-4100-ba09-fff3ba5bee67",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "claim_1",
+              "text": "Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.",
+              "quotes": [
+                {
+                  "text": "Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.\n\n",
+                  "evidence_id": "e_5249f597a095b0d5f5fc4ab7"
+                },
+                {
+                  "text": "Hepatitis C virus (HCV) nonstructural protein 3-4A (NS3-4A) is a complex composed of NS3 and its cofactor NS4A. It harbours serine protease as well as NTPase/RNA helicase activities and is essential for viral polyprotein processing, RNA replication and virion formation. Specific inhibitors of the NS3-4A protease significantly improve sustained virological response rates in patients with chronic hepatitis C when combined with pegylated interferon-\u03b1 and ribavirin. The NS3-4A protease can also target selected cellular proteins, thereby blocking innate immune pathways and modulating growth factor signalling. Hence, NS3-4A is not only ",
+                  "evidence_id": "e_8efe8721ae92688a4402704c"
+                },
+                {
+                  "text": "an essential component of the viral replication complex and prime target for antiviral intervention but also a key player in the persistence and pathogenesis of HCV. This review provides a concise update on the biochemical and structural aspects of NS3-4A, its role in the pathogenesis of chronic hepatitis C and the clinical development of NS3-4A protease inhibitors.",
+                  "evidence_id": "e_1f51d693e19557ebeefaf8ca"
+                }
+              ],
+              "evidence_ids": [
+                "e_5249f597a095b0d5f5fc4ab7",
+                "e_8efe8721ae92688a4402704c",
+                "e_1f51d693e19557ebeefaf8ca"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": []
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_040eb8aa1adb7903dbd261fb710807f62e752a88fe7c4f10972c41939f427caf"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_5ede90861d0a57aadf50fc975889be092957dbe4c7d396e677e7fc356cd12cb4"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_746f8fc7f0b623daf9d6daeb79795c59d7546ecef4d8dc07ff46ebaa371ccb4e"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2797,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 37028.75370000402
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.\n\n",
+            "score": 0.03278688524590164,
+            "title": "Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.",
+            "authors": [],
+            "chunk_id": "ch_8412f194e523418709bb86b1e1242822056c98941b1b67ffe769a990a86436d7",
+            "paper_id": "scifact-45287266",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 46.99324323557329,
+            "page_range": null,
+            "citation_id": "c69a15dc-2161-56fd-bf9e-42771a664a38",
+            "evidence_id": "e_5249f597a095b0d5f5fc4ab7",
+            "cosine_score": 0.7308392524719238,
+            "evidence_type": "prose",
+            "source_sha256": "7490d7d8fc8da194474ba239ddb6d77ddc3910d109e3bf79c6515ce4d4795726",
+            "source_locator": null,
+            "paper_version_id": "pv_cda0807a806d9fc1db6f343cc01939b8114a875df0f7edc91f97ab52eb0b5520",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "Hepatitis C virus (HCV) nonstructural protein 3-4A (NS3-4A) is a complex composed of NS3 and its cofactor NS4A. It harbours serine protease as well as NTPase/RNA helicase activities and is essential for viral polyprotein processing, RNA replication and virion formation. Specific inhibitors of the NS3-4A protease significantly improve sustained virological response rates in patients with chronic hepatitis C when combined with pegylated interferon-\u03b1 and ribavirin. The NS3-4A protease can also target selected cellular proteins, thereby blocking innate immune pathways and modulating growth factor signalling. Hence, NS3-4A is not only ",
+            "score": 0.03200204813108039,
+            "title": "Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.",
+            "authors": [],
+            "chunk_id": "ch_4c17e5549632c4a44b6bf5db36b11e4dbdc3dd5c19e43554c243c90a34407af1",
+            "paper_id": "scifact-45287266",
+            "rrf_score": 0.03200204813108039,
+            "source_id": null,
+            "bm25_score": 20.588811153154708,
+            "page_range": null,
+            "citation_id": "ef3421ae-2440-5512-ba5a-a2df0396609c",
+            "evidence_id": "e_8efe8721ae92688a4402704c",
+            "cosine_score": 0.5352787375450134,
+            "evidence_type": "prose",
+            "source_sha256": "7490d7d8fc8da194474ba239ddb6d77ddc3910d109e3bf79c6515ce4d4795726",
+            "source_locator": null,
+            "paper_version_id": "pv_cda0807a806d9fc1db6f343cc01939b8114a875df0f7edc91f97ab52eb0b5520",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "an essential component of the viral replication complex and prime target for antiviral intervention but also a key player in the persistence and pathogenesis of HCV. This review provides a concise update on the biochemical and structural aspects of NS3-4A, its role in the pathogenesis of chronic hepatitis C and the clinical development of NS3-4A protease inhibitors.",
+            "score": 0.03200204813108039,
+            "title": "Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.",
+            "authors": [],
+            "chunk_id": "ch_70a59e8a2d65e9723499ac897f75d1e7905e1bb3de51e6692afc1890253c173e",
+            "paper_id": "scifact-45287266",
+            "rrf_score": 0.03200204813108039,
+            "source_id": null,
+            "bm25_score": 10.945044346934363,
+            "page_range": null,
+            "citation_id": "9420ea2c-f14b-5710-bddb-b62bc281c8e9",
+            "evidence_id": "e_1f51d693e19557ebeefaf8ca",
+            "cosine_score": 0.5367527008056641,
+            "evidence_type": "prose",
+            "source_sha256": "7490d7d8fc8da194474ba239ddb6d77ddc3910d109e3bf79c6515ce4d4795726",
+            "source_locator": null,
+            "paper_version_id": "pv_cda0807a806d9fc1db6f343cc01939b8114a875df0f7edc91f97ab52eb0b5520",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "Role of NF-kappa B in cell survival and transcription of latent membrane protein 1-expressing or Epstein-Barr virus latency III-infected cells.\n\n",
+            "score": 0.031009615384615385,
+            "title": "Role of NF-kappa B in cell survival and transcription of latent membrane protein 1-expressing or Epstein-Barr virus latency III-infected cells.",
+            "authors": [],
+            "chunk_id": "ch_536b93a9d136c1fe04bfb62f11ce710866c1dd2b8715906ce139ad86da92f330",
+            "paper_id": "scifact-28644298",
+            "rrf_score": 0.031009615384615385,
+            "source_id": null,
+            "bm25_score": 6.315183857230332,
+            "page_range": null,
+            "citation_id": "a5099e5c-1405-595f-bb98-d14272220206",
+            "evidence_id": "e_93b8a8f34f0d5230f6a43342",
+            "cosine_score": 0.3298548758029938,
+            "evidence_type": "prose",
+            "source_sha256": "7000abab19e9dade4170f6887c46f011915d31f260e11c032284bf1d99d9b408",
+            "source_locator": null,
+            "paper_version_id": "pv_4332d0c78c627dabb3e95175ece0ebb268ccd2767d8f2ddf887e75705f105311",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "A recent study of plasma neutralization breadth in HIV-1 infected individuals at nine International AIDS Vaccine Initiative (IAVI) sites reported that viral load, HLA-A*03 genotype, and subtype C infection were strongly associated with the development of neutralization breadth. Here, we refine the findings of that study by analyzing the impact of the transmitted/founder (T/F) envelope (Env), early Env diversification, and autologous neutralization on the development of plasma neutralization breadth in 21 participants identified during recent infection at two of those sites: Kigali, Rwanda (n = 9) and Lusaka, Zambia (n = 12). Single-",
+            "score": 0.03007688828584351,
+            "title": "Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth",
+            "authors": [],
+            "chunk_id": "ch_128cdaa87970e02294c68a6ce721d62fad2f50011f25184702f76fad719bb7c0",
+            "paper_id": "scifact-2601135",
+            "rrf_score": 0.03007688828584351,
+            "source_id": null,
+            "bm25_score": 5.540920030295084,
+            "page_range": null,
+            "citation_id": "b7dacc37-a652-588a-ba6d-b57c1846803c",
+            "evidence_id": "e_1e6447f2ab0a64b96e68dc55",
+            "cosine_score": 0.30144697427749634,
+            "evidence_type": "prose",
+            "source_sha256": "b9255e645429680a42a136ac324130f43facf83d1daa1afe5e1a01fb9e9af540",
+            "source_locator": null,
+            "paper_version_id": "pv_37e081720c6f3de0d8776e5a2a2c303a861e4491bfd2d85ed5ea24376484e308",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 68617.46,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 69174.09950000001
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-07-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "a902f9a7-d39c-48c2-8469-da1f5fe1723c",
+      "error": "run ended as failed",
+      "elapsed_ms": 50614.92089999956,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-07-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "7ee31271-2a78-4689-b7bc-a55d42262597",
+      "error": "run ended as failed",
+      "elapsed_ms": 39138.96450000175,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-08-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "2ccbb690-6a2c-4c91-9b22-450c1ff138ec",
+      "error": "run ended as failed",
+      "elapsed_ms": 37321.41409999895,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-08-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "e8eefb2d-dc6d-4d04-b279-5f4f32c05ccc",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "claim_1",
+              "text": "The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.",
+              "quotes": [
+                {
+                  "text": "The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.\n\n",
+                  "evidence_id": "e_5f386dbb86c55d79077d09b4"
+                },
+                {
+                  "text": "women with pregestational diabetes, the relative risk compared to the background population was 3.2. In women with HbA1c < 53 mmol/mol (7.0%) in early pregnancy or HbA1c 53-64 mmol/mol (7.0-8.0%) the prevalence of congenital malformations was 4.3 and 3.7%, respectively, with a relative risk of 2.2 and 1.9, respectively. CONCLUSIONS In pregnant women with pregestational diabetes the prevalence of congenital abnormalities was threefold higher in women with pregestational diabetes compared to the background population. However, HbA1c below 53 mmol/mol (7.0%) in early pregnancy ",
+                  "evidence_id": "e_540153e1c4601caa03cd22a6"
+                }
+              ],
+              "evidence_ids": [
+                "e_5f386dbb86c55d79077d09b4",
+                "e_540153e1c4601caa03cd22a6"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": [
+            "The evidence provided is a literature review and does not include direct experimental data.",
+            "The evidence does not provide specific details about the authors' exact travel budget for the study."
+          ]
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_128cdaa87970e02294c68a6ce721d62fad2f50011f25184702f76fad719bb7c0"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_13e6791d85e3305dc8a14521438fa6f1885c561a94d04778a68a3584d7f21423"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_3e13877afff368aeef32b8c841f1044f7103e6b639365f90fcdfddeafdf1c47c"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2954,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 39119.71690000064
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.\n\n",
+            "score": 0.03278688524590164,
+            "title": "The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.",
+            "authors": [],
+            "chunk_id": "ch_1f4511aff144498ddfdd2110bc1c980ad85ddccfbc6bd971aaef23143f69c435",
+            "paper_id": "scifact-30983338",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 67.26083030715948,
+            "page_range": null,
+            "citation_id": "9c3d1056-f715-5625-acde-80c71e50f147",
+            "evidence_id": "e_5f386dbb86c55d79077d09b4",
+            "cosine_score": 0.9686010479927063,
+            "evidence_type": "prose",
+            "source_sha256": "15ee2b574063e3751142bdf824502781287b285335a1b355a0c673b559877c04",
+            "source_locator": null,
+            "paper_version_id": "pv_c7c49195a58af2b36877be5ccba90d52310a2ac511776a68293281c3160a97f6",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "women with pregestational diabetes, the relative risk compared to the background population was 3.2. In women with HbA1c < 53 mmol/mol (7.0%) in early pregnancy or HbA1c 53-64 mmol/mol (7.0-8.0%) the prevalence of congenital malformations was 4.3 and 3.7%, respectively, with a relative risk of 2.2 and 1.9, respectively. CONCLUSIONS In pregnant women with pregestational diabetes the prevalence of congenital abnormalities was threefold higher in women with pregestational diabetes compared to the background population. However, HbA1c below 53 mmol/mol (7.0%) in early pregnancy ",
+            "score": 0.03200204813108039,
+            "title": "The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.",
+            "authors": [],
+            "chunk_id": "ch_f3c810aad870e8b1f54a9be312877c0503f1f910fec0a7b1a2611fccadadcf52",
+            "paper_id": "scifact-30983338",
+            "rrf_score": 0.03200204813108039,
+            "source_id": null,
+            "bm25_score": 35.065015321669605,
+            "page_range": null,
+            "citation_id": "6f123c4c-afd8-5f3e-9180-a83163ff43a6",
+            "evidence_id": "e_540153e1c4601caa03cd22a6",
+            "cosine_score": 0.9010009169578552,
+            "evidence_type": "prose",
+            "source_sha256": "15ee2b574063e3751142bdf824502781287b285335a1b355a0c673b559877c04",
+            "source_locator": null,
+            "paper_version_id": "pv_c7c49195a58af2b36877be5ccba90d52310a2ac511776a68293281c3160a97f6",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "AIMS/HYPOTHESIS We assessed the association between congenital malformations and maternal hyperglycemia in pregnant women with pregestational (type 1 or type 2) diabetes and investigated if the rate of congenital malformations was similar in women with near-normal glycemic control compared to the background population. We also assessed the association between congenital malformations and maternal hyperglycemia in pregnant women with pregestational diabetes with special focus on women with near-normal HbA1c in early pregnancy. MATERIALS AND METHODS This is a literature review based on an electronic literature search of the databases PubMed, Cochrane, Embase and Web ",
+            "score": 0.031754032258064516,
+            "title": "The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.",
+            "authors": [],
+            "chunk_id": "ch_b1ec9b3b25507430debe0f4a39e4ecbef9977a96c65d4c4619a165e0d18c81eb",
+            "paper_id": "scifact-30983338",
+            "rrf_score": 0.031754032258064516,
+            "source_id": null,
+            "bm25_score": 43.84362947582124,
+            "page_range": null,
+            "citation_id": "b2128883-7de4-5e0a-a0bc-3a8c620e0457",
+            "evidence_id": "e_f8eab015e3863d9247544d8c",
+            "cosine_score": 0.8820556998252869,
+            "evidence_type": "prose",
+            "source_sha256": "15ee2b574063e3751142bdf824502781287b285335a1b355a0c673b559877c04",
+            "source_locator": null,
+            "paper_version_id": "pv_c7c49195a58af2b36877be5ccba90d52310a2ac511776a68293281c3160a97f6",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "of Science conducted in July 2017 using the search terms diabetes, pregnancy, HbA1c or glycemic control and congenital anomaly or congenital anomaly. We included original papers in English published after 1997 with data on congenital malformations and HbA1c in at least 250 women with pregestational diabetes. RESULTS Nine papers with in total 6225 women with type 1 diabetes and 2334 women with type 2 diabetes were included. The prevalence of congenital malformations was 6.4% in women with type 1 diabetes and 4.3% in women with type 2 diabetes and for the combined group of ",
+            "score": 0.03149801587301587,
+            "title": "The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.",
+            "authors": [],
+            "chunk_id": "ch_7c8a6215c305c9d1d63d8d3238578eedebeb63f9f8047167437ab5a9f01e5194",
+            "paper_id": "scifact-30983338",
+            "rrf_score": 0.03149801587301587,
+            "source_id": null,
+            "bm25_score": 30.46498422278714,
+            "page_range": null,
+            "citation_id": "caad33b3-72f3-5780-8d3a-f475d716b945",
+            "evidence_id": "e_a2ae4c2749fd323177ce6f5b",
+            "cosine_score": 0.8929225206375122,
+            "evidence_type": "prose",
+            "source_sha256": "15ee2b574063e3751142bdf824502781287b285335a1b355a0c673b559877c04",
+            "source_locator": null,
+            "paper_version_id": "pv_c7c49195a58af2b36877be5ccba90d52310a2ac511776a68293281c3160a97f6",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "was also associated with a two times increased risk of congenital malformations compared to the background population.",
+            "score": 0.030536130536130537,
+            "title": "The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.",
+            "authors": [],
+            "chunk_id": "ch_a93b8557d310ace4e29fb20ca80a65b4436bfa53458ff16358a457fa829717f0",
+            "paper_id": "scifact-30983338",
+            "rrf_score": 0.030536130536130537,
+            "source_id": null,
+            "bm25_score": 10.989290186807567,
+            "page_range": null,
+            "citation_id": "e7a608c5-540e-5b1a-97e4-39c6e831bb5a",
+            "evidence_id": "e_7dc1012e587891940645bcc3",
+            "cosine_score": 0.5431203842163086,
+            "evidence_type": "prose",
+            "source_sha256": "15ee2b574063e3751142bdf824502781287b285335a1b355a0c673b559877c04",
+            "source_locator": null,
+            "paper_version_id": "pv_c7c49195a58af2b36877be5ccba90d52310a2ac511776a68293281c3160a97f6",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 68046.18,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 68484.53359999985
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-08-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "9a6c64f5-32b0-44d2-b6c9-fd1d44375562",
+      "error": "run ended as failed",
+      "elapsed_ms": 36973.83879999688,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-09-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'position-specific gap penalties' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "3ce6e44e-ce7f-4a18-b197-b032ed718319",
+      "error": "run ended as failed",
+      "elapsed_ms": 32060.813800002506,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-09-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'position-specific gap penalties' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "c880a823-16aa-4d6a-842f-c23a2ad11bc4",
+      "error": "run ended as failed",
+      "elapsed_ms": 30067.332299993723,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-09-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'position-specific gap penalties'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "a4f2bed7-d443-4e9f-9481-84b69c88f717",
+      "error": "run ended as failed",
+      "elapsed_ms": 39813.30380000145,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-10-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Generation of mice with a conditional allele for the p75(NTR) neurotrophin receptor gene.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "4035bb8d-a20d-4bb4-869c-d5ad06c65005",
+      "error": "run ended as failed",
+      "elapsed_ms": 74471.46829999838,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-10-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Generation of mice with a conditional allele for the p75(NTR) neurotrophin receptor gene.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "7e5e5471-0ece-4342-b340-f75e7b349590",
+      "error": "run ended as failed",
+      "elapsed_ms": 111590.04409999761,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-10-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Generation of mice with a conditional allele for the p75(NTR) neurotrophin receptor gene.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "b4aa2c31-f2a8-433f-82a4-8216cd16034c",
+      "error": "run ended as failed",
+      "elapsed_ms": 41734.34029999771,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-11-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Long-term efficacy of nicotine replacement therapy for smoking cessation in adolescents: a randomized controlled trial.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "d0e83176-d4d1-4a57-9803-89fd864fef79",
+      "error": "run ended as failed",
+      "elapsed_ms": 54804.94190000172,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-11-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Long-term efficacy of nicotine replacement therapy for smoking cessation in adolescents: a randomized controlled trial.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "75a625ec-e693-4c97-bb84-b019cd5d47b3",
+      "error": "run ended as failed",
+      "elapsed_ms": 58470.04880000168,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-11-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Long-term efficacy of nicotine replacement therapy for smoking cessation in adolescents: a randomized controlled trial.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "ec28a6c6-ca3f-475b-9647-9af62032f062",
+      "error": "run ended as failed",
+      "elapsed_ms": 38641.81330000429,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-12-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "28804906-a4aa-4f4d-a3de-717c98e70df2",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "e_4e401692a10faeeafa3fe994",
+              "text": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.",
+              "quotes": [
+                {
+                  "text": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.\n\n",
+                  "evidence_id": "e_4e401692a10faeeafa3fe994"
+                }
+              ],
+              "evidence_ids": [
+                "e_4e401692a10faeeafa3fe994"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "answered",
+          "comparisons": [],
+          "limitations": []
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_c07633c186680392d93eac7bbd893b895145a683b5a50af4ce553ecb2dc4b01a"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_f3b5428d764766dd316a1ddeed320bc8d2556466acf1f526343fdbcb644d8bef"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_5e125aa389865684b4bf70ff53b76b2e93c9d16015fe2869bf27edaed1128323"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2757,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 38964.42029999889
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.\n\n",
+            "score": 0.03278688524590164,
+            "title": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.",
+            "authors": [],
+            "chunk_id": "ch_01ea004ba783cecc76debe048c0fff3774adabd16cfcd2a4bd639a0fe0f371bc",
+            "paper_id": "scifact-3863543",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 66.66889007093819,
+            "page_range": null,
+            "citation_id": "28f81d52-54c3-58ed-8880-acbd6d16207a",
+            "evidence_id": "e_4e401692a10faeeafa3fe994",
+            "cosine_score": 0.8824365139007568,
+            "evidence_type": "prose",
+            "source_sha256": "b85b5284ababb038f08a70140779bc9c3b27c4ebbbb9dad74a30e7b0ba93061c",
+            "source_locator": null,
+            "paper_version_id": "pv_c46926972671c74905ce75e9efc35dd3f0739ece40692c22cae5b20b96201633",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "common driving mechanism of genotoxic stress. Transcriptional activation of this signaling axis in the mesenchymal niche predicted leukemic evolution and progression-free survival in myelodysplastic syndrome (MDS), the principal leukemia predisposition syndrome. Collectively, our findings identify mesenchymal niche-induced genotoxic stress in heterotypic stem and progenitor cells through inflammatory signaling as a targetable determinant of disease outcome in human pre-leukemia.",
+            "score": 0.03225806451612903,
+            "title": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.",
+            "authors": [],
+            "chunk_id": "ch_4cc74a11199f923121909606d26347c8ca38b769d207c38ce9548da5e9ea8361",
+            "paper_id": "scifact-3863543",
+            "rrf_score": 0.03225806451612903,
+            "source_id": null,
+            "bm25_score": 36.938622793034035,
+            "page_range": null,
+            "citation_id": "f8a94650-129d-5ac2-b965-bb6b3f5f7b31",
+            "evidence_id": "e_e52b93010a31875fa3214e7f",
+            "cosine_score": 0.7131737470626831,
+            "evidence_type": "prose",
+            "source_sha256": "b85b5284ababb038f08a70140779bc9c3b27c4ebbbb9dad74a30e7b0ba93061c",
+            "source_locator": null,
+            "paper_version_id": "pv_c46926972671c74905ce75e9efc35dd3f0739ece40692c22cae5b20b96201633",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "Mesenchymal niche cells may drive tissue failure and malignant transformation in the hematopoietic system, but the underlying molecular mechanisms and relevance to human disease remain poorly defined. Here, we show that perturbation of mesenchymal cells in a mouse model of the pre-leukemic disorder Shwachman-Diamond syndrome (SDS) induces mitochondrial dysfunction, oxidative stress, and activation of DNA damage responses in hematopoietic stem and progenitor cells. Massive parallel RNA sequencing of highly purified mesenchymal cells in the SDS mouse model and a range of human pre-leukemic syndromes identified p53-S100A8/9-TLR inflammatory signaling as a ",
+            "score": 0.031746031746031744,
+            "title": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.",
+            "authors": [],
+            "chunk_id": "ch_d8a29022456ab7bb3ef6dbecacf8d7ea17eb298d968d65ee5041943eb26cfe7a",
+            "paper_id": "scifact-3863543",
+            "rrf_score": 0.031746031746031744,
+            "source_id": null,
+            "bm25_score": 26.958508392057663,
+            "page_range": null,
+            "citation_id": "485bf723-2341-5beb-a5e4-bbb54039a74c",
+            "evidence_id": "e_1830e60e4dd6227d709718d2",
+            "cosine_score": 0.6393054127693176,
+            "evidence_type": "prose",
+            "source_sha256": "b85b5284ababb038f08a70140779bc9c3b27c4ebbbb9dad74a30e7b0ba93061c",
+            "source_locator": null,
+            "paper_version_id": "pv_c46926972671c74905ce75e9efc35dd3f0739ece40692c22cae5b20b96201633",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "s endogenous homologous recombination machinery. Recent results have shown that ZFNs can be used to create targeting frequencies of up to 20% in a human disease-causing gene. Future work will be needed to translate these in vitro findings to in vivo applications and to determine whether zinc finger nucleases create undesired genomic instability.",
+            "score": 0.02946912242686891,
+            "title": "Gene targeting using zinc finger nucleases",
+            "authors": [],
+            "chunk_id": "ch_43196fce86c39fb1c60fd184cb9fc47f9612a05ac4fb2d48bfa4493662f7a374",
+            "paper_id": "scifact-13221399",
+            "rrf_score": 0.02946912242686891,
+            "source_id": null,
+            "bm25_score": 6.384973365230539,
+            "page_range": null,
+            "citation_id": "f44b1eef-e66d-5f78-aaa0-25f6330ae53a",
+            "evidence_id": "e_d155e6653145a4f915670ac6",
+            "cosine_score": 0.2876891493797302,
+            "evidence_type": "prose",
+            "source_sha256": "197e8aabb819b3bff7bfeceeb53f95712e03b2e681d4efa756c0fc35b7762857",
+            "source_locator": null,
+            "paper_version_id": "pv_e477c43b03e2a304a8826d12622866bfe9198f3c94f5e54984ba547ff3744eba",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "in a human cell line. Therefore, in a single circuit, oxygen, glucose, and reactive oxygen can repress respiration through SOD1/CK1\u03b3 signaling. Our data therefore may provide mechanistic insight into how rapidly proliferating cells and many cancers accomplish glucose-mediated repression of respiration in favor of aerobic glycolysis.",
+            "score": 0.029411764705882353,
+            "title": "SOD1 Integrates Signals from Oxygen and Glucose to Repress Respiration",
+            "authors": [],
+            "chunk_id": "ch_149c8435306e17572df16f088d76c4118e910a13f128cb7bb08a8fab851139d4",
+            "paper_id": "scifact-2919030",
+            "rrf_score": 0.029411764705882353,
+            "source_id": null,
+            "bm25_score": 5.1172866255295455,
+            "page_range": null,
+            "citation_id": "7efb53d2-9f27-5557-bac2-fde163504aad",
+            "evidence_id": "e_5b1f9105b796e692625b6046",
+            "cosine_score": 0.3030966520309448,
+            "evidence_type": "prose",
+            "source_sha256": "f62a598ada4da25eb57f73519b44ff1991aef78379faf033d388790322505d96",
+            "source_locator": null,
+            "paper_version_id": "pv_9cdb8c7c45b07db3f418be5d33d287279b9e8136f546a8a97bf319b46fb9f59e",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 52040.03,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 52497.248800005764
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-12-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "7f07474d-db7a-42e7-a88e-ec8baec518f9",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "claim_1",
+              "text": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.",
+              "quotes": [
+                {
+                  "text": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.\n\n",
+                  "evidence_id": "e_4e401692a10faeeafa3fe994"
+                },
+                {
+                  "text": "common driving mechanism of genotoxic stress. Transcriptional activation of this signaling axis in the mesenchymal niche predicted leukemic evolution and progression-free survival in myelodysplastic syndrome (MDS), the principal leukemia predisposition syndrome. Collectively, our findings identify mesenchymal niche-induced genotoxic stress in heterotypic stem and progenitor cells through inflammatory signaling as a targetable determinant of disease outcome in human pre-leukemia.",
+                  "evidence_id": "e_e52b93010a31875fa3214e7f"
+                }
+              ],
+              "evidence_ids": [
+                "e_4e401692a10faeeafa3fe994",
+                "e_e52b93010a31875fa3214e7f"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": [
+            "The evidence provided does not contain specific details about the authors' exact travel budget for the study."
+          ]
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_c07633c186680392d93eac7bbd893b895145a683b5a50af4ce553ecb2dc4b01a"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_5e125aa389865684b4bf70ff53b76b2e93c9d16015fe2869bf27edaed1128323"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_149c8435306e17572df16f088d76c4118e910a13f128cb7bb08a8fab851139d4"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2781,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 39622.1138999972
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.\n\n",
+            "score": 0.03278688524590164,
+            "title": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.",
+            "authors": [],
+            "chunk_id": "ch_01ea004ba783cecc76debe048c0fff3774adabd16cfcd2a4bd639a0fe0f371bc",
+            "paper_id": "scifact-3863543",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 66.66889007093819,
+            "page_range": null,
+            "citation_id": "eda60e94-29e6-515f-b581-9eed1eb8ff40",
+            "evidence_id": "e_4e401692a10faeeafa3fe994",
+            "cosine_score": 0.921511173248291,
+            "evidence_type": "prose",
+            "source_sha256": "b85b5284ababb038f08a70140779bc9c3b27c4ebbbb9dad74a30e7b0ba93061c",
+            "source_locator": null,
+            "paper_version_id": "pv_c46926972671c74905ce75e9efc35dd3f0739ece40692c22cae5b20b96201633",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "common driving mechanism of genotoxic stress. Transcriptional activation of this signaling axis in the mesenchymal niche predicted leukemic evolution and progression-free survival in myelodysplastic syndrome (MDS), the principal leukemia predisposition syndrome. Collectively, our findings identify mesenchymal niche-induced genotoxic stress in heterotypic stem and progenitor cells through inflammatory signaling as a targetable determinant of disease outcome in human pre-leukemia.",
+            "score": 0.03225806451612903,
+            "title": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.",
+            "authors": [],
+            "chunk_id": "ch_4cc74a11199f923121909606d26347c8ca38b769d207c38ce9548da5e9ea8361",
+            "paper_id": "scifact-3863543",
+            "rrf_score": 0.03225806451612903,
+            "source_id": null,
+            "bm25_score": 39.46798763440926,
+            "page_range": null,
+            "citation_id": "5aebe5ee-a3ea-55e5-b7ef-5ab34406f945",
+            "evidence_id": "e_e52b93010a31875fa3214e7f",
+            "cosine_score": 0.7502816915512085,
+            "evidence_type": "prose",
+            "source_sha256": "b85b5284ababb038f08a70140779bc9c3b27c4ebbbb9dad74a30e7b0ba93061c",
+            "source_locator": null,
+            "paper_version_id": "pv_c46926972671c74905ce75e9efc35dd3f0739ece40692c22cae5b20b96201633",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "Mesenchymal niche cells may drive tissue failure and malignant transformation in the hematopoietic system, but the underlying molecular mechanisms and relevance to human disease remain poorly defined. Here, we show that perturbation of mesenchymal cells in a mouse model of the pre-leukemic disorder Shwachman-Diamond syndrome (SDS) induces mitochondrial dysfunction, oxidative stress, and activation of DNA damage responses in hematopoietic stem and progenitor cells. Massive parallel RNA sequencing of highly purified mesenchymal cells in the SDS mouse model and a range of human pre-leukemic syndromes identified p53-S100A8/9-TLR inflammatory signaling as a ",
+            "score": 0.031746031746031744,
+            "title": "Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.",
+            "authors": [],
+            "chunk_id": "ch_d8a29022456ab7bb3ef6dbecacf8d7ea17eb298d968d65ee5041943eb26cfe7a",
+            "paper_id": "scifact-3863543",
+            "rrf_score": 0.031746031746031744,
+            "source_id": null,
+            "bm25_score": 27.22249238978255,
+            "page_range": null,
+            "citation_id": "b555bfc7-5182-509c-b755-a5da4149e7cb",
+            "evidence_id": "e_1830e60e4dd6227d709718d2",
+            "cosine_score": 0.6700684428215027,
+            "evidence_type": "prose",
+            "source_sha256": "b85b5284ababb038f08a70140779bc9c3b27c4ebbbb9dad74a30e7b0ba93061c",
+            "source_locator": null,
+            "paper_version_id": "pv_c46926972671c74905ce75e9efc35dd3f0739ece40692c22cae5b20b96201633",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "s endogenous homologous recombination machinery. Recent results have shown that ZFNs can be used to create targeting frequencies of up to 20% in a human disease-causing gene. Future work will be needed to translate these in vitro findings to in vivo applications and to determine whether zinc finger nucleases create undesired genomic instability.",
+            "score": 0.0293236301369863,
+            "title": "Gene targeting using zinc finger nucleases",
+            "authors": [],
+            "chunk_id": "ch_43196fce86c39fb1c60fd184cb9fc47f9612a05ac4fb2d48bfa4493662f7a374",
+            "paper_id": "scifact-13221399",
+            "rrf_score": 0.0293236301369863,
+            "source_id": null,
+            "bm25_score": 8.941540243523564,
+            "page_range": null,
+            "citation_id": "c5130541-e162-5599-a63c-51729f821bfd",
+            "evidence_id": "e_d155e6653145a4f915670ac6",
+            "cosine_score": 0.26555201411247253,
+            "evidence_type": "prose",
+            "source_sha256": "197e8aabb819b3bff7bfeceeb53f95712e03b2e681d4efa756c0fc35b7762857",
+            "source_locator": null,
+            "paper_version_id": "pv_e477c43b03e2a304a8826d12622866bfe9198f3c94f5e54984ba547ff3744eba",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "and functional analyses. Our findings indicate that CD4(+) memory T cells \"remember\" their previous effector lineage after antigen clearance, being poised to reacquire their lineage-specific effector functions upon antigen reencounter. These findings have important implications for rational vaccine design, where improving the generation and engagement of memory Tfh cells could be used to enhance vaccine-induced protective immunity.",
+            "score": 0.029236022193768675,
+            "title": "Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.",
+            "authors": [],
+            "chunk_id": "ch_ca8c3f39417f65364f703bc4a006ac46de93b1a105d94b2c6e4b32f4c4743411",
+            "paper_id": "scifact-24879055",
+            "rrf_score": 0.029236022193768675,
+            "source_id": null,
+            "bm25_score": 7.016402900261498,
+            "page_range": null,
+            "citation_id": "bc0701a6-ece6-5ace-90f3-d0e948a60927",
+            "evidence_id": "e_67f3b1e127818b463412e5f5",
+            "cosine_score": 0.2900805175304413,
+            "evidence_type": "prose",
+            "source_sha256": "2d1dcc18fa05fbb5094e208306cb48ad898bae4e9150e4af3e36e0a6415de5cb",
+            "source_locator": null,
+            "paper_version_id": "pv_29808c87e592745b6d9e82b44b0826fe50923b748b3d3e5249326146dc8b11ef",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 65073.45,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 65481.25869999785
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-12-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "b9e5527b-caa7-4d75-9692-9ddbbe6e71d2",
+      "error": "run ended as failed",
+      "elapsed_ms": 54770.19580000342,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-13-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "bc4f5631-333b-4c00-b096-5bef1a40e473",
+      "error": "run ended as failed",
+      "elapsed_ms": 46698.11559999653,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-13-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "d5fc96ff-3425-44d5-96eb-e0061e42d80f",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "claim_1",
+              "text": "The molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints were analyzed.",
+              "quotes": [
+                {
+                  "text": "Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.\n\n",
+                  "evidence_id": "e_a767d6b812522803232a511f"
+                }
+              ],
+              "evidence_ids": [
+                "e_a767d6b812522803232a511f"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": [
+            "The evidence provided does not contain specific details about the authors' exact travel budget for the study."
+          ]
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_d8a29022456ab7bb3ef6dbecacf8d7ea17eb298d968d65ee5041943eb26cfe7a"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_ca8c3f39417f65364f703bc4a006ac46de93b1a105d94b2c6e4b32f4c4743411"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_43196fce86c39fb1c60fd184cb9fc47f9612a05ac4fb2d48bfa4493662f7a374"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2723,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 48208.14569999493
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.\n\n",
+            "score": 0.03278688524590164,
+            "title": "Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.",
+            "authors": [],
+            "chunk_id": "ch_6e2cda9e87748d3a88c68cc2bd4f914fa4913fcb5ed51e8c62e103e338d218c8",
+            "paper_id": "scifact-38131471",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 32.75794338368983,
+            "page_range": null,
+            "citation_id": "68ecfce3-b0fc-5709-84d7-04d118d3685a",
+            "evidence_id": "e_a767d6b812522803232a511f",
+            "cosine_score": 0.8179503679275513,
+            "evidence_type": "prose",
+            "source_sha256": "18a9f3bd7a70377af7b2bb652ece47e2bd359cf0a9beec88121ca2ca186ea786",
+            "source_locator": null,
+            "paper_version_id": "pv_7580b8fa20294fc2c9b8bc623cc0e592820cdb2ffc484fbaeb23923ab9d15a22",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "Chk2 Ser/Thr kinases and Cdc25 phosphatases. The signal transducers activate p53 and inactivate cyclin-dependent kinases to inhibit cell cycle progression from G1 to S (the G1/S checkpoint), DNA replication (the intra-S checkpoint), or G2 to mitosis (the G2/M checkpoint). In this review the molecular mechanisms of DNA repair and the DNA damage checkpoints in mammalian cells are analyzed.",
+            "score": 0.03225806451612903,
+            "title": "Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.",
+            "authors": [],
+            "chunk_id": "ch_83d4408ce79e967f5097b72b47f197c59af141fd6cfe43b0c1e735cc7978601a",
+            "paper_id": "scifact-38131471",
+            "rrf_score": 0.03225806451612903,
+            "source_id": null,
+            "bm25_score": 22.97873819632902,
+            "page_range": null,
+            "citation_id": "4693c2cd-3440-5c63-8abd-3000d916ea00",
+            "evidence_id": "e_eb52db235353cb734672971b",
+            "cosine_score": 0.6473301649093628,
+            "evidence_type": "prose",
+            "source_sha256": "18a9f3bd7a70377af7b2bb652ece47e2bd359cf0a9beec88121ca2ca186ea786",
+            "source_locator": null,
+            "paper_version_id": "pv_7580b8fa20294fc2c9b8bc623cc0e592820cdb2ffc484fbaeb23923ab9d15a22",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "repair and prevention of the transmission of damaged or incompletely replicated chromosomes; (c) transcriptional response, which causes changes in the transcription profile that may be beneficial to the cell; and (d) apoptosis, which eliminates heavily damaged or seriously deregulated cells. DNA repair mechanisms include direct repair, base excision repair, nucleotide excision repair, double-strand break repair, and cross-link repair. The DNA damage checkpoints employ damage sensor proteins, such as ATM, ATR, the Rad17-RFC complex, and the 9-1-1 complex, to detect DNA damage and to initiate signal transduction cascades that employ Chk1 and ",
+            "score": 0.031746031746031744,
+            "title": "Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.",
+            "authors": [],
+            "chunk_id": "ch_82f56c50594f49f6e4887dfed18675e0a795a32853bf51b53568ca0696699645",
+            "paper_id": "scifact-38131471",
+            "rrf_score": 0.031746031746031744,
+            "source_id": null,
+            "bm25_score": 19.43476888086763,
+            "page_range": null,
+            "citation_id": "c01ad1f6-7f56-5fd9-b6df-93097ce31f6d",
+            "evidence_id": "e_be6f1de6d9b2cd25ad302d14",
+            "cosine_score": 0.6296233534812927,
+            "evidence_type": "prose",
+            "source_sha256": "18a9f3bd7a70377af7b2bb652ece47e2bd359cf0a9beec88121ca2ca186ea786",
+            "source_locator": null,
+            "paper_version_id": "pv_7580b8fa20294fc2c9b8bc623cc0e592820cdb2ffc484fbaeb23923ab9d15a22",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "DNA damage is a relatively common event in the life of a cell and may lead to mutation, cancer, and cellular or organismic death. Damage to DNA induces several cellular responses that enable the cell either to eliminate or cope with the damage or to activate a programmed cell death process, presumably to eliminate cells with potentially catastrophic mutations. These DNA damage response reactions include: (a) removal of DNA damage and restoration of the continuity of the DNA duplex; (b) activation of a DNA damage checkpoint, which arrests cell cycle progression so as to allow for ",
+            "score": 0.03125,
+            "title": "Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.",
+            "authors": [],
+            "chunk_id": "ch_b44e436cf30a6548dc9401f3b208f2b5e50c0fe0337a7461ab88233ec2b87036",
+            "paper_id": "scifact-38131471",
+            "rrf_score": 0.03125,
+            "source_id": null,
+            "bm25_score": 11.141430073914101,
+            "page_range": null,
+            "citation_id": "9d751a3f-3e2c-5de3-be15-a6266c2b5a67",
+            "evidence_id": "e_286975402c1068bff52e667e",
+            "cosine_score": 0.627771258354187,
+            "evidence_type": "prose",
+            "source_sha256": "18a9f3bd7a70377af7b2bb652ece47e2bd359cf0a9beec88121ca2ca186ea786",
+            "source_locator": null,
+            "paper_version_id": "pv_7580b8fa20294fc2c9b8bc623cc0e592820cdb2ffc484fbaeb23923ab9d15a22",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "The ability to achieve site-specific manipulation of the mammalian genome has widespread implications for basic and applied research. Gene targeting is a process in which a DNA molecule introduced into a cell replaces the corresponding chromosomal segment by homologous recombination, and thus presents a precise way to manipulate the genome. In the past, the application of gene targeting to mammalian cells has been limited by its low efficiency. Zinc finger nucleases (ZFNs) show promise in improving the efficiency of gene targeting by introducing DNA double-strand breaks in target genes, which then stimulate the cell'",
+            "score": 0.030536130536130537,
+            "title": "Gene targeting using zinc finger nucleases",
+            "authors": [],
+            "chunk_id": "ch_0fdf6a559ab493d2c253e207b58b200e8d913b6b8b1973b043e76d74d2c3edf3",
+            "paper_id": "scifact-13221399",
+            "rrf_score": 0.030536130536130537,
+            "source_id": null,
+            "bm25_score": 8.485583289512695,
+            "page_range": null,
+            "citation_id": "4a977c60-d96c-54bf-9b49-e79f603155db",
+            "evidence_id": "e_d8f9b11a205d3c9e81054df0",
+            "cosine_score": 0.3635839521884918,
+            "evidence_type": "prose",
+            "source_sha256": "197e8aabb819b3bff7bfeceeb53f95712e03b2e681d4efa756c0fc35b7762857",
+            "source_locator": null,
+            "paper_version_id": "pv_e477c43b03e2a304a8826d12622866bfe9198f3c94f5e54984ba547ff3744eba",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 63560.06,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 64157.69540000474
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-13-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "8f400022-789d-4e40-8881-9ad089a94dd5",
+      "error": "run ended as failed",
+      "elapsed_ms": 46280.690100000356,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-14-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Intestinal methane production in obese individuals is associated with a higher body mass index.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "2c383a7d-986b-49ad-827f-9c048e32cb83",
+      "error": "run ended as failed",
+      "elapsed_ms": 42390.84319999529,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-14-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Intestinal methane production in obese individuals is associated with a higher body mass index.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "c50b0c5d-3487-45cf-8ec1-13c7df59936a",
+      "error": "run ended as failed",
+      "elapsed_ms": 48688.15870000253,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-14-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Intestinal methane production in obese individuals is associated with a higher body mass index.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "740cf191-b518-46bd-854b-38df06ada336",
+      "error": "run ended as failed",
+      "elapsed_ms": 47777.76150000136,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-15-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Health and access to care: perspectives of homeless youth in Baltimore City, U.S.A.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "ab07305e-3e18-49e6-b381-b6c2e4d5c28a",
+      "error": "run ended as failed",
+      "elapsed_ms": 101291.1058000027,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-15-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Health and access to care: perspectives of homeless youth in Baltimore City, U.S.A.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "6cfdfdf5-7846-40b2-8daf-35d837990e5d",
+      "error": "run ended as failed",
+      "elapsed_ms": 43526.06850000302,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-15-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Health and access to care: perspectives of homeless youth in Baltimore City, U.S.A.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "1c875aeb-f88a-4f23-88f4-7a46ab908b71",
+      "error": "run ended as failed",
+      "elapsed_ms": 40683.13009999838,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-16-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'What is the best way to help caregivers in cancer and palliative care? A systematic literature review of interventions and their effectiveness.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "65392524-4fe5-49ed-9bcb-cc88ca80f8c7",
+      "error": "run ended as failed",
+      "elapsed_ms": 40237.39840000053,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-16-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'What is the best way to help caregivers in cancer and palliative care? A systematic literature review of interventions and their effectiveness.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "d9143785-4d4f-4ce4-b215-476e00585432",
+      "error": "run ended as failed",
+      "elapsed_ms": 38293.61639999843,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-16-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'What is the best way to help caregivers in cancer and palliative care? A systematic literature review of interventions and their effectiveness.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "32b8edcf-6400-48bf-9d51-4245591567bc",
+      "error": "run ended as failed",
+      "elapsed_ms": 38319.537900002615,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-17-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Inter- and Intra-Host Viral Diversity in a Large Seasonal DENV2 Outbreak' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "b06e75fa-7b82-4f36-962d-9d5bd156d4cc",
+      "error": "run ended as failed",
+      "elapsed_ms": 36598.454899998615,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-17-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Inter- and Intra-Host Viral Diversity in a Large Seasonal DENV2 Outbreak' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "0ee61b5b-5352-462d-9746-a0ad88b056fd",
+      "error": "run ended as failed",
+      "elapsed_ms": 99230.28409999824,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-17-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Inter- and Intra-Host Viral Diversity in a Large Seasonal DENV2 Outbreak'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "1c8878dc-012e-4e57-b618-5e31d5032134",
+      "error": "run ended as failed",
+      "elapsed_ms": 37294.57589999947,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-18-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Virus-encoded microRNAs.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "c8cf4cd2-6836-4e41-ae5d-2e0d46e304d9",
+      "error": "run ended as failed",
+      "elapsed_ms": 39418.72970000259,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-18-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Virus-encoded microRNAs.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "b6758b9c-cf9d-425d-980f-634ba610d0cf",
+      "error": "run ended as failed",
+      "elapsed_ms": 49176.99960000027,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-18-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Virus-encoded microRNAs.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "3c767135-8daf-45b0-8683-047fe19d2268",
+      "error": "run ended as failed",
+      "elapsed_ms": 45346.91929999826,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-19-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "c0e70a47-fe6e-4d85-810d-d5b2e2752b6d",
+      "error": "run ended as failed",
+      "elapsed_ms": 35288.473599997815,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-19-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "48cda1fd-187a-41a5-8975-812dc439b69a",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "c_68af27eadc7599fd362ce4ad",
+              "text": "Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo",
+              "quotes": [
+                {
+                  "text": "Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo\n\n",
+                  "evidence_id": "e_68af27eadc7599fd362ce4ad"
+                }
+              ],
+              "evidence_ids": [
+                "e_68af27eadc7599fd362ce4ad"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": [
+            "The evidence provided does not contain specific information about the authors' exact travel budget for the study."
+          ]
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_43196fce86c39fb1c60fd184cb9fc47f9612a05ac4fb2d48bfa4493662f7a374"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_12b4c2580f46ef7a2e7a20146be13838b844fa6631548a1ae3a66c5fba5ae799"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_af66176e6267d8debc5c7f57e5a0b60d4cbe2b2bb2aaa410ec5d604023548591"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2774,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 39535.838499999954
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo\n\n",
+            "score": 0.03278688524590164,
+            "title": "Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo",
+            "authors": [],
+            "chunk_id": "ch_ab7a72d6d2405433f1885d180a6688e5c155f4c84f9a03a3687acda0e5495b79",
+            "paper_id": "scifact-11172205",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 54.12110200482816,
+            "page_range": null,
+            "citation_id": "8d963683-d04d-5b39-9772-654dbc957733",
+            "evidence_id": "e_68af27eadc7599fd362ce4ad",
+            "cosine_score": 0.9145744442939758,
+            "evidence_type": "prose",
+            "source_sha256": "18d0e96fdcbbca79328bb8335849640886d966365788c0797ea04b55c9c82e7d",
+            "source_locator": null,
+            "paper_version_id": "pv_a518863d97d069b02a8482e42c95cc7a1e2f6bb285d21675c3ebd112cf8a5ee4",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "the matrix. Moreover, we used them to measure the ability of particles of different sizes to access the tumor. Finally, we successfully monitored the recruitment of quantum dot\u2013labeled bone marrow\u2013derived precursor cells to the tumor vasculature. These examples show the versatility of quantum dots for studying tumor pathophysiology and creating avenues for treatment.",
+            "score": 0.03225806451612903,
+            "title": "Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo",
+            "authors": [],
+            "chunk_id": "ch_eb47a75578672491591fbcc29979ccf6d616a012eedd4674995e79c9df208fff",
+            "paper_id": "scifact-11172205",
+            "rrf_score": 0.03225806451612903,
+            "source_id": null,
+            "bm25_score": 15.597575753794626,
+            "page_range": null,
+            "citation_id": "21c6cc60-190b-5a1c-b404-d5945c1fe8be",
+            "evidence_id": "e_ca3508a6c37e5c98d1d3e0c4",
+            "cosine_score": 0.6652994751930237,
+            "evidence_type": "prose",
+            "source_sha256": "18d0e96fdcbbca79328bb8335849640886d966365788c0797ea04b55c9c82e7d",
+            "source_locator": null,
+            "paper_version_id": "pv_a518863d97d069b02a8482e42c95cc7a1e2f6bb285d21675c3ebd112cf8a5ee4",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "A solid tumor is an organ composed of cancer and host cells embedded in an extracellular matrix and nourished by blood vessels. A prerequisite to understanding tumor pathophysiology is the ability to distinguish and monitor each component in dynamic studies. Standard fluorophores hamper simultaneous intravital imaging of these components. Here, we used multiphoton microscopy techniques and transgenic mice that expressed green fluorescent protein, and combined them with the use of quantum dot preparations. We show that these fluorescent semiconductor nanocrystals can be customized to concurrently image and differentiate tumor vessels from both the perivascular cells and ",
+            "score": 0.031746031746031744,
+            "title": "Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo",
+            "authors": [],
+            "chunk_id": "ch_2d24457a4c51c74d155504dceb5edd11e450cebe105bd0217c52981995435c53",
+            "paper_id": "scifact-11172205",
+            "rrf_score": 0.031746031746031744,
+            "source_id": null,
+            "bm25_score": 11.268523347274503,
+            "page_range": null,
+            "citation_id": "09a83840-61da-5997-b790-5e3d4d868155",
+            "evidence_id": "e_739fcf63865f236b980362a2",
+            "cosine_score": 0.5645719766616821,
+            "evidence_type": "prose",
+            "source_sha256": "18d0e96fdcbbca79328bb8335849640886d966365788c0797ea04b55c9c82e7d",
+            "source_locator": null,
+            "paper_version_id": "pv_a518863d97d069b02a8482e42c95cc7a1e2f6bb285d21675c3ebd112cf8a5ee4",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "The p75(NTR) neurotrophin receptor has been implicated in multiple biological and pathological processes. While significant advances have recently been made in understanding the physiologic role of p75(NTR) , many details and aspects remain to be determined. This is in part because the two existing knockout mouse models (Exons 3 or 4 deleted, respectively), both display features that defy definitive conclusions. Here we describe the generation of mice that carry a conditional p75(NTR) (p75(NTR-FX) ) allele made by flanking Exons 4-6, which encode the transmembrane and all cytoplasmic domains, by loxP sites. To ",
+            "score": 0.027417840375586856,
+            "title": "Generation of mice with a conditional allele for the p75(NTR) neurotrophin receptor gene.",
+            "authors": [],
+            "chunk_id": "ch_cbb7e75cdd1e9d5104319a7f64152a3afa0a64c8a84e9b5944a1389c37276ab3",
+            "paper_id": "scifact-368506",
+            "rrf_score": 0.027417840375586856,
+            "source_id": null,
+            "bm25_score": 3.9183457195035967,
+            "page_range": null,
+            "citation_id": "01e818ce-bcc9-5fcf-a2ed-bdf0cdcf2747",
+            "evidence_id": "e_759a4fb4c0b3ef00a77e3fc3",
+            "cosine_score": 0.18229545652866364,
+            "evidence_type": "prose",
+            "source_sha256": "7caedb9a8dbcd5cbb81cff1c67aa97ab10fc0361725f4968d1c3691250325699",
+            "source_locator": null,
+            "paper_version_id": "pv_88f77ad89033f6ab869a78658ebc98147bdc31df0b6a2c8ee4251b05a1092354",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "P. The structure presented here has allowed us to identify specificity determinants for the CheA-CheY interaction and subsequently to successfully reengineer phosphotransfer signalling. In summary, our results provide valuable insight into how cells mediate specificity in one of the most abundant signalling pathways in biology, two-component signal transduction.",
+            "score": 0.027119252873563218,
+            "title": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+            "authors": [],
+            "chunk_id": "ch_ce11d0b9f2331930439eeddaaa7544583713ae75a1c711f018686eb101e4f208",
+            "paper_id": "scifact-11603066",
+            "rrf_score": 0.027119252873563218,
+            "source_id": null,
+            "bm25_score": 2.476381671371934,
+            "page_range": null,
+            "citation_id": "038adc4e-716e-5fd5-834a-36af0a1ea4fb",
+            "evidence_id": "e_c681620cdd056422802d757b",
+            "cosine_score": 0.25327807664871216,
+            "evidence_type": "prose",
+            "source_sha256": "54fc6fb3ce878c7c332f9c8129b694ed2251c05c111f95c9b6c2462e5fc75043",
+            "source_locator": null,
+            "paper_version_id": "pv_4c1fa728c7d254ada19596d041c321a609f9aa106841aa4eb1e50e0fa3f149d0",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 53073.19,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 53468.99329999724
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-19-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "a338ace7-2a05-4026-904b-ab274d45bbb3",
+      "error": "run ended as failed",
+      "elapsed_ms": 47256.941499996174,
+      "error_code": "invalid_answer"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-20-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Role of NF-kappa B in cell survival and transcription of latent membrane protein 1-expressing or Epstein-Barr virus latency III-infected cells.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "01eef341-581b-4303-956a-099204ccd7df",
+      "error": "run ended as failed",
+      "elapsed_ms": 357956.5683000037,
+      "error_code": "provider_failed"
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-20-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Role of NF-kappa B in cell survival and transcription of latent membrane protein 1-expressing or Epstein-Barr virus latency III-infected cells.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "ffd94f45-7952-44fe-85fc-f1aed05ae0fd",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 106733.54349999863
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-20-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Role of NF-kappa B in cell survival and transcription of latent membrane protein 1-expressing or Epstein-Barr virus latency III-infected cells.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "4aafc012-4109-416a-9842-c82d1900446c",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 40666.17969999788
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-21-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Epidemiology of Staphylococcus aureus blood and skin and soft tissue infections in the US military health system, 2005-2010.' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "e7fe9d12-960e-412c-8acb-5fcb83c811b6",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 115840.00320000632
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-21-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Epidemiology of Staphylococcus aureus blood and skin and soft tissue infections in the US military health system, 2005-2010.' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "3b6ebf7d-ba55-45ea-bb9a-46ee3fd977e5",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 43305.42369998875
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-21-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Epidemiology of Staphylococcus aureus blood and skin and soft tissue infections in the US military health system, 2005-2010.'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "7f74e145-1271-4569-a566-c00ae8103085",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 98998.8730000041
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-22-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "31432530-480f-4ba9-a7a6-cc06175ae82a",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "claim_1",
+              "text": "The study titled 'Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex' reports that the structure presented here has allowed us to identify specificity determinants for the CheA-CheY interaction and subsequently to successfully reengineer phosphotransfer signalling.",
+              "quotes": [
+                {
+                  "text": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex\n\n",
+                  "evidence_id": "e_2505e4c14987e67485ac8d04"
+                }
+              ],
+              "evidence_ids": [
+                "e_2505e4c14987e67485ac8d04"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": []
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_c07633c186680392d93eac7bbd893b895145a683b5a50af4ce553ecb2dc4b01a"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_128cdaa87970e02294c68a6ce721d62fad2f50011f25184702f76fad719bb7c0"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_430a80decd80c555dbc900166d078be1f20d565e1fb7c946c64ce308331ae3c8"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2828,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 32964.40449998772
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex\n\n",
+            "score": 0.03278688524590164,
+            "title": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+            "authors": [],
+            "chunk_id": "ch_be8a0d902be23137af0d28b31de9c2c347d0dc81e78601e81c71c3cef5aa8456",
+            "paper_id": "scifact-11603066",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 49.23593311074655,
+            "page_range": null,
+            "citation_id": "99d10b9d-2917-54fb-9ef0-7d903e49f9a7",
+            "evidence_id": "e_2505e4c14987e67485ac8d04",
+            "cosine_score": 0.8822673559188843,
+            "evidence_type": "prose",
+            "source_sha256": "54fc6fb3ce878c7c332f9c8129b694ed2251c05c111f95c9b6c2462e5fc75043",
+            "source_locator": null,
+            "paper_version_id": "pv_4c1fa728c7d254ada19596d041c321a609f9aa106841aa4eb1e50e0fa3f149d0",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "P. The structure presented here has allowed us to identify specificity determinants for the CheA-CheY interaction and subsequently to successfully reengineer phosphotransfer signalling. In summary, our results provide valuable insight into how cells mediate specificity in one of the most abundant signalling pathways in biology, two-component signal transduction.",
+            "score": 0.03200204813108039,
+            "title": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+            "authors": [],
+            "chunk_id": "ch_ce11d0b9f2331930439eeddaaa7544583713ae75a1c711f018686eb101e4f208",
+            "paper_id": "scifact-11603066",
+            "rrf_score": 0.03200204813108039,
+            "source_id": null,
+            "bm25_score": 18.431830928700762,
+            "page_range": null,
+            "citation_id": "a5d4a194-43b0-5476-b3c3-fcb5191254a8",
+            "evidence_id": "e_c681620cdd056422802d757b",
+            "cosine_score": 0.7084437012672424,
+            "evidence_type": "prose",
+            "source_sha256": "54fc6fb3ce878c7c332f9c8129b694ed2251c05c111f95c9b6c2462e5fc75043",
+            "source_locator": null,
+            "paper_version_id": "pv_4c1fa728c7d254ada19596d041c321a609f9aa106841aa4eb1e50e0fa3f149d0",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "Two-component signal transduction pathways comprising histidine protein kinases (HPKs) and their response regulators (RRs) are widely used to control bacterial responses to environmental challenges. Some bacteria have over 150 different two-component pathways, and the specificity of the phosphotransfer reactions within these systems is tightly controlled to prevent unwanted crosstalk. One of the best understood two-component signalling pathways is the chemotaxis pathway. Here, we present the 1.40 A crystal structure of the histidine-containing phosphotransfer domain of the chemotaxis HPK, CheA(3), in complex with its cognate RR, CheY(6). A methionine finger ",
+            "score": 0.03200204813108039,
+            "title": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+            "authors": [],
+            "chunk_id": "ch_d20b9dd5fc6d84e315512d90cf40f1921c1453ff069d459774ebcb737fb284ee",
+            "paper_id": "scifact-11603066",
+            "rrf_score": 0.03200204813108039,
+            "source_id": null,
+            "bm25_score": 23.567557420959755,
+            "page_range": null,
+            "citation_id": "425bae66-0c97-5248-b0e2-de6e4bb748b4",
+            "evidence_id": "e_a009c65c2a383ddc5efac930",
+            "cosine_score": 0.5494037866592407,
+            "evidence_type": "prose",
+            "source_sha256": "54fc6fb3ce878c7c332f9c8129b694ed2251c05c111f95c9b6c2462e5fc75043",
+            "source_locator": null,
+            "paper_version_id": "pv_4c1fa728c7d254ada19596d041c321a609f9aa106841aa4eb1e50e0fa3f149d0",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "on CheY(6) that nestles in a hydrophobic pocket in CheA(3) was shown to be important for the interaction and was found to only occur in the cognate RRs of CheA(3), CheY(6), and CheB(2). Site-directed mutagenesis of this methionine in combination with two adjacent residues abolished binding, as shown by surface plasmon resonance studies, and phosphotransfer from CheA(3)-P to CheY(6). Introduction of this methionine and an adjacent alanine residue into a range of noncognate CheYs, dramatically changed their specificity, allowing protein interaction and rapid phosphotransfer from CheA(3)-",
+            "score": 0.031009615384615385,
+            "title": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+            "authors": [],
+            "chunk_id": "ch_ea5e677e6de126fea598182059b821eb4f9f372c6cf20985cc0f8eb7ae86c1c1",
+            "paper_id": "scifact-11603066",
+            "rrf_score": 0.031009615384615385,
+            "source_id": null,
+            "bm25_score": 9.510506389558756,
+            "page_range": null,
+            "citation_id": "b821400e-d17d-5c42-b202-7be7de68f712",
+            "evidence_id": "e_c6322feee0a7930887a2e06f",
+            "cosine_score": 0.43793874979019165,
+            "evidence_type": "prose",
+            "source_sha256": "54fc6fb3ce878c7c332f9c8129b694ed2251c05c111f95c9b6c2462e5fc75043",
+            "source_locator": null,
+            "paper_version_id": "pv_4c1fa728c7d254ada19596d041c321a609f9aa106841aa4eb1e50e0fa3f149d0",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "Dynamic Helix Interactions in Transmembrane Signaling\n\nStudying how protein transmembrane domains transmit signals across membranes is beset by unique challenges. Here, we discuss the circumstances that have led to success and reflect on what has been learned from these examples. Such efforts suggest that some of the most interesting properties of transmembrane helix interactions may be the least amenable to study by current techniques.",
+            "score": 0.030309988518943745,
+            "title": "Dynamic Helix Interactions in Transmembrane Signaling",
+            "authors": [],
+            "chunk_id": "ch_af66176e6267d8debc5c7f57e5a0b60d4cbe2b2bb2aaa410ec5d604023548591",
+            "paper_id": "scifact-17123657",
+            "rrf_score": 0.030309988518943745,
+            "source_id": null,
+            "bm25_score": 7.211452670554908,
+            "page_range": null,
+            "citation_id": "0f7fea7d-d4aa-53dc-abd3-88a4f5286372",
+            "evidence_id": "e_5bb9ed1afc99b4f70a3caf66",
+            "cosine_score": 0.33166614174842834,
+            "evidence_type": "prose",
+            "source_sha256": "e96bb111aaaea1819d7852e8f348c1e48bf0c8e981c576b4a7888a6ab6f35c8b",
+            "source_locator": null,
+            "paper_version_id": "pv_0211971a5e8232e757b86fe21fb27cfbc6054b8bbd360fca176f09f34cb47158",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 45687.71,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 46020.432900011656
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-22-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "27e41393-a669-4fb6-8057-2dab422c4411",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "c_2505e4c14987e67485ac8d04",
+              "text": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+              "quotes": [
+                {
+                  "text": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex\n\n",
+                  "evidence_id": "e_2505e4c14987e67485ac8d04"
+                }
+              ],
+              "evidence_ids": [
+                "e_2505e4c14987e67485ac8d04"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": [
+            "The evidence provided does not contain specific information about the authors' exact travel budget for the study."
+          ]
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_af66176e6267d8debc5c7f57e5a0b60d4cbe2b2bb2aaa410ec5d604023548591"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_128cdaa87970e02294c68a6ce721d62fad2f50011f25184702f76fad719bb7c0"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_2d24457a4c51c74d155504dceb5edd11e450cebe105bd0217c52981995435c53"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 2912,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 37126.16919999709
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex\n\n",
+            "score": 0.03278688524590164,
+            "title": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+            "authors": [],
+            "chunk_id": "ch_be8a0d902be23137af0d28b31de9c2c347d0dc81e78601e81c71c3cef5aa8456",
+            "paper_id": "scifact-11603066",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 49.23593311074655,
+            "page_range": null,
+            "citation_id": "0067fa65-e3c3-5756-a9a3-10f84dce80ba",
+            "evidence_id": "e_2505e4c14987e67485ac8d04",
+            "cosine_score": 0.8795551061630249,
+            "evidence_type": "prose",
+            "source_sha256": "54fc6fb3ce878c7c332f9c8129b694ed2251c05c111f95c9b6c2462e5fc75043",
+            "source_locator": null,
+            "paper_version_id": "pv_4c1fa728c7d254ada19596d041c321a609f9aa106841aa4eb1e50e0fa3f149d0",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "P. The structure presented here has allowed us to identify specificity determinants for the CheA-CheY interaction and subsequently to successfully reengineer phosphotransfer signalling. In summary, our results provide valuable insight into how cells mediate specificity in one of the most abundant signalling pathways in biology, two-component signal transduction.",
+            "score": 0.03200204813108039,
+            "title": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+            "authors": [],
+            "chunk_id": "ch_ce11d0b9f2331930439eeddaaa7544583713ae75a1c711f018686eb101e4f208",
+            "paper_id": "scifact-11603066",
+            "rrf_score": 0.03200204813108039,
+            "source_id": null,
+            "bm25_score": 19.701647984979928,
+            "page_range": null,
+            "citation_id": "e2421241-c8ea-5ebc-8a65-27a2589fa150",
+            "evidence_id": "e_c681620cdd056422802d757b",
+            "cosine_score": 0.7076873779296875,
+            "evidence_type": "prose",
+            "source_sha256": "54fc6fb3ce878c7c332f9c8129b694ed2251c05c111f95c9b6c2462e5fc75043",
+            "source_locator": null,
+            "paper_version_id": "pv_4c1fa728c7d254ada19596d041c321a609f9aa106841aa4eb1e50e0fa3f149d0",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "Two-component signal transduction pathways comprising histidine protein kinases (HPKs) and their response regulators (RRs) are widely used to control bacterial responses to environmental challenges. Some bacteria have over 150 different two-component pathways, and the specificity of the phosphotransfer reactions within these systems is tightly controlled to prevent unwanted crosstalk. One of the best understood two-component signalling pathways is the chemotaxis pathway. Here, we present the 1.40 A crystal structure of the histidine-containing phosphotransfer domain of the chemotaxis HPK, CheA(3), in complex with its cognate RR, CheY(6). A methionine finger ",
+            "score": 0.03200204813108039,
+            "title": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+            "authors": [],
+            "chunk_id": "ch_d20b9dd5fc6d84e315512d90cf40f1921c1453ff069d459774ebcb737fb284ee",
+            "paper_id": "scifact-11603066",
+            "rrf_score": 0.03200204813108039,
+            "source_id": null,
+            "bm25_score": 23.838464629431012,
+            "page_range": null,
+            "citation_id": "483bb1c4-968c-518e-a0a6-a47be65837ed",
+            "evidence_id": "e_a009c65c2a383ddc5efac930",
+            "cosine_score": 0.5532671213150024,
+            "evidence_type": "prose",
+            "source_sha256": "54fc6fb3ce878c7c332f9c8129b694ed2251c05c111f95c9b6c2462e5fc75043",
+            "source_locator": null,
+            "paper_version_id": "pv_4c1fa728c7d254ada19596d041c321a609f9aa106841aa4eb1e50e0fa3f149d0",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "on CheY(6) that nestles in a hydrophobic pocket in CheA(3) was shown to be important for the interaction and was found to only occur in the cognate RRs of CheA(3), CheY(6), and CheB(2). Site-directed mutagenesis of this methionine in combination with two adjacent residues abolished binding, as shown by surface plasmon resonance studies, and phosphotransfer from CheA(3)-P to CheY(6). Introduction of this methionine and an adjacent alanine residue into a range of noncognate CheYs, dramatically changed their specificity, allowing protein interaction and rapid phosphotransfer from CheA(3)-",
+            "score": 0.031009615384615385,
+            "title": "Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex",
+            "authors": [],
+            "chunk_id": "ch_ea5e677e6de126fea598182059b821eb4f9f372c6cf20985cc0f8eb7ae86c1c1",
+            "paper_id": "scifact-11603066",
+            "rrf_score": 0.031009615384615385,
+            "source_id": null,
+            "bm25_score": 10.653611223933863,
+            "page_range": null,
+            "citation_id": "32c56a72-6a13-5dfe-9711-8af029547484",
+            "evidence_id": "e_c6322feee0a7930887a2e06f",
+            "cosine_score": 0.4391988515853882,
+            "evidence_type": "prose",
+            "source_sha256": "54fc6fb3ce878c7c332f9c8129b694ed2251c05c111f95c9b6c2462e5fc75043",
+            "source_locator": null,
+            "paper_version_id": "pv_4c1fa728c7d254ada19596d041c321a609f9aa106841aa4eb1e50e0fa3f149d0",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "The TCR:CD3 complex transduces signals that are critical for optimal T cell development and adaptive immunity. In resting T cells, the CD3\u03b5 cytoplasmic tail associates with the plasma membrane via a proximal basic-rich stretch (BRS). In this study, we show that mice lacking a functional CD3\u03b5-BRS exhibited substantial reductions in thymic cellularity and limited CD4- CD8- double-negative (DN) 3 to DN4 thymocyte transition, because of enhanced DN4 TCR signaling resulting in increased cell death and TCR downregulation in all subsequent populations. Furthermore, positive, but not negative, T cell selection was affected in ",
+            "score": 0.026631393298059962,
+            "title": "Membrane association of the CD3\u03b5 signaling domain is required for optimal T cell development and function.",
+            "authors": [],
+            "chunk_id": "ch_c07633c186680392d93eac7bbd893b895145a683b5a50af4ce553ecb2dc4b01a",
+            "paper_id": "scifact-34905328",
+            "rrf_score": 0.026631393298059962,
+            "source_id": null,
+            "bm25_score": 6.715956205640354,
+            "page_range": null,
+            "citation_id": "131d1832-6912-53ef-805c-5b3206a430e8",
+            "evidence_id": "e_193e9eca0e31881f737be30d",
+            "cosine_score": 0.18830463290214539,
+            "evidence_type": "prose",
+            "source_sha256": "8f9823119c03c9afab5edb64381b08f982ca4d3ab51f5fee399fd941d7ed82f5",
+            "source_locator": null,
+            "paper_version_id": "pv_017aff511dec01fb9345db29c7ff650c6b892d1d78f070a7cf2791529446dca2",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 50294.1,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 50605.64789999626
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-22-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "9afa4276-b654-43fb-8add-63f885923c23",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 38447.85690000572
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-23-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "f999ffa1-6647-4af1-8df5-888edbedf2b6",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 64572.55490000534
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-23-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "completed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "f0a7b955-ad13-41dd-889e-268bf62148cd",
+      "result": {
+        "answer": {
+          "claims": [
+            {
+              "id": "c_6c42cbb60d03dc10e26edb6e",
+              "text": "Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth",
+              "quotes": [
+                {
+                  "text": "Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth\n\n",
+                  "evidence_id": "e_6c42cbb60d03dc10e26edb6e"
+                }
+              ],
+              "evidence_ids": [
+                "e_6c42cbb60d03dc10e26edb6e"
+              ],
+              "support_status": "structurally_valid"
+            }
+          ],
+          "status": "partial",
+          "comparisons": [],
+          "limitations": [
+            "The evidence provided does not contain explicit information about the authors' exact travel budget for the study."
+          ]
+        },
+        "budget": {
+          "excluded": [
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_7a1e71bb8fe866fe3ee9d517f75d4780190214b99d1e0f5f655d0124ba3cf9e6"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_af66176e6267d8debc5c7f57e5a0b60d4cbe2b2bb2aaa410ec5d604023548591"
+            },
+            {
+              "reason": "token_budget",
+              "chunk_id": "ch_746f8fc7f0b623daf9d6daeb79795c59d7546ecef4d8dc07ff46ebaa371ccb4e"
+            }
+          ],
+          "truncated": [],
+          "input_tokens": 3004,
+          "reserved_output_tokens": 1024
+        },
+        "timing": {
+          "definition": "Worker start to first nonempty content token; excludes queue.",
+          "worker_start_to_first_token_ms": 36088.190499998746
+        },
+        "evidence": [
+          {
+            "rank": 1,
+            "text": "Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth\n\n",
+            "score": 0.03278688524590164,
+            "title": "Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth",
+            "authors": [],
+            "chunk_id": "ch_2419292c32104d6c6bce6ab6d3b23d0b577a9f6293a63fe0fc37819e32d23616",
+            "paper_id": "scifact-2601135",
+            "rrf_score": 0.03278688524590164,
+            "source_id": null,
+            "bm25_score": 86.29154387320855,
+            "page_range": null,
+            "citation_id": "3150a6c7-4329-58ed-8cbb-cdcb9ee99ee2",
+            "evidence_id": "e_6c42cbb60d03dc10e26edb6e",
+            "cosine_score": 0.9507268667221069,
+            "evidence_type": "prose",
+            "source_sha256": "b9255e645429680a42a136ac324130f43facf83d1daa1afe5e1a01fb9e9af540",
+            "source_locator": null,
+            "paper_version_id": "pv_37e081720c6f3de0d8776e5a2a2c303a861e4491bfd2d85ed5ea24376484e308",
+            "original_available": false
+          },
+          {
+            "rank": 2,
+            "text": "A recent study of plasma neutralization breadth in HIV-1 infected individuals at nine International AIDS Vaccine Initiative (IAVI) sites reported that viral load, HLA-A*03 genotype, and subtype C infection were strongly associated with the development of neutralization breadth. Here, we refine the findings of that study by analyzing the impact of the transmitted/founder (T/F) envelope (Env), early Env diversification, and autologous neutralization on the development of plasma neutralization breadth in 21 participants identified during recent infection at two of those sites: Kigali, Rwanda (n = 9) and Lusaka, Zambia (n = 12). Single-",
+            "score": 0.03225806451612903,
+            "title": "Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth",
+            "authors": [],
+            "chunk_id": "ch_128cdaa87970e02294c68a6ce721d62fad2f50011f25184702f76fad719bb7c0",
+            "paper_id": "scifact-2601135",
+            "rrf_score": 0.03225806451612903,
+            "source_id": null,
+            "bm25_score": 33.306229859130546,
+            "page_range": null,
+            "citation_id": "8833fdb7-ee93-5053-8bf9-d4824369cc2e",
+            "evidence_id": "e_1e6447f2ab0a64b96e68dc55",
+            "cosine_score": 0.6648437976837158,
+            "evidence_type": "prose",
+            "source_sha256": "b9255e645429680a42a136ac324130f43facf83d1daa1afe5e1a01fb9e9af540",
+            "source_locator": null,
+            "paper_version_id": "pv_37e081720c6f3de0d8776e5a2a2c303a861e4491bfd2d85ed5ea24376484e308",
+            "original_available": false
+          },
+          {
+            "rank": 3,
+            "text": "Env variants revealed that extensive diversification focused in the V2, V4, and V5 regions of gp120, accompanied by contemporaneous viral escape, significantly favored the development of breadth. These results suggest that more efficient glycosylation of subtype A and C T/F Envs through fewer NXS-encoded glycan sites is more likely to elicit antibodies that can transition from autologous to heterologous neutralizing activity following exposure to gp120 diversification. This initiates an Env-antibody co-evolution cycle that increases neutralization breadth, and is further augmented over time by additional viral and host factors. These findings suggest that ",
+            "score": 0.031746031746031744,
+            "title": "Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth",
+            "authors": [],
+            "chunk_id": "ch_12b4c2580f46ef7a2e7a20146be13838b844fa6631548a1ae3a66c5fba5ae799",
+            "paper_id": "scifact-2601135",
+            "rrf_score": 0.031746031746031744,
+            "source_id": null,
+            "bm25_score": 28.748785108233783,
+            "page_range": null,
+            "citation_id": "6d1b336e-e015-505f-9fa4-cbb0ab505456",
+            "evidence_id": "e_d9d05c4c49c02fc1f39714e3",
+            "cosine_score": 0.6186042428016663,
+            "evidence_type": "prose",
+            "source_sha256": "b9255e645429680a42a136ac324130f43facf83d1daa1afe5e1a01fb9e9af540",
+            "source_locator": null,
+            "paper_version_id": "pv_37e081720c6f3de0d8776e5a2a2c303a861e4491bfd2d85ed5ea24376484e308",
+            "original_available": false
+          },
+          {
+            "rank": 4,
+            "text": "genome analysis of full-length T/F Env sequences revealed that all 21 individuals were infected with a highly homogeneous population of viral variants, which were categorized as subtype C (n = 12), A1 (n = 7), or recombinant AC (n = 2). An extensive amino acid sequence-based analysis of variable loop lengths and glycosylation patterns in the T/F Envs revealed that a lower ratio of NXS to NXT-encoded glycan motifs correlated with neutralization breadth. Further analysis comparing amino acid sequence changes, insertions/deletions, and glycan motif alterations between the T/F Env and autologous early ",
+            "score": 0.03125,
+            "title": "Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth",
+            "authors": [],
+            "chunk_id": "ch_5ede90861d0a57aadf50fc975889be092957dbe4c7d396e677e7fc356cd12cb4",
+            "paper_id": "scifact-2601135",
+            "rrf_score": 0.03125,
+            "source_id": null,
+            "bm25_score": 11.220431509394672,
+            "page_range": null,
+            "citation_id": "c2b2a6e1-7f6c-5a56-b801-384386d7a0d6",
+            "evidence_id": "e_a123cf6a2981d7225aa82fde",
+            "cosine_score": 0.5130705833435059,
+            "evidence_type": "prose",
+            "source_sha256": "b9255e645429680a42a136ac324130f43facf83d1daa1afe5e1a01fb9e9af540",
+            "source_locator": null,
+            "paper_version_id": "pv_37e081720c6f3de0d8776e5a2a2c303a861e4491bfd2d85ed5ea24376484e308",
+            "original_available": false
+          },
+          {
+            "rank": 5,
+            "text": "understanding how variation in the efficiency of site-specific glycosylation influences neutralizing antibody elicitation and targeting could advance the design of immunogens aimed at inducing antibodies that can transition from autologous to heterologous neutralizing activity.",
+            "score": 0.030536130536130537,
+            "title": "Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth",
+            "authors": [],
+            "chunk_id": "ch_9ef03e4c2740217c09fc4bc6e60d4d76e7abf28a129cb3598854da1959591a11",
+            "paper_id": "scifact-2601135",
+            "rrf_score": 0.030536130536130537,
+            "source_id": null,
+            "bm25_score": 9.015201587658943,
+            "page_range": null,
+            "citation_id": "26a6a13f-94fe-5a00-94e2-fb5a17868415",
+            "evidence_id": "e_6e65c2684cb5a77e1d030eb5",
+            "cosine_score": 0.4469705820083618,
+            "evidence_type": "prose",
+            "source_sha256": "b9255e645429680a42a136ac324130f43facf83d1daa1afe5e1a01fb9e9af540",
+            "source_locator": null,
+            "paper_version_id": "pv_37e081720c6f3de0d8776e5a2a2c303a861e4491bfd2d85ed5ea24376484e308",
+            "original_available": false
+          }
+        ],
+        "retrieval": {
+          "b": 0.75,
+          "k1": 1.2,
+          "rrf_k": 60,
+          "retrieval": "hybrid",
+          "candidates": 100,
+          "embedding_id": "em_63e8c3acd550606f6d399682fd3c0a3e9f25d11c5400c3dee6ea6f37801f68c1"
+        },
+        "elapsed_ms": 52106.29,
+        "validation": "structural_only",
+        "human_review": "pending",
+        "schema_version": 1
+      },
+      "elapsed_ms": 52365.50530001114
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-23-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "360677ca-d7a2-4946-a37e-0f1e958a98ea",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 36639.37029999215
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-24-answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "What scientific finding does the study titled 'Interactions between Non-Physician Clinicians and Industry: A Systematic Review' report?",
+      "question_kind": "answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "e33a7008-5d1a-4a3b-82d1-9d99e715eb7e",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 76240.26419999427
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-24-partially_answerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Summarize the findings of 'Interactions between Non-Physician Clinicians and Industry: A Systematic Review' and give the authors' exact travel budget for the study.",
+      "question_kind": "partially_answerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "7d79c0cc-db62-499b-be6b-874f814af2c7",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 75151.88820000913
+    },
+    {
+      "case_id": "local-qwen-1-5b/aq-24-unanswerable",
+      "provider": "local-qwen-1-5b",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Interactions between Non-Physician Clinicians and Industry: A Systematic Review'?",
+      "question_kind": "unanswerable",
+      "judgment_provenance": "synthetic",
+      "state": "failed",
+      "human_review": null,
+      "llm_judge": null,
+      "run_id": "f9595595-df72-4a17-a80c-5e3b2773bacb",
+      "error_code": "invalid_answer",
+      "error": "run ended as failed",
+      "elapsed_ms": 36782.79869999096
+    }
+  ],
+  "complete": true,
+  "nli_check": "NOT run",
+  "limitations": [
+    "Synthetic template expectations are not human judgments.",
+    "No semantic score is available without human review or an explicitly labeled judge.",
+    "TTFT excludes queue time; end-to-end latency includes polling."
+  ],
+  "stronger_provider_comparison": "pending: user requested Qwen2.5 1.5B only for this run",
+  "summary": {
+    "local-qwen-1-5b": {
+      "completed": 11,
+      "failed": 49,
+      "automatic_synthetic_abstention_correctness": 1,
+      "latency_ms": {
+        "p50": 64157.69540000474,
+        "p95": 90331.90064999872
+      },
+      "ttft_worker_ms": {
+        "samples": 11,
+        "p50": 37524.23850000196,
+        "p95": 43915.129799996066,
+        "definition": "Worker start to first nonempty model content token; excludes queue."
+      },
+      "human": {
+        "assessed_case_count": 0,
+        "citation_precision": null,
+        "faithfulness": null,
+        "abstention_correctness": null
+      },
+      "llm_judge": {
+        "assessed_case_count": 0,
+        "citation_precision": null,
+        "faithfulness": null,
+        "abstention_correctness": null
+      }
+    }
+  },
+  "judge_vs_human": {
+    "reviewed_case_count": 0,
+    "citation_pair_count": 0,
+    "citation_support_agreement": null,
+    "abstention_agreement": null
+  },
+  "execution": {
+    "transport": "ASGI application API with isolated PostgreSQL 18 and real RPC/llama servers",
+    "authentication": "Explicit local evaluation principal with opaque database session; OIDC login not exercised",
+    "chunking": "Product importer, explicit 96-token budget matching web ingest, no refinement",
+    "model_weights_committed": false,
+    "application_source_commit": "2b78b88",
+    "measurement_note": "Resumed after a host pause/database connection timeout; original outcomes retained. Latencies are descriptive across sessions.",
+    "interrupted_orphan_runs_cancelled": [
+      "002f312d-7540-4527-adff-b11f8bf64499"
+    ]
+  },
+  "all_runs_completed": false
+}

@@ -1,0 +1,737 @@
+{
+  "date": "2026-10-04",
+  "branch": "codex/ui-unification",
+  "base": "8384565",
+  "phase": 2,
+  "synthetic": true,
+  "validation": {
+    "workspace_check": {
+      "command": "python scripts/check.py",
+      "exit_code": 0,
+      "python_tests_reported": 125,
+      "python_tests_executed": 106,
+      "python_tests_skipped": 19,
+      "skip_reason": "Requires isolated PostgreSQL 18; Docker Linux engine unavailable on this host",
+      "go": "vet, test -count=1 ./..., build passed"
+    },
+    "build": {
+      "command": "cd web && npm run build",
+      "exit_code": 0,
+      "warnings": "Lucide use client directive warnings"
+    },
+    "ui": {
+      "command": "cd web && npm run test:ui -- --workers=2",
+      "exit_code": 0,
+      "passed": 29,
+      "failed": 0,
+      "screenshots": 144
+    }
+  },
+  "scope": "UI transport fixtures, automated axe checks and rendered-surface contrast. No retrieval, model-quality, release-performance or backend-authorization claims.",
+  "saved_lookup": "Uses the existing authorized collection-scoped endpoint with q/before and server default limit 50 (maximum 100). Backend policy inspected, not modified. UI tests check scope, pagination, no conversation fanout and denied responses.",
+  "unverified": [
+    "19 PostgreSQL integration tests automatically skipped by existing conditions",
+    "Real-service Playwright workspace integration suite (PostgreSQL/Docker unavailable)",
+    "Real OIDC, cloud provider and production data flows",
+    "Screen-reader walkthrough, actual 200% browser zoom, non-Chromium engines",
+    "Full human visual approval; representative captures inspected only"
+  ],
+  "quick_actions": [
+    {
+      "artifact": "web/test-results/phase2-quick-actions-revea-38292-80px-without-executing-them/quick-action-counts.json",
+      "actions": [
+        {
+          "action": "Add sources — choose files",
+          "activations": 2
+        },
+        {
+          "action": "Focus question composer",
+          "activations": 2
+        },
+        {
+          "action": "Compare retrieval methods",
+          "activations": 2
+        },
+        {
+          "action": "Boolean syntax and retrieval method",
+          "activations": 2
+        },
+        {
+          "action": "Evidence shortlist",
+          "activations": 2
+        },
+        {
+          "action": "Answer provider and consent",
+          "activations": 2
+        },
+        {
+          "action": "Standalone follow-up query",
+          "activations": 2
+        },
+        {
+          "action": "Find saved research",
+          "activations": 2
+        },
+        {
+          "action": "Browse conversations",
+          "activations": 2
+        },
+        {
+          "action": "Saved run provenance",
+          "activations": 2
+        },
+        {
+          "action": "Based on — used and retrieved evidence",
+          "activations": 2
+        },
+        {
+          "action": "Export saved answer as Markdown",
+          "activations": 2
+        },
+        {
+          "action": "Export saved answer as BibTeX",
+          "activations": 2
+        },
+        {
+          "action": "Export saved answer as JSON",
+          "activations": 2
+        },
+        {
+          "action": "Export saved answer as CSV",
+          "activations": 2
+        },
+        {
+          "action": "Replay pinned snapshot",
+          "activations": 2
+        },
+        {
+          "action": "Replay current snapshot",
+          "activations": 2
+        }
+      ]
+    },
+    {
+      "artifact": "web/test-results/phase2-quick-actions-revea-f47d4-90px-without-executing-them/quick-action-counts.json",
+      "actions": [
+        {
+          "action": "Add sources — choose files",
+          "activations": 2
+        },
+        {
+          "action": "Focus question composer",
+          "activations": 2
+        },
+        {
+          "action": "Compare retrieval methods",
+          "activations": 2
+        },
+        {
+          "action": "Boolean syntax and retrieval method",
+          "activations": 2
+        },
+        {
+          "action": "Evidence shortlist",
+          "activations": 2
+        },
+        {
+          "action": "Answer provider and consent",
+          "activations": 2
+        },
+        {
+          "action": "Standalone follow-up query",
+          "activations": 2
+        },
+        {
+          "action": "Find saved research",
+          "activations": 2
+        },
+        {
+          "action": "Browse conversations",
+          "activations": 2
+        },
+        {
+          "action": "Saved run provenance",
+          "activations": 2
+        },
+        {
+          "action": "Based on — used and retrieved evidence",
+          "activations": 2
+        },
+        {
+          "action": "Export saved answer as Markdown",
+          "activations": 2
+        },
+        {
+          "action": "Export saved answer as BibTeX",
+          "activations": 2
+        },
+        {
+          "action": "Export saved answer as JSON",
+          "activations": 2
+        },
+        {
+          "action": "Export saved answer as CSV",
+          "activations": 2
+        },
+        {
+          "action": "Replay pinned snapshot",
+          "activations": 2
+        },
+        {
+          "action": "Replay current snapshot",
+          "activations": 2
+        }
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "width": 1280,
+      "colorScheme": "light",
+      "synthetic": true,
+      "screens": [
+        "opening-workspace",
+        "signed-out-welcome",
+        "empty-workspace",
+        "collection-awaiting-sources",
+        "workspace-search",
+        "search-options",
+        "search-results",
+        "search-based-on",
+        "recent-searches",
+        "evidence-shortlist",
+        "search-inspector-table",
+        "structured-equation",
+        "structured-figure",
+        "structured-prose",
+        "structured-evidence-unavailable",
+        "original-source-preview",
+        "search-no-matches",
+        "collection-details-and-sources",
+        "upload-review-error",
+        "source-processing-states",
+        "cited-answers-no-provider",
+        "cited-answers-cloud-consent",
+        "answer-options",
+        "saved-research",
+        "saved-answer",
+        "answer-based-on",
+        "run-options-and-provenance",
+        "citation-inspector",
+        "research-generating",
+        "research-failed",
+        "research-cancelled",
+        "quick-actions",
+        "quick-actions-no-matches",
+        "archive-undo",
+        "forced-colors-dialog",
+        "reflow-640-empty-workspace"
+      ],
+      "ratios": {
+        "skip-link": {
+          "foreground": [
+            255,
+            255,
+            255
+          ],
+          "background": [
+            7,
+            100,
+            84
+          ],
+          "ratio": 7.094782930673297
+        },
+        "footer": {
+          "foreground": [
+            82,
+            99,
+            91
+          ],
+          "background": [
+            245,
+            247,
+            245
+          ],
+          "ratio": 5.920443650020758
+        },
+        "input-focus": {
+          "foreground": [
+            7,
+            100,
+            84
+          ],
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 7.094782930673297
+        },
+        "diagnostic-code": {
+          "foreground": [
+            82,
+            99,
+            91
+          ],
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 6.374124825901771
+        },
+        "file-error": {
+          "foreground": [
+            151,
+            47,
+            37
+          ],
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 7.638635097682112
+        },
+        "status-badge": {
+          "foreground": [
+            7,
+            100,
+            84
+          ],
+          "background": [
+            223,
+            247,
+            239
+          ],
+          "ratio": 6.313782398636064
+        },
+        "answer-status": {
+          "foreground": [
+            7,
+            100,
+            84
+          ],
+          "background": [
+            223,
+            247,
+            239
+          ],
+          "ratio": 6.313782398636064
+        }
+      },
+      "artifact_directory": "web/test-results/design-system-screen-inventory-1280-light"
+    },
+    {
+      "width": 1280,
+      "colorScheme": "dark",
+      "synthetic": true,
+      "screens": [
+        "opening-workspace",
+        "signed-out-welcome",
+        "empty-workspace",
+        "collection-awaiting-sources",
+        "workspace-search",
+        "search-options",
+        "search-results",
+        "search-based-on",
+        "recent-searches",
+        "evidence-shortlist",
+        "search-inspector-table",
+        "structured-equation",
+        "structured-figure",
+        "structured-prose",
+        "structured-evidence-unavailable",
+        "original-source-preview",
+        "search-no-matches",
+        "collection-details-and-sources",
+        "upload-review-error",
+        "source-processing-states",
+        "cited-answers-no-provider",
+        "cited-answers-cloud-consent",
+        "answer-options",
+        "saved-research",
+        "saved-answer",
+        "answer-based-on",
+        "run-options-and-provenance",
+        "citation-inspector",
+        "research-generating",
+        "research-failed",
+        "research-cancelled",
+        "quick-actions",
+        "quick-actions-no-matches",
+        "archive-undo",
+        "forced-colors-dialog",
+        "reflow-640-empty-workspace"
+      ],
+      "ratios": {
+        "skip-link": {
+          "foreground": [
+            255,
+            255,
+            255
+          ],
+          "background": [
+            7,
+            100,
+            84
+          ],
+          "ratio": 7.094782930673297
+        },
+        "footer": {
+          "foreground": [
+            180,
+            196,
+            187
+          ],
+          "background": [
+            16,
+            23,
+            19
+          ],
+          "ratio": 10.012361100900801
+        },
+        "input-focus": {
+          "foreground": [
+            104,
+            223,
+            193
+          ],
+          "background": [
+            27,
+            39,
+            34
+          ],
+          "ratio": 9.4960301708216
+        },
+        "diagnostic-code": {
+          "foreground": [
+            180,
+            196,
+            187
+          ],
+          "background": [
+            27,
+            39,
+            34
+          ],
+          "ratio": 8.496307935348927
+        },
+        "file-error": {
+          "foreground": [
+            255,
+            177,
+            165
+          ],
+          "background": [
+            27,
+            39,
+            34
+          ],
+          "ratio": 8.886022897050776
+        },
+        "status-badge": {
+          "foreground": [
+            104,
+            223,
+            193
+          ],
+          "background": [
+            23,
+            63,
+            53
+          ],
+          "ratio": 7.178911709797814
+        },
+        "answer-status": {
+          "foreground": [
+            104,
+            223,
+            193
+          ],
+          "background": [
+            23,
+            63,
+            53
+          ],
+          "ratio": 7.178911709797814
+        }
+      },
+      "artifact_directory": "web/test-results/design-system-screen-inventory-1280-dark"
+    },
+    {
+      "width": 390,
+      "colorScheme": "light",
+      "synthetic": true,
+      "screens": [
+        "opening-workspace",
+        "signed-out-welcome",
+        "empty-workspace",
+        "collection-awaiting-sources",
+        "workspace-search",
+        "search-options",
+        "search-results",
+        "search-based-on",
+        "recent-searches",
+        "evidence-shortlist",
+        "search-inspector-table",
+        "structured-equation",
+        "structured-figure",
+        "structured-prose",
+        "structured-evidence-unavailable",
+        "original-source-preview",
+        "search-no-matches",
+        "collection-details-and-sources",
+        "upload-review-error",
+        "source-processing-states",
+        "cited-answers-no-provider",
+        "cited-answers-cloud-consent",
+        "answer-options",
+        "saved-research",
+        "saved-answer",
+        "answer-based-on",
+        "run-options-and-provenance",
+        "citation-inspector",
+        "research-generating",
+        "research-failed",
+        "research-cancelled",
+        "quick-actions",
+        "quick-actions-no-matches",
+        "mobile-navigation",
+        "archive-undo",
+        "forced-colors-dialog"
+      ],
+      "ratios": {
+        "skip-link": {
+          "foreground": [
+            255,
+            255,
+            255
+          ],
+          "background": [
+            7,
+            100,
+            84
+          ],
+          "ratio": 7.094782930673297
+        },
+        "footer": {
+          "foreground": [
+            82,
+            99,
+            91
+          ],
+          "background": [
+            245,
+            247,
+            245
+          ],
+          "ratio": 5.920443650020758
+        },
+        "input-focus": {
+          "foreground": [
+            7,
+            100,
+            84
+          ],
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 7.094782930673297
+        },
+        "diagnostic-code": {
+          "foreground": [
+            82,
+            99,
+            91
+          ],
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 6.374124825901771
+        },
+        "file-error": {
+          "foreground": [
+            151,
+            47,
+            37
+          ],
+          "background": [
+            255,
+            255,
+            255
+          ],
+          "ratio": 7.638635097682112
+        },
+        "status-badge": {
+          "foreground": [
+            7,
+            100,
+            84
+          ],
+          "background": [
+            223,
+            247,
+            239
+          ],
+          "ratio": 6.313782398636064
+        },
+        "answer-status": {
+          "foreground": [
+            7,
+            100,
+            84
+          ],
+          "background": [
+            223,
+            247,
+            239
+          ],
+          "ratio": 6.313782398636064
+        }
+      },
+      "artifact_directory": "web/test-results/design-system-screen-inventory-390-light"
+    },
+    {
+      "width": 390,
+      "colorScheme": "dark",
+      "synthetic": true,
+      "screens": [
+        "opening-workspace",
+        "signed-out-welcome",
+        "empty-workspace",
+        "collection-awaiting-sources",
+        "workspace-search",
+        "search-options",
+        "search-results",
+        "search-based-on",
+        "recent-searches",
+        "evidence-shortlist",
+        "search-inspector-table",
+        "structured-equation",
+        "structured-figure",
+        "structured-prose",
+        "structured-evidence-unavailable",
+        "original-source-preview",
+        "search-no-matches",
+        "collection-details-and-sources",
+        "upload-review-error",
+        "source-processing-states",
+        "cited-answers-no-provider",
+        "cited-answers-cloud-consent",
+        "answer-options",
+        "saved-research",
+        "saved-answer",
+        "answer-based-on",
+        "run-options-and-provenance",
+        "citation-inspector",
+        "research-generating",
+        "research-failed",
+        "research-cancelled",
+        "quick-actions",
+        "quick-actions-no-matches",
+        "mobile-navigation",
+        "archive-undo",
+        "forced-colors-dialog"
+      ],
+      "ratios": {
+        "skip-link": {
+          "foreground": [
+            255,
+            255,
+            255
+          ],
+          "background": [
+            7,
+            100,
+            84
+          ],
+          "ratio": 7.094782930673297
+        },
+        "footer": {
+          "foreground": [
+            180,
+            196,
+            187
+          ],
+          "background": [
+            16,
+            23,
+            19
+          ],
+          "ratio": 10.012361100900801
+        },
+        "input-focus": {
+          "foreground": [
+            104,
+            223,
+            193
+          ],
+          "background": [
+            27,
+            39,
+            34
+          ],
+          "ratio": 9.4960301708216
+        },
+        "diagnostic-code": {
+          "foreground": [
+            180,
+            196,
+            187
+          ],
+          "background": [
+            27,
+            39,
+            34
+          ],
+          "ratio": 8.496307935348927
+        },
+        "file-error": {
+          "foreground": [
+            255,
+            177,
+            165
+          ],
+          "background": [
+            27,
+            39,
+            34
+          ],
+          "ratio": 8.886022897050776
+        },
+        "status-badge": {
+          "foreground": [
+            104,
+            223,
+            193
+          ],
+          "background": [
+            23,
+            63,
+            53
+          ],
+          "ratio": 7.178911709797814
+        },
+        "answer-status": {
+          "foreground": [
+            104,
+            223,
+            193
+          ],
+          "background": [
+            23,
+            63,
+            53
+          ],
+          "ratio": 7.178911709797814
+        }
+      },
+      "artifact_directory": "web/test-results/design-system-screen-inventory-390-dark"
+    }
+  ]
+}

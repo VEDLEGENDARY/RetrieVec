@@ -200,8 +200,12 @@ func Load(directory string) (*Snapshot, error) {
 			}
 		case bool:
 		case json.Number:
-			if _, err := strconv.ParseInt(string(value), 10, 32); err != nil {
+			integer, err := strconv.ParseInt(string(value), 10, 32)
+			if err != nil {
 				return nil, fmt.Errorf("configuration requires 32-bit integer: %w", err)
+			}
+			if strconv.FormatInt(integer, 10) != string(value) {
+				return nil, fmt.Errorf("configuration requires canonical integer spelling")
 			}
 		default:
 			return nil, fmt.Errorf("invalid configuration value")
