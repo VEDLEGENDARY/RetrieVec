@@ -1,4 +1,4 @@
-"""Command-line entry point; corpus and evaluation commands arrive in later steps."""
+"""Command-line tools for corpus import, validation, query capture and evaluation."""
 
 import argparse
 import sys
@@ -22,7 +22,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return registry_main(command_args[1:])
     parser = argparse.ArgumentParser(
         prog="retrievec",
-        description="Corpus and evaluation workspace. Workflow commands arrive in later steps.",
+        description="Import and validate corpora, capture retrieval runs, and evaluate results.",
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     subparsers = parser.add_subparsers(dest="command")
