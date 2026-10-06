@@ -63,7 +63,9 @@ class ResearchWorker:
                 run["snapshot_id"],
                 config["candidates"],
             )
-            result = client.search(run["effective_query"], top_k=config["top_k"])
+            result = client.search(
+                run["effective_query"], top_k=config["top_k"], section=config.get("section")
+            )
             _, papers, _ = load_snapshot(
                 store.path("corpora", client.manifest["corpus_snapshot_id"], "ss_")
             )
@@ -89,7 +91,7 @@ class ResearchWorker:
             run["owner_id"], run["collection_id"], run["snapshot_id"]
         )
         store = Store(self.settings.store)
-        corpus, _, chunks = load_snapshot(
+        corpus, retained_papers, chunks = load_snapshot(
             store.path("corpora", registered["corpus_snapshot_id"], "ss_")
         )
         typed_index = None
@@ -98,12 +100,38 @@ class ResearchWorker:
 
             typed_index = EvidenceIndex(store.root, corpus)
         retained = {chunk["chunk_id"]: chunk for chunk in chunks}
+        from retrievec.corpus.sections import PassageProvenance
+
+        provenance = PassageProvenance(store.root, corpus)
+        from retrievec.corpus.pdf_locations import LocationIndex
+
+        locations = LocationIndex(store.root, corpus)
+        papers_by_version = {paper["paper_version_id"]: paper for paper in retained_papers}
+        metadata = None
+        if corpus["configuration"].get("paper_metadata_id"):
+            from retrievec.corpus.metadata import PaperMetadata
+
+            metadata = PaperMetadata(store.root, corpus)
         with self.registry.connect() as db:
             self.state.access(db, run)
             for item in evidence:
                 chunk = retained.get(item["chunk_id"])
                 if not chunk or chunk["text"] != item["text"]:
                     raise ProviderError("retained evidence unavailable")
+                if corpus["configuration"].get("passage_provenance_id"):
+                    attributes = provenance.attributes(chunk)
+                    if any(item.get(key) != value for key, value in attributes.items()):
+                        raise ProviderError("passage provenance changed")
+                if locations.mapping:
+                    fields = locations.attributes(
+                        chunk, papers_by_version[chunk["paper_version_id"]]
+                    )
+                    if any(item.get(key) != value for key, value in fields.items()):
+                        raise ProviderError("PDF location provenance changed")
+                if metadata is not None:
+                    fields = metadata.attributes(papers_by_version[chunk["paper_version_id"]])
+                    if any(item.get(key) != value for key, value in fields.items()):
+                        raise ProviderError("paper metadata provenance changed")
                 if typed_index is not None:
                     attributes = typed_index.attributes(chunk)
                     if any(item.get(key) != value for key, value in attributes.items()):
@@ -176,6 +204,7 @@ class ResearchWorker:
         thread = threading.Thread(target=heartbeat, daemon=True)
         thread.start()
         started = time.perf_counter()
+        first_token_ms = None
         error = "provider_unavailable"
         try:
             if not self.state.heartbeat(run):
@@ -192,6 +221,7 @@ class ResearchWorker:
             error = "provider_failed"
 
             async def generate():
+                nonlocal first_token_ms
                 if not retrieved["hits"]:
                     return {
                         "evidence": [],
@@ -227,10 +257,11 @@ class ResearchWorker:
                         if output_size > 65536:
                             raise ProviderError("streamed answer exceeded its output budget")
                         parts.append(delta)
-                        if first:
+                        if first and delta:
+                            first_token_ms = (time.perf_counter() - started) * 1000
                             emit(
                                 "research.first_token",
-                                elapsed_ms=(time.perf_counter() - started) * 1000,
+                                elapsed_ms=first_token_ms,
                             )
                             first = False
                     raw = "".join(parts)
@@ -259,6 +290,10 @@ class ResearchWorker:
                 "budget": {k: v for k, v in packet.items() if k not in ("evidence", "prompt")},
                 "retrieval": retrieved["configuration"],
                 "elapsed_ms": round((time.perf_counter() - started) * 1000, 2),
+                "timing": {
+                    "worker_start_to_first_token_ms": first_token_ms,
+                    "definition": "Worker start to first nonempty content token; excludes queue.",
+                },
                 "validation": "structural_only",
                 "human_review": "pending",
             }

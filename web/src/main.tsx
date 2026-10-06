@@ -1,4 +1,16 @@
-import { Button, Input, Skeleton } from "./ui";
+import { focusAction } from "./focusAction";
+import { useProviders } from "./useProviders";
+import {
+  Button,
+  ActionLink,
+  IconButton,
+  Field,
+  Input,
+  Notice,
+  LoadingState,
+  Disclosure,
+  EmptyState,
+} from "./ui";
 import { useEffect, useState } from "react";
 import { recordTiming } from "./performance";
 import { createRoot } from "react-dom/client";
@@ -68,12 +80,287 @@ function App() {
     )
       setWorkspaceSelected(route.collection);
   }, [route.collection, collections, setWorkspaceSelected]);
-  const [askMode, setAskMode] = useState<"passages" | "answer">(
-    route.run ? "answer" : "passages",
-  );
+  const [modeChoice, setModeChoice] = useState<{
+    scope: string;
+    mode: "passages" | "answer";
+  } | null>(null);
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [collectionFilter, setCollectionFilter] = useState("");
   const active = collections.find((item) => item.collection_id === selected);
+  const generation = useProviders(active?.collection_id, session, fail);
+  const scope =
+    (session?.principal_id ?? "") + ":" + (active?.collection_id ?? "");
+  const askMode =
+    modeChoice?.scope === scope
+      ? modeChoice.mode
+      : route.run || generation.selectedProvider?.consented
+        ? "answer"
+        : "passages";
+  const setAskMode = (mode: "passages" | "answer") =>
+    setModeChoice({ scope, mode });
+  useEffect(() => setModeChoice(null), [session?.principal_id]);
+  const [commandNotice, setCommandNotice] = useState("");
+  useEffect(() => setCommandNotice(""), [scope]);
+  function reveal(
+    view: View,
+    mode: "answer" | "passages" | null,
+    target: string,
+    unavailable: string,
+  ) {
+    setView(view);
+    if (mode) setAskMode(mode);
+    setCommandNotice("");
+    requestAnimationFrame(() => {
+      if (!focusAction(target)) {
+        setCommandNotice(unavailable);
+        if (view === "saved") focusAction("saved-search");
+      }
+    });
+  }
+  const contextualCommands = active
+    ? [
+        ...[
+          {
+            id: "recent",
+            label: "Restore a recent query",
+            detail:
+              "Recent searches in this collection; restores fields without submitting",
+            target: "recent-searches",
+            saved: false,
+            unavailable: "Run a passage search to create a recent query.",
+          },
+          {
+            id: "excerpts",
+            label: "Compact or full excerpts",
+            detail: "Change how returned passages are displayed",
+            target: "excerpt-display",
+            saved: false,
+            unavailable:
+              "Run a passage search before changing excerpt display.",
+          },
+          {
+            id: "inspect",
+            label: "Inspect passages and original sources",
+            detail:
+              "Retained passages, source preview, structured evidence and raw extraction",
+            target: "search-based-on",
+            saved: false,
+            unavailable:
+              "Run a passage search, then choose a passage to inspect its source.",
+          },
+          {
+            id: "conversations",
+            label: "Browse conversations",
+            detail: "Select an existing conversation or start a new one",
+            target: "conversation",
+            saved: true,
+            unavailable: "Select a collection to browse its conversations.",
+          },
+        ].map((action) => ({
+          id: action.id,
+          label: action.label,
+          detail: action.detail,
+          run: () =>
+            reveal(
+              action.saved ? "saved" : "ask",
+              action.saved ? null : "passages",
+              action.target,
+              action.unavailable,
+            ),
+        })),
+        {
+          id: "upload",
+          label: "Add sources — choose files",
+          detail:
+            "Focus the upload picker; owner access and idle processing required",
+          run: () =>
+            reveal(
+              "sources",
+              null,
+              "documents",
+              "The upload picker is unavailable. Check collection ownership and processing activity in Sources.",
+            ),
+        },
+        {
+          id: "composer",
+          label: "Focus question composer",
+          detail: "Ask in the current mode · Ctrl / Command + Enter to submit",
+          run: () =>
+            reveal(
+              "ask",
+              askMode,
+              askMode === "answer" ? "research-question" : "question",
+              "The composer is unavailable. Select a collection first.",
+            ),
+        },
+        {
+          id: "comparison",
+          label: "Compare retrieval methods",
+          detail:
+            "Reveal comparison settings; activate Compare methods, then submit a question",
+          run: () =>
+            reveal(
+              "ask",
+              "passages",
+              "compare-methods",
+              "Select a searchable collection to compare retrieval methods.",
+            ),
+        },
+        {
+          id: "syntax",
+          label: "Boolean syntax and retrieval method",
+          detail:
+            "More search options; selecting Boolean syntax uses sparse retrieval",
+          run: () =>
+            reveal(
+              "ask",
+              "passages",
+              "parser",
+              "Select a collection to configure passage search.",
+            ),
+        },
+        {
+          id: "filters",
+          label: "Filter returned passages",
+          detail: "Search first; filters apply only to existing results",
+          run: () =>
+            reveal(
+              "ask",
+              "passages",
+              "passage-filter",
+              "Run a passage search first, then filter the returned results.",
+            ),
+        },
+        {
+          id: "shortlist",
+          label: "Evidence shortlist",
+          detail:
+            "Temporary selection; inspect, remove, or export shortlisted passages",
+          run: () =>
+            reveal(
+              "ask",
+              "passages",
+              "passage-shortlist",
+              "Select a collection to open its temporary shortlist.",
+            ),
+        },
+        {
+          id: "shortlist-export",
+          label: "Export evidence shortlist",
+          detail:
+            "Requires at least one shortlisted passage; JSON preserves provenance",
+          run: () =>
+            reveal(
+              "ask",
+              "passages",
+              "export-shortlist",
+              "Shortlist a passage before exporting evidence.",
+            ),
+        },
+        {
+          id: "saved-lookup",
+          label: "Find saved research",
+          detail: "Search saved questions in this collection only",
+          run: () =>
+            reveal(
+              "saved",
+              null,
+              "saved-search",
+              "Select a collection to search its saved research.",
+            ),
+        },
+        {
+          id: "provider",
+          label: "Answer provider and consent",
+          detail:
+            "Review model and local/cloud status; consent is always explicit",
+          run: () =>
+            reveal(
+              "ask",
+              "answer",
+              "generation-provider",
+              "Select a collection to review answer providers.",
+            ),
+        },
+        {
+          id: "follow-up",
+          label: "Standalone follow-up query",
+          detail: "More answer options; preserve the displayed question",
+          run: () =>
+            reveal(
+              "ask",
+              "answer",
+              "effective-query",
+              "Select a collection to edit a follow-up query.",
+            ),
+        },
+        {
+          id: "search-provenance",
+          label: "Search snapshot and provenance",
+          detail:
+            "Requires search results; inspect the exact search configuration",
+          run: () =>
+            reveal(
+              "ask",
+              "passages",
+              "search-diagnostics",
+              "Run a passage search first to inspect its snapshot and configuration.",
+            ),
+        },
+        {
+          id: "run-provenance",
+          label: "Saved run provenance",
+          detail:
+            "Choose a saved run first; snapshot, model revision, and effective query",
+          run: () =>
+            reveal(
+              "saved",
+              null,
+              "run-provenance",
+              "Choose a saved run to inspect its provenance.",
+            ),
+        },
+        {
+          id: "based-on",
+          label: "Based on — used and retrieved evidence",
+          detail:
+            "Choose a saved answer first; distinguish citations from other retrieved candidates",
+          run: () =>
+            reveal(
+              "saved",
+              null,
+              "answer-based-on",
+              "Choose a completed saved answer to inspect its used and retrieved evidence.",
+            ),
+        },
+        ...["Markdown", "BibTeX", "JSON", "CSV"].map((format) => ({
+          id: "export-" + format,
+          label: "Export saved answer as " + format,
+          detail:
+            "Choose a completed run first; review and activate the export control",
+          run: () =>
+            reveal(
+              "saved",
+              null,
+              "run-export-" + format.toLowerCase(),
+              "Choose a completed saved run before exporting its answer.",
+            ),
+        })),
+        ...["pinned", "current"].map((snapshot) => ({
+          id: "replay-" + snapshot,
+          label: "Replay " + snapshot + " snapshot",
+          detail:
+            "Choose an inactive run first; review before starting paid or local generation",
+          run: () =>
+            reveal(
+              "saved",
+              null,
+              "replay-" + snapshot,
+              "Choose an inactive saved run before replaying it.",
+            ),
+        })),
+      ]
+    : [];
   async function create(event: React.SubmitEvent) {
     event.preventDefault();
     setBusy(true);
@@ -135,7 +422,7 @@ function App() {
   if (loading)
     return (
       <main className="welcome">
-        <Skeleton label="Opening your workspace…" />
+        <LoadingState label="Opening your workspace…" />
       </main>
     );
   if (!session)
@@ -143,7 +430,7 @@ function App() {
       <main className="welcome">
         <div className="wordmark">
           <span className="logo-mark">
-            <BookOpenText size={19} />
+            <BookOpenText size={19} aria-hidden="true" />
           </span>{" "}
           RetrieVec
         </div>
@@ -157,14 +444,11 @@ function App() {
           A private workspace to collect papers, compare retrieval methods, and
           inspect the evidence behind every result.
         </p>
-        <a className="button primary" href="/auth/login">
-          Sign in to your workspace <ArrowUpRight size={17} />
-        </a>
-        {error && (
-          <p role="alert" className="error">
-            {error}
-          </p>
-        )}
+        <ActionLink variant="primary" href="/auth/login">
+          Sign in to your workspace{" "}
+          <ArrowUpRight size={17} aria-hidden="true" />
+        </ActionLink>
+        {error && <Notice error>{error}</Notice>}
         <p className="muted">
           Private collections · Snapshot-pinned search · Original sources
         </p>
@@ -181,27 +465,26 @@ function App() {
       >
         <div className="wordmark">
           <span className="logo-mark">
-            <BookOpenText size={18} />
+            <BookOpenText size={18} aria-hidden="true" />
           </span>{" "}
           RetrieVec
-          <Button
+          <IconButton
             className="mobile-close"
             aria-label="Close navigation"
             onClick={() => setNavigationOpen(false)}
           >
-            <X size={18} />
-          </Button>
+            <X size={18} aria-hidden="true" />
+          </IconButton>
         </div>
         <p className="eyebrow">Collections</p>
-        <label className="collection-filter">
-          Find a collection
+        <Field className="collection-filter" label="Find a collection">
           <Input
             type="search"
             value={collectionFilter}
             onChange={(event) => setCollectionFilter(event.target.value)}
             placeholder="Filter collections…"
           />
-        </label>
+        </Field>
         <nav aria-label="Collections">
           {collections
             .filter((item) =>
@@ -239,25 +522,26 @@ function App() {
             </p>
           )}
         <form onSubmit={create} className="new-collection">
-          <label htmlFor="collection-title">New collection</label>
-          <Input
-            id="collection-title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            maxLength={120}
-            required
-            placeholder="e.g. Retrieval methods"
-          />
+          <Field label="New collection">
+            <Input
+              id="collection-title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              maxLength={120}
+              required
+              placeholder="e.g. Retrieval methods"
+            />
+          </Field>
           <Button disabled={busy || !title.trim()} type="submit">
-            <Plus size={16} /> Create collection
+            <Plus size={16} aria-hidden="true" /> Create collection
           </Button>
         </form>
         <div className="account">
           <span>
-            <ShieldCheck size={14} /> Private workspace
+            <ShieldCheck size={14} aria-hidden="true" /> Private workspace
           </span>
           <Button onClick={logout}>
-            <LogOut size={14} /> Sign out
+            <LogOut size={14} aria-hidden="true" /> Sign out
           </Button>
         </div>
       </NavigationPanel>
@@ -296,6 +580,7 @@ function App() {
                   run: () => setView(id),
                 }),
               ),
+              ...contextualCommands,
               {
                 id: "create",
                 label: "Create a collection",
@@ -320,22 +605,23 @@ function App() {
             ]}
           />
         </div>
+        {commandNotice && <Notice>{commandNotice}</Notice>}
         <header>
           <div>
-            <Button
+            <IconButton
               className="mobile-menu"
               aria-label="Open navigation"
               aria-controls="workspace-navigation"
               aria-expanded={navigationOpen}
               onClick={() => setNavigationOpen(true)}
             >
-              <Menu size={19} />
-            </Button>
+              <Menu size={19} aria-hidden="true" />
+            </IconButton>
             <p className="eyebrow">Research workspace</p>
             <h1>{active?.title ?? "A place for your next question"}</h1>
             {active && (
               <p className="header-meta">
-                <ShieldCheck size={14} />{" "}
+                <ShieldCheck size={14} aria-hidden="true" />{" "}
                 {active.visibility === "curated"
                   ? "Curated collection"
                   : "Private collection"}
@@ -351,7 +637,7 @@ function App() {
               disabled={busy}
               title="Hide this collection and cancel active processing. Undo restores access, but does not restart cancelled work."
             >
-              <Archive size={15} /> Archive collection
+              <Archive size={15} aria-hidden="true" /> Archive collection
             </Button>
           )}
         </header>
@@ -366,11 +652,7 @@ function App() {
             </Button>
           </div>
         )}
-        {error && (
-          <p role="alert" className="error">
-            {error}
-          </p>
-        )}
+        {error && <Notice error>{error}</Notice>}
         {active && (
           <nav className="view-tabs" aria-label="Workspace sections">
             {(
@@ -393,7 +675,7 @@ function App() {
           </nav>
         )}
         {active && view === "sources" && (
-          <details className="diagnostics">
+          <Disclosure className="diagnostics">
             <summary>Collection details</summary>
             <p>
               {active.visibility === "curated" ? "Curated" : "Private"}{" "}
@@ -410,34 +692,44 @@ function App() {
               Sparse, dense and hybrid retrieval remain available in Ask → More
               options.
             </p>
-          </details>
+          </Disclosure>
         )}
         {active && view === "ask" && !active.active_snapshot && (
-          <section className="empty">
-            <h2>Add your first sources</h2>
-            <p>
-              Your collection is ready for documents. Processing makes them
-              searchable.
-            </p>
-            <Button variant="primary" onClick={() => setView("sources")}>
-              Add documents
-            </Button>
-          </section>
+          <EmptyState
+            title="Add your first sources"
+            action={
+              <Button variant="primary" onClick={() => setView("sources")}>
+                Add documents
+              </Button>
+            }
+          >
+            Your collection is ready for documents. Processing makes them
+            searchable.
+          </EmptyState>
         )}
         {active && view === "ask" && (
-          <div className="ask-modes" role="group" aria-label="Question mode">
-            <Button
-              aria-pressed={askMode === "answer"}
-              onClick={() => setAskMode("answer")}
-            >
-              Answer
-            </Button>
-            <Button
-              aria-pressed={askMode === "passages"}
-              onClick={() => setAskMode("passages")}
-            >
-              Find passages
-            </Button>
+          <div className="ask-mode-context">
+            <div className="ask-modes" role="group" aria-label="Question mode">
+              <Button
+                aria-pressed={askMode === "answer"}
+                onClick={() => setAskMode("answer")}
+              >
+                Answer
+              </Button>
+              <Button
+                aria-pressed={askMode === "passages"}
+                onClick={() => setAskMode("passages")}
+              >
+                Find passages
+              </Button>
+            </div>
+            <p className="muted" role="status">
+              {generation.selectedProvider
+                ? `${generation.selectedProvider.model} · ${generation.selectedProvider.cloud ? "Cloud" : "Local"}${generation.selectedProvider.consented ? "" : " · Consent required. Find passages is available; open Answer to review consent."}`
+                : generation.loaded
+                  ? "No answer provider configured. Use Find passages to search; ask the workspace operator to configure cited answers."
+                  : "Checking answer availability. Find passages is available for searchable collections."}
+            </p>
           </div>
         )}
         {active && (
@@ -462,26 +754,25 @@ function App() {
           </div>
         )}
         {!active ? (
-          <section className="empty">
-            <span className="empty-symbol">
-              <Sparkles size={30} />
-            </span>
-            <h2>Start with a collection</h2>
-            <p>
-              Create a collection for your research, then add your documents.
-            </p>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setNavigationOpen(true);
-                requestAnimationFrame(() =>
-                  document.getElementById("collection-title")?.focus(),
-                );
-              }}
-            >
-              Create collection
-            </Button>
-          </section>
+          <EmptyState
+            title="Start with a collection"
+            icon={<Sparkles size={30} aria-hidden="true" />}
+            action={
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setNavigationOpen(true);
+                  requestAnimationFrame(() =>
+                    document.getElementById("collection-title")?.focus(),
+                  );
+                }}
+              >
+                Create collection
+              </Button>
+            }
+          >
+            Create a collection for your research, then add your documents.
+          </EmptyState>
         ) : null}
         {active && (
           <div
@@ -491,6 +782,10 @@ function App() {
           >
             <Research
               key={`research-${active.collection_id}`}
+              providers={generation.providers}
+              provider={generation.provider}
+              setProvider={generation.select}
+              refreshProviders={generation.refresh}
               showHistory={view === "saved"}
               linkedRun={
                 route.collection === active.collection_id ? route.run : ""

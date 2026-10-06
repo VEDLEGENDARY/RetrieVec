@@ -1,8 +1,34 @@
 # Performance baseline and measurement contract
 
+
+## Current verification — 2026-10-05
+
+The 1,300-query retrieval study and phase 4 CPU answer run are recorded in
+[BENCHMARKS](../../BENCHMARKS.md) and [ANSWER_EVAL](../../ANSWER_EVAL.md).
+Worker TTFT is implemented and measured for 11 completed Qwen cases. Provider
+tokens stream provisionally before validated publication; the historical
+non-streaming baseline below describes the earlier implementation. Representative
+PDF ingest and concurrent-user service measurements remain unverified.
+
+## Phase 3 hybrid diagnostic profile
+
+The sequential offline hybrid path was profiled on 10 queries from the frozen SciFact
+development split, using the complete legacy corpus and cached pinned MiniLM model.
+[Per-query observations](../results/hybrid-profile-development-2026-10-04.json)
+retain sparse, dense, fusion and wall-clock durations. Under cProfile, the run took
+2.311 seconds: exact dense search accounted for 1.568 seconds cumulatively, sparse
+retrieval for 0.604 seconds, and query-encoder ONNX execution for 0.128 seconds.
+These are instrumented diagnostic observations, not held-out latency percentiles.
+Dense scoring includes validation of vector IDs, finiteness and normalization;
+this phase preserves those checks. The profile motivates overlapping the two legs,
+with exact ranking/score parity and separate alternating-order wall-clock measurements
+required before changing the scheduling default. The completed 1,300-query study
+verified exact parity and lower paired latency on both tasks; bounded concurrent
+scheduling is now enabled. See BENCHMARKS.md for measurements and session limitations.
+
 2026-09-29. Plan 3, measurement increment only. Source base: `f6e021142df2f4a4990b7b4c2b28da45bd485882` plus the uncommitted browser recorder/test. Plans 1 and 2 remain at their review gates. No motion, navigation, cache, persistence, or streaming behavior has changed.
 
-## Measured baseline
+## Historical UI baseline — 2026-09-29
 
 Single local user, Windows, Node 26.1.0, Vite 8.3.0 development server, headless Chromium 153.0.8010.12, 1280×720, no CPU/network throttling. Synthetic HTTP responses supply one collection and an empty hybrid search result. No real corpus, database, embedding model, PDF processing, or generation provider participates. This is a UI baseline, not release throughput or model-quality evidence.
 
@@ -52,12 +78,6 @@ npm run test:ui -- performance.spec.ts --workers=1
 npm run test:ui -- --workers=1
 ```
 
-This machine's global npm shim is broken; working PowerShell invocation:
-
-```powershell
-$env:PATH = 'C:\Program Files\nodejs;' + $env:PATH
-node 'C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js' run test:ui -- performance.spec.ts --workers=1
-```
 
 TypeScript/production build passed; all 10 browser checks passed. Benchmark rerun after adding the saved report also passed. Build reports dependency-level Lucide `use client` directive warnings, with no build failure.
 
@@ -65,9 +85,9 @@ Before accepting each later change, repeat its relevant before/after workload on
 
 Pending representative baseline: chosen concurrency, collection size, PDF pages/bytes and OCR status, model/provider, and hardware. Start with single-user local use until workload is specified. Proposed UI target for review: common interaction presentation p95 below 100 ms; motion never delays dispatch or focus. Real ingestion, retrieval and TTFT budgets must follow measured workloads rather than invented targets.
 
-## Remaining Plan 3 work and safeguards
+## Historical Plan 3 requirements and safeguards
 
-1. Complete real PDF/retrieval baselines and define streaming TTFT measurement; Step 1 is not fully complete yet.
+1. Representative PDF-ingest/load baselines remain open. Real retrieval and worker TTFT observations are now recorded above; they do not establish production capacity.
 2. Stream authorized evidence before generation finishes, then real supported provider tokens. Distinguish provisional output from checked claims; retain cancellation, resumable events and consent rechecks.
 3. Optimistically update reversible local actions with rollback. Do not show uploads as searchable, grant consent, or publish an answer before server confirmation.
 4. Cache only with defined identity/collection/snapshot/model keys and invalidation on logout, revocation, archive and version change. Inspect existing embedding artifact reuse before adding another cache. Prefetch must be bounded and must not trigger paid generation or relax authorization.
