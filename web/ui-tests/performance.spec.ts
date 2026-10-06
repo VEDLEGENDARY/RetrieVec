@@ -47,7 +47,7 @@ test("local performance baseline and recorder privacy", async ({
       .click();
     await page.getByLabel("Research question").fill("Private question");
     await page
-      .getByRole("button", { name: "Search evidence →", exact: true })
+      .getByRole("button", { name: "Search evidence", exact: true })
       .click();
     await expect(
       page.getByText("No matching passages. Try a different question."),

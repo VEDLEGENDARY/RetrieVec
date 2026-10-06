@@ -1,3 +1,4 @@
+import { NativeDialog } from "./ui";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /** Native modal behavior owns focus, Escape, and background isolation on mobile. */
@@ -39,7 +40,7 @@ export function NavigationPanel({
       </aside>
     );
   return (
-    <dialog
+    <NativeDialog
       id="workspace-navigation"
       ref={dialog}
       className="navigation-dialog"
@@ -67,6 +68,6 @@ export function NavigationPanel({
       }}
     >
       <aside className="navigation">{children}</aside>
-    </dialog>
+    </NativeDialog>
   );
 }

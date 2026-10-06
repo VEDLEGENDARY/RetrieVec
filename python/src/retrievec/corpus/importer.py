@@ -105,7 +105,11 @@ def import_manifest(
     evidence_bundles: dict[str, str] | None = None,
     evidence_root: Path | None = None,
     wordpiece_budget=None,
+    section_aware: bool = False,
+    metadata_enrichment: dict | None = None,
 ) -> Path:
+    if type(section_aware) is not bool:
+        raise CorpusError("section-aware setting must be boolean")
     if type(token_budget) is not int or not 1 <= token_budget <= 4096:
         raise CorpusError("token budget must be between 1 and 4096")
     manifest = parse_json(manifest_path.read_bytes())
@@ -123,8 +127,12 @@ def import_manifest(
     chunker_version = f"paragraph-v1-{token_budget}-{analyzer.version}"
     if wordpiece_budget is not None:
         chunker_version += "-" + wordpiece_budget.version
+    if section_aware:
+        chunker_version += "-explicit-sections-v1"
     papers, chunks = [], []
     evidence_mapping = {}
+    passage_mapping = {}
+    location_mapping = {}
     source_root = source_root.resolve(strict=True)
     for record in manifest["sources"]:
         if not isinstance(record, dict) or set(record) != SOURCE_FIELDS:
@@ -176,14 +184,53 @@ def import_manifest(
         )
         papers.append(paper)
         ordinal = 0
+        previous_section, previous_heading = "unclassified", None
         for page_index, (page_number, text) in enumerate(pages):
-            tokens = analyzer.analyze([text])[0]
-            page_chunks = chunk_page(text, tokens, token_budget)
+            locations, located_page, location_error = None, None, None
+            if path.suffix.lower() == ".pdf" and not typed:
+                from retrievec.corpus.pdf_locations import PDFLocations
+
+                try:
+                    locations = PDFLocations(source, output_root.parent)
+                    located_page, location_error = locations.page(page_number, text)
+                except Exception:
+                    location_error = (
+                        "PDF geometry extraction failed; "
+                        "passage text is retained without coordinates."
+                    )
+                finally:
+                    if locations is not None:
+                        locations.close()
+            if section_aware:
+                from retrievec.corpus.sections import segments
+
+                spans, previous_section, previous_heading = segments(
+                    text, previous_section, previous_heading
+                )
+            else:
+                spans = [(0, len(text), "unclassified", None)]
+            page_chunks, attributes = [], []
+            for begin, end, section, heading in spans:
+                part = text[begin:end]
+                packed = chunk_page(part, analyzer.analyze([part])[0], token_budget)
+                offset = begin
+                for item in packed:
+                    page_chunks.append(item)
+                    attributes.append((offset, offset + len(item), section, heading))
+                    offset += len(item)
             if wordpiece_budget is not None:
-                page_chunks = [
-                    part for chunk in page_chunks for part in wordpiece_budget.split(chunk)
-                ]
-            for chunk_text in page_chunks:
+                refined, refined_attributes = [], []
+                for chunk, (begin, _end, section, heading) in zip(
+                    page_chunks, attributes, strict=True
+                ):
+                    for part in wordpiece_budget.split(chunk):
+                        refined.append(part)
+                        refined_attributes.append((begin, begin + len(part), section, heading))
+                        begin += len(part)
+                page_chunks, attributes = refined, refined_attributes
+            for chunk_text, (begin, end, section, heading) in zip(
+                page_chunks, attributes, strict=True
+            ):
                 chunks.append(
                     make_chunk(
                         paper,
@@ -195,6 +242,22 @@ def import_manifest(
                     )
                 )
                 ordinal += 1
+                if locations is not None:
+                    location_mapping[chunks[-1]["chunk_id"]] = locations.passage(
+                        located_page, location_error, page_number, begin, end, chunks[-1]
+                    )
+                if section_aware:
+                    passage_mapping[chunks[-1]["chunk_id"]] = {
+                        "text_sha256": chunks[-1]["text_sha256"],
+                        "section": section,
+                        "section_heading": heading,
+                        "text_offsets": {
+                            "unit": "Unicode code points in extracted page text",
+                            "page": page_number,
+                            "start": begin,
+                            "end": end,
+                        },
+                    }
                 if page_index in typed:
                     item = typed[page_index]
                     evidence_mapping[chunks[-1]["chunk_id"]] = {
@@ -205,6 +268,29 @@ def import_manifest(
         if ordinal == 0:
             raise CorpusError(f"{path.name}: no indexable text; OCR is outside this milestone")
     extra = {}
+    if location_mapping:
+        from retrievec.corpus.pdf_locations import publish_locations
+
+        extra["pdf_locations_id"] = publish_locations(output_root.parent, location_mapping)
+    if metadata_enrichment:
+        from retrievec.corpus.metadata import publish_metadata
+
+        if set(metadata_enrichment) - {paper["paper_id"] for paper in papers}:
+            raise CorpusError("metadata refers to a paper outside the source manifest")
+        for paper in papers:
+            record = metadata_enrichment.get(paper["paper_id"])
+            if record is not None and (
+                record.get("schema_version") != 1
+                or record.get("source_sha256") != paper["source_sha256"]
+                or record["fields"]["title"] != paper["title"]
+                or record["fields"]["authors"] != paper["authors"]
+            ):
+                raise CorpusError("metadata does not match the retained source record")
+        extra["paper_metadata_id"] = publish_metadata(output_root.parent, metadata_enrichment)
+    if passage_mapping:
+        from retrievec.corpus.sections import publish_provenance
+
+        extra["passage_provenance_id"] = publish_provenance(output_root.parent, passage_mapping)
     if evidence_mapping:
         from retrievec.extraction.indexing import publish_map
 
