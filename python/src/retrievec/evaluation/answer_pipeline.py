@@ -1,6 +1,7 @@
 """Sequential, authenticated answer evaluation through the product API."""
 
 import asyncio
+import copy
 import time
 import uuid
 from urllib.parse import quote, urlsplit
@@ -11,7 +12,7 @@ from retrievec.corpus.snapshot import canonical, digest
 from retrievec.evaluation.answer_quality import load_dataset, summarize
 
 
-async def evaluate(args, session, corpus, *, transport=None, checkpoint=None):
+async def evaluate(args, session, corpus, *, transport=None, checkpoint=None, resume=None):
     address = urlsplit(args.origin)
     if (
         address.scheme != "http"
@@ -97,7 +98,29 @@ async def evaluate(args, session, corpus, *, transport=None, checkpoint=None):
             else "configured comparison; strength is an operator assertion"
         )
         questions = [row for row in dataset["questions"] if row["split"] == args.split]
+        expected_ids = {
+            f"{name}/{question['id']}" for name in args.providers for question in questions
+        }
+        if resume is not None:
+            for key in (
+                "schema_version",
+                "dataset_sha256",
+                "split",
+                "snapshot_id",
+                "collection_id",
+                "providers",
+            ):
+                if resume.get(key) != report[key]:
+                    raise ValueError("resume report differs: " + key)
+            prior = [case["case_id"] for case in resume["cases"]]
+            if len(prior) != len(set(prior)) or not set(prior) <= expected_ids:
+                raise ValueError("resume contains duplicate or foreign cases")
+            report = copy.deepcopy(resume)
+            report["complete"] = False
+        recorded_ids = {case["case_id"] for case in report["cases"]}
         for name in args.providers:
+            if all(f"{name}/{question['id']}" in recorded_ids for question in questions):
+                continue
             conversation = await request(
                 "POST",
                 "/api/v1/conversations",
@@ -107,6 +130,8 @@ async def evaluate(args, session, corpus, *, transport=None, checkpoint=None):
                 },
             )
             for question in questions:
+                if f"{name}/{question['id']}" in recorded_ids:
+                    continue
                 started = time.perf_counter()
                 case = {
                     "case_id": f"{name}/{question['id']}",
@@ -160,7 +185,6 @@ async def evaluate(args, session, corpus, *, transport=None, checkpoint=None):
                 report["cases"].append(case)
                 if checkpoint:
                     checkpoint(summarize(report))
-    report["complete"] = len(report["cases"]) == len(args.providers) * len(questions) and all(
-        row["state"] == "completed" for row in report["cases"]
-    )
+    report["complete"] = {case["case_id"] for case in report["cases"]} == expected_ids
+    report["all_runs_completed"] = all(row["state"] == "completed" for row in report["cases"])
     return summarize(report)

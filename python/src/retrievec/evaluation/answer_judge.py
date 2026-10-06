@@ -64,9 +64,9 @@ async def judge_report(report, args, session):
                 "Judge answer/partial/abstention correctness from evidence. "
                 "Do not use outside knowledge.\n"
             )
-            prompt = instruction + json.dumps(
-                {"rubric": packet["rubric"], "case": row}, ensure_ascii=True
-            )
+            payload = json.dumps({"rubric": packet["rubric"], "case": row}, ensure_ascii=True)
+            # Keep source text from introducing ChatML control delimiters.
+            prompt = instruction + payload.replace("<", "\\u003c").replace(">", "\\u003e")
             if await provider.count(prompt) + configured.output_tokens > configured.context_tokens:
                 raise ValueError("judge context budget exceeded; evidence will not be truncated")
             raw = await provider.generate(

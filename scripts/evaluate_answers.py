@@ -37,6 +37,9 @@ def main():
     run.add_argument("--providers", nargs="+", required=True, metavar="PROVIDER")
     run.add_argument("--timeout", type=int, default=360)
     run.add_argument("--output", type=Path, required=True)
+    run.add_argument(
+        "--resume", type=Path, help="Preserve recorded outcomes; run missing cases only"
+    )
     export = commands.add_parser("export-review")
     export.add_argument("report", type=Path)
     export.add_argument("output", type=Path)
@@ -58,10 +61,18 @@ def main():
         indexed = store.manifest(args.snapshot)
         corpus = load_snapshot(store.path("corpora", indexed["corpus_snapshot_id"], "ss_"))
         report = asyncio.run(
-            evaluate(args, session, corpus, checkpoint=lambda value: write(args.output, value))
+            evaluate(
+                args,
+                session,
+                corpus,
+                checkpoint=lambda value: write(args.output, value),
+                resume=(
+                    json.loads(args.resume.read_text(encoding="utf-8")) if args.resume else None
+                ),
+            )
         )
         write(args.output, report)
-        return 0 if report["complete"] else 1
+        return 0 if report["complete"] and report["all_runs_completed"] else 1
     report = json.loads(args.report.read_text(encoding="utf-8"))
     if args.command == "judge":
         session = json.loads(args.session.read_text(encoding="utf-8"))
