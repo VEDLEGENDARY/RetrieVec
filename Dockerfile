@@ -31,6 +31,8 @@ RUN pip install --no-cache-dir '/tmp/retrievec[app,telemetry]' && rm -rf /tmp/re
 COPY --from=engine /out/retrievald /usr/local/bin/retrievald
 COPY --from=web /src/web/dist /app/web/dist
 COPY configs /app/configs
+COPY demo /app/demo
+COPY datasets/answer_quality /app/datasets/answer_quality
 COPY docker/entrypoint.sh /usr/local/bin/retrievec-entrypoint
 RUN chmod +x /usr/local/bin/retrievec-entrypoint && mkdir -p /app/artifacts/store /app/artifacts/cache && chown -R retrievec:retrievec /app
 USER retrievec

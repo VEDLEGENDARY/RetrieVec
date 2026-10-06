@@ -121,7 +121,20 @@ class BatchedAnalyzer(GoAnalyzer):
         return [self.cache[text] for text in texts]
 
 
-def prepare(name, data, work, engine, model, protocol, document_limit=0, preflight_only=False):
+def prepare(
+    name,
+    data,
+    work,
+    engine,
+    model,
+    protocol,
+    document_limit=0,
+    preflight_only=False,
+    *,
+    allow_overflow=False,
+):
+    if allow_overflow and not preflight_only:
+        raise ValueError("overflow allowance is restricted to preflight controls")
     inputs = {
         file: digest((data / file).read_bytes()) for file in ("corpus.jsonl", "queries.jsonl")
     }
@@ -133,7 +146,7 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0, preflig
             and checked.get("protocol_sha256") == digest(canonical(protocol))
             and checked.get("document_limit") == document_limit
             and checked.get("model") == model.config
-            and not checked.get("overflow_count", 0)
+            and (allow_overflow or not checked.get("overflow_count", 0))
         ):
             manifest, _, chunks = load_snapshot(Path(checked["corpus"]))
             if manifest["collection_id"] != name or len(chunks) != checked["chunks"]:
@@ -204,7 +217,7 @@ def prepare(name, data, work, engine, model, protocol, document_limit=0, preflig
         }
     )
     (work / "input-preflight.json").write_bytes(canonical(checked) + b"\n")
-    if checked.get("overflow_count", 0):
+    if checked.get("overflow_count", 0) and not allow_overflow:
         raise ValueError(
             f"{name}: {checked['overflow_count']} chunks exceed model input limit; "
             f"see {work / 'input-preflight.json'}; no text truncated"

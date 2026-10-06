@@ -2,6 +2,7 @@ import os
 import tempfile
 import unittest
 import uuid
+from contextlib import ExitStack
 from pathlib import Path
 
 from retrievec.corpus.snapshot import load_snapshot, publish_snapshot
@@ -29,7 +30,7 @@ class VectorDatabaseTests(unittest.TestCase):
         owner, collection = "owner-" + uuid.uuid4().hex, "vector-" + uuid.uuid4().hex
         registry.create_collection(owner, collection)
         root = Path(__file__).resolve().parents[2]
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory() as directory, ExitStack() as resources:
             store = Store(Path(directory))
             _, papers, chunks = load_snapshot(
                 next((root / "datasets/fixtures/snapshots").iterdir())
@@ -47,6 +48,7 @@ class VectorDatabaseTests(unittest.TestCase):
             self.assertEqual(build(registry, store, owner, collection, snapshot), index_id)
             index = PgvectorIndex(registry, owner, collection, snapshot, index_id)
             embedding, vectors = load_embeddings(store, embedding_id, corpus.name)
+            resources.callback(vectors._mmap.close)
             query = model.encode(["retrieval"])[0]
             limit = len(embedding["chunks"])
             reference = exact_search(

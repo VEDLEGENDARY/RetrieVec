@@ -1,3 +1,21 @@
+import { BasedOn } from "./BasedOn";
+import { SectionField } from "./SectionField";
+import { PaperDetails } from "./PaperDetails";
+import { PassageLocation } from "./PassageLocation";
+import { stateLabel, exportLabels, errorMessage } from "./presentation";
+import {
+  Button,
+  ActionLink,
+  Field,
+  Input,
+  Select,
+  Textarea,
+  Notice,
+  StatusBadge,
+  LoadingState,
+  Disclosure,
+  More,
+} from "./ui";
 import { Citation } from "./Citation";
 import type {
   Conversation,
@@ -9,7 +27,6 @@ import type {
 import { EvidencePanel } from "./EvidencePanel";
 import { useDraft } from "./drafts";
 import { useRunProgress } from "./useRunProgress";
-import { Button, Input, Select, Textarea, More, Skeleton } from "./ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
@@ -25,12 +42,13 @@ const failure: Record<string, string> = {
   provider_unavailable:
     "The configured model is unavailable or changed. Check the provider setup, then retry.",
   provider_failed:
-    "The provider failed or exceeded its budget. Search is still available. A remote request may have been billed.",
+    "The provider failed or exceeded its budget. Search is still available. A remote request may have been billed. Check the provider before starting another run.",
   invalid_answer:
-    "The answer failed citation or structure checks. No unverified answer was published.",
+    "The answer failed citation or structure checks. No unverified answer was published. Review the passages or try a more focused question.",
   retrieval_unavailable:
-    "The pinned retrieval snapshot or search service is unavailable.",
-  source_unavailable: "Retained evidence or an original source is unavailable.",
+    "The pinned retrieval snapshot or search service is unavailable. Contact the workspace operator before retrying.",
+  source_unavailable:
+    "Retained evidence or an original source is unavailable. Inspect the available passages or contact the collection owner.",
   worker_interrupted:
     "The worker stopped before confirming completion. Retry creates a new run; remote billing may be uncertain.",
 };
@@ -41,7 +59,15 @@ export function Research({
   fail,
   showHistory = false,
   linkedRun = "",
+  providers,
+  provider,
+  setProvider,
+  refreshProviders,
 }: {
+  providers: Provider[];
+  provider: string;
+  setProvider: (name: string) => void;
+  refreshProviders: () => Promise<void>;
   showHistory?: boolean;
   linkedRun?: string;
   collection: Collection;
@@ -94,8 +120,6 @@ export function Research({
       controller.abort();
     };
   }, [showHistory, collection.collection_id, savedQuery, savedPage, fail]);
-  const [providers, setProviders] = useState<Provider[]>([]);
-  const [provider, setProvider] = useState("");
   const [question, setQuestion, draftSaved] = useDraft(
     session.principal_id,
     collection.collection_id,
@@ -142,6 +166,7 @@ export function Research({
     [],
   );
   const [busy, setBusy] = useState(false);
+  const [section, setSection] = useState("");
   const [notice, setNotice] = useState("");
   const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
   const selectedProvider = providers.find((item) => item.name === provider);
@@ -173,7 +198,7 @@ export function Research({
             setRewritePreview(value.effective_query);
         })
         .catch((error) => {
-          if (!controller.signal.aborted) setRewriteError(error.message);
+          if (!controller.signal.aborted) setRewriteError(errorMessage(error));
         });
     }, 250);
     return () => {
@@ -188,17 +213,6 @@ export function Research({
     selectedProvider?.consented,
     session.csrf_token,
   ]);
-  const refreshProviders = useCallback(async () => {
-    const rows = await api<Provider[]>(
-      `/api/v1/collections/${collection.collection_id}/providers`,
-    );
-    setProviders(rows);
-    setProvider((current) =>
-      rows.some((item) => item.name === current)
-        ? current
-        : (rows[0]?.name ?? ""),
-    );
-  }, [collection.collection_id]);
   useEffect(() => {
     const controller = new AbortController();
     api<Conversation[]>(
@@ -209,9 +223,8 @@ export function Research({
       .catch((error) => {
         if (error.name !== "AbortError") fail(error);
       });
-    refreshProviders().catch(fail);
     return () => controller.abort();
-  }, [collection.collection_id, refreshProviders, fail]);
+  }, [collection.collection_id, fail]);
   useEffect(() => {
     if (!conversation) {
       setHistory([]);
@@ -288,6 +301,14 @@ export function Research({
     snapshot: "current" | "historical" = "current",
     replay = false,
   ) {
+    if (
+      busy ||
+      (!replay &&
+        (!question.trim() ||
+          !collection.active_snapshot ||
+          !selectedProvider?.consented))
+    )
+      return;
     inspectionVersion.current += 1;
     setBusy(true);
     setNotice("");
@@ -323,6 +344,10 @@ export function Research({
               replay && run ? run.effective_query : effective || null,
             provider: replay && run ? run.configuration.provider : provider,
             retrieval: replay && run ? run.configuration.retrieval : "hybrid",
+            section:
+              replay && run
+                ? (run.configuration.section ?? null)
+                : section || null,
             parent_run: run?.run_id ?? null,
             snapshot,
           }),
@@ -407,29 +432,30 @@ export function Research({
   return (
     <section className="saved-research" aria-labelledby="saved-title">
       <h2 id="saved-title">
-        {showHistory ? "Saved research" : "Ask your sources"}
+        {showHistory ? "Saved research" : "Cited answers"}
       </h2>
       <p className="muted">
         Answers stay tied to their sources. Structural checks do not establish
         scientific or semantic correctness.
       </p>
       <div hidden={!showHistory}>
-        <label htmlFor="saved-search">Find saved research</label>
-        <Input
-          id="saved-search"
-          type="search"
-          maxLength={256}
-          value={savedQuery}
-          onChange={(event) => {
-            setSavedQuery(event.target.value);
-            setSavedPage(null);
-            setSaved([]);
-          }}
-        />
+        <Field label="Find saved research">
+          <Input
+            id="saved-search"
+            type="search"
+            maxLength={256}
+            value={savedQuery}
+            onChange={(event) => {
+              setSavedQuery(event.target.value);
+              setSavedPage(null);
+              setSaved([]);
+            }}
+          />
+        </Field>
         {savedLoading ? (
-          <Skeleton label="Loading saved research…" />
+          <LoadingState label="Loading saved research…" />
         ) : savedError ? (
-          <p role="alert">{savedError}</p>
+          <Notice error>{savedError}</Notice>
         ) : (
           <nav aria-label="All saved research">
             {saved.map((item) => (
@@ -446,7 +472,7 @@ export function Research({
               >
                 {item.original_question}
                 <small>
-                  {item.state.replaceAll("_", " ")} ·{" "}
+                  {stateLabel(item.state)} ·{" "}
                   {new Date(item.created_at).toLocaleDateString()}
                 </small>
               </Button>
@@ -470,28 +496,29 @@ export function Research({
           </Button>
         )}
         <More label="Browse conversations">
-          <label htmlFor="conversation">Conversation</label>
-          <Select
-            id="conversation"
-            disabled={busy}
-            value={conversation}
-            onChange={(event) => {
-              inspectionVersion.current += 1;
-              setConversation(event.target.value);
-              setRun(null);
-              setSelectedRunId(null);
-              setRunConnection("connected");
-              setEvidence(null);
-              setRequestKey(crypto.randomUUID());
-            }}
-          >
-            <option value="">New conversation</option>
-            {conversations.map((item) => (
-              <option key={item.conversation_id} value={item.conversation_id}>
-                {item.title}
-              </option>
-            ))}
-          </Select>
+          <Field label="Conversation">
+            <Select
+              id="conversation"
+              disabled={busy}
+              value={conversation}
+              onChange={(event) => {
+                inspectionVersion.current += 1;
+                setConversation(event.target.value);
+                setRun(null);
+                setSelectedRunId(null);
+                setRunConnection("connected");
+                setEvidence(null);
+                setRequestKey(crypto.randomUUID());
+              }}
+            >
+              <option value="">New conversation</option>
+              {conversations.map((item) => (
+                <option key={item.conversation_id} value={item.conversation_id}>
+                  {item.title}
+                </option>
+              ))}
+            </Select>
+          </Field>
         </More>
       </div>
       <form
@@ -501,29 +528,30 @@ export function Research({
           void submit();
         }}
       >
-        <label htmlFor="research-question">Question for cited answer</label>
-        <Textarea
-          id="research-question"
-          disabled={busy}
-          value={question}
-          maxLength={4096}
-          required
-          rows={3}
-          onKeyDown={(event) => {
-            if (
-              (event.ctrlKey || event.metaKey) &&
-              event.key === "Enter" &&
-              !event.nativeEvent.isComposing
-            ) {
-              event.preventDefault();
-              event.currentTarget.form?.requestSubmit();
-            }
-          }}
-          onChange={(event) => {
-            setQuestion(event.target.value);
-            setRequestKey(crypto.randomUUID());
-          }}
-        />
+        <Field label="Question for cited answer">
+          <Textarea
+            id="research-question"
+            disabled={busy}
+            value={question}
+            maxLength={4096}
+            required
+            rows={3}
+            onKeyDown={(event) => {
+              if (
+                (event.ctrlKey || event.metaKey) &&
+                event.key === "Enter" &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
+            onChange={(event) => {
+              setQuestion(event.target.value);
+              setRequestKey(crypto.randomUUID());
+            }}
+          />
+        </Field>
         <p className="muted">
           {draftSaved
             ? "Draft saved on this device for 7 days. Cleared on sign out."
@@ -548,41 +576,49 @@ export function Research({
             Edit search query
           </Button>
         </p>
-        {rewriteError && <p role="alert">{rewriteError}</p>}
-        <More label="Advanced question settings">
-          <label htmlFor="effective-query">
-            Standalone query for a follow-up (optional)
-          </label>
-          <Input
-            id="effective-query"
+        {rewriteError && <Notice error>{rewriteError}</Notice>}
+        <More label="More answer options">
+          <SectionField
+            value={section}
             disabled={busy}
-            value={effective}
-            maxLength={4096}
-            onChange={(event) => {
-              setEffective(event.target.value);
+            onChange={(value) => {
+              setSection(value);
               setRequestKey(crypto.randomUUID());
             }}
-            placeholder="Include the method or paper your follow-up refers to"
           />
-          <label htmlFor="generation-provider">Generation provider</label>
-          <Select
-            id="generation-provider"
-            disabled={busy}
-            value={provider}
-            onChange={(event) => {
-              setProvider(event.target.value);
-              setRequestKey(crypto.randomUUID());
-            }}
-          >
-            {!providers.length && (
-              <option value="">No provider configured</option>
-            )}
-            {providers.map((item) => (
-              <option key={item.name} value={item.name}>
-                {item.model} · {item.cloud ? "Cloud" : "Local"}
-              </option>
-            ))}
-          </Select>
+          <Field label="Standalone query for a follow-up (optional)">
+            <Input
+              id="effective-query"
+              disabled={busy}
+              value={effective}
+              maxLength={4096}
+              onChange={(event) => {
+                setEffective(event.target.value);
+                setRequestKey(crypto.randomUUID());
+              }}
+              placeholder="Include the method or paper your follow-up refers to"
+            />
+          </Field>
+          <Field label="Generation provider">
+            <Select
+              id="generation-provider"
+              disabled={busy}
+              value={provider}
+              onChange={(event) => {
+                setProvider(event.target.value);
+                setRequestKey(crypto.randomUUID());
+              }}
+            >
+              {!providers.length && (
+                <option value="">No provider configured</option>
+              )}
+              {providers.map((item) => (
+                <option key={item.name} value={item.name}>
+                  {item.model} · {item.cloud ? "Cloud" : "Local"}
+                </option>
+              ))}
+            </Select>
+          </Field>
         </More>
         <p className="muted">
           {selectedProvider
@@ -647,7 +683,7 @@ export function Research({
                 setEvidence(null);
               }}
             >
-              {item.original_question} · {item.state}
+              {item.original_question} · {stateLabel(item.state)}
             </Button>
           ))}
         </nav>
@@ -675,9 +711,9 @@ export function Research({
       {run && (
         <article className="answer">
           <h3>{run.original_question}</h3>
-          <p role="status">Research run: {run.state}</p>
+          <p role="status">Research run: {stateLabel(run.state)}</p>
           {activeStates.has(run.state) && (
-            <Skeleton
+            <LoadingState
               label={
                 run.state === "retrieving"
                   ? "Finding relevant passages…"
@@ -722,33 +758,44 @@ export function Research({
             </Button>
           )}
           {run.state === "failed" && (
-            <p role="alert">
+            <Notice error>
               {failure[run.error_code ?? ""] ??
                 "Run failed. Check the services and retry."}
-            </p>
+            </Notice>
           )}
           {run.state === "cancelled" && (
             <p>This run was cancelled. No late answer will be published.</p>
           )}
           {run.result && (
             <>
-              <More
-                label={`Based on ${run.result.evidence.length} retained passages`}
-              >
-                {cite(run.result.evidence.map((item) => item.evidence_id))}
-                <p>
-                  Retrieved from the pinned collection snapshot. These passages
-                  are the evidence pool; citations identify which support each
-                  claim.
-                </p>
-              </More>
-              <p className="answer-status">
+              <BasedOn
+                kind="answer"
+                snapshot={run.snapshot_id}
+                model={
+                  run.configuration.generation.model +
+                  " · " +
+                  run.configuration.generation.revision
+                }
+                candidates={run.result.evidence.map((item) => ({
+                  id: item.evidence_id,
+                  content: cite([item.evidence_id]),
+                }))}
+                usedIds={[
+                  ...run.result.answer.claims.flatMap(
+                    (claim) => claim.evidence_ids,
+                  ),
+                  ...run.result.answer.comparisons.flatMap(
+                    (row) => row.evidence_ids,
+                  ),
+                ]}
+              />
+              <StatusBadge className="answer-status">
                 {run.result.answer.status === "insufficient_evidence"
                   ? "I could not find this in your papers."
                   : run.result.answer.status === "partial"
                     ? "The sources support only part of this answer."
                     : "Answer with cited evidence"}
-              </p>
+              </StatusBadge>
               {run.result.answer.claims.map((claim) => (
                 <div className="claim" key={claim.id}>
                   <p>{claim.text}</p>
@@ -756,24 +803,28 @@ export function Research({
                 </div>
               ))}
               {run.result.answer.comparisons.map((row, index) => (
-                <section key={index} className="comparison">
-                  <h4>{row.method}</h4>
-                  <dl>
-                    <dt>Dataset / metric</dt>
-                    <dd>
-                      {row.dataset} / {row.metric}
-                    </dd>
-                    <dt>Paper-reported value</dt>
-                    <dd>{row.reported_value}</dd>
-                    <dt>Conditions</dt>
-                    <dd>{row.experimental_conditions}</dd>
-                    <dt>Comparability</dt>
-                    <dd>{row.comparability_note}</dd>
-                    <dt>Limitations</dt>
-                    <dd>{row.limitations}</dd>
-                  </dl>
-                  {cite(row.evidence_ids)}
-                </section>
+                <div key={index} className="advanced-table comparison">
+                  <table>
+                    <caption>Cited paper comparison {index + 1}</caption>
+                    <tbody>
+                      {[
+                        ["Method", row.method],
+                        ["Dataset / metric", `${row.dataset} / ${row.metric}`],
+                        ["Paper-reported value", row.reported_value],
+                        ["Conditions", row.experimental_conditions],
+                        ["Comparability", row.comparability_note],
+                        ["Limitations", row.limitations],
+                      ].map(([label, value]) => (
+                        <tr key={label}>
+                          <th scope="row">{label}</th>
+                          <td>
+                            {value} {cite(row.evidence_ids)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ))}
               <ul>
                 {run.result.answer.limitations.map((item, index) => (
@@ -787,38 +838,49 @@ export function Research({
               <More label="Export answer">
                 <div className="export-actions">
                   {["markdown", "bibtex", "json", "csv"].map((format) => (
-                    <Button key={format} onClick={() => exportRun(format)}>
-                      Export {format}
+                    <Button
+                      id={`run-export-${format}`}
+                      key={format}
+                      onClick={() => exportRun(format)}
+                    >
+                      Export {exportLabels[format] ?? format}
                     </Button>
                   ))}
                 </div>
               </More>
             </>
           )}
-          {!activeStates.has(run.state) && (
-            <div className="replay-actions">
-              <Button
-                disabled={busy}
-                onClick={() => submit("historical", true)}
-              >
-                Replay pinned snapshot
-              </Button>
-              <Button disabled={busy} onClick={() => submit("current", true)}>
-                Replay current snapshot
-              </Button>
-            </div>
-          )}
-          <details>
-            <summary>Run provenance</summary>
-            <dl>
-              <dt>Effective query</dt>
-              <dd>{run.effective_query}</dd>
-              <dt>Snapshot</dt>
-              <dd>{run.snapshot_id}</dd>
-              <dt>Model revision</dt>
-              <dd>{run.configuration.generation.revision}</dd>
-            </dl>
-          </details>
+          <More label="More run options">
+            {!activeStates.has(run.state) && (
+              <div className="replay-actions">
+                <Button
+                  id="replay-pinned"
+                  disabled={busy}
+                  onClick={() => submit("historical", true)}
+                >
+                  Replay pinned snapshot
+                </Button>
+                <Button
+                  id="replay-current"
+                  disabled={busy}
+                  onClick={() => submit("current", true)}
+                >
+                  Replay current snapshot
+                </Button>
+              </div>
+            )}
+            <Disclosure id="run-provenance">
+              <summary>Run provenance</summary>
+              <dl>
+                <dt>Effective query</dt>
+                <dd>{run.effective_query}</dd>
+                <dt>Snapshot</dt>
+                <dd>{run.snapshot_id}</dd>
+                <dt>Model revision</dt>
+                <dd>{run.configuration.generation.revision}</dd>
+              </dl>
+            </Disclosure>
+          </More>
         </article>
       )}
       {evidence && (
@@ -829,6 +891,16 @@ export function Research({
           snapshot={evidence.snapshot_id ?? run?.snapshot_id ?? "Unavailable"}
           onClose={closeCitation}
         >
+          <PaperDetails paper={evidence} />
+          {!evidence.evidence_object_id && evidence.chunk_id && run && (
+            <PassageLocation
+              key={evidence.chunk_id}
+              passage={evidence}
+              collectionId={collection.collection_id}
+              snapshotId={evidence.snapshot_id ?? run.snapshot_id}
+              chunkId={evidence.chunk_id}
+            />
+          )}
           {evidence.evidence_object_id && evidence.chunk_id && run && (
             <AdvancedEvidence
               collectionId={collection.collection_id}
@@ -837,13 +909,13 @@ export function Research({
             />
           )}
           {evidence.source_id ? (
-            <a
+            <ActionLink
               target="_blank"
               rel="noreferrer"
               href={`/api/v1/sources/${evidence.source_id}?snapshot_id=${evidence.snapshot_id}#page=${evidence.page_range?.[0] ?? 1}`}
             >
               Open original source
-            </a>
+            </ActionLink>
           ) : (
             <p>Exact passage retained; uploaded original unavailable.</p>
           )}

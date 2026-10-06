@@ -1,0 +1,952 @@
+{
+  "schema_version": 1,
+  "dataset_id": "answer-quality-scifact-v1",
+  "question_count": 72,
+  "corpus_manifest": "corpus-manifest.json",
+  "corpus_manifest_sha256": "cfb9d89825fd94ec8db1a1233e6f760892a9fb9454255481042b8819f4c37be8",
+  "provenance": {
+    "kind": "synthetic-questions",
+    "source": "BEIR SciFact title/abstract records",
+    "seed": 1729,
+    "split_policy": "Paper IDs and normalized question texts are disjoint across splits.",
+    "limitations": "Deterministic question templates; expectations are drafts, not human judgments. Full papers and original PDF extraction are not evaluated."
+  },
+  "questions": [
+    {
+      "id": "aq-01-answerable",
+      "split": "development",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Gene targeting using zinc finger nucleases' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-13221399"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-01-partially_answerable",
+      "split": "development",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Gene targeting using zinc finger nucleases' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-13221399"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-01-unanswerable",
+      "split": "development",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Gene targeting using zinc finger nucleases'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-13221399"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-02-answerable",
+      "split": "development",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Synaptic Determinants of Rett Syndrome' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-7997337"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-02-partially_answerable",
+      "split": "development",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Synaptic Determinants of Rett Syndrome' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-7997337"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-02-unanswerable",
+      "split": "development",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Synaptic Determinants of Rett Syndrome'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-7997337"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-03-answerable",
+      "split": "validation",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Membrane association of the CD3\u03b5 signaling domain is required for optimal T cell development and function.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-34905328"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-03-partially_answerable",
+      "split": "validation",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Membrane association of the CD3\u03b5 signaling domain is required for optimal T cell development and function.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-34905328"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-03-unanswerable",
+      "split": "validation",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Membrane association of the CD3\u03b5 signaling domain is required for optimal T cell development and function.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-34905328"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-04-answerable",
+      "split": "validation",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Dynamic Helix Interactions in Transmembrane Signaling' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-17123657"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-04-partially_answerable",
+      "split": "validation",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Dynamic Helix Interactions in Transmembrane Signaling' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-17123657"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-04-unanswerable",
+      "split": "validation",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Dynamic Helix Interactions in Transmembrane Signaling'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-17123657"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-05-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'SOD1 Integrates Signals from Oxygen and Glucose to Repress Respiration' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-2919030"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-05-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'SOD1 Integrates Signals from Oxygen and Glucose to Repress Respiration' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-2919030"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-05-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'SOD1 Integrates Signals from Oxygen and Glucose to Repress Respiration'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-2919030"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-06-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-24879055"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-06-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-24879055"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-06-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Distinct memory CD4+ T cells with commitment to T follicular helper- and T helper 1-cell lineages are generated after acute viral infection.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-24879055"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-07-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-45287266"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-07-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-45287266"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-07-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Nonstructural protein 3-4A: the Swiss army knife of hepatitis C virus.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-45287266"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-08-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-30983338"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-08-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-30983338"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-08-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'The prevalence of congenital malformations is still higher in pregnant women with pregestational diabetes despite near-normal HbA1c: a literature review.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-30983338"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-09-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'position-specific gap penalties' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-7260461"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-09-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'position-specific gap penalties' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-7260461"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-09-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'position-specific gap penalties'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-7260461"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-10-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Generation of mice with a conditional allele for the p75(NTR) neurotrophin receptor gene.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-368506"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-10-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Generation of mice with a conditional allele for the p75(NTR) neurotrophin receptor gene.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-368506"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-10-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Generation of mice with a conditional allele for the p75(NTR) neurotrophin receptor gene.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-368506"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-11-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Long-term efficacy of nicotine replacement therapy for smoking cessation in adolescents: a randomized controlled trial.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-34369306"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-11-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Long-term efficacy of nicotine replacement therapy for smoking cessation in adolescents: a randomized controlled trial.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-34369306"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-11-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Long-term efficacy of nicotine replacement therapy for smoking cessation in adolescents: a randomized controlled trial.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-34369306"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-12-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-3863543"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-12-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-3863543"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-12-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Mesenchymal Inflammation Drives Genotoxic Stress in Hematopoietic Stem Cells and Predicts Disease Evolution in Human Pre-leukemia.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-3863543"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-13-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-38131471"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-13-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-38131471"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-13-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Molecular mechanisms of mammalian DNA repair and the DNA damage checkpoints.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-38131471"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-14-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Intestinal methane production in obese individuals is associated with a higher body mass index.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-29947146"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-14-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Intestinal methane production in obese individuals is associated with a higher body mass index.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-29947146"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-14-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Intestinal methane production in obese individuals is associated with a higher body mass index.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-29947146"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-15-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Health and access to care: perspectives of homeless youth in Baltimore City, U.S.A.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-20334484"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-15-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Health and access to care: perspectives of homeless youth in Baltimore City, U.S.A.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-20334484"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-15-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Health and access to care: perspectives of homeless youth in Baltimore City, U.S.A.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-20334484"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-16-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'What is the best way to help caregivers in cancer and palliative care? A systematic literature review of interventions and their effectiveness.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-22446093"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-16-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'What is the best way to help caregivers in cancer and palliative care? A systematic literature review of interventions and their effectiveness.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-22446093"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-16-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'What is the best way to help caregivers in cancer and palliative care? A systematic literature review of interventions and their effectiveness.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-22446093"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-17-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Inter- and Intra-Host Viral Diversity in a Large Seasonal DENV2 Outbreak' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-16172576"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-17-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Inter- and Intra-Host Viral Diversity in a Large Seasonal DENV2 Outbreak' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-16172576"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-17-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Inter- and Intra-Host Viral Diversity in a Large Seasonal DENV2 Outbreak'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-16172576"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-18-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Virus-encoded microRNAs.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-32556431"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-18-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Virus-encoded microRNAs.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-32556431"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-18-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Virus-encoded microRNAs.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-32556431"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-19-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-11172205"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-19-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-11172205"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-19-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Quantum dots spectrally distinguish multiple species within the tumor milieu in vivo'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-11172205"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-20-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Role of NF-kappa B in cell survival and transcription of latent membrane protein 1-expressing or Epstein-Barr virus latency III-infected cells.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-28644298"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-20-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Role of NF-kappa B in cell survival and transcription of latent membrane protein 1-expressing or Epstein-Barr virus latency III-infected cells.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-28644298"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-20-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Role of NF-kappa B in cell survival and transcription of latent membrane protein 1-expressing or Epstein-Barr virus latency III-infected cells.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-28644298"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-21-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Epidemiology of Staphylococcus aureus blood and skin and soft tissue infections in the US military health system, 2005-2010.' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-14408200"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-21-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Epidemiology of Staphylococcus aureus blood and skin and soft tissue infections in the US military health system, 2005-2010.' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-14408200"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-21-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Epidemiology of Staphylococcus aureus blood and skin and soft tissue infections in the US military health system, 2005-2010.'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-14408200"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-22-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-11603066"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-22-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-11603066"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-22-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Using Structural Information to Change the Phosphotransfer Specificity of a Two-Component Chemotaxis Signalling Complex'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-11603066"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-23-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-2601135"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-23-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-2601135"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-23-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Diversification in the HIV-1 Envelope Hyper-variable Domains V2, V4, and V5 and Higher Probability of Transmitted/Founder Envelope Glycosylation Favor the Development of Heterologous Neutralization Breadth'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-2601135"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-24-answerable",
+      "split": "test",
+      "kind": "answerable",
+      "question": "What scientific finding does the study titled 'Interactions between Non-Physician Clinicians and Industry: A Systematic Review' report?",
+      "expected_answer": "A concise finding supported by the retained abstract, without additional claims.",
+      "source_paper_ids": [
+        "scifact-24077493"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-24-partially_answerable",
+      "split": "test",
+      "kind": "partially_answerable",
+      "question": "Summarize the findings of 'Interactions between Non-Physician Clinicians and Industry: A Systematic Review' and give the authors' exact travel budget for the study.",
+      "expected_answer": "Summarize supported findings and explicitly say that the travel budget is absent from retained evidence.",
+      "source_paper_ids": [
+        "scifact-24077493"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    {
+      "id": "aq-24-unanswerable",
+      "split": "test",
+      "kind": "unanswerable",
+      "question": "Which exact RetrieVec software release indexed the original study titled 'Interactions between Non-Physician Clinicians and Industry: A Systematic Review'?",
+      "expected_answer": "Abstain: a paper abstract cannot establish a RetrieVec indexing release.",
+      "source_paper_ids": [
+        "scifact-24077493"
+      ],
+      "judgment_provenance": "synthetic",
+      "reviewer": null,
+      "reviewed_at": null
+    }
+  ]
+}

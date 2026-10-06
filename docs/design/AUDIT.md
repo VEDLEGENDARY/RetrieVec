@@ -1,9 +1,101 @@
 # RetrieVec UI/UX consistency audit
 
+## Current verification — 2026-10-06
+
+The [material refinement](MATERIALS.md) adds a modular collection header and
+destination navigation, adaptive chrome and damped-spring press feedback. Reading
+surfaces remain solid. Reduced motion, reduced transparency and forced colors
+have explicit fallbacks. The final repository check passed 149 Python tests with
+PostgreSQL/pgvector enabled and no skips; Go checks and the web build passed.
+All 33 UI tests passed, with 144 inventoried captures at 1280px/390px in light/dark
+and supplemental 320px reflow at doubled text size. Named contrast surfaces passed
+in all four conditions. See [issue dispositions and commands](../maintenance-2026-10-06.md).
+Manual screen-reader, other-browser, browser-zoom and production gates remain open.
+
+## Release verification — 2026-10-05
+
+Phase 5 adds opt-in section filters, retained source metadata, verified ordinary
+PDF highlights with explicit missing-locator limitations, and comparison tables
+with citations in every data cell. The full repository check passed 145 Python
+tests with PostgreSQL and pgvector enabled and no skips. The 30-test UI suite
+passed after PDF locations; five targeted comparison/saved-research tests then
+passed, including 390px reflow. A real Docker demo exercised Keycloak registration,
+OIDC sign-in, default hybrid retrieval and sign-out. Final clean-checkout results
+are recorded in [release verification](../releases/verification.md).
+
+Manual screen-reader, non-Chromium, production identity/deployment, representative
+PDF-ingest/load and human visual-approval gates remain open. Historical audit
+findings below preserve their original dates and baseline; they are not current
+failure claims. No synthetic answer scores are labeled human review.
+
 Date: 2026-09-29  
 Baseline: `f6e021142df2f4a4990b7b4c2b28da45bd485882`  
 Plan: **Plan 1, Step 1 only**  
-Status: **Baseline audit approved by the owner. Implementation is underway in PR #46; the inventory below records the pre-change state.**
+Status: **UI unification implemented on `feature/ui-unification`, based on `origin/main` (`8384565`). The original inventory below is historical; the implementation update records current coverage and remaining verification limits.**
+
+## Implementation update — 2026-10-04
+
+See [the design-system contract](../DESIGN_SYSTEM.md) for the shared APIs, token roles, static asset generation, and reproduction commands. This phase changes presentation and browser tests only; retrieval defaults, storage, authorization, consent, snapshot immutability, and API error codes are unchanged.
+
+| Findings | Current implementation |
+| --- | --- |
+| DS-01–06 | One token source, complete semantic light/dark roles, six named type sizes, 4px spacing scale, five radius roles, shared elevation and explicit disabled colors. |
+| DS-07–08, DS-30 | Native `color-scheme`, generated theme-color metadata, supported system/serif/monospace font stacks, explicit small/heading/code/placeholder roles. Inter is not assumed. |
+| DS-09–10 | Standard control icons and icon-button sizes, accessible icon-only names, decorative icons hidden; trailing action-arrow copy removed. Source SVG geometry and keyboard notation are retained. |
+| DS-11–12 | Focus outlines remain visible; disabled controls do not receive enabled hover styles. Rendered input-focus and disabled-hover assertions cover both themes. |
+| DS-13–15 | Shared loading/busy controls, persistent Notices, and Fields with label/help/error associations. Upload queue errors now associate with the file control; retry keys and validation limits are unchanged. |
+| DS-16–17, DS-20 | Shared Button/ActionLink/IconButton, Surface, EmptyState/LoadingState, StatusBadge, Disclosure, and native-dialog base. Native control sites are centralized in `ui.tsx`; domain workflows and nonmodal inspectors retain their behavior. |
+| DS-18–19 | Removed obsolete overview/hero/stat/workflow, tooltip, old citation-inspector, navigation-open, status, and `rise` rules; merged repeated eyebrow/inspector/excerpt declarations. Shared 150–250ms motion and reduced-motion override remain. |
+| DS-21–28 | Cited answers and Saved research are distinct; consistent source actions and sentence case; explicit readable state mapping; recovery-oriented errors; readable-text/OCR wording; named export formats. Backend enums and error codes are unchanged. |
+| DS-29 | Generated favicon palette and browser chrome colors come from the token source. Structured evidence uses a tokenized highlight with a contrasting halo; ordinary PDF exact highlighting is not claimed. |
+
+### Phase 2 navigation — 2026-10-04
+
+The three destinations are **Ask, Sources, and Saved research**. Overview capabilities remain in onboarding, collection readiness/access, and collection details. Ask chooses Answer automatically only after the collection's authorized provider response confirms a consented provider; otherwise Find passages explains the missing setup/consent. An explicit mode choice survives late provider responses. Provider requests abort on collection/session changes. Opening an existing run is an explicit history action, not permission to generate.
+
+More disclosures contain search configuration, answer options, result filters/diagnostics, shortlist, and run provenance/replay. The model and Local/Cloud indicator remain visible in Ask. Cmd/Ctrl+Enter works in both modes, ignores IME composition, and checks readiness/consent before submitting. No consent is granted by navigation, provider selection or a shortcut.
+
+Quick actions index destinations, upload/composer focus, comparison and syntax, filters, recent queries, excerpt display, passage inspection, shortlist/export, provider/follow-up, saved lookup/conversations, four answer exports, replay and provenance. Selecting an action opens enclosing native disclosures and focuses the relevant control; it does not trigger export or paid generation. Missing prerequisites produce an explanation. [Current activation counts](CORE_FLOWS.md#current-feature-map-and-click-counts) include native-select steps and identify quick-action alternatives to deeper paths.
+
+The shared **Based on** control distinguishes actual claim/comparison citations from other retained retrieved candidates. Search results are explicitly identified as retrieved passages, not generated-answer evidence; shortlist membership never becomes a citation.
+
+Saved lookup reuses the existing collection-authorized, owner-filtered, cursor-paginated endpoint (default 50, maximum 100). No backend authorization/storage/API changes were made. UI fixtures cover collection scope, pagination, no per-conversation fanout, and denied responses; real database policy execution remains unverified on this host.
+
+The phase-2 verification record is [navigation-phase-2-2026-10-04.json](../results/navigation-phase-2-2026-10-04.json): `scripts/check.py` passed (106 Python tests executed; 19 existing PostgreSQL skips; Go checks passed), `npm run build` passed, and `npm run test:ui -- --workers=2` passed all 29 tests. The inventory produced 144 captures across 1280/390px and light/dark, including the new disclosure/evidence states. Shortlist feedback, cancellation messages and Undo remain outside collapsed disclosures. The phase-1 results below remain historical. Manual screen-reader, non-Chromium, and human visual-approval gates remain open; real local service checks are recorded below.
+
+### Current screen coverage
+
+`web/ui-tests/design-system.spec.ts` captures the current equivalents of every application-owned inventory row at **1280px and 390px, light and dark**, including errors, empty/loading states, disabled/selected controls, all four structured-evidence bodies, processing/run states, provider consent, source previews, and overlays. PNGs and `screen-and-contrast-report.json` are saved under `web/test-results/design-system-screen-inventory-<width>-<theme>/` and attached to Playwright results. Fixtures are explicitly synthetic, not model-quality evidence. They are captures, not approved golden-image baselines.
+
+The standalone overview and browser archive-confirmation screen had already been replaced on `main`; captures cover Collection details/readiness and archive Undo. Mobile navigation is captured at 390px; its desktop equivalent is the persistent sidebar. External OIDC-provider pages are outside this repository's UI and are not represented as tested screens.
+
+The suite runs WCAG-tagged axe scans against each settled fixture screen in both themes. It also measures computed foreground and composited background colors for answer/status badges, file errors, diagnostic code, footer, focused skip links, and input focus. The historical stat-detail surface was removed with the obsolete overview. The measurement helper rejects gradient/image/opacity text surfaces instead of guessing a passing ratio. Source images use their own retained colors; no arbitrary-image highlight contrast certification is claimed.
+
+Supplemental checks cover forced-colors focus, reduced motion, and 640px reflow. Existing tests cover shortcuts, focus return, Escape, upload retry keys, drafts, session cleanup, and streaming revocation. Manual screen-reader testing, actual browser zoom, other browser engines, and production identity/deployment integration remain unverified. PostgreSQL and pgvector integrations were subsequently exercised on isolated Docker services: the current repository check passed 145 tests without skips. Real Keycloak demo sign-in and hybrid search were also exercised. These checks do not close manual screen-reader, other-browser or production-load gates.
+
+The remaining sections preserve the original source audit and its exact baseline values for comparison. Historical statements such as “no shared library” or “not applied” below describe `f6e0211`, not the current implementation.
+
+### Verification results — 2026-10-04
+
+Measured records: [UI screen/contrast report](../results/ui-unification-2026-10-04.json). Both viewport sizes produced the same ratios below; values are rounded to two decimals only for this table.
+
+| Rendered surface | Light | Dark | Minimum |
+| --- | ---: | ---: | ---: |
+| Answer/status badge | 6.31:1 | 7.18:1 | 4.5:1 |
+| Upload file error | 7.64:1 | 8.89:1 | 4.5:1 |
+| Diagnostic code | 6.37:1 | 8.50:1 | 4.5:1 |
+| Footer | 5.92:1 | 10.01:1 | 4.5:1 |
+| Focused skip link | 7.09:1 | 7.09:1 | 4.5:1 |
+| Input focus outline against field surface | 7.09:1 | 9.50:1 | 3:1 |
+
+The new skip-link assertion first failed at **1.43:1** in dark mode; using the shared action background fixed it. Historical stat-detail styles are removed, so there is no surviving stat-detail surface to certify.
+
+- `python scripts/check.py`: exit 0; Go vet/tests/build and Python dependency/lint/format/token checks passed. Python reported 125 tests, with **106 executed and 19 automatically skipped** for the unavailable isolated PostgreSQL service.
+- `cd web && npm run build`: exit 0; generated-brand consistency and TypeScript checks passed. Dependency-level Lucide `use client` warnings remain.
+- `cd web && npm run test:ui -- --workers=2`: **19 passed**, including all four screen matrices, with **124 PNG captures**. Settled inventory fixtures have no violations from the selected WCAG axe rules. Loading, forced-colors and supplemental reflow captures have their explicitly scoped assertions rather than a claim of full axe certification.
+- `docker info --format '{{.ServerVersion}}'`: failed because the Docker Desktop Linux engine pipe does not exist, including on the escalated retry. Database/integration checks remain unverified; no test skip conditions were changed.
+
+On this Windows host, Python used `.venv/Scripts/python.exe`; npm used `node C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js`. Generated screenshots/logs remain local and ignored. These checks establish fixture behavior and measured contrast, not full WCAG conformance or release performance.
 
 ## Scope and method
 
@@ -181,7 +273,7 @@ Acceptance checks for later steps:
 - Keep all existing UI, database/RPC/OIDC integration and API contract checks; update selectors only for intentional glossary/semantic changes.
 - Use a separate small commit per plan step. Do not modify retrieval, storage, generation, authorization or deployment behavior as part of visual unification.
 
-## Step 1 completion
+## Step 1 completion (historical)
 
 The audit and exact inventories are the only deliverable in this step. No tokens, components, behavior, copy, or application styling have been changed. Plans 2 and 3 have not yet been supplied. **Stop here for owner review before Step 2.**
 

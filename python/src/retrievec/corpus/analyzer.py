@@ -40,7 +40,8 @@ class GoAnalyzer:
         if not isinstance(batches, list) or len(batches) != len(texts):
             raise CorpusError("analyzer response count mismatch")
         for text, tokens in zip(texts, batches, strict=True):
-            byte_length = len(text.encode("utf-8"))
+            raw = text.encode("utf-8")
+            byte_length = len(raw)
             if not isinstance(tokens, list):
                 raise CorpusError("invalid analyzer token array")
             end = 0
@@ -60,6 +61,10 @@ class GoAnalyzer:
                     or not end <= token["start"] < token["end"] <= byte_length
                 ):
                     raise CorpusError("invalid analyzer token position")
+                if raw[token["start"]] & 0xC0 == 0x80 or (
+                    token["end"] < byte_length and raw[token["end"]] & 0xC0 == 0x80
+                ):
+                    raise CorpusError("invalid analyzer token UTF-8 boundary")
                 end = token["end"]
         self.version = version
         return batches
