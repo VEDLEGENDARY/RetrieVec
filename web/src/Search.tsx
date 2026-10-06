@@ -1,6 +1,7 @@
 import { BasedOn } from "./BasedOn";
 import { SectionField } from "./SectionField";
 import { PaperDetails } from "./PaperDetails";
+import { PassageLocation } from "./PassageLocation";
 import {
   Button,
   ActionLink,
@@ -473,6 +474,15 @@ export function Search({
                 onClose={closeInspector}
               >
                 <PaperDetails paper={selected} />
+                {!selected.evidence_object_id && (
+                  <PassageLocation
+                    key={selected.chunk_id}
+                    passage={selected}
+                    collectionId={collection.collection_id}
+                    snapshotId={result.snapshot_id}
+                    chunkId={selected.chunk_id}
+                  />
+                )}
                 {selected.evidence_object_id ? (
                   <AdvancedEvidence
                     key={selected.chunk_id}

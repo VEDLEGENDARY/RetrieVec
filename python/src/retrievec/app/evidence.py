@@ -36,6 +36,45 @@ def install_evidence(app):
 
     route = "/api/v1/collections/{collection_id}/snapshots/{snapshot_id}/evidence/{chunk_id}"
 
+    @app.get(route + "/pdf-page")
+    def pdf_page(collection_id: str, snapshot_id: str, chunk_id: str, request: Request):
+        from retrievec.corpus.pdf_locations import LocationIndex
+        from retrievec.extraction.store import validate_png
+
+        user = principal(request)
+        registered = registry.resolve(user, collection_id, snapshot_id)
+        corpus, papers, chunks = load_snapshot(
+            store.path("corpora", registered["corpus_snapshot_id"], "ss_")
+        )
+        chunk = next((row for row in chunks if row["chunk_id"] == chunk_id), None)
+        if chunk is None:
+            raise APIError(404, "evidence_unavailable", "Passage is not in this snapshot")
+        paper = next(row for row in papers if row["paper_version_id"] == chunk["paper_version_id"])
+        locator = LocationIndex(store.root, corpus).attributes(chunk, paper)["pdf_locator"]
+        if locator is None:
+            raise APIError(404, "image_unavailable", "No verified page image is available")
+        checksum = locator["image_sha256"]
+        if len(checksum) != 64 or any(c not in "0123456789abcdef" for c in checksum):
+            raise APIError(409, "image_unavailable", "Retained image identity is invalid")
+        path = store.root / "pdf-pages" / (checksum + ".png")
+        if (
+            not path.is_file()
+            or path.is_symlink()
+            or not path.resolve().is_relative_to(store.root)
+            or path.stat().st_size > 32 * 1024 * 1024
+        ):
+            raise APIError(404, "image_unavailable", "Retained page image is unavailable")
+        raw = path.read_bytes()
+        if digest(raw) != checksum:
+            raise APIError(409, "image_unavailable", "Retained page image is inconsistent")
+        validate_png(raw)
+        registry.resolve(user, collection_id, snapshot_id)
+        return Response(
+            raw,
+            media_type="image/png",
+            headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
+        )
+
     @app.get(route)
     def inspect(collection_id: str, snapshot_id: str, chunk_id: str, request: Request):
         user = principal(request)
