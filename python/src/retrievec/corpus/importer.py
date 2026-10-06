@@ -106,6 +106,7 @@ def import_manifest(
     evidence_root: Path | None = None,
     wordpiece_budget=None,
     section_aware: bool = False,
+    metadata_enrichment: dict | None = None,
 ) -> Path:
     if type(section_aware) is not bool:
         raise CorpusError("section-aware setting must be boolean")
@@ -247,6 +248,21 @@ def import_manifest(
         if ordinal == 0:
             raise CorpusError(f"{path.name}: no indexable text; OCR is outside this milestone")
     extra = {}
+    if metadata_enrichment:
+        from retrievec.corpus.metadata import publish_metadata
+
+        if set(metadata_enrichment) - {paper["paper_id"] for paper in papers}:
+            raise CorpusError("metadata refers to a paper outside the source manifest")
+        for paper in papers:
+            record = metadata_enrichment.get(paper["paper_id"])
+            if record is not None and (
+                record.get("schema_version") != 1
+                or record.get("source_sha256") != paper["source_sha256"]
+                or record["fields"]["title"] != paper["title"]
+                or record["fields"]["authors"] != paper["authors"]
+            ):
+                raise CorpusError("metadata does not match the retained source record")
+        extra["paper_metadata_id"] = publish_metadata(output_root.parent, metadata_enrichment)
     if passage_mapping:
         from retrievec.corpus.sections import publish_provenance
 

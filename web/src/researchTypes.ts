@@ -1,3 +1,5 @@
+import type { PaperMetadata } from "./PaperDetails";
+
 export type Conversation = { conversation_id: string; title: string };
 export type SavedRun = {
   run_id: string;
@@ -12,7 +14,7 @@ export type Provider = {
   cloud: boolean;
   consented: boolean;
 };
-export type Evidence = {
+export type Evidence = PaperMetadata & {
   chunk_id?: string;
   evidence_object_id?: string;
   evidence_id: string;

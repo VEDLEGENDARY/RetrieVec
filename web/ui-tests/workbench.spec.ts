@@ -17,6 +17,10 @@ const hits = [
     rank: 2,
     chunk_id: "passage-b",
     title: "Lexical baselines",
+    authors: ["Synthetic Author"],
+    year: 2020,
+    doi: "10.1234/fixture",
+    metadata_provenance: { provider: "synthetic-test-fixture" },
     text: "Sparse retrieval uses exact term overlap. Hybrid retrieval combines lexical and dense evidence.",
     source_id: null,
     page_range: [7, 7],
@@ -88,6 +92,13 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     name: "Evidence inspector",
   });
   await expect(inspector).toBeFocused();
+  await inspector.getByText("Source metadata", { exact: true }).click();
+  await expect(
+    inspector.getByText("Synthetic Author", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    inspector.getByText("10.1234/fixture", { exact: true }),
+  ).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(hit).toBeFocused();
   await ranking.getByRole("button", { name: "Shortlist passage" }).click();

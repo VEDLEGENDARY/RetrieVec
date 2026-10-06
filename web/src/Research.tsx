@@ -1,5 +1,6 @@
 import { BasedOn } from "./BasedOn";
 import { SectionField } from "./SectionField";
+import { PaperDetails } from "./PaperDetails";
 import { stateLabel, exportLabels, errorMessage } from "./presentation";
 import {
   Button,
@@ -885,6 +886,7 @@ export function Research({
           snapshot={evidence.snapshot_id ?? run?.snapshot_id ?? "Unavailable"}
           onClose={closeCitation}
         >
+          <PaperDetails paper={evidence} />
           {evidence.evidence_object_id && evidence.chunk_id && run && (
             <AdvancedEvidence
               collectionId={collection.collection_id}

@@ -1,4 +1,5 @@
 import { recordTiming } from "./performance";
+import type { PaperMetadata } from "./PaperDetails";
 
 export type Session = { principal_id: string; csrf_token: string };
 export type Job = {
@@ -10,7 +11,7 @@ export type Job = {
   error_code: string | null;
   output_snapshot: string | null;
 };
-export type Hit = {
+export type Hit = PaperMetadata & {
   section?: string;
   section_heading?: string | null;
   text_offsets?: {

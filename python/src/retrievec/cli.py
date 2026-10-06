@@ -10,7 +10,7 @@ from retrievec.client.capture import capture
 from retrievec.client.http import Client, RetrievalError
 from retrievec.corpus.analyzer import GoAnalyzer
 from retrievec.corpus.importer import import_manifest
-from retrievec.corpus.snapshot import CorpusError, load_snapshot
+from retrievec.corpus.snapshot import CorpusError, load_snapshot, parse_json
 from retrievec.evaluation.report import evaluate
 
 
@@ -35,6 +35,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     ingest.add_argument("--collection", default="research")
     ingest.add_argument("--token-budget", type=int, default=256)
     ingest.add_argument("--engine", type=Path)
+    ingest.add_argument("--metadata", type=Path, help="Source-bound paper metadata JSON")
     ingest.add_argument(
         "--section-aware", action="store_true", help="Opt in to explicit heading boundaries"
     )
@@ -79,6 +80,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.token_budget,
                 GoAnalyzer(args.engine),
                 section_aware=args.section_aware,
+                metadata_enrichment=(
+                    parse_json(args.metadata.read_bytes())["papers"] if args.metadata else None
+                ),
             )
         except (CorpusError, OSError) as error:
             parser.error(str(error))

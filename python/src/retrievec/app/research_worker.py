@@ -91,7 +91,7 @@ class ResearchWorker:
             run["owner_id"], run["collection_id"], run["snapshot_id"]
         )
         store = Store(self.settings.store)
-        corpus, _, chunks = load_snapshot(
+        corpus, retained_papers, chunks = load_snapshot(
             store.path("corpora", registered["corpus_snapshot_id"], "ss_")
         )
         typed_index = None
@@ -103,6 +103,12 @@ class ResearchWorker:
         from retrievec.corpus.sections import PassageProvenance
 
         provenance = PassageProvenance(store.root, corpus)
+        metadata = None
+        if corpus["configuration"].get("paper_metadata_id"):
+            from retrievec.corpus.metadata import PaperMetadata
+
+            metadata = PaperMetadata(store.root, corpus)
+            papers_by_version = {paper["paper_version_id"]: paper for paper in retained_papers}
         with self.registry.connect() as db:
             self.state.access(db, run)
             for item in evidence:
@@ -113,6 +119,10 @@ class ResearchWorker:
                     attributes = provenance.attributes(chunk)
                     if any(item.get(key) != value for key, value in attributes.items()):
                         raise ProviderError("passage provenance changed")
+                if metadata is not None:
+                    fields = metadata.attributes(papers_by_version[chunk["paper_version_id"]])
+                    if any(item.get(key) != value for key, value in fields.items()):
+                        raise ProviderError("paper metadata provenance changed")
                 if typed_index is not None:
                     attributes = typed_index.attributes(chunk)
                     if any(item.get(key) != value for key, value in attributes.items()):
