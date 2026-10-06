@@ -10,13 +10,16 @@ from retrievec.corpus.snapshot import digest, load_snapshot, parse_json
 
 
 def audit(snapshot: Path, source_manifest: Path, source_root: Path) -> dict:
+    source_root = source_root.resolve(strict=True)
     manifest, papers, chunks = load_snapshot(snapshot)
     sources = parse_json(source_manifest.read_bytes())["sources"]
     by_id = {paper["paper_id"]: paper for paper in papers}
     analyzer = GoAnalyzer()
     summary = []
     for source in sources:
-        path = source_root / source["path"]
+        path = (source_root / source["path"]).resolve(strict=True)
+        if not path.is_relative_to(source_root) or not path.is_file():
+            raise ValueError("source escapes root or is not a file")
         raw = path.read_bytes()
         if digest(raw) != source["source_sha256"]:
             raise ValueError("source hash changed")
@@ -29,9 +32,14 @@ def audit(snapshot: Path, source_manifest: Path, source_root: Path) -> dict:
         )
         counts = []
         for start in range(0, len(paper_chunks), 128):
-            batch = analyzer.analyze([chunk["text"] for chunk in paper_chunks[start : start + 128]])
+            batch = analyzer.analyze(
+                [chunk["text"] for chunk in paper_chunks[start : start + 128]]
+            )
             counts.extend(len(tokens) for tokens in batch)
-        if any(not 0 < count <= manifest["configuration"]["token_budget"] for count in counts):
+        if any(
+            not 0 < count <= manifest["configuration"]["token_budget"]
+            for count in counts
+        ):
             raise ValueError("chunk token budget violated")
         skipped_pages = []
         for page, text in pages:
