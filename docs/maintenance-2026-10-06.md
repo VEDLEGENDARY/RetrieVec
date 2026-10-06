@@ -3,7 +3,9 @@
 The inventory examined all 51 historical PRs and the one repository issue using
 the authenticated GitHub API, including comments, reviews and check runs. The
 only inline feedback was seven threads on merged PRs #1 and #3. Open PRs #49–52
-had no inline or submitted review comments. No PR was merged, squashed, rebased,
+had no inline comments or substantive code-review findings; #49 had a Copilot
+quota notice, which is not a completed review. Review summaries on #1, #3 and #4
+also contained five suppressed findings, assessed below. No PR was merged, squashed, rebased,
 force-pushed or discarded during this work.
 
 ## Dispositions
@@ -15,6 +17,11 @@ force-pushed or discarded during this work.
 | PR #3, UTF-16 comment | The proposed compile error is incorrect. `go doc unicode/utf16.EncodeRune` confirms `(r1, r2 rune)`; the existing implementation compiles and Go checks pass. Resolved with no code change. |
 | PR #3, audit path containment | Still valid: a manifest could point outside the declared source root. The fix resolves the real path and rejects files outside the root before reading. A real-import regression reproduced both relative and absolute escapes, then passed after the fix; thread resolved. |
 | PR #3, implementation-status summary | That historical status document is absent on current main. Current design, benchmark and release records supersede it. Resolved as obsolete. |
+| PR #3, suppressed UTF-8 finding | Reproduced invalid start/end byte offsets inside a multibyte character. Reject continuation-byte boundaries with `CorpusError` before chunking; valid Unicode offsets and engine fixtures pass. |
+| PR #3, suppressed canonical-number finding | Reproduced Go accepting a manifest configuration containing `-0`, although Python canonicalizes it to `0`. Require canonical decimal spelling for configuration integers. Valid zero and negative integers pass; snapshot encoding, identities and published artifacts remain unchanged. |
+| PR #3, suppressed CLI-copy finding | Replaced the obsolete future-command description. Actual `python -m retrievec --help` now describes the implemented import, validation, capture and evaluation commands. |
+| PR #1, suppressed missing-workflow-input finding | The old workflow/status-file pair is absent on current main and superseded by current records. No unused historical files were restored. |
+| PR #4, suppressed revert-path finding | Historical revert/roadmap naming is superseded by subsequent restoration and removal of those paths. No old commits or history were rewritten. |
 | PR #49, Kubernetes path | Latest four checks were green and the PR is mergeable. Live cluster verification remains unavailable: `kubectl config current-context` reports no context. Keep open for review. |
 | PR #50, retrieval experiments | Latest five checks were green. Preserve opt-in configurations and the published rejection decision. Human PDF passage judgments and end-to-end optional layout-adapter evaluation remain open. Keep draft. |
 | PR #51, answer/workspace polish | Latest five checks were green. Preserve blank human-review fields and automatic-only/synthetic labels. Keep draft and preserve its stack on #50. |
@@ -32,6 +39,10 @@ the profile graph did not indicate a squash.
   and a regression using retained source bytes with matching hashes.
 - PR #52: `python/src/retrievec/app/evidence.py`, `python/tests/test_contracts.py`,
   `contracts/openapi.json`: contract metadata and drift protection.
+- `python/src/retrievec/corpus/analyzer.py`, `python/tests/test_analyzer.py`,
+  `engine/internal/corpus/snapshot.go`, `snapshot_test.go`: validated UTF-8 byte
+  boundaries and canonical configuration integers; both reproduced before fixes.
+- `python/src/retrievec/cli.py`: accurate help for implemented commands.
 - `web/src/tokens.css`, `web/index.html`: semantic light/dark material roles,
   typography, elevation and spring motion; regenerated browser theme colors.
 - `web/src/WorkspaceChrome.tsx`, `main.tsx`, `ui.tsx`, `style.css`: modular header,
@@ -50,7 +61,10 @@ the profile graph did not indicate a squash.
 | `python -m retrievec.contracts --check` | Reproduced failure; passed after generated contract review. |
 | Contract unit tests | Two passed after the PNG metadata correction; the new test failed before it. |
 | Import-audit regression | Both escapes reproduced before the fix; valid import and rejection assertions pass afterward. |
-| `python scripts/check.py` with isolated PostgreSQL/pgvector test DSNs | 148 tests, no skips; Go vet/tests/build, dependency check, Ruff lint/format and token guards passed. Initial lint/format findings were fixed and the full command rerun. |
+| `python scripts/check.py` with isolated PostgreSQL/pgvector test DSNs | Final run: 149 tests, no skips; Go vet/tests/build, dependency check, Ruff lint/format and token guards passed. Initial lint/format findings were fixed and the full command rerun. |
+| Analyzer boundary regression | Both malformed UTF-8 start/end offsets failed before the fix; all three analyzer tests passed after it. |
+| Canonical integer regression | Real copied snapshot with `-0` was accepted before the fix; after it, noncanonical zero is rejected and canonical zero/negative integers remain valid. |
+| `python -m retrievec --help` | Passed; lists the four implemented workflow commands with accurate descriptions. |
 | `npm run build` | Passed; existing Lucide module-directive warnings remain. |
 | `npx prettier --check src ui-tests playwright.ui.config.ts` | Passed. |
 | `npm run test:ui -- --workers=2` | 33 passed; 144 inventory captures across four viewport/theme conditions. |
@@ -95,7 +109,7 @@ doubled text, and material effects respect reduced motion, reduced transparency
 and forced colors. A historical import-audit root escape is fixed with a real
 regression. Existing domain workflows, consent and snapshot semantics are preserved.
 
-Validation: 148 Python tests without skips, Go vet/tests/build, web build, formatting
+Validation: 149 Python tests without skips, Go vet/tests/build, web build, formatting
 and all 33 UI tests passed. The inventory covers 1280px/390px and both themes.
 The rebuilt Docker demo passed real Keycloak sign-in, hybrid search and sign-out.
 Manual assistive-technology, other-browser, live-cluster and production-load gates

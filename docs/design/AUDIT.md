@@ -5,7 +5,7 @@
 The [material refinement](MATERIALS.md) adds a modular collection header and
 destination navigation, adaptive chrome and damped-spring press feedback. Reading
 surfaces remain solid. Reduced motion, reduced transparency and forced colors
-have explicit fallbacks. The full repository check passed 148 Python tests with
+have explicit fallbacks. The final repository check passed 149 Python tests with
 PostgreSQL/pgvector enabled and no skips; Go checks and the web build passed.
 All 33 UI tests passed, with 144 inventoried captures at 1280px/390px in light/dark
 and supplemental 320px reflow at doubled text size. Named contrast surfaces passed
