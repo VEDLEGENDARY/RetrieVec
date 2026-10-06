@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import httpx
+from retrievec.corpus.snapshot import canonical, digest
 from retrievec.evaluation.answer_pipeline import evaluate
 from retrievec.evaluation.answer_quality import (
     export_review,
@@ -43,6 +44,82 @@ def report_fixture():
 
 
 class AnswerQualityTests(unittest.TestCase):
+    def test_resume_preserves_failed_outcomes_and_rejects_changed_identity(self):
+        path = Path(__file__).resolve().parents[2] / "datasets/answer_quality/questions-v1.json"
+        dataset, sources = load_dataset(path)
+        provider = {"name": "local", "model": "Qwen2.5-1.5B", "cloud": False, "consented": True}
+        args = SimpleNamespace(
+            origin="http://127.0.0.1:8000",
+            dataset=path,
+            collection="fixed",
+            snapshot="pinned",
+            providers=["local"],
+            split="test",
+            timeout=30,
+        )
+        corpus = (
+            {"collection_id": "fixed"},
+            [{"paper_id": key, "source_sha256": value} for key, value in sources.items()],
+            [],
+        )
+        calls = []
+
+        def respond(request):
+            calls.append(request.method)
+            if request.url.path.endswith("/me"):
+                return httpx.Response(200, json={})
+            if request.url.path.endswith("/collections"):
+                return httpx.Response(
+                    200, json=[{"collection_id": "fixed", "active_snapshot": "pinned"}]
+                )
+            return httpx.Response(200, json=[provider])
+
+        resume = {
+            "schema_version": 1,
+            "dataset_sha256": digest(canonical(dataset)),
+            "split": "test",
+            "snapshot_id": "pinned",
+            "collection_id": "fixed",
+            "providers": {"local": provider},
+            "cases": [
+                {
+                    "case_id": "local/" + q["id"],
+                    "provider": "local",
+                    "state": "failed",
+                    "error_code": "invalid_answer",
+                    "human_review": None,
+                    "llm_judge": None,
+                }
+                for q in dataset["questions"]
+                if q["split"] == "test"
+            ],
+        }
+
+        def run(value):
+            return asyncio.run(
+                evaluate(
+                    args,
+                    {"session_cookie": "private", "csrf_token": "private"},
+                    corpus,
+                    transport=httpx.MockTransport(respond),
+                    resume=value,
+                )
+            )
+
+        result = run(resume)
+        self.assertTrue(result["complete"])
+        self.assertFalse(result["all_runs_completed"])
+        self.assertEqual(result["cases"], resume["cases"])
+        self.assertTrue(all(method == "GET" for method in calls))
+        changed = copy.deepcopy(resume)
+        changed["providers"]["local"]["model"] = "different"
+        with self.assertRaisesRegex(ValueError, "providers"):
+            run(changed)
+        duplicate = copy.deepcopy(resume)
+        duplicate["cases"].append(duplicate["cases"][0])
+        with self.assertRaisesRegex(ValueError, "duplicate"):
+            run(duplicate)
+
     def test_cloud_consent_and_active_snapshot_are_checked_before_mutations(self):
         root = Path(__file__).resolve().parents[2]
         path = root / "datasets/answer_quality/questions-v1.json"

@@ -63,8 +63,36 @@ TTFT is measured from worker start to the first nonempty model content token,
 excluding queue time. Nonstreaming, no-evidence, and failed runs may have no TTFT.
 Failures are retained and excluded from successful-answer metric denominators.
 
-**NLI check: NOT run. Human review: not performed.** The local Qwen run is in
-progress; a complete measured results table will be added after it finishes.
+## Recorded Qwen2.5 1.5B results
+
+[Measured report](docs/results/answers-2026-10-05.json): all 60 test cases have
+recorded outcomes; only 11 completed the pipeline. The local Q4_K_M model used
+4,096 context tokens, 1,024 output tokens, temperature 0 and seed 42. Its exact
+weights hash and provider identity are retained in the report.
+
+| Synthetic question kind | Completed | Failed | Published answer status |
+|---|---:|---:|---|
+| Answerable | 4 / 20 | 16 / 20 | 1 answered, 3 partial |
+| Partially answerable | 7 / 20 | 13 / 20 | 7 partial |
+| Unanswerable | 0 / 20 | 20 / 20 | None |
+
+There were 48 `invalid_answer` failures and one `provider_failed` failure. The
+automatic binary abstention score is 11/11 among completed cases only: all those
+templates expected a non-abstaining response. It says nothing about the failed
+unanswerable cases, completeness, or semantic accuracy. Human and LLM-judge
+citation precision, faithfulness and abstention scores are all **null**.
+
+Successful-case end-to-end p50/p95 were 64,158 / 90,332 ms; worker TTFT p50/p95
+were 37,524 / 43,915 ms (11 samples). The run resumed after a host pause and
+database timeout, retaining original failures. These timings describe this CPU
+run across sessions, not a controlled production performance comparison.
+The real API, PostgreSQL, Go retrieval and llama server were used through ASGI;
+an explicit isolated local evaluation session bypassed OIDC login. Application
+source was frozen at `2b78b88` throughout the run.
+
+**NLI check: NOT run. Human review: not performed.** Every human-review field
+remains blank. The stronger-provider comparison remains deferred at the user's
+request. These are **synthetic-question, automatic-only** results.
 No model weights, original paper PDFs, sessions, or credentials belong in the
 evaluation commit. Abstract-only synthetic results do not establish full-paper
 answer quality, production readiness, or superiority to another model.
