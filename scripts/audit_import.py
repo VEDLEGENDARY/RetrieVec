@@ -32,14 +32,9 @@ def audit(snapshot: Path, source_manifest: Path, source_root: Path) -> dict:
         )
         counts = []
         for start in range(0, len(paper_chunks), 128):
-            batch = analyzer.analyze(
-                [chunk["text"] for chunk in paper_chunks[start : start + 128]]
-            )
+            batch = analyzer.analyze([chunk["text"] for chunk in paper_chunks[start : start + 128]])
             counts.extend(len(tokens) for tokens in batch)
-        if any(
-            not 0 < count <= manifest["configuration"]["token_budget"]
-            for count in counts
-        ):
+        if any(not 0 < count <= manifest["configuration"]["token_budget"] for count in counts):
             raise ValueError("chunk token budget violated")
         skipped_pages = []
         for page, text in pages:
