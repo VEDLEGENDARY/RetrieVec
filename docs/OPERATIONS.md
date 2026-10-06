@@ -1,5 +1,14 @@
 # Deployment and development
 
+## Architecture
+
+React presents the research workspace through same-origin FastAPI requests.
+Python handles ingest, model adapters, consent-checked generation and workers;
+Go handles query analysis, indexes, sparse/dense retrieval and fusion. PostgreSQL
+holds ownership, sessions, jobs and saved runs. Immutable artifacts retain source,
+chunk, model and snapshot identities. Retrieval RPC enforces scope independently
+of the API. Generation is optional and does not change source authorization.
+
 ## Requirements
 
 Native development requires Python 3.13, Go 1.26, Node.js 24, npm and PostgreSQL 18. The workspace requires an OpenID Connect provider. Docker Desktop or Docker Engine with Compose is sufficient for the container workflow.

@@ -98,6 +98,7 @@ python -m pip install --no-build-isolation --no-deps -e ./python
 python scripts/check.py
 cd web
 npm ci
+npx playwright install chromium
 npm run build
 npm run test:ui -- --workers=2
 ```
@@ -111,5 +112,5 @@ Keep weights, PDFs, credentials and private data outside Git.
 |---|---|
 | Design and navigation | [Audit](docs/design/AUDIT.md) · [Core flows](docs/design/CORE_FLOWS.md) · [Performance](docs/design/PERF.md) |
 | Provenance extensions | [Sections, metadata, PDF locations and comparison](docs/design/PHASE5.md) |
-| Architecture | [System architecture](docs/architecture) |
+| Under the hood | [Architecture and operations](docs/OPERATIONS.md#architecture) |
 | Release | [Changelog](CHANGELOG.md) · [v0.1.0 candidate](docs/releases/v0.1.0.md) · [Verification](docs/releases/verification.md) |
