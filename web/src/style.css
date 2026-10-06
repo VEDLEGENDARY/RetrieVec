@@ -707,7 +707,15 @@ summary {
   overflow-wrap: anywhere;
 }
 .advanced-table {
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
+}
+.evidence-tray table {
+  table-layout: fixed;
+}
+.evidence-tray td {
+  overflow-wrap: anywhere;
 }
 .advanced-table table {
   width: 100%;

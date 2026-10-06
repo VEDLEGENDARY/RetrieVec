@@ -1,4 +1,4 @@
-import { Button, IconButton, Disclosure } from "./ui";
+import { Button, IconButton, Disclosure, ActionLink } from "./ui";
 import { Download, BookmarkCheck, X } from "lucide-react";
 import type { Hit } from "./api";
 
@@ -22,6 +22,20 @@ export function EvidenceTray({
   collectionId: string;
   remove: (key: string) => void;
 }) {
+  const papers = new Map<string, { item: SavedPassage; index: number }[]>();
+  items.forEach((item, index) => {
+    const key = item.hit.paper_id ?? passageKey(item);
+    papers.set(key, [...(papers.get(key) ?? []), { item, index }]);
+  });
+  const reference = (index: number) => (
+    <ActionLink
+      variant="quiet"
+      href={`#shortlist-citation-${index}`}
+      aria-label={`Inspect citation ${index + 1}`}
+    >
+      [{index + 1}]
+    </ActionLink>
+  );
   function download() {
     const blob = new Blob(
       [
@@ -73,41 +87,103 @@ export function EvidenceTray({
             evidence.
           </p>
         ) : (
-          <div className="passage-board">
-            {items.map((item) => (
-              <article key={passageKey(item)}>
-                <div className="passage-heading">
-                  <h3>{item.hit.title}</h3>
-                  <IconButton
-                    aria-label={`Remove ${item.hit.title} from shortlist`}
-                    onClick={() => remove(passageKey(item))}
-                  >
-                    <X size={16} aria-hidden="true" />
-                  </IconButton>
-                </div>
-                <p className="passage-meta">
-                  {item.hit.page_range
-                    ? item.hit.page_range[0] === item.hit.page_range[1]
-                      ? `Page ${item.hit.page_range[0]}`
-                      : `Pages ${item.hit.page_range.join("–")}`
-                    : "Page unavailable"}{" "}
-                  · {item.methods.join(", ")}
-                </p>
-                <blockquote>{item.hit.text}</blockquote>
-                <Disclosure>
-                  <summary>Evidence provenance</summary>
-                  <dl>
-                    <dt>Question</dt>
-                    <dd>{item.query}</dd>
-                    <dt>Snapshot</dt>
-                    <dd>{item.snapshot_id}</dd>
-                    <dt>Passage</dt>
-                    <dd>{item.hit.chunk_id}</dd>
-                  </dl>
-                </Disclosure>
-              </article>
-            ))}
-          </div>
+          <>
+            <div className="advanced-table">
+              <table>
+                <caption>
+                  Compare selected papers · every cell cites retained evidence
+                </caption>
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>Metadata</th>
+                    <th>Section</th>
+                    <th>Retained passage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...papers.entries()].map(([key, entries]) => (
+                    <tr key={key}>
+                      <td>
+                        {entries[0].item.hit.title}{" "}
+                        {reference(entries[0].index)}
+                      </td>
+                      <td>
+                        {entries[0].item.hit.authors?.join(", ") ||
+                          "Authors not reported"}{" "}
+                        · {entries[0].item.hit.year ?? "Year not reported"}{" "}
+                        {reference(entries[0].index)}
+                      </td>
+                      <td>
+                        {entries.map(({ item, index }) => (
+                          <p key={index}>
+                            {item.hit.section_heading ??
+                              item.hit.section ??
+                              "Unclassified"}{" "}
+                            {reference(index)}
+                          </p>
+                        ))}
+                      </td>
+                      <td>
+                        {entries.map(({ item, index }) => (
+                          <p key={index}>
+                            {item.hit.text} {reference(index)}
+                          </p>
+                        ))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p>
+                Compare reported evidence, not inferred winners. Missing
+                metadata stays explicit; each citation retains its own snapshot.
+              </p>
+            </div>
+            <div className="passage-board">
+              {items.map((item, index) => (
+                <article
+                  id={`shortlist-citation-${index}`}
+                  tabIndex={-1}
+                  key={passageKey(item)}
+                >
+                  <div className="passage-heading">
+                    <h3>{item.hit.title}</h3>
+                    <IconButton
+                      aria-label={`Remove ${item.hit.title} from shortlist`}
+                      onClick={() => remove(passageKey(item))}
+                    >
+                      <X size={16} aria-hidden="true" />
+                    </IconButton>
+                  </div>
+                  <p className="passage-meta">
+                    {item.hit.page_range
+                      ? item.hit.page_range[0] === item.hit.page_range[1]
+                        ? `Page ${item.hit.page_range[0]}`
+                        : `Pages ${item.hit.page_range.join("–")}`
+                      : "Page unavailable"}{" "}
+                    · {item.methods.join(", ")}
+                  </p>
+                  <blockquote>{item.hit.text}</blockquote>
+                  <p>
+                    Citation [{index + 1}] · Passage {item.hit.chunk_id} ·
+                    Snapshot {item.snapshot_id}
+                  </p>
+                  <Disclosure>
+                    <summary>Evidence provenance</summary>
+                    <dl>
+                      <dt>Question</dt>
+                      <dd>{item.query}</dd>
+                      <dt>Snapshot</dt>
+                      <dd>{item.snapshot_id}</dd>
+                      <dt>Passage</dt>
+                      <dd>{item.hit.chunk_id}</dd>
+                    </dl>
+                  </Disclosure>
+                </article>
+              ))}
+            </div>
+          </>
         )}
         <small>
           Exported passages retain their original snapshot and question.

@@ -803,24 +803,28 @@ export function Research({
                 </div>
               ))}
               {run.result.answer.comparisons.map((row, index) => (
-                <section key={index} className="comparison">
-                  <h4>{row.method}</h4>
-                  <dl>
-                    <dt>Dataset / metric</dt>
-                    <dd>
-                      {row.dataset} / {row.metric}
-                    </dd>
-                    <dt>Paper-reported value</dt>
-                    <dd>{row.reported_value}</dd>
-                    <dt>Conditions</dt>
-                    <dd>{row.experimental_conditions}</dd>
-                    <dt>Comparability</dt>
-                    <dd>{row.comparability_note}</dd>
-                    <dt>Limitations</dt>
-                    <dd>{row.limitations}</dd>
-                  </dl>
-                  {cite(row.evidence_ids)}
-                </section>
+                <div key={index} className="advanced-table comparison">
+                  <table>
+                    <caption>Cited paper comparison {index + 1}</caption>
+                    <tbody>
+                      {[
+                        ["Method", row.method],
+                        ["Dataset / metric", `${row.dataset} / ${row.metric}`],
+                        ["Paper-reported value", row.reported_value],
+                        ["Conditions", row.experimental_conditions],
+                        ["Comparability", row.comparability_note],
+                        ["Limitations", row.limitations],
+                      ].map(([label, value]) => (
+                        <tr key={label}>
+                          <th scope="row">{label}</th>
+                          <td>
+                            {value} {cite(row.evidence_ids)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               ))}
               <ul>
                 {run.result.answer.limitations.map((item, index) => (
