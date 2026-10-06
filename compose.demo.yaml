@@ -1,0 +1,64 @@
+name: retrievec-demo
+services:
+  init:
+    profiles: [demo]
+    image: python:3.13.15-slim-bookworm
+    network_mode: none
+    command: [python, /demo/init.py]
+    volumes:
+      - ./demo/init.py:/demo/init.py:ro
+      - settings:/settings
+      - store:/store
+  postgres:
+    profiles: [demo]
+    image: postgres:18.3
+    depends_on:
+      init: {condition: service_completed_successfully}
+    environment:
+      POSTGRES_DB: retrievec
+      POSTGRES_USER: retrievec
+      POSTGRES_PASSWORD_FILE: /settings/postgres-password
+    volumes:
+      - settings:/settings:ro
+      - database:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U retrievec -d retrievec]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  workspace:
+    profiles: [demo]
+    build: .
+    depends_on:
+      postgres: {condition: service_healthy}
+    entrypoint: [python, /app/demo/bootstrap.py]
+    environment:
+      RETRIEVEC_LOCAL_HTTP: "1"
+      RETRIEVEC_ORIGIN: http://127.0.0.1:8000
+      RETRIEVEC_OIDC_ISSUER: http://127.0.0.1:8080/realms/retrievec
+      RETRIEVEC_OIDC_CLIENT: retrievec
+      RETRIEVEC_PRINCIPAL: "*"
+      HF_HOME: /app/artifacts/store/cache/huggingface
+    ports: ["127.0.0.1:8000:8000", "127.0.0.1:8080:8080"]
+    volumes:
+      - settings:/settings:ro
+      - store:/app/artifacts/store
+    stop_grace_period: 40s
+  identity:
+    profiles: [demo]
+    image: quay.io/keycloak/keycloak:26.7.4
+    depends_on:
+      workspace: {condition: service_started}
+    network_mode: service:workspace
+    command: [start-dev, --import-realm]
+    environment:
+      KC_HOSTNAME: http://127.0.0.1:8080
+    volumes:
+      - ./demo/realm.json:/opt/keycloak/data/import/retrievec-realm.json:ro
+      - identity:/opt/keycloak/data
+    mem_limit: 1g
+volumes:
+  settings:
+  store:
+  database:
+  identity:
