@@ -132,6 +132,7 @@ def import_manifest(
     papers, chunks = [], []
     evidence_mapping = {}
     passage_mapping = {}
+    location_mapping = {}
     source_root = source_root.resolve(strict=True)
     for record in manifest["sources"]:
         if not isinstance(record, dict) or set(record) != SOURCE_FIELDS:
@@ -185,6 +186,21 @@ def import_manifest(
         ordinal = 0
         previous_section, previous_heading = "unclassified", None
         for page_index, (page_number, text) in enumerate(pages):
+            locations, located_page, location_error = None, None, None
+            if path.suffix.lower() == ".pdf" and not typed:
+                from retrievec.corpus.pdf_locations import PDFLocations
+
+                try:
+                    locations = PDFLocations(source, output_root.parent)
+                    located_page, location_error = locations.page(page_number, text)
+                except Exception:
+                    location_error = (
+                        "PDF geometry extraction failed; "
+                        "passage text is retained without coordinates."
+                    )
+                finally:
+                    if locations is not None:
+                        locations.close()
             if section_aware:
                 from retrievec.corpus.sections import segments
 
@@ -226,6 +242,10 @@ def import_manifest(
                     )
                 )
                 ordinal += 1
+                if locations is not None:
+                    location_mapping[chunks[-1]["chunk_id"]] = locations.passage(
+                        located_page, location_error, page_number, begin, end, chunks[-1]
+                    )
                 if section_aware:
                     passage_mapping[chunks[-1]["chunk_id"]] = {
                         "text_sha256": chunks[-1]["text_sha256"],
@@ -248,6 +268,10 @@ def import_manifest(
         if ordinal == 0:
             raise CorpusError(f"{path.name}: no indexable text; OCR is outside this milestone")
     extra = {}
+    if location_mapping:
+        from retrievec.corpus.pdf_locations import publish_locations
+
+        extra["pdf_locations_id"] = publish_locations(output_root.parent, location_mapping)
     if metadata_enrichment:
         from retrievec.corpus.metadata import publish_metadata
 

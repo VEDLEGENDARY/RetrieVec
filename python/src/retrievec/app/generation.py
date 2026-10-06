@@ -131,7 +131,16 @@ def load_providers(path: Path | None) -> dict[str, ProviderConfig]:
 
 def prompt(question: str, evidence: list[dict]) -> str:
     # JSON escapes stop document text from becoming ChatML control tokens.
-    data = json.dumps({"question": question, "evidence": evidence}, ensure_ascii=True)
+    # Display geometry is retained for inspection, not model context or token budgets.
+    supplied = [
+        {
+            key: value
+            for key, value in item.items()
+            if key not in ("pdf_locator", "locator_limitation")
+        }
+        for item in evidence
+    ]
+    data = json.dumps({"question": question, "evidence": supplied}, ensure_ascii=True)
     data = data.replace("<", "\\u003c").replace(">", "\\u003e")
     system = SYSTEM
     if any(item.get("extraction") is not None for item in evidence):

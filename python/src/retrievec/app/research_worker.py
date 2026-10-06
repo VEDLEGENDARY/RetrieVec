@@ -103,12 +103,15 @@ class ResearchWorker:
         from retrievec.corpus.sections import PassageProvenance
 
         provenance = PassageProvenance(store.root, corpus)
+        from retrievec.corpus.pdf_locations import LocationIndex
+
+        locations = LocationIndex(store.root, corpus)
+        papers_by_version = {paper["paper_version_id"]: paper for paper in retained_papers}
         metadata = None
         if corpus["configuration"].get("paper_metadata_id"):
             from retrievec.corpus.metadata import PaperMetadata
 
             metadata = PaperMetadata(store.root, corpus)
-            papers_by_version = {paper["paper_version_id"]: paper for paper in retained_papers}
         with self.registry.connect() as db:
             self.state.access(db, run)
             for item in evidence:
@@ -119,6 +122,12 @@ class ResearchWorker:
                     attributes = provenance.attributes(chunk)
                     if any(item.get(key) != value for key, value in attributes.items()):
                         raise ProviderError("passage provenance changed")
+                if locations.mapping:
+                    fields = locations.attributes(
+                        chunk, papers_by_version[chunk["paper_version_id"]]
+                    )
+                    if any(item.get(key) != value for key, value in fields.items()):
+                        raise ProviderError("PDF location provenance changed")
                 if metadata is not None:
                     fields = metadata.attributes(papers_by_version[chunk["paper_version_id"]])
                     if any(item.get(key) != value for key, value in fields.items()):

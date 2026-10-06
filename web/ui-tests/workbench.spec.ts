@@ -21,6 +21,14 @@ const hits = [
     year: 2020,
     doi: "10.1234/fixture",
     metadata_provenance: { provider: "synthetic-test-fixture" },
+    pdf_locator: {
+      page: 7,
+      width: 612,
+      height: 792,
+      boxes: [[72, 62, 130, 74]],
+      coordinates: "PDF points; top-left page origin",
+      extractor: "synthetic-test-fixture",
+    },
     text: "Sparse retrieval uses exact term overlap. Hybrid retrieval combines lexical and dense evidence.",
     source_id: null,
     page_range: [7, 7],
@@ -32,6 +40,14 @@ const hits = [
 async function openWorkbench(page: Page, view: "Search" | "Sources") {
   await page.route("**/api/v1/**", (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/pdf-page"))
+      return route.fulfill({
+        contentType: "image/png",
+        body: Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=",
+          "base64",
+        ),
+      });
     let json: unknown = [];
     if (path.endsWith("/me"))
       json = { principal_id: "test", csrf_token: "test-token" };
@@ -92,6 +108,14 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     name: "Evidence inspector",
   });
   await expect(inspector).toBeFocused();
+  await inspector
+    .getByText("Passage on original page 7", { exact: true })
+    .click();
+  const highlight = inspector.getByRole("img", {
+    name: "Verified passage highlight",
+  });
+  await expect(highlight).toHaveAttribute("viewBox", "0 0 612 792");
+  await expect(highlight.locator("rect")).toHaveAttribute("x", "72");
   await inspector.getByText("Source metadata", { exact: true }).click();
   await expect(
     inspector.getByText("Synthetic Author", { exact: true }),

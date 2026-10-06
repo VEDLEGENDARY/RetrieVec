@@ -1,6 +1,7 @@
 import { BasedOn } from "./BasedOn";
 import { SectionField } from "./SectionField";
 import { PaperDetails } from "./PaperDetails";
+import { PassageLocation } from "./PassageLocation";
 import { stateLabel, exportLabels, errorMessage } from "./presentation";
 import {
   Button,
@@ -887,6 +888,15 @@ export function Research({
           onClose={closeCitation}
         >
           <PaperDetails paper={evidence} />
+          {!evidence.evidence_object_id && evidence.chunk_id && run && (
+            <PassageLocation
+              key={evidence.chunk_id}
+              passage={evidence}
+              collectionId={collection.collection_id}
+              snapshotId={evidence.snapshot_id ?? run.snapshot_id}
+              chunkId={evidence.chunk_id}
+            />
+          )}
           {evidence.evidence_object_id && evidence.chunk_id && run && (
             <AdvancedEvidence
               collectionId={collection.collection_id}

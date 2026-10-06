@@ -58,3 +58,20 @@ retained its PDF, title, five authors and publication year 2021, and produced
 an immutable sparse corpus. DOI import was checked with deterministic Crossref
 fixtures, not a live publisher PDF. Full repository checks passed with both
 PostgreSQL and pgvector integrations enabled (142 tests, no skips).
+
+## Ordinary PDF passage locations
+
+Ordinary PDF ingestion preserves its existing pypdf text and paragraph packing.
+A separate hash-bound locator records page-text character offsets and actual
+pdfplumber glyph boxes. The complete non-whitespace page text must match the
+glyph stream exactly, so repeated phrases map through their retained offsets.
+Page images are derived from retained source bytes and served only after the
+existing collection/snapshot authorization checks, repeated before response.
+Original source retention and access rules remain unchanged.
+
+The inspector overlays those boxes on the corresponding page image. Mismatched
+reading order, multi-character glyphs, rotation, cropping, unusual PDF units or
+extraction failure leave an explicit limitation instead of guessed coordinates.
+Older snapshots and text imports also explain when a PDF location is absent.
+Geometry is excluded from generation prompts. Exact-box, repeated-text,
+source/text binding and mismatch tests passed against the real extractor.
