@@ -36,7 +36,13 @@ def install_evidence(app):
 
     route = "/api/v1/collections/{collection_id}/snapshots/{snapshot_id}/evidence/{chunk_id}"
 
-    @app.get(route + "/pdf-page")
+    @app.get(
+        route + "/pdf-page",
+        response_class=Response,
+        responses={
+            200: {"content": {"image/png": {"schema": {"type": "string", "format": "binary"}}}}
+        },
+    )
     def pdf_page(collection_id: str, snapshot_id: str, chunk_id: str, request: Request):
         from retrievec.corpus.pdf_locations import LocationIndex
         from retrievec.extraction.store import validate_png

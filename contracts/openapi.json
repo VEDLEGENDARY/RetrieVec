@@ -233,6 +233,27 @@
             "title": "Retrieval",
             "type": "string"
           },
+          "section": {
+            "anyOf": [
+              {
+                "enum": [
+                  "abstract",
+                  "introduction",
+                  "methods",
+                  "results",
+                  "discussion",
+                  "conclusion",
+                  "references",
+                  "unclassified"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          },
           "snapshot": {
             "default": "current",
             "enum": [
@@ -290,6 +311,27 @@
             ],
             "title": "Retrieval",
             "type": "string"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "enum": [
+                  "abstract",
+                  "introduction",
+                  "methods",
+                  "results",
+                  "discussion",
+                  "conclusion",
+                  "references",
+                  "unclassified"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
           },
           "snapshot_id": {
             "anyOf": [
@@ -2093,6 +2135,129 @@
           }
         ],
         "summary": "Original"
+      }
+    },
+    "/api/v1/collections/{collection_id}/snapshots/{snapshot_id}/evidence/{chunk_id}/pdf-page": {
+      "get": {
+        "operationId": "pdf_page_api_v1_collections__collection_id__snapshots__snapshot_id__evidence__chunk_id__pdf_page_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "collection_id",
+            "required": true,
+            "schema": {
+              "title": "Collection Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "snapshot_id",
+            "required": true,
+            "schema": {
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "chunk_id",
+            "required": true,
+            "schema": {
+              "title": "Chunk Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "browserSession": []
+          }
+        ],
+        "summary": "Pdf Page"
       }
     },
     "/api/v1/collections/{collection_id}/uploads": {
