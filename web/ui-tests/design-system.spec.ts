@@ -391,6 +391,20 @@ for (const width of [1280, 390])
       await measure("skip-link", page.locator(".skip"));
       await measure("footer", page.locator("footer"));
       const question = page.getByLabel("Research question");
+      await measure("control-boundary", question, "border-top-color", 3);
+      await question.hover();
+      await measure("control-hover-boundary", question, "border-top-color", 3);
+      const currentDestination = sections.getByRole("button", {
+        name: "Ask",
+        exact: true,
+      });
+      await expect(currentDestination).not.toHaveCSS("border-top-width", "0px");
+      await measure(
+        "destination-selection",
+        currentDestination,
+        "border-top-color",
+        3,
+      );
       await question.focus();
       await expect(question).toHaveCSS("outline-style", "solid");
       await measure("input-focus", question, "outline-color", 3);

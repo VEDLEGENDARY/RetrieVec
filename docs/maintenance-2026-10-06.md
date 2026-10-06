@@ -60,10 +60,17 @@ the profile graph did not indicate a squash.
 | `go doc unicode/utf16.EncodeRune` | Confirms two returned runes; historical compile-error suggestion declined. |
 | `kubectl config current-context` | No context; no live cluster claim. |
 
-The seven guarded contrast checks passed in all four inventory conditions. Light
+The ten guarded contrast checks passed in all four inventory conditions. Light
 footer/code/error/status ratios were 6.11/6.68/7.64/6.31; dark were
 9.94/8.51/8.72/7.18. Light/dark focus ratios were 7.09/9.31. These measurements
 cover named rendered surfaces, not arbitrary retained images or full WCAG conformance.
+
+The added unfocused-control check reproduced a 2.05:1 light-mode border failure.
+Dedicated semantic control-border tokens now measure 3.37:1 light / 4.26:1 dark
+in both resting and hover states. The selected destination's real visible border
+measures 7.09:1 light / 9.31:1 dark; it also has a distinct weight. The complete
+build, 148-test repository check, 33-test UI suite and real demo test were rerun
+after this correction. The README capture is framed from the top of the workspace.
 
 On Windows, the installed npm/npx Node entry points were used because the shell
 shim is broken. The unchanged isolated-database runner supplies private DSNs to

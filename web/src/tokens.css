@@ -42,6 +42,7 @@
   --surface: #ffffff;
   --surface-solid: #ffffff;
   --line: #a8b7c6;
+  --control-line: #7c8e9f;
   --brand: #076454;
   --brand-dark: #064f43;
   --brand-soft: #dff7ef;
@@ -103,6 +104,7 @@
     --surface: #1b2734;
     --surface-solid: #1b2734;
     --line: #62788d;
+    --control-line: #758aa0;
     --material-tint: #1b2734f5;
     --material-rim: #96b7ce;
     --material-shadow: inset 0 1px 0 #a0bed02b, 0 12px 32px #00000033;
