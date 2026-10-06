@@ -42,6 +42,9 @@ transform. Native activation, focus outlines and keyboard behavior are retained.
 - All three destination controls fit a single navigation group on narrow screens.
   Layout supports 320px with doubled root text; this is a reflow test, not a claim
   of manual browser-zoom or screen-reader certification.
+- Unfocused and hovered input borders meet 3:1 on their rendered reading surface.
+  The selected destination has an explicit contrasting border and stronger text
+  weight; its selected state does not depend on a faint surface tint.
 - Source images keep their original colors. Exact PDF highlights still require
   verified retained locators; unavailable coordinates are never guessed.
 
