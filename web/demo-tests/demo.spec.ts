@@ -48,6 +48,8 @@ test("real Keycloak sign-in, preloaded hybrid search and sign-out", async ({
     ),
   ).toBe(true);
   await expect(page.getByText(/unique passages/)).toBeVisible();
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await expect(page.locator(".collection-header")).toBeInViewport();
   await page.screenshot({
     path: info.outputPath("demo-hybrid.png"),
     animations: "disabled",
