@@ -25,8 +25,9 @@ type token struct {
 	position   int
 }
 type parser struct {
-	tokens []token
-	at     int
+	tokens          []token
+	at              int
+	analyzerVersion string
 }
 
 func lex(input string) ([]token, error) {
@@ -92,11 +93,18 @@ func lex(input string) ([]token, error) {
 }
 
 func Parse(input string) (*Node, error) {
+	return ParseVersion(input, analysis.Version)
+}
+
+func ParseVersion(input, analyzerVersion string) (*Node, error) {
+	if !analysis.Supported(analyzerVersion) {
+		return nil, fmt.Errorf("unsupported analyzer version")
+	}
 	tokens, err := lex(input)
 	if err != nil {
 		return nil, err
 	}
-	p := parser{tokens: tokens}
+	p := parser{tokens: tokens, analyzerVersion: analyzerVersion}
 	node, err := p.expression(0, 0)
 	if err != nil {
 		return nil, err
@@ -159,7 +167,7 @@ func (p *parser) unary(depth int) (*Node, error) {
 		return child, nil
 	case "term", "phrase":
 		p.at++
-		tokens, err := analysis.Analyze(t.text)
+		tokens, err := analysis.AnalyzeVersion(t.text, p.analyzerVersion)
 		if err != nil {
 			return nil, err
 		}

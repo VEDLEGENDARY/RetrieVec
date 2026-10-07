@@ -293,6 +293,17 @@ Create the namespace before creating its secrets:
 kubectl create namespace retrievec
 ```
 
+Register `https://research.example.com/auth/callback` with the OIDC provider.
+Create `private/db-password` with the PostgreSQL password and
+`private/workspace.env` with the following keys; replace all placeholders and
+keep both files outside Git:
+
+```dotenv
+RETRIEVEC_DSN=postgresql://retrievec:YOUR_ENCODED_PASSWORD@postgres:5432/retrievec
+RETRIEVEC_READ_TOKEN=YOUR_DISTINCT_RANDOM_TOKEN_AT_LEAST_24_CHARACTERS
+RETRIEVEC_WORKER_TOKEN=ANOTHER_DISTINCT_RANDOM_TOKEN_AT_LEAST_24_CHARACTERS
+```
+
 Provision `database-secrets` with key `password`, and `workspace-secrets` with
 `RETRIEVEC_DSN`, `RETRIEVEC_READ_TOKEN`, `RETRIEVEC_WORKER_TOKEN`, and optionally
 `RETRIEVEC_OIDC_SECRET`. Use a local private environment file or a secret manager;

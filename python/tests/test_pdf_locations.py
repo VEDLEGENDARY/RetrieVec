@@ -41,6 +41,18 @@ class PDFLocationTests(unittest.TestCase):
             altered = {**chunks[0], "text_sha256": "0" * 64}
             with self.assertRaisesRegex(ValueError, "different source text"):
                 index.attributes(altered, papers[0])
+            experimental = import_manifest(
+                manifest,
+                root,
+                root / "corpora",
+                token_budget=8,
+                chunker="paragraph-v2",
+                overlap=1,
+            )
+            v2_corpus, v2_papers, v2_chunks = load_snapshot(experimental)
+            location = LocationIndex(root, v2_corpus).attributes(v2_chunks[0], v2_papers[0])
+            self.assertIsNone(location["pdf_locator"])
+            self.assertIn("No verified PDF location", location["locator_limitation"])
 
     def test_alignment_failure_never_guesses_coordinates(self):
         with tempfile.TemporaryDirectory() as directory:
