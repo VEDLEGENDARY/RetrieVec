@@ -79,11 +79,14 @@ export function SearchRankings({
                           ? `Page ${hit.page_range[0]}`
                           : "Page unavailable"}{" "}
                         ·{" "}
-                        {mode === "sparse"
-                          ? `BM25 ${hit.bm25_score?.toFixed(3)}`
-                          : mode === "dense"
-                            ? `Cosine ${hit.cosine_score?.toFixed(3)}`
-                            : `RRF ${hit.rrf_score?.toFixed(5)}`}
+                        {value.reranker?.status === "applied" &&
+                        hit.reranker_score !== undefined
+                          ? `Reranker ${hit.reranker_score.toFixed(3)}`
+                          : mode === "sparse"
+                            ? `BM25 ${hit.bm25_score?.toFixed(3)}`
+                            : mode === "dense"
+                              ? `Cosine ${hit.cosine_score?.toFixed(3)}`
+                              : `RRF ${hit.rrf_score?.toFixed(5)}`}
                       </small>
                     </Button>
                     <Button

@@ -39,7 +39,7 @@ func Execute(ctx context.Context, idx index.Reader, request Request, config scor
 	terms := []string{}
 	candidates := map[int]bool{}
 	if request.Mode == "structured" {
-		node, err := query.Parse(request.Query)
+		node, err := query.ParseVersion(request.Query, idx.Stats().AnalyzerVersion)
 		if err != nil {
 			return Result{}, err
 		}
@@ -49,7 +49,7 @@ func Execute(ctx context.Context, idx index.Reader, request Request, config scor
 			return Result{}, err
 		}
 	} else if request.Mode == "free_text" {
-		tokens, err := analysis.Analyze(request.Query)
+		tokens, err := analysis.AnalyzeVersion(request.Query, idx.Stats().AnalyzerVersion)
 		if err != nil {
 			return Result{}, err
 		}

@@ -1,0 +1,4717 @@
+{
+  "schema_version": 1,
+  "policy": "explicit-headings-v1",
+  "datasets": {
+    "scifact": {
+      "record_count": 5183,
+      "input_sha256": "dec31c8182f3d744c7d2c09423756fd1d17cbef75808db13ba01cc0aab4d1ac6",
+      "records_with_explicit_headings": 0,
+      "records": [],
+      "whole_paper_sections": "unavailable"
+    },
+    "scidocs": {
+      "record_count": 25657,
+      "input_sha256": "328bb38854179c83ee40d4f49fae2ef7209ede7163785193cbdcd5906b28eecc",
+      "records_with_explicit_headings": 593,
+      "records": [
+        {
+          "paper_id": "befdf0eb1a3d2e0d404e7fbdb43438be7ae607e5",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "45e2e2a327ea696411b212492b053fd328963cc3",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4f0a21f94152f68f102d90c6f63f2eb8638eacc6",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6e91e18f89027bb01c791ce54b2f7a1fc8d8ce9c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c2b6755543c3f7c71adb3e14eb06179f27b6ad5d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "519f5892938d4423cecc999b6e489b72fc0d0ca7",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "525dc4242b21df23ba4e1ec0748cf46de0e8f5c0",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3d9e919a4de74089f94f5a1b2a167c66c19a241d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e030aa1ea57ee47d3f3a0ce05b7e983f95115f1a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a31b795f8defb59889df8f13321e057192d64f73",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "64eb627f5e2048892edbeab44567516af4a43b2e",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e170ca6dad1221f4bb2e4fc3d42a182e23026b80",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4e116ae01d873ad67fb2ab6da5cb4feeb24bbcb5",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "08d6c0f860378a8c56b4ba7f347429970f70e3bd",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "e38b9f339e858c8ac95679737a0852d21c48d89c",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "d012519a924e41aa7ff49d9b6be58033bd60fd9c",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6c1cabe3f5980cbc50d290c2ed60b9aca624eab8",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "55ea7bb4e75608115b50b78f2fea6443d36d60cc",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4c790c71219f6be248a3d426347bf7c4e3a0a6c4",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2f4bdb8f54ae1a7666c7be8e6b461e3c717a20cf",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "cbd8a90e809151b684e73fb3e31c2731874570c4",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3df4b372489e734beeb70b320666354e53eb23c4",
+          "sections": [
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "3ce29949228103340391dbb57e38dd68d58e9b9e",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6cbb6db2561ecee3b24e22ee060b01068cba6b5a",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1613a9fe64fbc2228e52b021ad45041556cc77ef",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0e52fbadb7af607b4135189e722e550a0bd6e7cc",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e1cfd9fa3f55c89ff1a09bb8b5ae44485451fb99",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ec76d5b32cd6f57a59d0c841f3ff558938aa6ddd",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "108200780ff50d766c1a13e2a5095d59b5a5421f",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "dd58d7c7083c1ee6e281fd2a5293653d4aecca5d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "74a5e76a6e45dfecfb4f4542a6a8cb1c6be3c2cb",
+          "sections": [
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "b3c346b3da022238301c1c95e17823b7d7ab2f49",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d1feb47dd448594d30517add168b7365b45688c1",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1a3fe9032cf48e877bf44e24f5d06d9d14e04c9e",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4c27eef7fa83900ef8f2e48a523750d035830342",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f45cfbb9377a7da8be3f0a09d7291a7b01bb79d2",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f5a1eeab058b91503d7ebb25fd3615480d96a639",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5c6f2becfb309e5b1323857bddc2c8fbc0c0ace5",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "b0bd79de12dcc892c7ed3750fa278d14158cab26",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c66dc716dc0ab674386255e64a743c291c3a1ab5",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "325be255b9eb19cb721b7ec0429e46570181370e",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "3e8482443faa2319a6c2c04693402d9b5264bc0a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b6626537ce41ccd7b8442799eb4c33576f1ce482",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c668bf08ccce6f68ad2a285727dbfb7433f3cfa7",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a0041f890b7e1ffef5c3919fd4a7de95c82282d7",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "af91a6a76f71a399794b10bcfa1500ffdef9410d",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "aa5a3009c83b497918127f6696557658d142b706",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7f1aefe7eeb759bf05c27438c1687380f7b6b06f",
+          "sections": [
+            "introduction",
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d0596a92400fa2268ee502d682a5b72fca4cc678",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8843dc55d09407a8b22de1e0c8b781cda9f70bb6",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "fd17fcc2d8736d270b34ddc2fbc8bfa581b7d6dd",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5ffff74a97cc52c9061f45295ce94ac77bf2f350",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ab575f3953b5e998439f3d17ac12c6c42e1f0220",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b13d8434b140ac3b9cb923b91afc17d1e448abfc",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "20b41b2a0d8ee71efd3986b4baeed24eba904350",
+          "sections": [
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8cbe965f4909a3a7347f4def8365e473db1faf2b",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7661539d276da03f63864e8df4162521af2d8184",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "e2c318d32e58a1cdc073080dd189a88eab6c07b3",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "28a7bad2788637fcf83809cd5725ea847fb74832",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "6e407ee7ef1edc319ca5fd5e12f67ce46158b4f7",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3a4fe8f246ad7461e52741780010e288c147906c",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e99b38c64aec6109a126f5f6e192b7ed7f1afb58",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b1117993836169e2b24b4bf0d5afea6d49a0348c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f9b7cb13eee257a67a5a8049f22580152873c0a4",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "803b70098fe8e6c84bb266e8f2abb23d785cc46b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ae0f81e746cb41562970711c94b53f9a53bb466d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e915fb1cd8285aad1b9aceebb510c50ce1e131d3",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "7336015b2de1c3a7accf7651c28939f7fa03cb9e",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "ae081edc60a62b1b1d542167dbe716ce7c5ec9ff",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a63b97291149bfed416aa9e56a21314069540a7b",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d6609337639ad64c59afff71637b42c0c6be7d6d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "78abaa22d3fdc0181e44a23c4a93ec220840ecd1",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "dbc6fa024c0169a87a33b97634d061a96492db6d",
+          "sections": [
+            "introduction",
+            "methods",
+            "discussion",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b208fb408ca3d6a88051a83b3cfa2e757b61d42b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a55d01c2a6d33e8dff01d4eab89b941465d288ba",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "c39ecde1f38e9aee9ad846f7633a33403274d019",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "baca9a36855ee7e5d80a860072be24a865ec8bf1",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5829ac859bd2b301cfd53a44194aecb884e99355",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "bdd7d0a098365a0a83cc15c11d708362fd2d748b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ab293bf07ac0971cd859595d86dd71c2fed5be9d",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "edc70c2b07c5bf343067640d53fbc3623b79b170",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "83e859ff4842cb7fbc4eca1ba68b8144897925d8",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d044d399049bb9bc6df8cc2a5d72610a95611eed",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "acdacc042f29dea296c1a5e130ccea7b011d7ca4",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "526f595dca4d9c61131df2dd2aa001398f6bea43",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "60756d9b0d8bf637b5ecdc1d782932903d6490f2",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2f5f766944162077579091a40315ec228d9785ba",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "1c8fac651cda7abcf0140ce73252ae53be21ad2c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "50dea03d4feb1797f1d5c260736e1cf7ad6d45ca",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1d89516427c0d91653b70171a0e8998af9d5960b",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "69097673bd39554bbbd880ef588763b073fe79c7",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "65130672f6741b16b0d76fde6ed6c686d5363f4b",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "94bde5e6667e56c52b040c1d893205828e9e17af",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "66d1a4614941f1121462cefb2e14a39bf72ddb67",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9c6eb7ec2de5779baa8ceb782a1c8fe7affeaf70",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b49ba7bd01a9c3627efb78489a2e536fdf5ef2f3",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "26a686811d8aba081dd56ebba4d6e691fb301b9a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1f3774fecbe0ee12a2135cd05a761a7d2b537e13",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "122374a3baf1e0efde03301226344a2d728eafc3",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e180d2d1b58d553a948d778715ddf15246f838a9",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d10dbb161f4f975e430579a7e71802c824be4087",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ea2ad4358bfd06b288c7cbbec7b0465057711738",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b6bf558edda0378cd756a0267801164109f5f5c5",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e2a533a7966b9c9d338149bac78bc3d7c1a3b420",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ff00e759842a949776fb15235db1f4a433d4a303",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "0390337f0a3315051ed685e943c2fe676b332357",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "901528adf0747612c559274100581bc305e55faa",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "bd863d284d552d9c506fc2978d4019d45101250a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "057dd526f262be89e6ba22bfc12bb89f61537c6b",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "242a3f4c68e6153debf889560390cd4c75900924",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "108520cc4be3b7558fc22b8287999f921f01b34d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e7830a70f9170eccc088b5e70523b4aa1cc03b6a",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "cfa6986dd9f124aeb5c9430a5f5b638fb71d405b",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d78c26f2e2fe87ea600ef6f667020fd933b8060f",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "48444fdfe803bb62d3f1a5595f5821954f03b6ea",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "25f3d15130c2e5591d7daf6f69e88edbcfc1ab9d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e346cb8ecd797c7001bab004f10ebfca25d58074",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9d526feb12b50b8956432dde911513b55f708bdd",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "744fdd298a2abff4273a5d1e8a9aa3c378fbf9d5",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "338557d69772b2018793e026cda7afa091a638dd",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "48451a29f8627b2c7fa1d27e6c7a8c61dc5fda7c",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "045b415f039ca547e0720f6bbc7d80256c725681",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "523eea06d191218488f11b52bed5246e5cdb3f31",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "fa4cdf31d062cae4d6425648a28b88f555ad71f4",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e6049b61e7e963a206a3a8e3d6447b672a794370",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "28fadbb09e3bf36e58660b30e626d870de43785a",
+          "sections": [
+            "introduction",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "b25bf94033b726d85b44446551e0b4936be2e4f7",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8c0062c200cfc4fb740d4c64d310068530dec58b",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "83b01b5f8c127a081b74ff96952a3ec9695d9e50",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d3339336d8c66272321a39e802a96fcb2f717516",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "66903e95f84767a31beef430b2367492ac9cc750",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ec5bfa1d267d0797af46b6cc6f69f91748ae27c1",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e9bb3ca7558ea0ce9ca7d5c965e4179668d69d0a",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d7d901a9e311e6c434a8a39566d1ed2845546f5b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1797a323f1024ba17389befe19824c8d443a0940",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ede538be81d0d2f7982500374a329be18438881d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5863433b7f1fd3e73aba0b747b530012f3679bc8",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "18767cf566f3654318814a18f418325047167e06",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c517f80aa000dd91f721f0ab759ceb703546c355",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "36d759b46c001c28247a03129db81bda2f3c190d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "28a500f4422032e42315e40b44bfb1db72d828d2",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "13890c2699dd12a4f4d722b9f35a666c98b8de45",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4c68e7eff1da14003cc7efbfbd9a0a0a3d5d4968",
+          "sections": [
+            "introduction",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "0483a8aa5992185b38f69c87d2f5db15a9de3294",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5bf3bf0e7725133ccb3ee3bba6a2df52ec8d4abf",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "fd06836db095e897ca83c43820d1d44fb481201a",
+          "sections": [
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "82ad99ac9fdeb42bb01248e67d28ee05d9b33ca8",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "da86e24280d596ecda32cbed4f4a73d0f3695b67",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e3454ea07e4e618989b9d6c658c3653c4577b81b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4af39befa8fa3d1e4d8f40e0a2460937df3dac4d",
+          "sections": [
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c2bd37348784b4e6c16c7ab5ca8317987f3a73dd",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c8ea1664d0cf4823b5ffb61a0d2f6dbda2441c49",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0db7dcb8f91604a6b9f74bd789e70188377984ea",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a6507332b400340cce408e0be948c118d41f440a",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7097d025d2ac36154de75f65b3c33e213a53f037",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "54efb068debeea58fd05951f86db797b5b5e4788",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "18163ea60e83cd3266150bd4b7d7fd3a849ee2db",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "73623d7b97157358f279fef53ba37b8d2c9908f6",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c160ae4b1eed860e96250df2d7ecd86a0120c0a2",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4f564267ba850f58a310b74b228b0f59409f2202",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7e8064a35914d301eb41d2211e770b1d1ad5f9b8",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a2eb1abd58e1554dc6bac5a8ea2f9876e9f4d36b",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4f7886b0a905d9c5c76327044482e60b5799584e",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3895b68df599bda93c3dc2e3aca3205bf6ab0783",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7ff528c57aeaf0afadcd03d4c7cbcb3d8c7eb5d0",
+          "sections": [
+            "introduction",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "5501e5c600a13eafc1fe0f75b6e09a2b40947844",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3eefbcf161b5b95b34980d17c042c7cb4fd76864",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "45a9c00b07129b63515945b60d778134ffc3773f",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "aef8cbfbf08ed04ba242d15f515d610d315f9904",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f62b9c6ef565e820d21dfa64e4aed00323a50417",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3832b8446bf3256148868ce62d84546e48c0a7be",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "fa7bf12a18250018c6b38dcd5ef879a7a05a4c09",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "77768638f4f400272b6e5970596b127663471538",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "cce2dc7712e0b1fe8ae1fd0ea3148a5ab3cc3c07",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6b30fce40a8a5baae028c50914093d32ba37a60c",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "59a50612fbdfa3d91eb15f344f726c5b96783803",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "648b03cfa3fa899019ebc418923fa7afdcd64828",
+          "sections": [
+            "introduction",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "d29ef3a422b589c33e123d37d66c97316f2c1c92",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0d636d8241b3c578513f0f52448198c035bb717e",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "f61dd368316f45bc45c740aba9570b93ea48c40a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "528dd75a9b3f56a8fb03072d41565056a7e1c1e0",
+          "sections": [
+            "introduction",
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "bd7eb1e0dfb280ffcccbb07c9c5f6bfc3b79f6c3",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b3f1d0a8b2ea51baa44461bddd627cf316628b7e",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "33ef870128a5a7ea3c98274f0753324083b955aa",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "4e8160b341556d11ea11a636f4e85f221e80df92",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "04cf655bfc5da8ae164626034734e1d409adf5ed",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b65f3cd5431f91cca97469996f08d2c139d8ef6a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "407ee40d3f6168411e4b66eec003e416f6195466",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "be410f931d5369a5bdadff8f94ddea7fb25869ce",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d0399694b31c933d66cd2a6896afbd5aa7bc097d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ef8f45bcfbc98dbd7b434a2342adbd66c3182b54",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2a361cc98ff78de97fcd2f86e9ababb95c922eae",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c5d34128e995bd0039f74eba2255c82950ca4c46",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a44ebe793947d04d9026a42f9a28c962ff66c5c6",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c47b829a6a19f405e941e32ce19ea5e662967519",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e911518c14dffe2ce9d25a5bdd8d0bf20df1069f",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "37d0f68ed0d6a1293d260cc2a43be462b553c0f6",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "211efdc4db415ad42c7c5eb9b0457c84ad23ef30",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4424a9788e70ef4a1d447f6e28c1fc0c7cbdefc0",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "946716c6759498d1ee953ad6d13b052a5052c6a8",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4b278c79a7ba22a0eb9f5f967010bf57d6667c37",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "61d530578b8b91157cda18c5097ea97ac2f6910e",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0cbda5365adc971b0d0ed51c0cb4bfcf0013959d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b1ec21386d1573b9a9ad791c434aca576378ee9b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a90d4559e7d4fb07b1ae495f5062aa83ce84ef4f",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "07c00639d498de8b3aa0c3ee50dd939cd03fce7d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a17a069a093dba710582e6e3a25abe67e7d74da7",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8ee4ed49fbf411fb25ba3119c2bc5c5f27a3e93e",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1a4134f85c9b5cb0697a3213308c148e7e53afee",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a697e3eb3c52d2c8833a178fbf99dd4f728bcddd",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5332dbbdba1f4918b0fe164036dd76623848e66e",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3164ff63c7fd8f062e0d3c487059630def97955c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "25ea0f831c214ee211ee55ffd31eab719799861c",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f98990356a62e05af16993a5fc355a7e675a3320",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d12f2be30367f85eb9ca54313939bf07f6482b0a",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a1420a6c619d2572109abfb4a387f70c2fc998ff",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "01eff5a77d72b34ea2dfab434f82efee91827519",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9b35f4dcaa1831e05adda9a8e37e6d590c79609b",
+          "sections": [
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "a7ebc07154979549def2c39e33ad711ae5f41c65",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6d9dc7c078bc32f2b7c17637ecc60e5ffe410897",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ac7257f58991d63ec9541b632a3c19d7c3db4275",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "169edc215baf08a96f626fc8edf35aec6772576b",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e394b3ff9d2968f6e9559f1fbf461f8093487614",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b935782a365384758e79fd18edbcab2738e475f7",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4fc5358d34053a18c0ea715c8a12dd533f69eb2d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "44390b470f08932829076f59f02c3b0d6e702cb9",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "a62131bcfe971af9c421025dcb850dcb32f9f7b3",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "903683bd91d0c67f566121a7351569edd7a4cb1a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5bb875e3db6b9a845d78b25265a9e661024b13e1",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f2382c15763fb5c2b8cb22a1de7beaf64dd96c3b",
+          "sections": [
+            "introduction",
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b71aa6ec14d0714c0ccc0a76654166cfe53c7ec3",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a3daa12e3535065e82cc1806058be31c42c48f5d",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c5021337a11be124cb126fc2e9fa847aa3778228",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5ec2ffed443fff4917bd86e0b9c6507df3b13f70",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7f14e2bfdfd2d55e3836d116724484c56d84f859",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9e2cd1ad32759a4307f789b757a115b71907703f",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "cd6a0adcceaa9d743db83305cec9b1bff37b443d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "67d137d0496d7339e302c18d693c7ec960ddf733",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "410b473157a19bff7af01a0586664a956988c66d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e497b884938f491a9fd53b89f54a15ee8ecf6ce9",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "69d603d7ecb4c66d6636d9698ec04598aecbc1e2",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b7fb576498a0bde9a0ebd1f79f51b034a4b83bc9",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "212cdc602cf9222297beaa9cbdb7792441ceb7e4",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3e9d005447307990b63854933812749e2ebdef1d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a555de6cb4fa0491d5618e1bfd192cd613eb72e9",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "df46dfaebb86a62d7dc31bd3e8857fe9eb0abb84",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "390ee4176b464148d67a16af088802b937845221",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9eb145ff069c6bb23b5d3b95a7081f360047558a",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c665f4a9b2ca7beb4ad4a7221e8830ea38b8d769",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "504c1ff1557dcffeda90be5bccf90c94dcd6aa4e",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5304becaddedc7f91085e825f650187a1932fe60",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "29caa4af6b719b87ebdd2ed46dabf7fb0a3a8602",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "87a4faff907a55953e10cee1603a6e438bdf228e",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6dd657465d5ddb0f827df674920da635d97b50d3",
+          "sections": [
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "f8a2cf86baee7f68509576a923831539b35b13d0",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "eca39eb10435a7f4825431e733616c9900f502aa",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8dae4b64804974d542b819eca6b8393ee458307a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "55840cff7f84c970207b65f084e33cb0992fe45b",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "2ffc08388367569d4eb99aa05b224dc92f299164",
+          "sections": [
+            "introduction",
+            "methods",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "47843b4e522b7e0b792fad6c818091c996c5861b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3371fe1086029f6f34c8a8eb2b6ef61e86920bdd",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "cacfb6df4937059a166c0c59b2ad152c9b67c42c",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "079607a10e055e02224a2cceb4820cda34dea4ee",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e5e9d64984b28f24a7423ada022d843e341b4351",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a1f87939a171de1bdd1a99a8a16eb11346285bc7",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f6eff6b7b5f05d5ee81232ed0aa69efad01c9c2b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "60fc396b7f4d3c817337db14648a7250e21d90e7",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f1592442297d172f5c07887bbaa609f0b169fc26",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "4440af6f81e78f04c6e923b076d276dfb977ac37",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2d86e73e56aa4394fe4ac9a6ed742d850abc73ce",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "fd75ab282acbfa4f248c204af3e4574e9ea8d69b",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "22b2bcdbabc47757505cceaeefe8d93be2d2d1ae",
+          "sections": [
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "d258b75043376e1809bda00487023c4025e1c7a9",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7a3bc1b39e914ff10386ce0e6db24b64e0e2378c",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "476244bf49d3153a8b3c3fad4aac38848579a314",
+          "sections": [
+            "introduction",
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "44d859ba961c5ec3c3ebd5203b221dc596cea1c3",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "09dd654a4007754a4551c624671468cfa5f08867",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a6cdb31e20b7a102c7c62b768caf717f9226cd37",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "536727a754e1d04bd2a749a813c0ac68eb2bb1f5",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9b312435f460f8137aa0b083b999794f676d9a38",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3ccb694c2363d73afa300b26bfa8b59115a7f278",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "38c205162aacb20cbdd47fb60e585929189d2770",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d018519d0f844228557b30f8e2b887fae4f3c2a1",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c78d55112529472d6b7f7adb5ec5993bcd8df952",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2f9677eafcea2537585a3c3b717284d398fa3747",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ad8626a0d99a6cdea5179a01a2c06f84a72c1a75",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "29975c4969e5a473317ca3012c1c7e45350699b2",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3366030d7a0cebe35087c1dbb39d7bbddd17993a",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "4c3396fcdd149ac2877201068794a3fca8208840",
+          "sections": [
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3ba399dc9d678a852223953f57f23184204fb360",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "aa5de1112a3e91a26e1362ae1ae0f323b6707811",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6eb6f722499acb3783bcb67f01447f3c59854711",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9689b1b7ddcb203b6d9a8f633d8bbef71c44a44c",
+          "sections": [
+            "methods",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "acd5d3ea9e88c96b63b6594d5c59961425986785",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "575039bf87823fcccd1d2597baf296367d13b7b0",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a37aeb94b56be9943198cb57021251cc0668ef3d",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0236a9d8e9d3a648a5a945524f79b75dd5d01edb",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8de327d3ec7b2b3a9ec007cdf532360482bd8017",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5642eb6d333ca0d9e3772ca007f020f6e533c46c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4529c536c241e0e1deaf6f8d03c9e340684e9412",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "29cd61d634786dd3b075eeeb06349a98ea0535c6",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ed28ce5a2d74e28949f33ae9bb521c4795b53df2",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4bd837a78ed8a217b6da10adbb391a61ac42ebc6",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "312ecc16ff1ac3d5fe896bb29df5fd8da2a50573",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a54559bc351726d481e94e47094af11287c01ea6",
+          "sections": [
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "981414fb045bf10380e3a154da9b7555b8334ad8",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "66326f2e81838c23f92d427f69ebc16c33e1006b",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e64d6db47ed60e8c6f446ec7a34d869a05c44e0f",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8c250dfbdeb96976a3f8be1a90f7052c5d8d9130",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2e02d25a3b7f9e287a572900e6f5c4800e94ca2f",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0f6af4ad085494b94c6ac66d187ccfd91800ba55",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "bf341864280ae25a35d2db236bfff05b3a3b8e2e",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3c045560f824473172027c89eaeefa46260afe55",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8ff35ce40d89b02bff71ed03da24bbd3ce383df3",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9cb7c36728cd09cabf30a3bb04d5daefd2a86e9d",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "9c222a6d7ca4b305be445c73d89a6f2485b04f31",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3dbc3541609c97dce9b3d991604689fdbcfd6964",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "adeef1a00a7dcee03a9de566e6c53ab134becdd9",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5164d01ff133ef3aeb04b44d0e10efb19316267b",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "1fda076db531e56feb00b4c256f270eff97c3da7",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9c3ca80ef875a356e642a33b19c954da3b217e01",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "65424ccfbf1ae9498e909aa94d42d2af2a111268",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c67a8f1da910152dcfda706bda25a37164a75110",
+          "sections": [
+            "methods",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "41c3dfda0d261070d84a2070c8b70b1f86cab52d",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1d76607a7b8f996dfa2562bd28322b6c1544f32b",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "bc67a6e3d4dfa1d463a69db0b697298d86daea1d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c7e4ca76c31ffe2a63ea3d1fc33b9a39824cb90a",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b94734cae410afda30da9c6b168b17a8cdd0267a",
+          "sections": [
+            "introduction",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "555f5848923c83e2e7a7c21e0a5b7dce7cf2394c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3f7a6b561ac1519856c3c4214d25f8144ba4eb46",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "386a8419dfb6a52e522cdab70ee8449422e529ba",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "27d205314a4e416a685d153a8c7bd65966f9f7d1",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "57044431b148c2fb365953899337b593f2adba5c",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7ca069e923d0fbbc1b700786357c1772ac625ad9",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "6bed44cc1bed40a23f598d1a6c6a2b3ebb72bdc9",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f3ef161eea5efee306b9579b3e3a0362ef771af3",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "74f661e3213529c7ad54e2794bc28d7ef13f90e0",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4356893d96e116b8aedd918e243f8d165cce1da2",
+          "sections": [
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b41b3fe42675d5cd1e74463098b2f6b0008cf46f",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b92e1545fe1ac506a2649a2086e51840a8651b82",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e5f42f1727e77cdb300dee189e323ce6710df813",
+          "sections": [
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "058879dd03907ba4910e8da64ce521c2be1a11c5",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "1cb051fe38814109803218301a2156e0b1649c88",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e742d8d7cdbef9393af36495137088cc7ca4e5d5",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c1369d9ebdde76b855bd8a9405db65400af01620",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "fa6f01cc26d2fd9ca7e6e1101067d10d111965ab",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "52f71dd1d0dce311869fc0dd5623b2ac917d3f61",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "81ada473d6bf2b6cda837d869579619a9e009338",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d5304dcb730b86b5af756e3c59ff8f63b67119b8",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "936b23b7611fdebc8c002b34f309762f4d719571",
+          "sections": [
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a0bca6dbb9232bc2a868f27b7d07acd08d0a1622",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7d2196f89d0054f4665a124fd92d88d7a06894ba",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d60c52a77e974797b14774f22bff06faa1e03003",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7abfc23db18808f96b2d5f471194443ecd58a2ce",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f825b2dfac69d2e161b128189bf06318b0bda00c",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ccbf2067133a2caa7f8a01ebdcf882e85a704374",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "360071e2f644fdecacaddca9d4af6188dc89846b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2fd8689da8211fa0a9c224a91610ed4083adeb55",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e570d707d5ea094cb6cb5ad63083a4831fd4ac8c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ced4d6cf95921608c91b3fcf52e96fc758f0912d",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "40f913627f9c554686e2be02333ca719032e8012",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7c62116714a9b8a9222083b0f688ec7d423e81ac",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "903579c8503c773531305373b58a1579c41df6da",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "4e2af96503b687ebdb488df8a294fe3cdeafd653",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1adee499c87210c6973717caac5b275988503d1e",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ca907b01355ae3fbb528c19283160a4f133f5d3e",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "635ec42247bd80bd41fd1f4a1b0618c2a9e0f1fc",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9d2ea884a8103ad756e9a743fab9cf2f95f054da",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "5332e304313225d9e7bab79117f5b15783d8b09f",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b271d7ab632ebb9eb4f2c979ee666844aaec218e",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "596c4b9e0b7817120acb917cff4728fab9f95ca8",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f1a394cc3aaad04c6aaf0dd7fde6bf0572d6fd44",
+          "sections": [
+            "introduction",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "690bc3fd6b30cd82b0e22b55a51f53e114935f09",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "f1da8ff91712c0e733166db7e4c5de97b0dc698c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7db09ea901b308ae8dc41b3d5e916bd41f46f385",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "555506a4ed9c3b5e96e9ccd5c05fbe127323932c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "898982b6ffb591e52d783fb9e85ca3d4e4ddea87",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "697d28f8c1074b67ac6300ca6ca46c8f913380da",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "40b5ebd81c556a3799100689d1e92a5af7f895fb",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7fb9383f368c4dd40e605bb5bca0f1daec965df3",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e26cbabe8c60f1c62616917410f47ac2ad7d7609",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d59239df881e4839e4bdc3f9f61867c69bafcb0e",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f5ea5a7c7dee975883cb39a6a84566ff311b977f",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c26b6b3c828ccd24eec011467ab6e328919fda9a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4360e434f56032b08ee19561c21aa22250e01ccd",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f879a87d69a531646de069317cb9478a4ee5bee2",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7da34b637b8801df6d6b5c8b455a5deeb5faac05",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9be787ea1c0a649656fcdbf2e9fe8a575f592d52",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "569bdc4061467cd0827cfaedacab4d6b770c9492",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "94ea49024281f6e922e38887adbf93434ac2991a",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5b24ec5dc67169c3ddbd671d09fc62b6d15f9bd0",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "46033ddbf93e8fa8cfafbd8a0cf6bf76a9a68fc6",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "675b402bd488aae006ff9a9dd0951797558b2d6d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "07e0100c44d6f635f2aa44edd38adfeae3c159c4",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "88768a8ffa3574fce845ffa841686cfeed267267",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7bcbe5d58352ffc97123526a8fe7188c6185dc2d",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "dca6b4b7cc03e565481e4d8fb255d079c2e61cbb",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5d1f2136c3fc17b5ed0864cedcfcca5173ffeaa2",
+          "sections": [
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "d4d09d20b869389f7313d05462365a9d77706088",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2621c894885e3f42bca8bd2b11dab1637e697814",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d2f5c15df36ef495d176a5683de636eef3089359",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5728401922a96d0918b041162180873079b44db0",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4d36efe9f3568ad31ae48e287d81e03588a201d8",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "eb7ba7940e2fda0dfd0f5989e3fd0b5291218450",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "820db2f7f1245f9dca77a7bfd0c8081078573976",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "742ae6841eefa0ce5ec2f22cef938f88e660f677",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "ebf3b172f640b6e4f565ae72247c91825d4fa527",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5cd7273a0e81c241b2e502a80447b128358e77dc",
+          "sections": [
+            "introduction",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "c9824c687887ae34739ad0a8cd94c08bf996e9ca",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a9fd7321bddc2527397b3c44096b9f9c7915c4da",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "654f0dfe78333cc5824a507486f7cede751cd301",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2e5d3eeb4fbcfa60203f2bba46cb0fbe3c3a2e84",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "202b797c1ed589027978ed52997df67d53155738",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7e48ecaee001358a19cda8cbdc9081239834cb54",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "2bab122e886271733c3be851b2b11b040cefc213",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "098463dcd780b59d966cc76336b9beb1c85f6499",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "ac960d2baa95944a83b28410e5e299ebca8ddc37",
+          "sections": [
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "12d29accd24976eb4f27bcf26b5d5093dc2b24a7",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b4ed1f783a5f8ae219dd9042ee0b180fd9e1d261",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "76f4d82775819f7c70bd211fc4334336bff0eea4",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "cf03950cbed331c1a7a8770cfaa64b7e005facfc",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4c359447d4759efcdfe2ac37a7bdfa7c0d56544a",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "078e6aee9d0327a851ea04709452d642df8fbafd",
+          "sections": [
+            "introduction",
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "42a6372f9e447d086f51b1a0ab629d5775fdc85d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1867459df0d6cd15d9c0bba81c35c4db6d813fec",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "8f67e7287f545f644abb9086eb33e25f978bb87e",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f7a4a0b2ed6557e4eb9e09a8e74d94de23994c60",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f69faa33b0ce5597dbdfb772ef12495f4f1391eb",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5cb332dbb797cadd573ebc5f6d2149786e09cc47",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4a8c279e01ca4c713f1be72f4fde0031a53d0c14",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "391c00495de723dd459e9834c8af0a353fe44b92",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "e901162b6dca552b213a010bfab318d5445227a6",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7721cd34379cfebfce7925e38f4832364f404eda",
+          "sections": [
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b51e6bf2f9dc38f76c55ea2caa185b11833901ee",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0f32f3a8e401f863899b0ef623a721a0996e7ae3",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f8cd248abc151a5b972cf7797be94aac0bd4f5e1",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "843b208402a8c52883e7e96d3a5d218fda39e541",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8f343dccd9c87a1d388e8fbc0fa716f623d6e690",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1ed2f698fe40a689309df8af4b9ccb448440a333",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f1d72a08c83d9ffb4fbd5eea529f2ad326a7289e",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4f8b3a4ca73f29b6b6dd5643a6da09c885d7f108",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5eec231709381c901209e5dac97e0784e80ebc7a",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3f4b312d0bc1c954064eca04f2663d8ee72b5dcf",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a3c7af4ffc4f04dd2cbb32f108af6d7ba823f35a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "96dfb38a00a9c78cd39e8a2f38494a38ed364cc8",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3dda8abcbd5ade5b1e6846f73dc43b1eab8254e0",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3295de63e1ff45040f6f14123e49e510068e6eee",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d6847623d62f390f6843cf27868cfc077f5555e1",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3fa712a641a80e9f5438bb8f1ca0093159689da0",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "fc5940c207325590decf094c17f83521c86982a3",
+          "sections": [
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "f4f6ae0b10f2cc26e5cf75b4c39c70703f036e9b",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0083e2483969d7679bd8b8340ea1172b148840d5",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "54209b06d3c976398fd0b35e6fc08107dd648af5",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e343de355b7b0cd0654b4098e4446421ca98a5e3",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b563b7e6e14661d488bb082bffe7c2837e56c022",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "deb55cf5286c5a04cd25b3e5a91cc8caf3ca7ba1",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e189b162d573137cc9da570c14575f6f7f785ce0",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b3986b6d730e957fa7a587463047127c517fb49a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7dee0155d17ca046b69e51fecd62a057329add01",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "761f0c2baaafc82633c1d78e3931d031d9673b11",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "9f071a8e51ff72eb7cca49f90dae6f48f6f489a5",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a804e95d5641e85674cab2fe8c51c34bfbe3a146",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9687bea911e5fa72aeecbae752b2d785c38798dc",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "58832ee5fdd48b9c919074e6317eff70161759dc",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f5a5202acd2a0c14f589c505845eeac16334d652",
+          "sections": [
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "3beb69bfa0a8fef2cd04fc441e57304e3bf815f6",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6916f6f2fbafea44cf772579a37c70f0d64cdbc0",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e92329142f66b782312d23bb35166a826fc08255",
+          "sections": [
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "b50e38e06f51e30f365e8cbd218769cf2ddc78d2",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "dff4fa5374648fbf838fd10dc1bc5b8cf7b60356",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a4c408a991925aca147df668999d775eb2a1e24a",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "1f95617ace456a1d543ccc6de4171904d8aeb1d2",
+          "sections": [
+            "methods",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "6d60a7255878f03e3405c60c72a6420c38b165bc",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2e1bb7a4af40726ccaa1a4eb4823d31622371c17",
+          "sections": [
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ca73bd452855b1b90cecd84e54d703186911e168",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "4bb8e200b25db55f7014a46c6f2d71b471e49a4f",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "929f18130460d562d15db085b87a781a0dd34017",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d409d8978034de5e5e8f9ee341d4a00441e3d05f",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b34626d58b29f507f9186637a7260202c324e8f8",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "87ae824d0e87b19939c373b415814cce85778f44",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "95688c5444a109ec64e8921cdac469b4db5220ac",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e8f65887210e6f20413a60a1e0a0ec4a4e2735bd",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b2b012f7a798757704ee5b9743b99176a9578ef8",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c662e9a76dacdc9ca7171e7731e26c9a823f05a9",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "bd475c9494a9e10bc711e5d8301eddb684b1663a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0fba92ea026075dc27df9f6d9c7ab1f856a0a3b2",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "615c92a9130adc40aad4268027a7af3c9ede192e",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3aa883df8963851c56e651218e178eb00900f833",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ca89131171b58a4c6747187cd0c0f737ad4297b2",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8db7f5a54321e1a4cd51d0666607279556a57404",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3c094494f6a911de3087ed963d3d893f6f2b1d71",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ad7841f04f71653b33919475378d95dc0a372892",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "92f366979edb22ed7dba1de20a241d384658b54a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4be1afa552fd9241204a878c7ae9e40dd351de52",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "55419d7878d75fc38125567f0a43515e0f34ae6a",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "a95c2fbffa7bc9b2c530dec353822833d2e4822b",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5b80cda5166ba75e6c1110fc4ca6b8c12fe1fa37",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ea03a5ea291bff200be74a40aa71a7254012d018",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f398126174b51e958d4e866c754c65195f26730d",
+          "sections": [
+            "introduction",
+            "methods",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "8fe6b34838797e1de5e1d82b03190c52c15118fa",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "aad658d9dee24f15014360af83d63df34f47f12e",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "72ef661a052be7685d93c79011ba4a5fbcf308f7",
+          "sections": [
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6b3b3cbce3ec7514632fcd92a7b0e0e26acc3ed2",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4f6fa087d402c3a1bfcc5c1dc417abfacf55db2d",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "bef85a596596689caa74bb711044a15d5b3ba1f8",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "844e0141f47374c6c2cb4c5425d5f9b3ce201f75",
+          "sections": [
+            "introduction",
+            "introduction",
+            "methods",
+            "results",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "827a8ab345b673ebc0896296272333d4f88bd539",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "956d66d2a95f60054a473eea583786f2b3c16f9d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "8ac753263f962be06f49a661b243182c583b1b56",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "993793efa6e1a3562ba2cc392bad601a94e15680",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "21acea7e14ab225aeaea61314187d4d8e9a76e91",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "23989b084ebb68d0fcc26c6f0a4119635d16feb1",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3343d1d78f2a14045b52b71428efaf43073d616d",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c0669244ca03002382b642aa0d744c101e2fa04b",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "842a50bf43e8b59efbab69c8b6d6e309fe8568ba",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "08480bdf82aed2f891e6844792ee190930228457",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "99982a0d1d33c6a946c5bf66a0b74a8e8789c8e9",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3274aa71b2bac7325e6abc84d814cc7da765b717",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ae432e6036c7c17d91f383ab623636bbb8827ac4",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b5ea982d6628f5fabb58a7d4f0c262de3a9b34df",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7957c8194364c32a29c982442c9644ecf3d33362",
+          "sections": [
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "843c7b9f500f6491ae56af4e2999e16558377bf6",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c8010801fe989281d7e1a498b7331714d4243f19",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e09c38c84e953f85d4ebca9b5c2b9f9e25903d9f",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b6e6112193da680f88502a0eb5b9e3478ba64109",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "26a07743cc9e3864a85b1c4044202ab5103cc206",
+          "sections": [
+            "methods",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "7072470b0a0654709107c8c8b335dbbacd9b3a8c",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "35bb7f871dbb9383854dbf48274aa839f9580564",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e6b6a75ac509d30089b63451c2ed640f471af18a",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "17d1949e6653ec81eb496b38f816e99572eabcb1",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6d173e78ee719a0713abdcf2110cd7f38d082ae7",
+          "sections": [
+            "introduction",
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "182696253c4bee32c98c27e3252add22ac09b328",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "836e9643c4e31171d4b653c0ecb1cb82ad714b48",
+          "sections": [
+            "introduction",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "415b0ed9197b634fed55aed351317e5880866ce1",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b6e330eb5e8299eae17b4ad629b852e4d8500026",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "a3bb4cebd1b33e4e780a57ba7ac088156f334730",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e3bf66adcc1e338f3ca8d669876a4f36c5e68c2a",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "61556fee73f0804fb0148ec93df8de8e595a3584",
+          "sections": [
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b2827253cb663812ff1065751823f0a6a3d020fd",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5a4f62874520a97ec2002abcd6d906326291f07f",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5eb552c3b282227b6abd7745c666526c7b7a0dd2",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b2e68ca577636aaa6f6241c3af7478a3ae1389a7",
+          "sections": [
+            "introduction",
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "cbb47597ba3d5ec38c4a2beab1214af44d3152c5",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "e2108ac145425d94d98d7615b6b211b17fc1b3e8",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ea1a2ee6c608806d98e93368ff2bba209bce0c60",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f94b8094a5ebe69e027e67b04292b1bb1f275273",
+          "sections": [
+            "methods",
+            "results"
+          ]
+        },
+        {
+          "paper_id": "e5dcb0abc4d482cec5395a3e09ce80f70e94227b",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "d99b2aaac602455f8dafef725ea59298cd7d5871",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b697eed0a2ff305622ea4d6d3c8a3df68248ac3a",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ab9922f5961e0607380da80b257d0adbb8b3bbcd",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "2fbe574330abb86d3a544dff76adc6b7d0f89c44",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7b3e0b0f776c995375a8b47db094a9a5a601374f",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "658005feeca85750e2a35f94c8499340ab404d5d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "503e91d69742a723be55ff4143a6c02457a6caca",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5937acec2b19a40a778f05e020979c894689dc44",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "afd812d62479dbb9c7e586229b80de79d5ecf4b1",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "105a216d530d05e9f22be59b8be786735f9a19fa",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7a40321919c6f6489ea62817aab83b12f32948b5",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ecd0ae4cc17e29dc20265c049134b242c06a64b4",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5ef6f2a4274c4f61ebd46901a50ee8457dd68cf4",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "e6f6af7899a6aea57f4a4d87d45bd5719dc4e08d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5c5244811a3400ec9622a879b5ab279fea7a16c3",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "16ce0d2712a8f8f4797496cc6c306d6c2b8535e9",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "da6c3fdf8ef9aae979a5dd156e074ba6691b2e2c",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "4a92f809913c9e6d4f50b8ceaaf6bb7a5a43c8f7",
+          "sections": [
+            "introduction",
+            "methods"
+          ]
+        },
+        {
+          "paper_id": "9f573d557b3e76053736e179ee23bea4c4f2222f",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5e29ccd8eba6482848c18adda9012bb537419fbb",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3848d8181efd4a504dfa02b531b7713ab4a2573a",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "9d2222506f6a076e2c9803ac4ea5414eda881c73",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8d778d57c182bff1a0a3c5e8dac83b58012c0383",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "275896f126776bc7e7bb960d169591bd5140ee68",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8395bf934f4589a4c2d38eac828d185a955d98c5",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "658ae58cc25748e5767ca17710c42d9b0d9061be",
+          "sections": [
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "c57111a50b9e0818138b19cb9d8f01871145ee0a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6ef1e1c54855fc1d1de1066510e7ea3e588a38c6",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "8b3939b8d31fd384cbb6fc7cb95f06425f035f6d",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0dbf801def1dd27800f3e0ab9cbf4d36c38a1250",
+          "sections": [
+            "results",
+            "discussion"
+          ]
+        },
+        {
+          "paper_id": "5f3da96c19b8b9416aeb29d51867f7d4d1c6ddca",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "6fa84cb2356ed30ca4ab6b747e3aa23f2b9ac7b4",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "0f5de113e90a882e6da22a83e4a68f70ecedb1ab",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "783b0c1b297dba90e586f435f54410f2a2082ef3",
+          "sections": [
+            "introduction"
+          ]
+        },
+        {
+          "paper_id": "6b99529d792427f037bf7b415128649943f757e4",
+          "sections": [
+            "introduction",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "7df3eab32b051b1bd94ca11120a656590c5508d5",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5c219b9fe36ea7bb22d11bad634b64e244f4d9d0",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "6d28fb585dc903bc21e999db83f9101d91c13856",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "3895912b187adee599b1ea662da92865dd0b197d",
+          "sections": [
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "f9b0950b5dbc033e41670caa6309fb35d2ec6f05",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "105e77b8182b6e591247918f45f04c6a67f9a72f",
+          "sections": [
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "b620ce13b5dfaabc8b837b569a2265ff8c0e4e71",
+          "sections": [
+            "methods",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "ac4a2337afdf63e9b3480ce9025736d71f8cec1a",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "5b62860a9eb3492c5c2d7fb42fd023cae891df45",
+          "sections": [
+            "results"
+          ]
+        },
+        {
+          "paper_id": "9312a805f90f0858ae421a8472dc794fe8f1cf03",
+          "sections": [
+            "conclusion"
+          ]
+        },
+        {
+          "paper_id": "4c479f8d18badb29ec6a2a49d6ca8e36d833fbe9",
+          "sections": [
+            "introduction",
+            "methods",
+            "results",
+            "conclusion"
+          ]
+        }
+      ],
+      "whole_paper_sections": "unavailable"
+    }
+  },
+  "retrieval_metrics": null,
+  "limitations": "BEIR records contain titles and abstracts, not paper bodies. No section retrieval gain is claimed."
+}

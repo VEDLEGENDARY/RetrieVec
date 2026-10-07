@@ -21,7 +21,7 @@ All implementation checks passed at `1be7933ebb8bec8e9bf3ffaaec18405d6e9ae7eb`, 
 
 At the pinned MiniLM tokenizer, both retained 256-analyzer-token snapshots overflowed on 160/193 chunks (82.90%). A fresh 96-analyzer-token import overflowed on 0/467; maximum 244 wordpieces. These are local seed-corpus results, not universal bounds. `wordpiece-budget.json` records snapshot IDs, tokenizer hash, counts and quantiles. Oversized input is explicitly rejected before inference.
 
-No before/after authenticated HTTP search/answer latency measurements were made: the local service/database fixture is unavailable. Existing synthetic browser and small real-model transport timings remain in PERF.md with their limits. No speedup or human quality labels are claimed.
+No before/after authenticated HTTP search/answer latency measurements were made: the local service/database fixture is unavailable. Existing synthetic browser and small real-model transport timings remain in [PERF.md](../../design/PERF.md) with their limits. No speedup or human quality labels are claimed.
 
 Follow-up rewriting deliberately uses one original parent question as bounded context, with no generated facts or extra model charges. It is not a learned pronoun resolver. Authorization and configured-provider consent are checked before preview and enqueue. Token budgets still apply downstream. Cross-request artifact caching is deferred; request-scoped reuse avoids retaining another principal's data or bypassing artifact checks across requests. Larger controller files have explicit architectural exceptions in GAP_AUDIT.md.
 
