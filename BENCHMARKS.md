@@ -1,7 +1,7 @@
 <!-- PHASE3 RESULTS START -->
 # BEIR retrieval benchmark
 
-Measured source: [docs/results/benchmark-2026-10-05-phase3.json](docs/results/benchmark-2026-10-05-phase3.json). Product ranking defaults unchanged.
+Measured source: [docs/results/benchmark-2026-10-05-phase3.json.gz](docs/results/benchmark-2026-10-05-phase3.json.gz). Product ranking defaults unchanged.
 
 | Dataset | Pipeline | nDCG@10 | Recall@100 | MRR@10 | p50 ms | p95 ms |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -160,7 +160,7 @@ Source hashes, corpus hashes, per-query rankings, frozen pool hashes and model a
 
 ## Historical baseline (2026-10-01)
 
-Measured source: [docs/results/benchmark-2026-10-01.json](docs/results/benchmark-2026-10-01.json).
+Measured source: [docs/results/benchmark-2026-10-01.json.gz](docs/results/benchmark-2026-10-01.json.gz).
 
 | Dataset | Pipeline | nDCG@10 | Recall@100 | MRR@10 | p50 ms | p95 ms |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |

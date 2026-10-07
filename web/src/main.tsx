@@ -24,25 +24,21 @@ import { useWorkspace } from "./useWorkspace";
 import { NavigationPanel } from "./NavigationPanel";
 import { navigate, readRoute, useWorkspaceRoute } from "./routing";
 import {
-  Archive,
   ArrowUpRight,
   BookOpenText,
-  FileText,
   LogOut,
-  Menu,
   Plus,
-  Search as SearchIcon,
   ShieldCheck,
   Sparkles,
   X,
 } from "lucide-react";
 
-type View = "ask" | "sources" | "saved";
-const viewLabels: Record<View, string> = {
-  ask: "Ask",
-  sources: "Sources",
-  saved: "Saved research",
-};
+import {
+  CollectionHeader,
+  WorkspaceDestinations,
+  destinationLabels as viewLabels,
+  type Destination as View,
+} from "./WorkspaceChrome";
 
 function App() {
   const {
@@ -606,41 +602,13 @@ function App() {
           />
         </div>
         {commandNotice && <Notice>{commandNotice}</Notice>}
-        <header>
-          <div>
-            <IconButton
-              className="mobile-menu"
-              aria-label="Open navigation"
-              aria-controls="workspace-navigation"
-              aria-expanded={navigationOpen}
-              onClick={() => setNavigationOpen(true)}
-            >
-              <Menu size={19} aria-hidden="true" />
-            </IconButton>
-            <p className="eyebrow">Research workspace</p>
-            <h1>{active?.title ?? "A place for your next question"}</h1>
-            {active && (
-              <p className="header-meta">
-                <ShieldCheck size={14} aria-hidden="true" />{" "}
-                {active.visibility === "curated"
-                  ? "Curated collection"
-                  : "Private collection"}
-                <span />
-                {active.active_snapshot ? "Search ready" : "Awaiting sources"}
-              </p>
-            )}
-          </div>
-          {active?.can_manage && (
-            <Button
-              className="quiet"
-              onClick={archive}
-              disabled={busy}
-              title="Hide this collection and cancel active processing. Undo restores access, but does not restart cancelled work."
-            >
-              <Archive size={15} aria-hidden="true" /> Archive collection
-            </Button>
-          )}
-        </header>
+        <CollectionHeader
+          collection={active}
+          busy={busy}
+          navigationOpen={navigationOpen}
+          onOpenNavigation={() => setNavigationOpen(true)}
+          onArchive={archive}
+        />
         {archived && (
           <div className="notice" role="status">
             <p>
@@ -653,27 +621,7 @@ function App() {
           </div>
         )}
         {error && <Notice error>{error}</Notice>}
-        {active && (
-          <nav className="view-tabs" aria-label="Workspace sections">
-            {(
-              [
-                ["ask", SearchIcon, "Ask"],
-                ["sources", FileText, "Sources"],
-                ["saved", BookOpenText, "Saved research"],
-              ] as const
-            ).map(([id, Icon, label]) => (
-              <Button
-                key={id}
-                className={view === id ? "active" : ""}
-                aria-current={view === id ? "page" : undefined}
-                onClick={() => setView(id)}
-              >
-                <Icon size={16} />
-                {label}
-              </Button>
-            ))}
-          </nav>
-        )}
+        {active && <WorkspaceDestinations selected={view} onSelect={setView} />}
         {active && view === "sources" && (
           <Disclosure className="diagnostics">
             <summary>Collection details</summary>
