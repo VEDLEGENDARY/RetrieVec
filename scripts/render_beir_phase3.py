@@ -8,6 +8,7 @@ END = "<!-- PHASE3 RESULTS END -->"
 
 
 def render(root, report, relative, table):
+    raw_relative = relative.removesuffix(".gz")
     lines = [
         START,
         "# BEIR retrieval benchmark",
@@ -188,8 +189,8 @@ def render(root, report, relative, table):
         "python scripts/benchmark_beir.py --study phase3 --phase tune "
         "--work artifacts/beir-phase3-reproduction",
         "python scripts/benchmark_beir.py --study phase3 --phase evaluate "
-        f"--work artifacts/beir-phase3-reproduction --output {relative}",
-        f"python scripts/render_beir_report.py {relative}",
+        f"--work artifacts/beir-phase3-reproduction --output {raw_relative}",
+        f"python scripts/render_beir_report.py {raw_relative}",
         "```",
         "",
         "Source hashes, corpus hashes, per-query rankings, frozen pool hashes and model "
