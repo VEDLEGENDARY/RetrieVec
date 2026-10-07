@@ -1,4 +1,6 @@
-import { Button, Input, Skeleton } from "./ui";
+import { Welcome } from "./Welcome";
+import { CollectionSidebar } from "./CollectionSidebar";
+import { Button, Skeleton } from "./ui";
 import { useEffect, useState } from "react";
 import { recordTiming } from "./performance";
 import { createRoot } from "react-dom/client";
@@ -13,16 +15,12 @@ import { NavigationPanel } from "./NavigationPanel";
 import { navigate, readRoute, useWorkspaceRoute } from "./routing";
 import {
   Archive,
-  ArrowUpRight,
   BookOpenText,
   FileText,
-  LogOut,
   Menu,
-  Plus,
   Search as SearchIcon,
   ShieldCheck,
   Sparkles,
-  X,
 } from "lucide-react";
 
 type View = "ask" | "sources" | "saved";
@@ -72,7 +70,6 @@ function App() {
     route.run ? "answer" : "passages",
   );
   const [navigationOpen, setNavigationOpen] = useState(false);
-  const [collectionFilter, setCollectionFilter] = useState("");
   const active = collections.find((item) => item.collection_id === selected);
   async function create(event: React.SubmitEvent) {
     event.preventDefault();
@@ -138,38 +135,7 @@ function App() {
         <Skeleton label="Opening your workspace…" />
       </main>
     );
-  if (!session)
-    return (
-      <main className="welcome">
-        <div className="wordmark">
-          <span className="logo-mark">
-            <BookOpenText size={19} />
-          </span>{" "}
-          RetrieVec
-        </div>
-        <p className="eyebrow">Your papers. Traceable evidence.</p>
-        <h1>
-          Research begins
-          <br />
-          with the source.
-        </h1>
-        <p className="intro">
-          A private workspace to collect papers, compare retrieval methods, and
-          inspect the evidence behind every result.
-        </p>
-        <a className="button primary" href="/auth/login">
-          Sign in to your workspace <ArrowUpRight size={17} />
-        </a>
-        {error && (
-          <p role="alert" className="error">
-            {error}
-          </p>
-        )}
-        <p className="muted">
-          Private collections · Snapshot-pinned search · Original sources
-        </p>
-      </main>
-    );
+  if (!session) return <Welcome error={error} />;
   return (
     <div className="workspace">
       <a className="skip" href="#research">
@@ -179,89 +145,22 @@ function App() {
         open={navigationOpen}
         onClose={() => setNavigationOpen(false)}
       >
-        <div className="wordmark">
-          <span className="logo-mark">
-            <BookOpenText size={18} />
-          </span>{" "}
-          RetrieVec
-          <Button
-            className="mobile-close"
-            aria-label="Close navigation"
-            onClick={() => setNavigationOpen(false)}
-          >
-            <X size={18} />
-          </Button>
-        </div>
-        <p className="eyebrow">Collections</p>
-        <label className="collection-filter">
-          Find a collection
-          <Input
-            type="search"
-            value={collectionFilter}
-            onChange={(event) => setCollectionFilter(event.target.value)}
-            placeholder="Filter collections…"
-          />
-        </label>
-        <nav aria-label="Collections">
-          {collections
-            .filter((item) =>
-              item.title.toLowerCase().includes(collectionFilter.toLowerCase()),
-            )
-            .map((item) => (
-              <Button
-                key={item.collection_id}
-                className={
-                  selected === item.collection_id
-                    ? "collection selected"
-                    : "collection"
-                }
-                aria-pressed={selected === item.collection_id}
-                onClick={() => {
-                  setSelected(item.collection_id);
-                  setError("");
-                  setView("ask");
-                  setNavigationOpen(false);
-                }}
-              >
-                <span>{item.title}</span>
-                <small>
-                  {item.visibility === "curated" ? "Curated" : "Private"}
-                </small>
-              </Button>
-            ))}
-        </nav>
-        {collectionFilter &&
-          !collections.some((item) =>
-            item.title.toLowerCase().includes(collectionFilter.toLowerCase()),
-          ) && (
-            <p className="muted" role="status">
-              No collections match “{collectionFilter}”.
-            </p>
-          )}
-        <form onSubmit={create} className="new-collection">
-          <label htmlFor="collection-title">New collection</label>
-          <Input
-            id="collection-title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            maxLength={120}
-            required
-            placeholder="e.g. Retrieval methods"
-          />
-          <Button disabled={busy || !title.trim()} type="submit">
-            <Plus size={16} /> Create collection
-          </Button>
-        </form>
-        <div className="account">
-          <span>
-            <ShieldCheck size={14} /> Private workspace
-          </span>
-          <Button onClick={logout}>
-            <LogOut size={14} /> Sign out
-          </Button>
-        </div>
+        <CollectionSidebar
+          collections={collections}
+          selected={selected}
+          title={title}
+          setTitle={setTitle}
+          busy={busy}
+          create={create}
+          logout={logout}
+          onClose={() => setNavigationOpen(false)}
+          onSelect={(id) => {
+            setSelected(id);
+            setError("");
+          }}
+        />
       </NavigationPanel>
-      <main id="research" className="research">
+      <main id="research" className="research" tabIndex={-1}>
         <div className="workspace-toolbar">
           <span>Collection / {viewLabels[view]}</span>
           <CommandMenu
