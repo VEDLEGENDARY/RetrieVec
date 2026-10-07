@@ -105,6 +105,8 @@ def import_manifest(
     evidence_bundles: dict[str, str] | None = None,
     evidence_root: Path | None = None,
     wordpiece_budget=None,
+    chunker: str = "paragraph-v1",
+    overlap: int = 0,
     section_aware: bool = False,
     metadata_enrichment: dict | None = None,
 ) -> Path:
@@ -112,6 +114,12 @@ def import_manifest(
         raise CorpusError("section-aware setting must be boolean")
     if type(token_budget) is not int or not 1 <= token_budget <= 4096:
         raise CorpusError("token budget must be between 1 and 4096")
+    if chunker not in ("paragraph-v1", "paragraph-v2"):
+        raise CorpusError("unsupported chunker version")
+    if type(overlap) is not int or not 0 <= overlap < token_budget:
+        raise CorpusError("overlap must be smaller than token budget")
+    if chunker == "paragraph-v1" and overlap:
+        raise CorpusError("paragraph-v1 does not support overlap")
     manifest = parse_json(manifest_path.read_bytes())
     if (
         not isinstance(manifest, dict)
@@ -124,7 +132,9 @@ def import_manifest(
         raise CorpusError("invalid source manifest schema")
     analyzer = analyzer or GoAnalyzer()
     analyzer.analyze([])
-    chunker_version = f"paragraph-v1-{token_budget}-{analyzer.version}"
+    chunker_version = f"{chunker}-{token_budget}-{analyzer.version}"
+    if chunker == "paragraph-v2":
+        chunker_version += f"-overlap-{overlap}"
     if wordpiece_budget is not None:
         chunker_version += "-" + wordpiece_budget.version
     if section_aware:
@@ -185,9 +195,10 @@ def import_manifest(
         papers.append(paper)
         ordinal = 0
         previous_section, previous_heading = "unclassified", None
+        current_section = ""
         for page_index, (page_number, text) in enumerate(pages):
             locations, located_page, location_error = None, None, None
-            if path.suffix.lower() == ".pdf" and not typed:
+            if path.suffix.lower() == ".pdf" and not typed and chunker == "paragraph-v1":
                 from retrievec.corpus.pdf_locations import PDFLocations
 
                 try:
@@ -212,11 +223,24 @@ def import_manifest(
             page_chunks, attributes = [], []
             for begin, end, section, heading in spans:
                 part = text[begin:end]
-                packed = chunk_page(part, analyzer.analyze([part])[0], token_budget)
+                if chunker == "paragraph-v2":
+                    from retrievec.corpus.section_chunks import chunk_page_v2
+
+                    packed, current_section = chunk_page_v2(
+                        part, analyzer, token_budget, overlap, current_section
+                    )
+                else:
+                    packed = chunk_page(part, analyzer.analyze([part])[0], token_budget)
                 offset = begin
                 for item in packed:
                     page_chunks.append(item)
-                    attributes.append((offset, offset + len(item), section, heading))
+                    # V2 adds section prefixes and overlapping windows, so its text
+                    # is not a lossless page slice. Never invent offsets or PDF boxes.
+                    attributes.append(
+                        (None, None, section, heading)
+                        if chunker == "paragraph-v2"
+                        else (offset, offset + len(item), section, heading)
+                    )
                     offset += len(item)
             if wordpiece_budget is not None:
                 refined, refined_attributes = [], []
@@ -225,8 +249,9 @@ def import_manifest(
                 ):
                     for part in wordpiece_budget.split(chunk):
                         refined.append(part)
-                        refined_attributes.append((begin, begin + len(part), section, heading))
-                        begin += len(part)
+                        end = None if begin is None else begin + len(part)
+                        refined_attributes.append((begin, end, section, heading))
+                        begin = end
                 page_chunks, attributes = refined, refined_attributes
             for chunk_text, (begin, end, section, heading) in zip(
                 page_chunks, attributes, strict=True
@@ -242,7 +267,7 @@ def import_manifest(
                     )
                 )
                 ordinal += 1
-                if locations is not None:
+                if locations is not None and begin is not None:
                     location_mapping[chunks[-1]["chunk_id"]] = locations.passage(
                         located_page, location_error, page_number, begin, end, chunks[-1]
                     )
@@ -256,7 +281,9 @@ def import_manifest(
                             "page": page_number,
                             "start": begin,
                             "end": end,
-                        },
+                        }
+                        if begin is not None
+                        else None,
                     }
                 if page_index in typed:
                     item = typed[page_index]
@@ -304,7 +331,7 @@ def import_manifest(
             "token_budget": token_budget,
             "analyzer_version": analyzer.version,
             "chunker_version": chunker_version,
-            "overlap": 0,
+            "overlap": overlap,
             **(
                 {"wordpiece_budget": canonical(wordpiece_budget.configuration).decode("utf-8")}
                 if wordpiece_budget

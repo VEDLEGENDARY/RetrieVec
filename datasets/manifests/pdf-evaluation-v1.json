@@ -1,0 +1,228 @@
+{
+  "sources": [
+    {
+      "paper_id": "2020.emnlp-main.550",
+      "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+      "authors": [
+        "Vladimir Karpukhin",
+        "Barlas Oğuz",
+        "Sewon Min",
+        "Patrick Lewis",
+        "Ledell Wu",
+        "Sergey Edunov",
+        "Danqi Chen",
+        "Wen-tau Yih"
+      ],
+      "path": "2020.emnlp-main.550.pdf",
+      "source_url": "https://aclanthology.org/2020.emnlp-main.550/",
+      "source_sha256": "2abfc7991519be2b8ce30215905516fdb593218b7bf59e50ece0d8a088a7c4d5",
+      "license_note": "CC BY 4.0; ACL copyright policy; full text retained locally only"
+    },
+    {
+      "paper_id": "2021.emnlp-main.496",
+      "title": "Simple Entity-Centric Questions Challenge Dense Retrievers",
+      "authors": [
+        "Christopher Sciavolino",
+        "Zexuan Zhong",
+        "Jinhyuk Lee",
+        "Danqi Chen"
+      ],
+      "path": "2021.emnlp-main.496.pdf",
+      "source_url": "https://aclanthology.org/2021.emnlp-main.496/",
+      "source_sha256": "fd846968daae2d08a4df3202ed0f8fd19d56cd4eac3e3b3a963213ba8abc532d",
+      "license_note": "CC BY 4.0; ACL copyright policy; full text retained locally only"
+    },
+    {
+      "paper_id": "2021.naacl-main.241",
+      "title": "COIL: Revisit Exact Lexical Match in Information Retrieval with Contextualized Inverted List",
+      "authors": [
+        "Luyu Gao",
+        "Zhuyun Dai",
+        "Jamie Callan"
+      ],
+      "path": "2021.naacl-main.241.pdf",
+      "source_url": "https://aclanthology.org/2021.naacl-main.241/",
+      "source_sha256": "6ccf36352b485fe492d15a787b162635b38fd3d50b67b617706325f83453a2bf",
+      "license_note": "CC BY 4.0; ACL copyright policy; full text retained locally only"
+    },
+    {
+      "paper_id": "2022.acl-long.203",
+      "source_sha256": "ee840097ef4c5998da74aeab5f7c30737a91f703daf13a54f0686cedd6f5d477",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "Luyu Gao",
+        "Jamie Callan"
+      ],
+      "source_url": "https://aclanthology.org/2022.acl-long.203/",
+      "title": "Unsupervised Corpus Aware Language Model Pre-training for Dense Passage Retrieval",
+      "path": "2022.acl-long.203.pdf"
+    },
+    {
+      "paper_id": "2022.emnlp-main.445",
+      "source_sha256": "7f073a6e9b3180fcbc3f3296f5621ba074a5012362305eee72c06d7841458659",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "Si Sun",
+        "Chenyan Xiong",
+        "Yue Yu",
+        "Arnold Overwijk",
+        "Zhiyuan Liu",
+        "Jie Bao"
+      ],
+      "source_url": "https://aclanthology.org/2022.emnlp-main.445/",
+      "title": "Reduce Catastrophic Forgetting of Dense Retrieval Training with Teleportation Negatives",
+      "path": "2022.emnlp-main.445.pdf"
+    },
+    {
+      "paper_id": "2022.emnlp-main.730",
+      "source_sha256": "71e95a6964a2e85b6b3364963c369c7cf2d4505d76b35716d12acdf9a6eabbef",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "Tianhao Shen",
+        "Mingtong Liu",
+        "Ming Zhou",
+        "Deyi Xiong (德意 熊)"
+      ],
+      "source_url": "https://aclanthology.org/2022.emnlp-main.730/",
+      "title": "Recovering Gold from Black Sand: Multilingual Dense Passage Retrieval with Hard and False Negative Samples",
+      "path": "2022.emnlp-main.730.pdf"
+    },
+    {
+      "paper_id": "2023.emnlp-main.665",
+      "source_sha256": "b5cc4a2eb0f027a1911fd55798bd85e68a64791f2a9f925159457b275cb623bc",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "George Zerveas",
+        "Navid Rekabsaz",
+        "Carsten Eickhoff"
+      ],
+      "source_url": "https://aclanthology.org/2023.emnlp-main.665/",
+      "title": "Enhancing the Ranking Context of Dense Retrieval through Reciprocal Nearest Neighbors",
+      "path": "2023.emnlp-main.665.pdf"
+    },
+    {
+      "paper_id": "2023.findings-acl.695",
+      "source_sha256": "2cdd39ddec9b090dfe51189e8dc2acd977786c23aea3d96b4aeceb2151415cc7",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "Yibin Lei",
+        "Liang Ding",
+        "Yu Cao",
+        "Changtong Zan",
+        "Andrew Yates",
+        "Dacheng Tao"
+      ],
+      "source_url": "https://aclanthology.org/2023.findings-acl.695/",
+      "title": "Unsupervised Dense Retrieval with Relevance-Aware Contrastive Pre-Training",
+      "path": "2023.findings-acl.695.pdf"
+    },
+    {
+      "paper_id": "2023.findings-emnlp.1057",
+      "source_sha256": "d8da86a0bd9add3b597c5ef64064babbcfd16d54a5ccd1aa6fc8a190617c392c",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "Ruiyang Ren",
+        "Yingqi Qu",
+        "Jing Liu",
+        "Xin Zhao",
+        "Qifei Wu",
+        "Yuchen Ding",
+        "Hua Wu (吴华)",
+        "Haifeng Wang",
+        "Ji-Rong Wen"
+      ],
+      "source_url": "https://aclanthology.org/2023.findings-emnlp.1057/",
+      "title": "A Thorough Examination on Zero-shot Dense Retrieval",
+      "path": "2023.findings-emnlp.1057.pdf"
+    },
+    {
+      "paper_id": "2023.tacl-1.35",
+      "source_sha256": "3602366ac5adae676148f09666b530f2cad32a76bb2954411020be0141c82934",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "Devendra Singh Sachan",
+        "Mike Lewis",
+        "Dani Yogatama",
+        "Luke Zettlemoyer",
+        "Joelle Pineau",
+        "Manzil Zaheer"
+      ],
+      "source_url": "https://aclanthology.org/2023.tacl-1.35/",
+      "title": "Questions Are All You Need to Train a Dense Passage Retriever",
+      "path": "2023.tacl-1.35.pdf"
+    },
+    {
+      "paper_id": "2024.eacl-demo.16",
+      "source_sha256": "e2038b8cff7574bf5302e1ceb6bfbac6d2471c352073b27f21460910936febce",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "Shahul Es",
+        "Jithin James",
+        "Luis Espinosa Anke",
+        "Steven Schockaert"
+      ],
+      "source_url": "https://aclanthology.org/2024.eacl-demo.16/",
+      "title": "RAGAs: Automated Evaluation of Retrieval Augmented Generation",
+      "path": "2024.eacl-demo.16.pdf"
+    },
+    {
+      "paper_id": "2024.findings-emnlp.449",
+      "source_sha256": "e94b9f862f921a41ccd346226d73663b8e417bead69cbab81820c2dbf8ff97fe",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "David Rau",
+        "Hervé Déjean",
+        "Nadezhda Chirkova",
+        "Thibault Formal",
+        "Shuai Wang",
+        "Stéphane Clinchant",
+        "Vassilina Nikoulina"
+      ],
+      "source_url": "https://aclanthology.org/2024.findings-emnlp.449/",
+      "title": "BERGEN: A Benchmarking Library for Retrieval-Augmented Generation",
+      "path": "2024.findings-emnlp.449.pdf"
+    },
+    {
+      "paper_id": "2024.naacl-long.20",
+      "source_sha256": "5a585d88f7b63c06439a4ecb8fd3165615d637e2061f242bff3f6ec3a209bd34",
+      "license_note": "CC BY 4.0; ACL Anthology copyright policy; full text retained locally only",
+      "authors": [
+        "Jon Saad-Falcon",
+        "Omar Khattab",
+        "Christopher Potts",
+        "Matei Zaharia"
+      ],
+      "source_url": "https://aclanthology.org/2024.naacl-long.20/",
+      "title": "ARES: An Automated Evaluation Framework for Retrieval-Augmented Generation Systems",
+      "path": "2024.naacl-long.20.pdf"
+    },
+    {
+      "paper_id": "2025.bucc-1.5",
+      "title": "BEIR-NL: Zero-shot Information Retrieval Benchmark for the Dutch Language",
+      "authors": [
+        "Nikolay Banar",
+        "Ehsan Lotfi",
+        "Walter Daelemans"
+      ],
+      "path": "2025.bucc-1.5.pdf",
+      "source_url": "https://aclanthology.org/2025.bucc-1.5/",
+      "source_sha256": "0d188fa4a232ff9f92f499f3965a70dec1f5d8e6d20dc5745c99994c99644379",
+      "license_note": "CC BY 4.0; ACL copyright policy; full text retained locally only"
+    },
+    {
+      "paper_id": "2025.naacl-long.220",
+      "title": "Benchmarking and Building Zero-Shot Hindi Retrieval Model with Hindi-BEIR and NLLB-E5",
+      "authors": [
+        "Arkadeep Acharya",
+        "Rudra Murthy",
+        "Vishwajeet Kumar",
+        "Jaydeep Sen"
+      ],
+      "path": "2025.naacl-long.220.pdf",
+      "source_url": "https://aclanthology.org/2025.naacl-long.220/",
+      "source_sha256": "403284fa20a87a38c1bddd03cfb70a4d110bd93e2e8c8b0d2bd94152acf5922a",
+      "license_note": "CC BY 4.0; ACL copyright policy; full text retained locally only"
+    }
+  ],
+  "schema_version": 1
+}

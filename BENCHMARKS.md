@@ -254,7 +254,7 @@ Intervals are descriptive query-paired percentile intervals for right minus left
 
 ## Reproduce
 
-Complete the README native setup first. Replace `python` with `.\.venv\Scripts\python.exe` on Windows or `.venv/bin/python` on Linux.
+Complete the [native setup](docs/DEVELOPMENT.md#native-setup) first. Replace `python` with `.\.venv\Scripts\python.exe` on Windows or `.venv/bin/python` on Linux.
 
 ```sh
 python scripts/benchmark_beir.py --phase preflight

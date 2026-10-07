@@ -34,6 +34,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     ingest.add_argument("--output", required=True, type=Path)
     ingest.add_argument("--collection", default="research")
     ingest.add_argument("--token-budget", type=int, default=256)
+    ingest.add_argument(
+        "--chunker", choices=("paragraph-v1", "paragraph-v2"), default="paragraph-v1"
+    )
+    ingest.add_argument("--overlap", type=int, default=0)
     ingest.add_argument("--engine", type=Path)
     ingest.add_argument("--metadata", type=Path, help="Source-bound paper metadata JSON")
     ingest.add_argument(
@@ -80,6 +84,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.token_budget,
                 GoAnalyzer(args.engine),
                 section_aware=args.section_aware,
+                chunker=args.chunker,
+                overlap=args.overlap,
                 metadata_enrichment=(
                     parse_json(args.metadata.read_bytes())["papers"] if args.metadata else None
                 ),
