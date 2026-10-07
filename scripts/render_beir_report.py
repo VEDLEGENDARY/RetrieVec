@@ -4,6 +4,8 @@ import argparse
 import json
 from pathlib import Path
 
+from retrievec.evaluation.report_io import load_report
+
 ROOT = Path(__file__).resolve().parents[1]
 START, END = "<!-- BEIR RESULTS START -->", "<!-- BEIR RESULTS END -->"
 
@@ -62,7 +64,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", type=Path)
     args = parser.parse_args()
-    report = json.loads(args.report.read_bytes())
+    report = load_report(args.report)
     table = tables(report)
     relative = args.report.resolve().relative_to(ROOT).as_posix()
     update_readme(ROOT, report, relative)
@@ -71,12 +73,13 @@ def main():
 
         render(ROOT, report, relative, table)
         return
+    raw_relative = relative.removesuffix(".gz")
     command = (
         "python scripts/benchmark_beir.py --phase preflight\n"
         "python scripts/benchmark_beir.py --phase prepare\n"
         "python scripts/benchmark_beir.py --phase tune\n"
-        f"python scripts/benchmark_beir.py --phase evaluate --output {relative}\n"
-        f"python scripts/render_beir_report.py {relative}"
+        f"python scripts/benchmark_beir.py --phase evaluate --output {raw_relative}\n"
+        f"python scripts/render_beir_report.py {raw_relative}"
     )
     limitations = (
         "These are paper-level rankings collapsed from the production top-100 chunk pool, "

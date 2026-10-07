@@ -69,7 +69,7 @@ Keyboard focus, Escape, dark mode and reduced motion are covered by browser test
 | SciFact | 0.6670 | 255.35 ms |
 | SCIDOCS | 0.1928 | 897.29 ms |
 
-Source: [docs/results/benchmark-2026-10-05-phase3.json](docs/results/benchmark-2026-10-05-phase3.json). Warm local retrieval excludes HTTP, authorization and database work.
+Source: [docs/results/benchmark-2026-10-05-phase3.json.gz](docs/results/benchmark-2026-10-05-phase3.json.gz). Warm local retrieval excludes HTTP, authorization and database work.
 
 <!-- BEIR RESULTS END -->
 
