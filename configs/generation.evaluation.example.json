@@ -1,0 +1,22 @@
+[
+  {
+    "name": "qwen-0.5b",
+    "endpoint": "http://127.0.0.1:8095",
+    "model": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+    "revision": "sha256:74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+    "cloud": false,
+    "context_tokens": 4096,
+    "output_tokens": 1536,
+    "timeout_seconds": 120
+  },
+  {
+    "name": "qwen-1.5b",
+    "endpoint": "http://127.0.0.1:8096",
+    "model": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+    "revision": "sha256:6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+    "cloud": false,
+    "context_tokens": 4096,
+    "output_tokens": 1536,
+    "timeout_seconds": 120
+  }
+]

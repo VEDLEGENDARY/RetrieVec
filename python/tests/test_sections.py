@@ -55,6 +55,27 @@ class SectionTests(unittest.TestCase):
             for chunk in chunks:
                 offsets = index.attributes(chunk)["text_offsets"]
                 self.assertEqual(text[offsets["start"] : offsets["end"]], chunk["text"])
+            # Overlapping, prefixed experimental windows retain section labels
+            # but cannot claim a literal page-text interval.
+            experimental = import_manifest(
+                manifest,
+                root,
+                root / "corpora",
+                "collection",
+                96,
+                section_aware=True,
+                chunker="paragraph-v2",
+                overlap=4,
+            )
+            v2_corpus, _, v2_chunks = load_snapshot(experimental)
+            v2_provenance = PassageProvenance(root, v2_corpus)
+            self.assertEqual(
+                {v2_provenance.attributes(c)["section"] for c in v2_chunks},
+                {"abstract", "methods", "results"},
+            )
+            self.assertTrue(
+                all(v2_provenance.attributes(c)["text_offsets"] is None for c in v2_chunks)
+            )
             key = corpus["configuration"]["passage_provenance_id"]
             (root / "passage-provenance" / (key + ".json")).write_bytes(b"{}")
             with self.assertRaises((ValueError, KeyError)):

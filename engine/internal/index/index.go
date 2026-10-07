@@ -42,6 +42,13 @@ func copyDocument(document corpus.Document) corpus.Document {
 
 // Build assigns internal IDs in external-ID order and rejects unindexable input.
 func Build(documents []corpus.Document) (*Index, error) {
+	return BuildVersion(documents, analysis.Version)
+}
+
+func BuildVersion(documents []corpus.Document, analyzerVersion string) (*Index, error) {
+	if !analysis.Supported(analyzerVersion) {
+		return nil, fmt.Errorf("index: unsupported analyzer version")
+	}
 	if len(documents) == 0 {
 		return nil, fmt.Errorf("index: empty corpus")
 	}
@@ -60,7 +67,7 @@ func Build(documents []corpus.Document) (*Index, error) {
 		if _, exists := result.externalIDs[document.ChunkID]; exists {
 			return nil, fmt.Errorf("index: duplicate chunk ID %s", document.ChunkID)
 		}
-		tokens, err := analysis.Analyze(document.Text)
+		tokens, err := analysis.AnalyzeVersion(document.Text, analyzerVersion)
 		if err != nil {
 			return nil, fmt.Errorf("index chunk %s: %w", document.ChunkID, err)
 		}
@@ -87,7 +94,7 @@ func Build(documents []corpus.Document) (*Index, error) {
 	result.stats.ChunkCount = len(ordered)
 	result.stats.TermCount = len(result.terms)
 	result.stats.AverageChunkLength = float64(result.stats.TotalTokens) / float64(len(ordered))
-	result.stats.AnalyzerVersion = analysis.Version
+	result.stats.AnalyzerVersion = analyzerVersion
 	return result, nil
 }
 

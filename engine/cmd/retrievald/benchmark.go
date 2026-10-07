@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"retrievec/engine/internal/analysis"
 	"retrievec/engine/internal/corpus"
 	"retrievec/engine/internal/index"
 	"retrievec/engine/internal/scoring"
@@ -22,8 +23,8 @@ func benchmarkCommand(args []string, input io.Reader, output, stderr io.Writer) 
 	flags.SetOutput(stderr)
 	directory := flags.String("corpus", "", "validated corpus snapshot")
 	documentsPath := flags.String("documents", "", "offline BEIR JSONL document control; title plus text")
-	analyzer := flags.String("analyzer", "unicode", "offline document analyzer ablation")
-	if flags.Parse(args) != nil || (*directory == "") == (*documentsPath == "") || flags.NArg() != 0 || (*directory != "" && *analyzer != "unicode") {
+	analyzer := flags.String("analyzer", "unicode", "offline document control or versioned corpus analyzer")
+	if flags.Parse(args) != nil || (*directory == "") == (*documentsPath == "") || flags.NArg() != 0 {
 		return 2
 	}
 	started := time.Now()
@@ -43,13 +44,17 @@ func benchmarkCommand(args []string, input io.Reader, output, stderr io.Writer) 
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
-	idx, err := index.Build(documents)
+	analyzerVersion := analysis.Version
+	if *directory != "" && *analyzer != "unicode" {
+		analyzerVersion = *analyzer
+	}
+	idx, err := index.BuildVersion(documents, analyzerVersion)
 	if err != nil {
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
 	encoder := json.NewEncoder(output)
-	if encoder.Encode(map[string]any{"snapshot_id": identity, "analyzer_control": *analyzer, "document_count": len(documents), "build_ms": float64(time.Since(started).Microseconds()) / 1000}) != nil {
+	if encoder.Encode(map[string]any{"snapshot_id": identity, "analyzer_control": *analyzer, "analyzer_version": idx.Stats().AnalyzerVersion, "document_count": len(documents), "build_ms": float64(time.Since(started).Microseconds()) / 1000}) != nil {
 		return 1
 	}
 	scanner := bufio.NewScanner(input)

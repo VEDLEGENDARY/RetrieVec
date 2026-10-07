@@ -1,9 +1,10 @@
 # Repository cleanup — 2026-10-06
 
-This maintenance change keeps the existing PR work and separate commits. No PR
-is merged, no history is rewritten, and unmerged branches/worktrees are retained.
-The existing no-merge and draft instructions remain in effect until the owner
-explicitly changes them.
+This maintenance change keeps the existing PR work and separate commits. History
+is not rewritten, and unmerged branches/worktrees are retained. After the cleanup
+was verified and pushed, the owner explicitly authorized all PRs to land through
+regular, unsquashed merges after their checks pass. Remaining integration results
+are recorded separately; this record does not claim unrun checks.
 
 ## What changed
 
