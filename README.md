@@ -12,7 +12,22 @@ retrieval, not generated answers or a model-quality claim.*
 
 ## Try it in 2 minutes
 
-With Docker Desktop running, start the local demo from this checkout:
+**You need:** Git, Docker Desktop with Linux containers (or Docker Engine with
+the Compose plugin on Linux), an internet connection for the first build, and
+free local ports **8000** and **8080**. No host Python, Go, Node, database or
+language model setup is needed for this demo.
+
+Get the project, then check that Docker is running. Skip the clone if you already
+have this checkout; run the remaining commands from its root:
+
+```sh
+git clone https://github.com/VEDLEGENDARY/RetrieVec.git
+cd RetrieVec
+docker info
+docker compose version
+```
+
+Start the app, database and local sign-in service:
 
 ```sh
 docker compose -f compose.demo.yaml --profile demo up --build -d
@@ -30,15 +45,52 @@ Ports 8000 and 8080 must be free; use `127.0.0.1` consistently.
 The demo includes 24 title/abstract records, no paper PDFs and no generation
 provider. It generates credentials into local Docker volumes; no preset password
 or cloud consent is included. Create a private collection to upload your papers.
+In **Sources**, choose text or PDF files, submit the upload, and wait for processing
+to finish before searching. Scanned PDFs need a separate OCR/extraction workflow.
+
+### Check startup, stop and return later
 
 ```sh
 docker compose -f compose.demo.yaml --profile demo ps
+docker compose -f compose.demo.yaml --profile demo logs --tail=100 workspace identity
+```
+
+Wait for the workspace to become healthy, then open the browser. The API health
+endpoint is **http://127.0.0.1:8000/healthz**; a successful health response does not
+replace the browser sign-in check.
+
+```sh
 docker compose -f compose.demo.yaml --profile demo down
 ```
 
-Stopping keeps your volumes and account. For deployment, identity configuration,
+Stopping keeps your volumes and account. Run the original `up --build -d` command
+to return later. Avoid `down --volumes` unless you intend to delete your local
+database, accounts, retained sources and model cache.
+
+| If you get stuck | What to do |
+|---|---|
+| Docker cannot connect | Start Docker Desktop/Engine; on Windows select Linux containers, then retry `docker info`. |
+| A port is already allocated | Stop the process using 8000/8080, then retry startup. Changing these ports also requires matching OIDC URLs. |
+| The app or sign-in is not ready | Check `ps` and the logs above. Allow the first model download and Keycloak startup to finish; retry the same `up` command if a download failed. |
+| Sign-in redirects fail | Open `http://127.0.0.1:8000` consistently, including registration; do not switch between `localhost` and `127.0.0.1`. |
+| Answer mode is unavailable | This demo has no generation provider. Passage search works immediately; configure generation separately as described below. |
+
+For deployment, identity configuration,
 backups, tracing, pgvector, Kubernetes, OpenTofu and mTLS, see
 [operations](docs/OPERATIONS.md).
+
+### Want generated cited answers?
+
+Generation is optional. The demo does **not** download Qwen or start a language
+model server. Use the [generation setup](docs/OPERATIONS.md#optional-generation)
+to configure a pinned llama.cpp-compatible provider and give the API/research
+worker the same configuration. A server running on your host is not the
+container's `127.0.0.1`. Local providers require loopback HTTP, so the model server
+must share the worker's network namespace in a container deployment; simply using
+a host hostname is not supported. Do not paste the local example endpoint
+unchanged into a container deployment.
+Cloud providers require explicit consent for each collection. Once configured,
+select **Answer** in Ask and check its model/provider indicator before submitting.
 
 ## A workspace built around evidence
 
@@ -90,7 +142,21 @@ Go owns retrieval; Python owns ingest, workers and FastAPI; React owns the web
 workspace. PostgreSQL holds application state; immutable artifacts retain evidence.
 
 For native development, install Python 3.13, Go 1.26, Node 24 and PostgreSQL 18.
-In an activated Python environment:
+Create and activate a virtual environment first:
+
+```powershell
+# Windows PowerShell
+py -3.13 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+```sh
+# Linux/macOS (with Python 3.13 installed)
+python3.13 -m venv .venv
+. .venv/bin/activate
+```
+
+Then, from the repository root:
 
 ```sh
 python -m pip install -r python/requirements-dev.txt
@@ -101,7 +167,15 @@ npm ci
 npx playwright install chromium
 npm run build
 npm run test:ui -- --workers=2
+cd ..
 ```
+
+These commands build and test the project; they do not start the native app.
+Follow [Run the native workspace](docs/OPERATIONS.md#run-the-native-workspace)
+to configure database credentials, Keycloak, RPC tokens, the built frontend and
+both workers, then start the API. Native Keycloak uses generated development
+accounts rather than the demo's registration flow. Stop the Docker demo first
+if it is using ports 8000/8080.
 
 Database integrations require isolated test DSNs; see [verification setup](docs/releases/verification.md).
 UI tests use labeled synthetic HTTP fixtures. They complement real-service checks.
