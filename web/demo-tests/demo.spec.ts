@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 
 test("real Keycloak sign-in, preloaded hybrid search and sign-out", async ({
   page,
-}) => {
+}, info) => {
   await page.goto("/");
   await page.getByRole("link", { name: /Sign in to your workspace/ }).click();
   await page.getByRole("link", { name: "Register", exact: true }).click();
@@ -48,8 +48,10 @@ test("real Keycloak sign-in, preloaded hybrid search and sign-out", async ({
     ),
   ).toBe(true);
   await expect(page.getByText(/unique passages/)).toBeVisible();
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await expect(page.locator(".collection-header")).toBeInViewport();
   await page.screenshot({
-    path: "test-results/demo-hybrid.png",
+    path: info.outputPath("demo-hybrid.png"),
     animations: "disabled",
   });
   await page.getByRole("button", { name: "Sign out", exact: true }).click();

@@ -1,6 +1,18 @@
 # RetrieVec UI/UX consistency audit
 
-## Current verification — 2026-10-05
+## Current verification — 2026-10-06
+
+The [material refinement](MATERIALS.md) adds a modular collection header and
+destination navigation, adaptive chrome and damped-spring press feedback. Reading
+surfaces remain solid. Reduced motion, reduced transparency and forced colors
+have explicit fallbacks. The final repository check passed 149 Python tests with
+PostgreSQL/pgvector enabled and no skips; Go checks and the web build passed.
+All 33 UI tests passed, with 144 inventoried captures at 1280px/390px in light/dark
+and supplemental 320px reflow at doubled text size. Named contrast surfaces passed
+in all four conditions. See [issue dispositions and commands](../maintenance-2026-10-06.md).
+Manual screen-reader, other-browser, browser-zoom and production gates remain open.
+
+## Release verification — 2026-10-05
 
 Phase 5 adds opt-in section filters, retained source metadata, verified ordinary
 PDF highlights with explicit missing-locator limitations, and comparison tables

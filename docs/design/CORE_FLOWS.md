@@ -1,5 +1,11 @@
 # RetrieVec core flows and navigation
 
+The 2026-10-06 [material refinement](MATERIALS.md) changes presentation only:
+collection-header and navigation modules retain the same actions and activation
+counts. All three destination controls remain visible at 320px with doubled text;
+the 33-test browser run preserved shortcuts, focus return, Escape, scoped lookup,
+upload retry keys, consent and provenance.
+
 Date: 2026-09-29. **Navigation and implementation approved by the owner.** This document preserves the original flow inventory and proposal. The 2026-10-04 UI-unification phase builds on the navigation already merged into `main`; see [current audit status](AUDIT.md#implementation-update--2026-10-04) and [shared component contracts](../DESIGN_SYSTEM.md).
 
 Current presentation uses Ask → Answer / Find passages, Sources, and Saved research. Answer composition is headed **Cited answers**. Collection details/readiness replace the old overview, and archive uses the existing Undo flow. UI unification retains the existing shortcuts, focus/Escape behavior, retry keys, session cleanup, consent rules, and research state machine; Phase 2 completes consent-aware initial mode selection, contextual quick actions, More disclosures, and shared evidence context. Retrieval defaults are unchanged. The audit lists actual automated coverage and remaining manual/integration gates.

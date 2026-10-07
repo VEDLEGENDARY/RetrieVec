@@ -86,6 +86,14 @@ for (const width of [1280, 390])
       page.setDefaultTimeout(10000);
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      const materialMedia = await page.context().newCDPSession(page);
+      await materialMedia.send("Emulation.setEmulatedMedia", {
+        features: [
+          { name: "prefers-color-scheme", value: colorScheme },
+          { name: "prefers-reduced-motion", value: "reduce" },
+          { name: "prefers-reduced-transparency", value: "no-preference" },
+        ],
+      });
       let signedIn = true,
         empty = false,
         snapshot = true,
@@ -383,6 +391,20 @@ for (const width of [1280, 390])
       await measure("skip-link", page.locator(".skip"));
       await measure("footer", page.locator("footer"));
       const question = page.getByLabel("Research question");
+      await measure("control-boundary", question, "border-top-color", 3);
+      await question.hover();
+      await measure("control-hover-boundary", question, "border-top-color", 3);
+      const currentDestination = sections.getByRole("button", {
+        name: "Ask",
+        exact: true,
+      });
+      await expect(currentDestination).not.toHaveCSS("border-top-width", "0px");
+      await measure(
+        "destination-selection",
+        currentDestination,
+        "border-top-color",
+        3,
+      );
       await question.focus();
       await expect(question).toHaveCSS("outline-style", "solid");
       await measure("input-focus", question, "outline-color", 3);

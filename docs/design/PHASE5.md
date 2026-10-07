@@ -31,7 +31,7 @@ SciFact had no recognized headings; SCIDOCS had 593 records with explicit
 headings. These are titles and abstracts, not full paper bodies. Dense/hybrid
 impact was not measured. The result does not support a default promotion.
 Full rankings, metrics and paired intervals:
-[sections-2026-10-05.json](../results/sections-2026-10-05.json).
+[sections-2026-10-05.json.gz](../results/sections-2026-10-05.json.gz).
 
 Verification: lossless boundaries, cross-page context, offsets, immutable
 provenance and tamper rejection passed unit tests. The section UI test and the
