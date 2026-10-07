@@ -11,43 +11,19 @@ of the API. Generation is optional and does not change source authorization.
 
 ## Requirements
 
-Native development requires Python 3.13, Go 1.26, Node.js 24, npm and PostgreSQL 18. The workspace requires an OpenID Connect provider. Docker Desktop or Docker Engine with Compose is sufficient for the container workflow.
+Native development requires Python 3.13, Go 1.26, Node.js 24, npm and PostgreSQL 18. The workspace requires an OpenID Connect provider. Docker builds the image; Kubernetes is the deployment path described below.
 
 Sparse and exact retrieval run on CPU. Generation is optional. Store model weights and papers under ignored directories; never commit credentials, sessions, downloaded papers or private answers.
 
-## Docker quick start
+## Container image
 
-The multi-stage image builds React, Go and Python, then runs as an unprivileged user. The workspace container starts migrations, loopback retrieval RPC, ingestion worker, research worker and API. PostgreSQL and artifacts use named volumes.
+The multi-stage `Dockerfile` builds React, Go and Python, then runs the workspace as an unprivileged user. Build it locally for a smoke test:
 
-1. Create local configuration:
+```bash
+docker build -t retrievec:local .
+```
 
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Replace every placeholder. Use distinct random values of at least 24 characters for `RETRIEVEC_READ_TOKEN` and `RETRIEVEC_WORKER_TOKEN`. Set `RETRIEVEC_OIDC_ISSUER` to the issuer visible to the browser and register `${RETRIEVEC_ORIGIN}/auth/callback`.
-
-3. Build and start:
-
-   ```bash
-   docker compose -f compose.app.yaml up --build -d
-   docker compose -f compose.app.yaml ps
-   docker compose -f compose.app.yaml logs -f workspace
-   ```
-
-4. Open `http://127.0.0.1:8000`, sign in, create a collection and upload sources.
-
-5. Stop without deleting data:
-
-   ```bash
-   docker compose -f compose.app.yaml down
-   ```
-
-Add `--volumes` only when intentionally deleting the database and artifact volumes. `compose.yaml` starts only PostgreSQL for native development. `compose.identity.yaml` starts pinned local Keycloak after generating its ignored realm file.
+For Kubernetes, push the image to a registry and deploy it by immutable digest. `compose.yaml` remains available when native development only needs a local PostgreSQL container. `compose.identity.yaml` starts pinned local Keycloak after generating its ignored realm file.
 
 ## Native setup
 
@@ -219,18 +195,13 @@ pending review** until representative quality/resource evidence supports a chang
 
 ### Optional distributed tracing
 
-Enable the collector and Jaeger alongside the app with:
-
-```bash
-docker compose -f compose.app.yaml -f compose.observability.yaml up --build -d
-```
-
-Open Jaeger at `http://127.0.0.1:16686`. Native processes can install
+Native processes can install
 `python -m pip install -e "./python[app,telemetry]"` and set `RETRIEVEC_OTEL=1`,
 `RETRIEVEC_OTEL_ENDPOINT=http://127.0.0.1:4318/v1/traces`, and optionally
 `RETRIEVEC_OTEL_SAMPLE_RATIO` between 0 and 1 (default 0.1). Restart after changes.
-Tracing is disabled by default. The sample collector uses bounded memory/queues;
-Jaeger uses transient storage, so restarting it loses traces.
+Tracing is disabled by default. Run a collector and Jaeger separately when those
+services are needed. The sample collector configuration in `deploy/otel/` uses
+bounded memory and queues.
 
 API requests propagate W3C traceparent through Python RPC into Go. Database connection
 and worker tick spans are included. SQL, query text, source text, credentials,
@@ -257,7 +228,7 @@ the actual application. Never send private research data to a mock server.
 python scripts/check.py
 cd web && npm run build
 cd web && npm test
-docker compose -f compose.app.yaml config --quiet
+docker build --check .
 docker build -t retrievec:local .
 ```
 
@@ -282,21 +253,55 @@ Backups contain private corpus data and are not encrypted by this tool.
 
 ## Security
 
-### Optional single-node Kubernetes
+### Kubernetes deployment
 
-Docker Compose remains the reference deployment. The Kubernetes renderer targets
-a Linux k3s node with the `local-path` storage class and NetworkPolicy enforcement.
-For Minikube, select an enforcing CNI and pass its storage class explicitly. This is
-a single-node deployment with restart downtime, not a high-availability service.
+The Kubernetes renderer targets a Linux k3s node with the `local-path` storage class
+and NetworkPolicy enforcement. For another cluster, select an enforcing CNI and pass
+its storage class with `--storage-class`. This is a single-node deployment with
+restart downtime, not a high-availability service.
 Do not scale the workspace replica count: worker locks and local storage require it.
 
-Build/push the image to your registry, obtain its immutable digest, then render:
+The cluster must have `kubectl`, an enforcing CNI, a storage class, and an HTTPS
+hostname with an OIDC provider. First verify the selected cluster and its storage
+class:
+
+```powershell
+kubectl config current-context
+kubectl get nodes
+kubectl get storageclass
+```
+
+Build and push a Linux image for the cluster architecture, then copy its immutable
+digest from the registry:
+
+```powershell
+docker buildx build --platform linux/amd64 --push `
+  -t YOUR_REGISTRY/retrievec:YOUR_TAG .
+```
+
+Render the deployment with the immutable image digest:
 
 ```bash
 python -m retrievec.deployment --image YOUR_REGISTRY/retrievec@sha256:YOUR_DIGEST \
   --origin https://research.example.com --issuer https://identity.example.com/realms/retrievec \
-  --output artifacts/deploy/workspace.json
+  --storage-class YOUR_STORAGE_CLASS --output artifacts/deploy/workspace.json
+```
+
+Create the namespace before creating its secrets:
+
+```bash
 kubectl create namespace retrievec
+```
+
+Register `https://research.example.com/auth/callback` with the OIDC provider.
+Create `private/db-password` with the PostgreSQL password and
+`private/workspace.env` with the following keys; replace all placeholders and
+keep both files outside Git:
+
+```dotenv
+RETRIEVEC_DSN=postgresql://retrievec:YOUR_ENCODED_PASSWORD@postgres:5432/retrievec
+RETRIEVEC_READ_TOKEN=YOUR_DISTINCT_RANDOM_TOKEN_AT_LEAST_24_CHARACTERS
+RETRIEVEC_WORKER_TOKEN=ANOTHER_DISTINCT_RANDOM_TOKEN_AT_LEAST_24_CHARACTERS
 ```
 
 Provision `database-secrets` with key `password`, and `workspace-secrets` with
@@ -318,8 +323,11 @@ The deployment creates three PVCs, resource budgets, a nonroot/read-only workspa
 startup/readiness/liveness probes, and default-deny network policies. HTTPS egress
 is allowed for the configured identity provider and model downloads; tighten it
 with your CNI's domain policy or preloaded models where required. No RPC port is
-exposed. Back up both PostgreSQL and artifact storage before upgrades. Local-path
-volumes stay on their node; replacing that node requires a restore.
+exposed. PostgreSQL requests half a CPU and has no CPU limit, allowing it to use
+spare node capacity during query bursts; benchmark your workload before changing
+the request or memory limit. Back up both PostgreSQL and artifact storage before
+upgrades. Local-path volumes stay on their node; replacing that node requires a
+restore.
 
 For HTTPS, install a maintained Gateway API controller and TLS certificate separately.
 Create a Gateway named `retrievec` in `gateway-system` with an `https` listener,
@@ -356,8 +364,8 @@ the image sets it to `/app/web/dist`. Persist `/app/artifacts/cache` for model d
 The image now uses UID/GID 10001. Before upgrading an existing deployment, back up
 its data and ensure the artifact/cache volumes are writable by that identity;
 older images used a distribution-assigned system UID. Kubernetes sets the matching
-filesystem group. Compose passes PostgreSQL credentials as separate libpq environment
-variables so punctuation in passwords is not interpreted as URI syntax.
+filesystem group. Native setup passes PostgreSQL credentials as separate libpq
+environment variables so punctuation in passwords is not interpreted as URI syntax.
 
 Plaintext RPC accepts numeric loopback addresses only. For separate hosts, mount
 a private CA and distinct server/client certificates, then set these variables in
@@ -394,7 +402,7 @@ This follows the [gRPC authentication model](https://grpc.io/docs/guides/auth/).
 | RPC unavailable | Start `retrievald rpc`; verify tokens, store path and address |
 | Upload remains queued | Check ingestion worker and absolute engine path |
 | Research remains queued | Check research worker, generation config and key |
-| Container unhealthy | Inspect `docker compose -f compose.app.yaml logs workspace` |
+| Container unhealthy | Inspect Kubernetes pod events and logs with `kubectl -n retrievec describe pod` and `kubectl -n retrievec logs deployment/workspace` |
 | Stale frontend | Rebuild `web/dist` with `npm run build` |
 | Interrupted run | Inspect saved state and create a new run; do not mutate history |
 

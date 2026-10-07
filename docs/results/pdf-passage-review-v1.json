@@ -1,0 +1,1360 @@
+{
+  "schema_version": 1,
+  "kind": "pdf-passage-review-packet",
+  "manifest_sha256": "fcf5ebc92fed67b22778bba5f8af9997ffc56892d321004411e3f4a7eb7aad3e",
+  "corpus_snapshot_id": "ss_82fc844413de7c60302c854337c67f99a4665ff27c619fcba2e9d2222b3e7627",
+  "question_count": 0,
+  "quality_evidence": false,
+  "candidates": [
+    {
+      "candidate_id": "pq_271efe7bde9ee9e1b01915d534c6106c3158b49d6dffd232b8b7af79ec33b1d6",
+      "paper_id": "2020.emnlp-main.550",
+      "paper_title": "Dense Passage Retrieval for Open-Domain Question Answering",
+      "source_sha256": "2abfc7991519be2b8ce30215905516fdb593218b7bf59e50ece0d8a088a7c4d5",
+      "chunk_id": "ch_edb5ec9437bfc62389aa0b7752034fd524ea18e05ec7b74b05dedf7e345e3bab",
+      "text_sha256": "87b3d4299ddaadd1de238a7b8bceed3cd850e1bbbd02c719622846e42bd76dd2",
+      "page_range": [
+        2,
+        2
+      ],
+      "passage": "for retrieval.\n3The ideal size and boundary of a text passage are func-\ntions of both the retriever and reader. We also experimented\nwith natural paragraphs in our preliminary trials and found that\nusing ﬁxed-length passages performs better in both retrieval\nand ﬁnal QA accuracy, as observed by Wang et al. (2019).\n4Exceptions include (Seo et al., 2019) and (Roberts et al.,\n2020), which retrieves and generates the answers, respectively.",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_75ffdc2e6ec0b711be266b1b14ceb2f54469042f2c96b03155f37dbe2c009b88",
+      "paper_id": "2020.emnlp-main.550",
+      "paper_title": "Dense Passage Retrieval for Open-Domain Question Answering",
+      "source_sha256": "2abfc7991519be2b8ce30215905516fdb593218b7bf59e50ece0d8a088a7c4d5",
+      "chunk_id": "ch_d07f9a09968999094739c14c18c600b14091e3d001f893bc21fde33e67d0f09d",
+      "text_sha256": "61acce38ab6e7d1b11769763b0c3f6f0985e0b0c246a2b0297ec8673d13f2d33",
+      "page_range": [
+        4,
+        4
+      ],
+      "passage": "questions in training/dev/test sets for all the\ndatasets and the actual questions used for training\nthe retriever.\n5 Experiments: Passage Retrieval\nIn this section, we evaluate the retrieval perfor-\nmance of our Dense Passage Retriever (DPR),\nalong with analysis on how its output differs from\n6We use the unﬁltered TriviaQA version and discard the\nnoisy evidence documents mined from Bing.\n7The improvement of using gold contexts over passages\nthat contain answers is small. See Section 5.2 and Ap-\npendix A.",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_db02cc1c2a91166bdd7f5d6a42f159468dbcfbc852d999058bc800590f72291b",
+      "paper_id": "2020.emnlp-main.550",
+      "paper_title": "Dense Passage Retrieval for Open-Domain Question Answering",
+      "source_sha256": "2abfc7991519be2b8ce30215905516fdb593218b7bf59e50ece0d8a088a7c4d5",
+      "chunk_id": "ch_e6a63d018aa5f654c3b1fb1cf8adad50ea5c1c588e1bca23a74a1aae292bf7a9",
+      "text_sha256": "1494c4de915831822e61894b45b37dd911f034155d48f2a34508f0598742a327",
+      "page_range": [
+        6,
+        6
+      ],
+      "passage": "details can be found in Appendix B.\nCross-dataset generalization One interesting\nquestion regarding DPR’s discriminative training\nis how much performance degradation it may suf-\nfer from a non-iid setting. In other words, can\nit still generalize well when directly applied to\na different dataset without additional ﬁne-tuning?\nTo test the cross-dataset generalization, we train\nDPR on Natural Questions only and test it directly\non the smaller WebQuestions and CuratedTREC\ndatasets. We ﬁnd that DPR generalizes well, with\n3-5 points loss from the best performing ﬁne-tuned\nmodel in top-20 ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_abac3cd75ae691e890f735ada57733f54b7dc0731efcd5c41cd0e059761cd1a4",
+      "paper_id": "2020.emnlp-main.550",
+      "paper_title": "Dense Passage Retrieval for Open-Domain Question Answering",
+      "source_sha256": "2abfc7991519be2b8ce30215905516fdb593218b7bf59e50ece0d8a088a7c4d5",
+      "chunk_id": "ch_22d81fdefc0b263dbf0c1fe9763dc6e5bf18af5ed3e3129458474fdf5af2058f",
+      "text_sha256": "3a163fcdb08fa53aee5fd1a6ead656a19980a6906f3b47116ad0038139ca57f2",
+      "page_range": [
+        8,
+        8
+      ],
+      "passage": "all of them into one batch on a sin-\ngle 32GB GPU, thus the latency remains almost\nidentical to the single passage case (around 20ms).\nThe exact impact on throughput is harder to mea-\nsure: ORQA uses 2-3x longer passages compared\nto DPR (288 word pieces compared to our 100\ntokens) and the computational complexity is super-\nlinear in passage length. We also note that we\nfoundk = 50 to be optimal for NQ, and k = 10\nleads to only marginal loss in exact match accu-\nracy (40.8 vs. 41.5 EM on NQ), which ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_df4da4fd850c1254d2521d7083483eb56ee315424c963a8291508620359d0d06",
+      "paper_id": "2020.emnlp-main.550",
+      "paper_title": "Dense Passage Retrieval for Open-Domain Question Answering",
+      "source_sha256": "2abfc7991519be2b8ce30215905516fdb593218b7bf59e50ece0d8a088a7c4d5",
+      "chunk_id": "ch_033066a66af8ef54b462376d1e6c9feb8b23a78973e1ce5ef34af732b1927031",
+      "text_sha256": "75f1c09286be7ed15c0d24b3216a28216f86fef88b4c606605eb1ad982f038b5",
+      "page_range": [
+        10,
+        10
+      ],
+      "passage": "and Slav Petrov. 2019. Natu-\nral questions: a benchmark for question answering\nresearch. Transactions of the Association of Compu-\ntational Linguistics (TACL).\nKenton Lee, Ming-Wei Chang, and Kristina Toutanova.\n2019. Latent retrieval for weakly supervised open\ndomain question answering. In Association for Com-\nputational Linguistics (ACL), pages 6086–6096.\nMike Lewis, Yinhan Liu, Naman Goyal, Mar-\njan Ghazvininejad, Abdelrahman Mohamed, Omer\nLevy, Veselin Stoyanov, and Luke Zettlemoyer.\n2020a. BART: Denoising sequence-to-sequence pre-\ntraining for natural language generation, translation,\nand comprehension. In Association for Computa-\ntional Linguistics (ACL), pages 7871–7880.\nPatrick Lewis, Ethan ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_f79e8a0e3cd5b34028d46f59dd6174257ac94873dd22c499300bae0f1e823fbf",
+      "paper_id": "2021.emnlp-main.496",
+      "paper_title": "Simple Entity-Centric Questions Challenge Dense Retrievers",
+      "source_sha256": "fd846968daae2d08a4df3202ed0f8fd19d56cd4eac3e3b3a963213ba8abc532d",
+      "chunk_id": "ch_80d397758005d374617aa62a3f7670528b5037d542fbb5e5d0492f1920115628",
+      "text_sha256": "26bddd77704f1d8e4999b4cda5972198d5501e04dfe4e1815373e2fd65c18f00",
+      "page_range": [
+        2,
+        2
+      ],
+      "passage": "B.\nand pre-indexed—for any test question, the top\npassages with the highest similarity scores are re-\nturned. Recently, other advances have been made in\nimproving dense retrieval, including incorporating\nbetter hard negatives (Xiong et al., 2021; Qu et al.,\n2021), or ﬁne-grained phrase retrieval (Lee et al.,\n2021). We leave them for future investigation.\nGeneralization problem Despite the impressive\nin-domain performance of dense retrievers, their\ncapability of generalizing to unseen questions still\nremains relatively under-explored. Recently, Lewis\net al. (2021a) discover that there is a large over-\nlap between training and ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_f9693586146e97e46d3e82d34fe5035b7c669c2faae703a8eeca22d28ff714d5",
+      "paper_id": "2021.emnlp-main.496",
+      "paper_title": "Simple Entity-Centric Questions Challenge Dense Retrievers",
+      "source_sha256": "fd846968daae2d08a4df3202ed0f8fd19d56cd4eac3e3b3a963213ba8abc532d",
+      "chunk_id": "ch_2ad6dfd6188913f7b73c107728b612ef619aa5cfe63e71ef4fa621842d08cc07",
+      "text_sha256": "bec839fd5c520453d73169be6eec6c543ee7d2270b00e7b0be9ff27ce5ec6b7d",
+      "page_range": [
+        4,
+        4
+      ],
+      "passage": "en-\ncoder and only updating the passage encoder, or vice\nversa.\nseen during NQ training than on randomly selected\nentities. This suggests that DPR representations\nare much better at representing the most common\nentities as well as entities observed during training.\n4.2 Observing questions helps generalization\nWe next investigate whether DPR generalizes to un-\nseen entities when trained on the question pattern.\nFor each relation considered, we build a training\nset with at most 8, 000 triples. We ensure no to-\nkens from training triples overlap with tokens from\ntriples in the corresponding test set. ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_4f4f2aa01845bb977d618d6a4a75bf742d883da7bbbd472e132570154fca2814",
+      "paper_id": "2021.emnlp-main.496",
+      "paper_title": "Simple Entity-Centric Questions Challenge Dense Retrievers",
+      "source_sha256": "fd846968daae2d08a4df3202ed0f8fd19d56cd4eac3e3b3a963213ba8abc532d",
+      "chunk_id": "ch_3a6644884a1ee99bd1adc230722b15a1b509d8f895e889cb38af95eb9005849b",
+      "text_sha256": "9e0b1515e9c54b61e31369c3de95749c87f741ef55e1ae1f0441e7eb9242441a",
+      "page_range": [
+        5,
+        5
+      ],
+      "passage": "com-\nmon entities, but has trouble differentiating rarer\nentities without explicitly observing the question\npattern during training.\nWe suggest future work in incorporating explicit\nentity memory into dense retrievers to help differen-\ntiate rare entities. Numerous recent works (Wu et al.\n2020; Li et al. 2020; Cao et al. 2021) demonstrate\nretrievers can easily learn dense representations for\na large number of Wikipedia entities. DPR could\nalso leverage entity-aware embedding models like\nEaE (Févry et al., 2020) or LUKE (Yamada et al.,\n2020) to better recall long-tail entities.",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_3b28ac69868cdb50cdfcd08b883ad45031c91520645f9da9bafe8872bb4fce7f",
+      "paper_id": "2021.emnlp-main.496",
+      "paper_title": "Simple Entity-Centric Questions Challenge Dense Retrievers",
+      "source_sha256": "fd846968daae2d08a4df3202ed0f8fd19d56cd4eac3e3b3a963213ba8abc532d",
+      "chunk_id": "ch_14424eeb29fbd8cc4d2a2ffc4eb985e640ea5fb66edf6cd4fe33a81949505dd0",
+      "text_sha256": "d38036c2e38bd21b001d6ebbec09596341a3ed8353cce0a3bc0a708e035fa7a7",
+      "page_range": [
+        7,
+        7
+      ],
+      "passage": "Z. Li, Sewon Min, Srinivasan Iyer, Yashar\nMehdad, and Wen-tau Yih. 2020. Efﬁcient one-pass\nend-to-end entity linking for questions. In Proceed-\nings of the 2020 Conference on Empirical Methods\nin Natural Language Processing (EMNLP) , pages\n6433–6441, Online. Association for Computational\nLinguistics.\nJimmy Lin, Xueguang Ma, Sheng-Chieh Lin, Jheng-\nHong Yang, Ronak Pradeep, and Rodrigo Nogueira.\n2021. Pyserini: An easy-to-use python toolkit to\nsupport replicable ir research with sparse and dense\nrepresentations. ArXiv preprint, abs/2102.10073.\nMoin Nadeem, Anna Bethke, and Siva Reddy. 2021.\nStereoSet: Measuring stereotypical bias ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_f581a90a58c8d4071c2fa4d55982b748de16ee1a572d0c7f676e65775cb02229",
+      "paper_id": "2021.emnlp-main.496",
+      "paper_title": "Simple Entity-Centric Questions Challenge Dense Retrievers",
+      "source_sha256": "fd846968daae2d08a4df3202ed0f8fd19d56cd4eac3e3b3a963213ba8abc532d",
+      "chunk_id": "ch_83a4f8c36bec77f6aa50ef3d1a58f252344c11862cc8686795061d0c65f194cb",
+      "text_sha256": "71c32ce64fecb9c4938fbcc2525bba0bde6f1b1c0af9afc1e01c250bc9fe4268",
+      "page_range": [
+        9,
+        9
+      ],
+      "passage": "87.1\nP176 Which company is [E] produced by? 69.2 83.2\nP20 Where did [E] die? 61.9 89.2\nP112 Who founded [E]? 77.3 85.5\nP127 Who owns [E]? 73.6 84.4\nP19 Where was [E] born? 52.9 90.3\nP740 Where was [E] founded? 50.9 77.5\nP413 What position does [E] play? 53.8 90.4\nP800 What is [E] famous for? 45.3 81.9\nP69 Where was [E] educated? 38.6 84.1\nP50 Who is the author of [E]? 77.2 76.2\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_b4acc3c9616bd1ba829af4ff2024c19e539a84f536e6214568f5db18fe26e4bf",
+      "paper_id": "2021.naacl-main.241",
+      "paper_title": "COIL: Revisit Exact Lexical Match in Information Retrieval with Contextualized Inverted List",
+      "source_sha256": "6ccf36352b485fe492d15a787b162635b38fd3d50b67b617706325f83453a2bf",
+      "chunk_id": "ch_acaa72709443959ca26d8b9f66ce81a79831344c6653621108ce502a136246ba",
+      "text_sha256": "737c5e9af3cb0b77e64841a9e81fdb391366e3af4d99ae4b17572244aea29ccf",
+      "page_range": [
+        2,
+        2
+      ],
+      "passage": "to augment-\ning lexical retrieval with deep LMs by expanding\nthe document surface form to narrow the vocab-\nulary gap, e.g., DocT5Query (Nogueira and Lin,\n2019), or altering term weights to emphasize impor-\ntant terms, e.g., DeepCT (Dai and Callan, 2019a).\nSmartly combining deep LM retriever and reranker\ncan offer additive gain for end performance (Gao\net al., 2021a). These retrievers however still suffer\nfrom vocabulary and semantic mismatch as tradi-\ntional lexical retrievers.\nAnother line of research continues the work on\nsingle vector representation and build dense retriev-\ners, as illustrated in Figure ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_b6f6e62808a80cb88040f7c5db836a4a5021d97a88c4e845b29ef6b9d364f3e9",
+      "paper_id": "2021.naacl-main.241",
+      "paper_title": "COIL: Revisit Exact Lexical Match in Information Retrieval with Contextualized Inverted List",
+      "source_sha256": "6ccf36352b485fe492d15a787b162635b38fd3d50b67b617706325f83453a2bf",
+      "chunk_id": "ch_2a680f7e9bcc24d1cfeaab6711c9e430cd80f7459e9c1422f75ed3150c3f5192",
+      "text_sha256": "7e476c3ed99b9b74f9e5b075cca4ed021764e055c5a239a06c92bd52d74e3443",
+      "page_range": [
+        4,
+        4
+      ],
+      "passage": "that it sufﬁces to use lower dimension\ntoken vectors. We conﬁrm this in section 5. Simi-\nlarly, we encode a documentd’sj-th tokendj with:\nvd\nj = WtokLM(d,j ) + btok (4)\nWe then deﬁne the contextualized exact lexical\nmatch scoring function between query document\nbased on vector similarities between exact matched\nquery document token pairs:\nstok(q,d ) =\n∑\nqi∈q∩d\nmax\ndj =qi\n(vq\ni\n⊺vd\nj ) (5)\nNote that, importantly, the summation goes through\nonly overlapping terms,qi∈q∩d. For each query\ntokenqi, we ﬁnds all same tokensdj in the docu-\nment, ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_a6bd380080cd6f9e3d4e409cc7f64d09863a876c88ca7a7b7c38847d63803498",
+      "paper_id": "2021.naacl-main.241",
+      "paper_title": "COIL: Revisit Exact Lexical Match in Information Retrieval with Contextualized Inverted List",
+      "source_sha256": "6ccf36352b485fe492d15a787b162635b38fd3d50b67b617706325f83453a2bf",
+      "chunk_id": "ch_79046ba6016d9707530769ffbd022a6add7699c22066c7a3d72b493f134eea94",
+      "text_sha256": "feaa33ae9a3d2a49e7f7cb3817353dec1d55ca6308593d031aac6f4d34e1dd7c",
+      "page_range": [
+        6,
+        6
+      ],
+      "passage": "negatives or with mixed BM25 and\nrandom negatives, published in Xiong et al. (2020).\nHowever since these systems use a robust version\nof BERT, RoBERTa (Liu et al., 2019) as the LM\nand train document retriever also on MSMARCO\npassage set, we in addition reproduce a third dense\nretriever, that uses the exact same training setup as\nCOIL. All dense retrievers use 768 dimension em-\nbedding. For ColBERT, we report its published re-\nsults (available only on passage collection). BERT\nreranker is added in the rerank task.\nWe include 2 COIL systems: 1) COIL-tok, the\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_41742881f3776397d6b8950fc326f000d30bb98d1a23f84aa2188e9be2fcc14a",
+      "paper_id": "2021.naacl-main.241",
+      "paper_title": "COIL: Revisit Exact Lexical Match in Information Retrieval with Contextualized Inverted List",
+      "source_sha256": "6ccf36352b485fe492d15a787b162635b38fd3d50b67b617706325f83453a2bf",
+      "chunk_id": "ch_d6ee3a4f16c3d8c78c6b6975084458ea9fb45749a52ce04efdd197eaad678617",
+      "text_sha256": "e8a23d31b32cfaf3de35bc7a5974145a9c7ddc3a3d1d77523c71d2d61cff3214",
+      "page_range": [
+        7,
+        7
+      ],
+      "passage": "768 to 128 leads to a small drop in perfor-\nmance on the Dev set, indicating that a full 768\ndimension may not be necessary for COIL. Keep-\ning CLS dimension at 128, systems with token\ndimension 32 and 8 have very small performance\ndifference, suggesting that token-speciﬁc semantic\nconsumes much fewer dimensions. Similar pattern\ninnt is also observed in COIL-tok (nc = 0).\nOn the DL2019 queries, we observe that reduc-\ning dimension actually achieves better MRR. We\nbelieve this is due to a regulatory effect, as the",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_0a1d396a0828f0ce4678483007fe627ac8918e110142b5eadf5bb992b17b43d3",
+      "paper_id": "2021.naacl-main.241",
+      "paper_title": "COIL: Revisit Exact Lexical Match in Information Retrieval with Contextualized Inverted List",
+      "source_sha256": "6ccf36352b485fe492d15a787b162635b38fd3d50b67b617706325f83453a2bf",
+      "chunk_id": "ch_3afb80709857ddc1a238946923710509ed002c3d419e54d8309af09370881cb1",
+      "text_sha256": "e13764d9c0e1dc87405c277c6ca0c8e4cb5f3e4f5625c0c076667c2c2e5ffe5d",
+      "page_range": [
+        10,
+        10
+      ],
+      "passage": "3039\nReferences\nS. Blackford, J. Demmel, J. Dongarra, I. Duff, S. Ham-\nmarling, Greg Henry, M. Héroux, L. Kaufman, An-\ndrew Lumsdaine, A. Petitet, R. Pozo, K. Remington,\nand C. Whaley. 2002. An updated set of basic linear\nalgebra subprograms (blas). ACM Transactions on\nMathematical Software, 28.\nNick Craswell, Bhaskar Mitra, Emine Yilmaz, Daniel\nCampos, and Ellen M V oorhees. 2020. Overview\nof the trec 2019 deep learning track. arXiv preprint\narXiv:2003.07820.\nZhuyun Dai and J. Callan. 2019a. Context-aware sen-\ntence/passage term importance estimation for ﬁrst\nstage retrieval. ArXiv, abs/1910.10687.\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_ee5108bb3fef4149c03dad35d348f360ceceea58c1dc751abc29938c7d56a218",
+      "paper_id": "2022.acl-long.203",
+      "paper_title": "Unsupervised Corpus Aware Language Model Pre-training for Dense Passage Retrieval",
+      "source_sha256": "ee840097ef4c5998da74aeab5f7c30737a91f703daf13a54f0686cedd6f5d477",
+      "chunk_id": "ch_d8d2749c71a9d8b1b850cca49964bf984cd680d5a72d0c2ed5a49138b2eebf44",
+      "text_sha256": "1a746c351284e595c3204c52470576ff5ea5bf780f4e1a09d58da1933895f4a5",
+      "page_range": [
+        2,
+        2
+      ],
+      "passage": "such\nas FAISS (Johnson et al., 2017). By pre-encoding\nthe corpus into a MIPS index, retrieval can run on-\nline with millisecond-level latency (Johnson et al.,\n2017; Guo et al., 2020).\nContrastive Learning Contrastive learning has\nbecome a very popular topic in computer vi-\nsion (Chen et al., 2020; He et al., 2020). Recent\nworks have brought the idea to natural language\nprocessing to learn high-quality sentence represen-\ntation (Giorgi et al., 2020; Wu et al., 2020). In\nthis work, we use contrastive learning to do pre-\ntraining for dense retrieval. Different from ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_eba2365cfaa1c89f683e9242fcbafa6427d336aab31cd661b5704ecd2d591d47",
+      "paper_id": "2022.acl-long.203",
+      "paper_title": "Unsupervised Corpus Aware Language Model Pre-training for Dense Passage Retrieval",
+      "source_sha256": "ee840097ef4c5998da74aeab5f7c30737a91f703daf13a54f0686cedd6f5d477",
+      "chunk_id": "ch_bcaa68fddb9336f568112570bdcd37403baee54ec72f1dbda45329e2dc4549f6",
+      "text_sha256": "b5c77046d32c2c5f5efb94a90b3094c1ef9ec6150f6bfed3b9bf0fd46e3e8901",
+      "page_range": [
+        4,
+        4
+      ],
+      "passage": "four commercial GPUs. To break the memory con-\nstraint and perform effective contrastive learning,\nwe adjust the gradient caching technique (Gao et al.,\n2021b) for our setup. We describe the procedure\nhere for people who want to perform coCondenser\npre-training but have limited resources. Denote\nLco = ∑\ni\n∑\njLco\nij , we can write Equation 7 as,\nL = 1\n2n[Lco +\n∑\ni\n∑\nj\nLmlm\nij ] (8)\nThe spirit of gradient caching is to decouple rep-\nresentation gradient and encoder gradient compu-\ntation. Before computing the model weight up-\ndate, we ﬁrst run an extra backbone forward for\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_02f6e7ac9622876440cc5da2a6a71946d6d0d14a9ddb25c3c4c070eeb75dfab2",
+      "paper_id": "2022.acl-long.203",
+      "paper_title": "Unsupervised Corpus Aware Language Model Pre-training for Dense Passage Retrieval",
+      "source_sha256": "ee840097ef4c5998da74aeab5f7c30737a91f703daf13a54f0686cedd6f5d477",
+      "chunk_id": "ch_f3a52f03a12ef551fc2b55398ae2eb3c3dc15be23363fc6f5b3b40021517d3c0",
+      "text_sha256": "2e2f021b93eaf7e4903643e9f29e751184425d9c4309bbeec3eed2f12e7ec2af",
+      "page_range": [
+        5,
+        5
+      ],
+      "passage": "2020). All models are trained on one RTX 2080\nTi. We added gradient caching to DPR to deal with\nmemory constraints. The models are trained only\non each task’s corresponding training set. We note\nthat RocketQA is trained on a concatenation of\nseveral datasets (Qu et al., 2021).\nModel Validation Since for dense retrieval, vali-\ndating a checkpoint requires encoding the full cor-\npus, evaluating a checkpoint becomes very costly.\nDue to our computation resource limitation, we\nfollow the suggestion in the DPR toolkit and take\n2847",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_99975a7b3bbdfaffe2cdc26c82bbe32f27fe2f17ccbad69473f15d59cbfae3d2",
+      "paper_id": "2022.acl-long.203",
+      "paper_title": "Unsupervised Corpus Aware Language Model Pre-training for Dense Passage Retrieval",
+      "source_sha256": "ee840097ef4c5998da74aeab5f7c30737a91f703daf13a54f0686cedd6f5d477",
+      "chunk_id": "ch_b2aee765131b466bfb5e783ba66b32a3e2a9627f848420a65d0d3d2d642ec0ee",
+      "text_sha256": "9ce1df2ab87a58681d28181bcfc4e0457c5e95cc9a1718c20257696510967ade",
+      "page_range": [
+        7,
+        7
+      ],
+      "passage": "training and ﬁne-tuning\nstages.\n5.1 Learning with Soft Labels\nTo analyze the local robustness of coCondenser,\nwe introduce a knowledge distillation upper-bound\nmodel: instead of training using the noisy labels,\nwe ﬁrst train a cross encoder and then ﬁne-tune a co-\nCondenser model using soft labels generated from\nthe cross-encoder. Unlike Qu et al. (2021) that uses\ncross encoder for ﬁltering, here we directly expose\nthe logits as soft labels. Concretely, given cross\nencoder g, a batch of M queries{q1, q2, .., qM},\neach paired with N passages (positive and hard\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_b1237790519ac6a6e7974a76c8b3b767a844f30f67af1064bb4dc878d92627a1",
+      "paper_id": "2022.acl-long.203",
+      "paper_title": "Unsupervised Corpus Aware Language Model Pre-training for Dense Passage Retrieval",
+      "source_sha256": "ee840097ef4c5998da74aeab5f7c30737a91f703daf13a54f0686cedd6f5d477",
+      "chunk_id": "ch_46217fcc8e56e05966a9941e1ab261382cf0da0b9cf1613724a387bcc2e2be69",
+      "text_sha256": "71374d1e8cb6aec44f3306a2f204222d37615c23a68bc8104b318ea477700c63",
+      "page_range": [
+        9,
+        9
+      ],
+      "passage": "power. Lever-\naging the Condenser architecture and a corpus\naware contrastive loss, coCondenser acquires two\nimportant properties for dense retrieval, noise re-\nsistance, and structured embedding space. This\ncorpus-aware pre-training needs to be done once\nfor a search corpus and is query agnostic. The\nlearned model can be shared among various types\nof end task queries.\nExperiments show that coCondenser can drasti-\ncally reduce the costs of ﬁne-tuning a strong dense\nretriever. We also ﬁnd coCondenser yields per-\nformance close or similar to semi-supervised pre-\ntrained models that are several times larger.\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_c0ec6d81d6df3188a187d5de5d01887dccf81cb9cd32747decef4b94ea71141e",
+      "paper_id": "2022.emnlp-main.445",
+      "paper_title": "Reduce Catastrophic Forgetting of Dense Retrieval Training with Teleportation Negatives",
+      "source_sha256": "7f073a6e9b3180fcbc3f3296f5621ba074a5012362305eee72c06d7841458659",
+      "chunk_id": "ch_26bd8414d8d2f662d55e8c13c582116a5aabeb565d5df9da4cb418d418ed5e51",
+      "text_sha256": "8c423a2d93694f36fe8de847a425c53ca651fc03cc1961c22f00d4da28db6137",
+      "page_range": [
+        3,
+        3
+      ],
+      "passage": "The model is trained to separateD−\ni fromd+\nusing the ranking lossl, e.g., cross entropy or hinge\nloss. For clarity, we refer to an iteration of negative\nconstruction and model training as one training\nepisode in the rest of this paper, with episode 1\nreferring to the first fine-tuning iteration from the\npretrained model.\n3.2 Learning Instability Investigation\nWe now investigate the training process described\nin Eqn. 3. We first study the training curves of\nvarious iterative training configurations, proceed\nwith model behaviors, and then the dynamics of\nhard negative selection through training ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_5007b37f8e2187b5f8adbc603305e5dc81621709d8c46abbe9b10e526b79242b",
+      "paper_id": "2022.emnlp-main.445",
+      "paper_title": "Reduce Catastrophic Forgetting of Dense Retrieval Training with Teleportation Negatives",
+      "source_sha256": "7f073a6e9b3180fcbc3f3296f5621ba074a5012362305eee72c06d7841458659",
+      "chunk_id": "ch_c0885c9b5bb5bb062dfaab0578f3ff89ec75db3509b86519c3c4e22f4a62af87",
+      "text_sha256": "39cbb2b0766585f4ee5a20e2e8a52bc4178aab423ee088f6233f1bf69c74d1e1",
+      "page_range": [
+        6,
+        6
+      ],
+      "passage": "9 74.4 85.3 73.1 80.4 85.7\nDense Retrieval\nDPR (2020) 110M BM25 31.1 95.2 n.a. 78.4 85.4 n.a. 79.4 85.0\nDrBoost (2022) 110M ×5 Self (Boosted) 34.4 n.a. n.a. 80.9 87.6 n.a n.a n.a\nANCE (2021) 110M BM25+Self 33.0 95.9 n.a. 81.9 87.5 n.a. 80.3 85.3\nSEED-Encoder (2021) 110M BM25+Self 33.9 96.1 n.a. 83.1 88.7 n.a. n.a. ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_c320246d4f24e8f9603c5574d675f463556247fcb8107ddb10b1f16111682fed",
+      "paper_id": "2022.emnlp-main.445",
+      "paper_title": "Reduce Catastrophic Forgetting of Dense Retrieval Training with Teleportation Negatives",
+      "source_sha256": "7f073a6e9b3180fcbc3f3296f5621ba074a5012362305eee72c06d7841458659",
+      "chunk_id": "ch_d4d1153e5654ea3e143ffacae8cb699135572b41705806b6b3a6b6435b962f23",
+      "text_sha256": "3428ead92c10d177ae9fe7c9f9dda7ac099e193c089c9db47f4ad0803a9e7c18",
+      "page_range": [
+        8,
+        8
+      ],
+      "passage": "2021; Ni et al., 2021; Gao and\nCallan, 2022). The baseline performances of zero-\nshot, DPR (BM25 negatives), and ANCE with Con-\ndenser and coCondenser confirm the benefits of\nthese two pretraining techniques.\nANCE-Tele provides robust improvements de-\nspite different pretrained starting points. Among\ndifferent negative selection approaches, Query neg-\natives alone lag behind ANCE after three training\nepisodes, confirming the important role of BM25\nnegatives in ANCE. Adding either momentum or\nlookahead negatives eliminates the dependency on\nsparse retrieval, even when starting from BERT\nwhose zero-shot performance is barely nonrandom.\nThe two provide ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_b9c2eebd742e0ea4af8a963d7afdb00d2bbdc545190dafacd50ac2cbabe1ffc4",
+      "paper_id": "2022.emnlp-main.445",
+      "paper_title": "Reduce Catastrophic Forgetting of Dense Retrieval Training with Teleportation Negatives",
+      "source_sha256": "7f073a6e9b3180fcbc3f3296f5621ba074a5012362305eee72c06d7841458659",
+      "chunk_id": "ch_57b506aece1d73d052bbe51dd3213d37e8e61bb00e813c93ac195e694a0dcdb7",
+      "text_sha256": "ec98b181c15d4c4577e3dba406f877025c29ac416d531edc90a127d0eb6a25c3",
+      "page_range": [
+        11,
+        11
+      ],
+      "passage": "Yu Meng, Chenyan Xiong, Payal Bajaj, Saurabh Ti-\nwary, Paul Bennett, Jiawei Han, and Xia Song.\n2021. COCO-LM: Correcting and contrasting text\nsequences for language model pretraining. In Pro-\nceedings of NeurIPS 2021 .\nTom Mitchell, William Cohen, Estevam Hruschka,\nPartha Talukdar, Bishan Yang, Justin Betteridge, An-\ndrew Carlson, Bhavana Dalvi, Matt Gardner, Bryan\nKisiel, et al. 2018. Never-ending learning. Commu-\nnications of the ACM.\nArvind Neelakantan, Tao Xu, Raul Puri, Alec Rad-\nford, Jesse Michael Han, Jerry Tworek, Qiming Yuan,\nNikolas Tezak, Jong Wook Kim, Chris Hallacy, et al.\n2022. Text and code embeddings ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_0568fd5e628d06c82b8963d58079a7f83dc42a9009df2580f8c7969d7060f396",
+      "paper_id": "2022.emnlp-main.445",
+      "paper_title": "Reduce Catastrophic Forgetting of Dense Retrieval Training with Teleportation Negatives",
+      "source_sha256": "7f073a6e9b3180fcbc3f3296f5621ba074a5012362305eee72c06d7841458659",
+      "chunk_id": "ch_395b96ef464627999fd050f7408fd8a2cabdd6a720e64706eb1c1b15fd48e053",
+      "text_sha256": "791d7f847997f5ae72198560bbf2fd0ed5c071b614b2a98eea3022b3489f7baf",
+      "page_range": [
+        13,
+        13
+      ],
+      "passage": "different training negatives. Take Epi-\n3 as an example: On MARCO, each training batch\ncontains eight queries, each query is equipped with\none positive and 31 negatives, and the number of\ntraining epochs is three. On NQ and TriviaQA, the\nquery batch size is 128, each query is equipped\nwith one positive and eleven negatives, and the to-\ntal training epoch is 40. Next, we introduce how to\nHyperparameters Standard ANCE\nNegative refresh step 10k\nNegative mining depth 200\nBatch size (query size per batch) 8\nPositive number per query 1\nNegative number per query 7\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_d50ebe50a80f9619d108e660d04c7f51f11e013b9ab224a310c2982bc17c0504",
+      "paper_id": "2022.emnlp-main.730",
+      "paper_title": "Recovering Gold from Black Sand: Multilingual Dense Passage Retrieval with Hard and False Negative Samples",
+      "source_sha256": "71e95a6964a2e85b6b3364963c369c7cf2d4505d76b35716d12acdf9a6eabbef",
+      "chunk_id": "ch_47d47c09acce4668a559b07aa9e8f3058347e7619c5317365c09f9d501e760cf",
+      "text_sha256": "52051fda217ba173233d09b42151ac6052e10ac7311b89c4e4ecc2010c570712",
+      "page_range": [
+        2,
+        2
+      ],
+      "passage": "9% and 6.5% in average MRR@100 and\nRecall@100 over all languages respectively\non Mr. TyDi (Zhang et al., 2021), a high-\nquality multilingual passage retrieval bench-\nmark dataset.\n10660",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_70fff473fd0284e0f9827d7a0286ad756da7f4b7dc14fa8f32fa11bcf43a6802",
+      "paper_id": "2022.emnlp-main.730",
+      "paper_title": "Recovering Gold from Black Sand: Multilingual Dense Passage Retrieval with Hard and False Negative Samples",
+      "source_sha256": "71e95a6964a2e85b6b3364963c369c7cf2d4505d76b35716d12acdf9a6eabbef",
+      "chunk_id": "ch_c8948cea32a5a32a79543dc2d6137c811179592e8f7a8842b4a9850c957af752",
+      "text_sha256": "e66651bbea1cd08dacd7b139c6668c04fabfb3c1aca827b948f5d47e07ce4f85",
+      "page_range": [
+        5,
+        5
+      ],
+      "passage": "wheres = 1, 2,··· ,n .H′\nls is the combined hard\nnegative set, and pls\nj is thej-th negative passage in\nthe hard negative sample set of languagels.\nInspired by Kalantidis et al. (2020), we further\nlinearly interpolate representations of queries and\nrandomly chosen hard negative samples to provide\nsynthetic hard negative samples (hard negative sam-\nple augmenter):\n˜hi,j =αEq(q) +βEp(pi) +γEp(pj), (4)\nhi,j =\n˜hi,j\n∥˜hi,j∥2\n(5)\nwhere q is a query, and pi, pj are two random hard\nnegative samples inH′\nl. Eq andEp denote query\nencoder ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_bc765f2cf03ba1a822cdc433105dc844757d261bbebd66db52011d564a037860",
+      "paper_id": "2022.emnlp-main.730",
+      "paper_title": "Recovering Gold from Black Sand: Multilingual Dense Passage Retrieval with Hard and False Negative Samples",
+      "source_sha256": "71e95a6964a2e85b6b3364963c369c7cf2d4505d76b35716d12acdf9a6eabbef",
+      "chunk_id": "ch_9c13fc5574d354383d7f12e52af0251179d1f5838276d815b713f842ada3d4eb",
+      "text_sha256": "b6a2f5cc1fa26619e85687e77d18a3503bdbec2dcf1ee081a43186e8224082c5",
+      "page_range": [
+        6,
+        6
+      ],
+      "passage": "model. Mr. TyDi (Zhang et al.,\n2021) is a multilingual retrieval benchmark dataset\nconstructed from TyDi QA (Clark et al., 2020), a\nquestion answering dataset covering eleven typo-\nlogically diverse languages. Given a query, the goal\nof Mr. TyDi is to find relevant passages in a pool\nof Wikipedia passages in the same language. The\ndetailed statistics of the dataset are shown in Table\n1, which are copied from the original Mr. TyDi\npaper. Following the original setting in Mr. TyDi,\nwe report MRR@100 and Recall@100 on the test\nset of each language.\n10664",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_51e8fa1a3bd7e2a35bda374b8557751186ea0d8457021b315b7593117d0ceae4",
+      "paper_id": "2022.emnlp-main.730",
+      "paper_title": "Recovering Gold from Black Sand: Multilingual Dense Passage Retrieval with Hard and False Negative Samples",
+      "source_sha256": "71e95a6964a2e85b6b3364963c369c7cf2d4505d76b35716d12acdf9a6eabbef",
+      "chunk_id": "ch_a0cc82d8077c2312c04a9a30e819f32a1afb6a13c5a793348cfe786a46395ea7",
+      "text_sha256": "73e20b3f78292b23c7323c9872da44d7a1e0b42a9b4fcb54568217a56d525ad0",
+      "page_range": [
+        8,
+        8
+      ],
+      "passage": "of the multilingual hard nega-\ntive sample augmentation module (including both\nthe index gatherer & dispatcher and hard nega-\ntive sample augmenter) leads to a significant per-\nformance drop of average 3.7% MRR@100 and\n5.8% Recall@100 on all languages. Specifically,\nthe removal of the index gatherer & dispatcher\nresults in a drop of average 2.3% and 3.1% in\nMRR@100 and Recall@100 in all languages re-\nspectively. Especially, the three languages which\nhave the smallest amount of training data (Ko-\nrean, Bengali, and Swahili) suffer from the largest\nperformance drop of ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_94b39d3e15e22a716a2a79e4c5692a654e380c9ad24fe47d1e4d6bee902cf66f",
+      "paper_id": "2022.emnlp-main.730",
+      "paper_title": "Recovering Gold from Black Sand: Multilingual Dense Passage Retrieval with Hard and False Negative Samples",
+      "source_sha256": "71e95a6964a2e85b6b3364963c369c7cf2d4505d76b35716d12acdf9a6eabbef",
+      "chunk_id": "ch_fd9970cc54eba7e30a52d7c9386ce5d984246641c1c608182ec4f65e7f662d11",
+      "text_sha256": "4c2bba476ebe4f5e4118b0758f8ad1d2c27f38ae40d49f98f037baa42cc0b8b8",
+      "page_range": [
+        10,
+        10
+      ],
+      "passage": "Limitations\nAlthough we propose a multilingual negative sam-\nple cache queue to mitigate the limit of GPU mem-\nory, several powerful GPUs are still necessary to\nspeed up training. Additionally, as the corpus is\nmuch larger than the training data, it is also time-\nconsuming to encode the entire corpus in the eval-\nuation phase, which makes real-time evaluation\nmuch more difficult with a huge corpus for most\npretrained model-based dense passage retrieval\nmodels. For example, it takes us more than 10\nhours to evaluate a checkpoint on a single NVIDIA\nA6000 GPU for ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_24fffa51a777d23e6043be1643f8a5a5c588185f07d7d04ec51e1c852d87b283",
+      "paper_id": "2023.emnlp-main.665",
+      "paper_title": "Enhancing the Ranking Context of Dense Retrieval through Reciprocal Nearest Neighbors",
+      "source_sha256": "b5cc4a2eb0f027a1911fd55798bd85e68a64791f2a9f925159457b275cb623bc",
+      "chunk_id": "ch_968dae918fea933ccd7a3948cff92816502f461b3369608ab7e329aca20d9bb5",
+      "text_sha256": "3c65672a742ffedd6ec5366e5ef43f34055e945890c98eeeb958b38ea68ec6d7",
+      "page_range": [
+        3,
+        3
+      ],
+      "passage": "dis-\ncard documents that receive a high similarity score\nto the query and are thus likely relevant from the\npool of hard negatives (Qu et al., 2021; Ren et al.,\n2021b). However, discarding top-ranking hard neg-\natives also discards potentially useful information\nfor training.\nRecently, Zhou et al. (2022) tackled the problem\nof false negatives through selective sampling of\nnegatives around the rank of the ground-truth doc-\nument, avoiding candidates that are ranked either\nmuch higher than the ground truth (probable false\nnegatives) or much lower (too easy negatives). This\n10781",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_6b41188a5ea599312827d41fa387d2df7ee0a686f684dbefca36638eb6c6eaa1",
+      "paper_id": "2023.emnlp-main.665",
+      "paper_title": "Enhancing the Ranking Context of Dense Retrieval through Reciprocal Nearest Neighbors",
+      "source_sha256": "b5cc4a2eb0f027a1911fd55798bd85e68a64791f2a9f925159457b275cb623bc",
+      "chunk_id": "ch_d9b13c4ca7fbbeb33c4eae6429129c618cc69a912b3f7955415b22a4ac44c4fc",
+      "text_sha256": "54e4209b00d0a111974607d4588ae85e3226c15daaf0a85d1be8b9998a16d5f8",
+      "page_range": [
+        6,
+        6
+      ],
+      "passage": "575 0.346 0.200\nCODER(RB) 0.634 0.316 0.674 0.419 0.234\nR. CODER(RB) 0.638 0.317 0.679 0.418 0.234\nRB + CODER(RB) 0.637 0.318 0.679 0.421 0.235\nRB + R. CODER(RB) 0.641 0.319 0.681 0.422 0.236\nTable 2: Recip. NN reranking, TripClick Test (cut-off\n@10). Bold: overall best, underline: best in model class.\nRow 1: from (Rekabsaz et al., 2021b), 2: (Hofstätter\net al., 2022). Blue: our contributions.\nfollowing base models subjected to CODER ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_587871e5c9b6a8427118acbb96005cc50579afdbac25955c2972bee62cca8b2f",
+      "paper_id": "2023.emnlp-main.665",
+      "paper_title": "Enhancing the Ranking Context of Dense Retrieval through Reciprocal Nearest Neighbors",
+      "source_sha256": "b5cc4a2eb0f027a1911fd55798bd85e68a64791f2a9f925159457b275cb623bc",
+      "chunk_id": "ch_3640a63b27c1a4cc18e9598ebb0c7818ced503ab20bfa196652947d0e2a6bb79",
+      "text_sha256": "948f097b99a94e0f61691549ff1b9d5b37ce48ed70a95a00970483eb86d683f1",
+      "page_range": [
+        9,
+        9
+      ],
+      "passage": "the rest of the candidates.\nFinally, we examine how EB label smoothing\nperforms when training in an important alterna-\ntive setting, TripClick: a dataset with significantly\nmore relevance labels per query, that come from\npseudo-relevance feedback without human judge-\nments. Unlike above, here we investigate the joint\noptimization of rNN-related parameters together\nwith training-specific parameters (e.g., learning\nrate and linear warm-up steps), instead of using\nthe same rNN-related hyperparameters for label\nsmoothing as for reranking. To allow this, we train\non the union of theHEAD and TORSO training subsets\n(avg. ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_e231bfabf30e845da2c8437aeb6524a82333be3715569bf8f7eba445c06d5eb4",
+      "paper_id": "2023.emnlp-main.665",
+      "paper_title": "Enhancing the Ranking Context of Dense Retrieval through Reciprocal Nearest Neighbors",
+      "source_sha256": "b5cc4a2eb0f027a1911fd55798bd85e68a64791f2a9f925159457b275cb623bc",
+      "chunk_id": "ch_b08ad57cd4d3bd6eafedbed20cc471f6fe3511f7e06c824c0c453d347cbd4cde",
+      "text_sha256": "ebf8af053c8041fa76c3bc2bc724453d805ae9ec5b43eb5fcc70ca28259e6cc8",
+      "page_range": [
+        11,
+        11
+      ],
+      "passage": "2835, Online and Punta Cana, Dominican Re-\npublic. Association for Computational Linguistics.\nKeshav Santhanam, Omar Khattab, Jon Saad-Falcon,\nChristopher Potts, and Matei Zaharia. 2021. Col-\nBERTv2: Effective and Efficient Retrieval via\nLightweight Late Interaction. ArXiv:2112.01488\n[cs].\nHarrisen Scells, Shengyao Zhuang, and Guido Zuccon.\n2022. Reduce, reuse, recycle: Green information\nretrieval research. In Proceedings of the 45th Inter-\nnational ACM SIGIR Conference on Research and\nDevelopment in Information Retrieval , SIGIR ’22,\npage 2825–2837, New York, NY , USA. Association\nfor Computing Machinery.\nLee Xiong, Chenyan Xiong, Ye Li, Kwok-Fung Tang,\nJialin Liu, Paul ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_b682683103d27b736919c4ccb54bcc1401664716fbdeb74118fe2abc0c350ffd",
+      "paper_id": "2023.emnlp-main.665",
+      "paper_title": "Enhancing the Ranking Context of Dense Retrieval through Reciprocal Nearest Neighbors",
+      "source_sha256": "b5cc4a2eb0f027a1911fd55798bd85e68a64791f2a9f925159457b275cb623bc",
+      "chunk_id": "ch_e45b7ea16ce62fbeeaa034c75fd8c6545df9bd661dd870bc70d698b5010220a8",
+      "text_sha256": "4701b6f1ba9904244ec5a5d0972136d17e0dc714161d319f0a5e279af0648eb7",
+      "page_range": [
+        16,
+        16
+      ],
+      "passage": "the hyperparameters of reciprocal\nnearest neighbors (e.g. k, kexp, λ, τ, fw) on the\nMS MARCO dev.small subset.\nWe first rerank candidates initially ranked by\na CODER-optimized TAS-B retriever, denoted as\n“CODER(TAS-B)”. To determine an appropriate\nsize of reranking context, we first sort candidates by\ntheir original relevance score (geometric similarity)\nand then recompute query similarity scores with a\ngrowing number of in-context candidates (selected\nin the order of decreasing geometric similarity from\nthe query), while measuring changes in ranking\neffectiveness.\nFigure 3 shows that rNN-based reranking\nslightly ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_cd4cb8eaeacd3a72c5f5dcbcb78c4c7134302bc8a1fedd9a3c030a8d7f8b7a96",
+      "paper_id": "2023.findings-acl.695",
+      "paper_title": "Unsupervised Dense Retrieval with Relevance-Aware Contrastive Pre-Training",
+      "source_sha256": "2cdd39ddec9b090dfe51189e8dc2acd977786c23aea3d96b4aeceb2151415cc7",
+      "chunk_id": "ch_117250e68460b6676f2b2f3514f9b27ba40a0dac4cbde9e465ae22205461586b",
+      "text_sha256": "f05eac9e24d58ed1b5fe8b540713161ff1dcd96238c7239552cc56638ff3017f",
+      "page_range": [
+        2,
+        2
+      ],
+      "passage": "sure that the model can learn positive knowl-\nedge from every document in the corpus.\nTo summarize, our contributions in this paper\nare three-fold: 1) We propose relevance-aware con-\ntrastive learning for dense retrieval pre-training,\nwhich aims to reduce the false positive problem.\n2) Experiments show our method brings consis-\ntent improvements to the SOTA unsupervised Con-\ntriver model on 10/15 tasks on the BEIR benchmark\nand three representative open-domain QA retrieval\ndatasets. 3) Further explorations show that our\nmethod works well given no or limited labeled\ndata. Specifically, on 4 ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_5784395659a6d91e4beb2e5b5b3dda73b266d01112d9de6fc29c7c1fa008dd3f",
+      "paper_id": "2023.findings-acl.695",
+      "paper_title": "Unsupervised Dense Retrieval with Relevance-Aware Contrastive Pre-Training",
+      "source_sha256": "2cdd39ddec9b090dfe51189e8dc2acd977786c23aea3d96b4aeceb2151415cc7",
+      "chunk_id": "ch_522b27e76ccc3ad338865f4466f0bac10d9e950d20f774c9aa8db69bcf675b40",
+      "text_sha256": "f2683dccf66e78eefe31b3cac339114fe393dde8eafecde560dd02d0128f12da",
+      "page_range": [
+        3,
+        3
+      ],
+      "passage": "6 15.1 29.2 27.6 29.3 †\nSCIDOCS 15.8 2.7 7.4 7.4 1.9 14.9 15.0 15.6 †\nFEVER 75.3 4.9 20.1 7.1 25.3 68.2 66.9 68.9 †\nClimate-fever 21.3 4.1 17.6 4.4 9.8 15.5 15.6 15.6\nSciFact 66.5 9.8 38.5 53.1 48.1 64.9 65 66.4\nA vg 41.7 8.7 24.6 18.7 8.9 35.8 37.0 37.8\nA ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_c40748f046f91e00ebc78e9aba2b18b0d4551a5df1de679dc7daad904ca57ae5",
+      "paper_id": "2023.findings-acl.695",
+      "paper_title": "Unsupervised Dense Retrieval with Relevance-Aware Contrastive Pre-Training",
+      "source_sha256": "2cdd39ddec9b090dfe51189e8dc2acd977786c23aea3d96b4aeceb2151415cc7",
+      "chunk_id": "ch_5b82c5a592e8974255ff170eedcb27aa89089d4bac29a8be670e047c56a3418d",
+      "text_sha256": "34bc0856628e44b4be24dea7731fb737a22334110534b14503790deb396e72ed",
+      "page_range": [
+        4,
+        4
+      ],
+      "passage": "Table 2: Recall of open-domain retrieval benchmarks . Bold: the best results across unsupervised models. “ †”\nmeans ReContriever performs significantly better than our reproduced Contriever, as determined by a t-test with\np-value 0.05 as threshold.\nvery slight decreases on datasets without promo-\ntion (e.g., FiQA, Touche and Climate-Fever with\nat most -0.1 decrease). Moreover, our method ob-\ntains an average rank of 2.2, proving our method to\nbe the best unsupervised dense retriever. BM25 is\nstill a strong baseline under the fully unsupervised\nscenario, but ReContriever greatly narrows the gap\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_9daf66e6cabe404fcb70fd2a095e2fc4ed92102da362d6099644d8bd62ec4c8c",
+      "paper_id": "2023.findings-acl.695",
+      "paper_title": "Unsupervised Dense Retrieval with Relevance-Aware Contrastive Pre-Training",
+      "source_sha256": "2cdd39ddec9b090dfe51189e8dc2acd977786c23aea3d96b4aeceb2151415cc7",
+      "chunk_id": "ch_dbd26376a7da70cde881cced3e0aed87bbb0f4fce9b5a86821435020f18d11b6",
+      "text_sha256": "238d145315b8d18683f49367182053a540826f25d7d67f164903f8f83be55ab9",
+      "page_range": [
+        5,
+        5
+      ],
+      "passage": "relevance among\nthe N pairs within a batch, which slightly differs\nfrom equation (2) that normalizes over 4 pairs from\nthe same document. As shown in Table 5, solely\nadding relevance-aware contrastive loss to Con-\ntriever will lead to a noticeable degeneration, ow-\ning to the missing information from the documents\nwith low adjusted weights and the unstable rele-\nvance comparison without a fixed query. Applying\nthe one-document-multi-pair strategy can obtain\na slight improvement which can be attributed to\nthe effective usage of the unlabeled data. Combin-\ning both strategies (i.e., ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_54d9cf9b8fb713180064879380d7831f33f7bb85cffaf578115200ba04c373df",
+      "paper_id": "2023.findings-acl.695",
+      "paper_title": "Unsupervised Dense Retrieval with Relevance-Aware Contrastive Pre-Training",
+      "source_sha256": "2cdd39ddec9b090dfe51189e8dc2acd977786c23aea3d96b4aeceb2151415cc7",
+      "chunk_id": "ch_8ad66795807ac1ca9c32ecf8a9f213f31e455e3fa67b19f406737ef4813d9695",
+      "text_sha256": "a896efa8675f302fa154d8c83b851094caf6d48f7dce9ea4098967ac608cb4cf",
+      "page_range": [
+        6,
+        6
+      ],
+      "passage": "web crawl data. In LREC.\nShitao Xiao, Zheng Liu, Shao Yingxia, and Cao Zhao.\n2022. Retromae: Pre-training retrieval-oriented lan-\nguage models via masked auto-encoder. In EMNLP.\nLee Xiong, Chenyan Xiong, Ye Li, Kwok-Fung Tang,\nJialin Liu, Paul N. Bennett, Junaid Ahmed, and\nArnold Overwijk. 2021. Approximate nearest neigh-\nbor negative contrastive learning for dense text re-\ntrieval. In ICLR.\nJieyu Zhao, Tianlu Wang, Mark Yatskar, Vicente Or-\ndonez, and Kai-Wei Chang. 2017. Men also like\nshopping: Reducing gender bias amplification using\ncorpus-level constraints. In EMNLP.\nA Implementation Details\nBasic Infrastructure ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_3911dbe0d4d0b145c4b0831518b5f9a0e8ed9ee8e22706ee9a894d575d1ece4b",
+      "paper_id": "2023.findings-emnlp.1057",
+      "paper_title": "A Thorough Examination on Zero-shot Dense Retrieval",
+      "source_sha256": "d8da86a0bd9add3b597c5ef64064babbcfd16d54a5ccd1aa6fc8a190617c392c",
+      "chunk_id": "ch_7e9ee364f22744fafa4183e509efd44593359e63071d5801b882b07958620bef",
+      "text_sha256": "29d9b47e435256dd5cd10d247db1def88df0fb28d5c40ec24bcff04ad0786349",
+      "page_range": [
+        3,
+        3
+      ],
+      "passage": "Target (→) NQ MSMARCO\nModels (with source dataset) (↓) M@10 R@50 M@10 R@50\nBM25 31.3 69.7 18.7 59.2\nANCE (MSMARCO) 39.9 78.9 33.0 79.1\nRocketQAv2 (MSMARCO) 50.8 83.2 38.8 86.5\nRocketQAv2 (NQ) 61.1 86.9 22.4 67.2\nTable 2: Evaluation results of models trained on MS-\nMARCO and NQ.\ndenotes the whole relative document and short an-\nswer denotes the short span that directly answers\nthe query. When examining the effects of query set\nand document set in the ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_a9e6097f2e3dc76af9e0116c0d3d5f19e7dd4ed02588297d37359ed76f69d75c",
+      "paper_id": "2023.findings-emnlp.1057",
+      "paper_title": "A Thorough Examination on Zero-shot Dense Retrieval",
+      "source_sha256": "d8da86a0bd9add3b597c5ef64064babbcfd16d54a5ccd1aa6fc8a190617c392c",
+      "chunk_id": "ch_61f270999bf9992cc1e20d398b389c269fe155e9c9cce6d1cf19f6633c7a65dd",
+      "text_sha256": "97690183433348ee87846a910f42d90ed4e18e71e01fe9800ffe6422c827bdaa",
+      "page_range": [
+        4,
+        4
+      ],
+      "passage": "effects on the zero-shot\ncapability of the DR model.\nGiven the above overall analysis, we next zoom\ninto two more detailed factors for better under-\nstanding the effect of the query set.\n3.1.2 Query Vocabulary Overlap\nSince domain similarity is critical in cross-domain\ntask performance (Van Asch and Daelemans,\n2010), we consider studying a simple yet im-\nportant indicator to reflect the domain similarity,\ni.e., vocabulary overlap between source and tar-\nget query sets. Following the previous work (Gu-\nrurangan et al., 2020), we consider the top 10K\nmost frequent words (",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_9729e51d7303632e720a8860da2f3fd5baabff888cf305b9e30c430995b300cd",
+      "paper_id": "2023.findings-emnlp.1057",
+      "paper_title": "A Thorough Examination on Zero-shot Dense Retrieval",
+      "source_sha256": "d8da86a0bd9add3b597c5ef64064babbcfd16d54a5ccd1aa6fc8a190617c392c",
+      "chunk_id": "ch_b058f5badb52b42b7e718b0c93bd399ad92e5484eb38f7a248de99968314473b",
+      "text_sha256": "5f86e3b8d950eb4c4b0eaa2189c0d52cddd653b3bc309b1f49778936f4f6e848",
+      "page_range": [
+        6,
+        6
+      ],
+      "passage": "target test sets.\nSpecially, for each query from the test set of a\ntarget dataset, we compute the overlap coefficient\nfor six target datasets, by dividing the number of\noverlap terms of the query and its annotated docu-\n15788",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_4ee6c5f4aad600227b77912450041367f28040c52f30f9e34dc76f435ac17fbe",
+      "paper_id": "2023.findings-emnlp.1057",
+      "paper_title": "A Thorough Examination on Zero-shot Dense Retrieval",
+      "source_sha256": "d8da86a0bd9add3b597c5ef64064babbcfd16d54a5ccd1aa6fc8a190617c392c",
+      "chunk_id": "ch_4766fb789901cc789834f7e1ba3228295f6d15ea0c5ce5f4f1827d6dcd5827b9",
+      "text_sha256": "f3427d89418e017486dab79ff26e77889b55a9d987fbd024f9576dcd9ff8c8b7",
+      "page_range": [
+        8,
+        8
+      ],
+      "passage": "on the retrieval performance. In partic-\nular, we find that the factors of vocabulary overlap,\nquery type distribution, and data scale are likely\n15790",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_38a904d812b89a5b6853691d1f0dd65978a37a65371f6481b3d2468a0e512e74",
+      "paper_id": "2023.findings-emnlp.1057",
+      "paper_title": "A Thorough Examination on Zero-shot Dense Retrieval",
+      "source_sha256": "d8da86a0bd9add3b597c5ef64064babbcfd16d54a5ccd1aa6fc8a190617c392c",
+      "chunk_id": "ch_f22a256e4389f5df9a24c6cc515499f749887c7ee4bef7d7eb0ff1a6a87579fd",
+      "text_sha256": "7b11820387f3eec323c15c2aa9ed416abe6274fdc09f80f70b1ce40be1129680",
+      "page_range": [
+        11,
+        11
+      ],
+      "passage": "K Kavitha. 2016. A survey on\nsimilarity measures in text mining. Machine Learn-\ning and Applications: An International Journal ,\n3(2):19–28.\nHenning Wachsmuth, Shahbaz Syed, and Benno Stein.\n2018. Retrieval of the best counterargument with-\nout prior topic knowledge. In Proceedings of the\n56th Annual Meeting of the Association for Compu-\ntational Linguistics (V olume 1: Long Papers), pages\n241–251.\nDavid Wadden, Shanchuan Lin, Kyle Lo, Lucy Lu\nWang, Madeleine van Zuylen, Arman Cohan, and\nHannaneh Hajishirzi. 2020. Fact or fiction: Veri-\nfying scientific claims. In Proceedings of the 2020\nConference on Empirical ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_95c49be7c50539e02e76b5ef6c8f4bdf30cd57d94f360633e9470de5e595831d",
+      "paper_id": "2023.tacl-1.35",
+      "paper_title": "Questions Are All You Need to Train a Dense Passage Retriever",
+      "source_sha256": "3602366ac5adae676148f09666b530f2cad32a76bb2954411020be0141c82934",
+      "chunk_id": "ch_73dd267a1d97346e2138648bac871f75c5a177627447e6523b76c2c5efbc1f87",
+      "text_sha256": "63153fa434e0aa26d370841e16372deb5d57c65e83a449b2be292730cf0d04cf",
+      "page_range": [
+        3,
+        3
+      ],
+      "passage": "T ) and evidence\npassages (D) are provided as input. During train-\ning, the weights of the retriever are updated while\nthe PLM is not finetuned, i.e., it is used in in-\nference mode. Our training algorithm consists of\nfive core steps. The first four steps are performed\nat every training iteration while the last step is\nperformed every few hundred iterations. Figure 1\npresents an illustration of our approach.\nStep 1: Top- K Passage Retrieval For fast\nretrieval, we pre-compute the evidence passage\nembedding using the initial retriever parameters\n(ˆΦd). Given a question q, ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_d28e1043bf3792f9d28787347e7a1224f24a92f73203bed6848f80b9fc1b7b71",
+      "paper_id": "2023.tacl-1.35",
+      "paper_title": "Questions Are All You Need to Train a Dense Passage Retriever",
+      "source_sha256": "3602366ac5adae676148f09666b530f2cad32a76bb2954411020be0141c82934",
+      "chunk_id": "ch_5bf7e6db13566fb08377a8cc31401f0db4534c4e1a13aad3d47e21d633518774",
+      "text_sha256": "48397b76c3b04d4ce58e2cd727d70fa5976c1fe5d7f284ef515c97e6a90bec77",
+      "page_range": [
+        5,
+        5
+      ],
+      "passage": "perform contrastive training\nof the retriever. These differ in how the negative\nexamples are obtained during contrastive train-\ning: They can be from the same batch (ICT; Lee\net al., 2019; Sachan et al., 2021a), or contexts pas-\nsages from previous batches (Contriever; Izacard\net al., 2022), or by using other passages in the\nsame article (Spider; Ram et al., 2022). Context\n604",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_59bade7fcab1389d58c33de6b1411da4a5ed112370cc2666cbcc09ce13acc715",
+      "paper_id": "2023.tacl-1.35",
+      "paper_title": "Questions Are All You Need to Train a Dense Passage Retriever",
+      "source_sha256": "3602366ac5adae676148f09666b530f2cad32a76bb2954411020be0141c82934",
+      "chunk_id": "ch_f6f88d531761b6ae65f9e35c695ffc914020a0b225677e96c1b04a215b1618bd",
+      "text_sha256": "aafe7515671f1f2273f709bded2e81821d009e621ce962005e921423d53eac39",
+      "page_range": [
+        8,
+        8
+      ],
+      "passage": "true OOD gen-\neralization as a majority of the questions (51%)\nwere marked as unanswerable from Wikipedia\nby human annotators.6\nTable 3 presents OOD generalization results\non the four QA datasets including the results\nof DPR and Spider models trained on NQ-Open.7\nART trained on NQ-Open always performs signif-\nicantly better than both DPR and Spider, showing\nthat it is better at generalization than super-\nvised models. When trained using NQ-Full, ART\nperformance further improves by 3 and 0.5–1\npoints on EQ and other datasets, respectively,\nover NQ-Open. ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_9a341dd86263ef94b7232a2bdc936f0d248d205c0133a69fe548343c80b34e65",
+      "paper_id": "2023.tacl-1.35",
+      "paper_title": "Questions Are All You Need to Train a Dense Passage Retriever",
+      "source_sha256": "3602366ac5adae676148f09666b530f2cad32a76bb2954411020be0141c82934",
+      "chunk_id": "ch_7a0c54e09de52b6914df7f9675c81a56d32869dab87509158740c5adce1359d2",
+      "text_sha256": "b49af953dcbd58b3cd22192cb546dad2efccf48a48e617ee7b6c30d9462f5d91",
+      "page_range": [
+        10,
+        10
+      ],
+      "passage": "improve with the inclusion of a\nhard-negative passage in Z. However, in-batch\ntraining leads to a slight drop in performance. As\nthe gold passages are not always available, our\nmethod of selecting the top passages from evi-\ndence at every training step can be seen as an\n609",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_ce187c86cb14dc9cfbc80dbefa4294ff82c6e07f35f37a0260e9331fb338bdfc",
+      "paper_id": "2023.tacl-1.35",
+      "paper_title": "Questions Are All You Need to Train a Dense Passage Retriever",
+      "source_sha256": "3602366ac5adae676148f09666b530f2cad32a76bb2954411020be0141c82934",
+      "chunk_id": "ch_34816b9a30ec570fec35e385efe016f09a88287d743a7d2e687be7b49a02f8d1",
+      "text_sha256": "1e8f433764d4307411cee74cc205cc9054b8c119f16ea6e4a2588077e7f4ab0d",
+      "page_range": [
+        13,
+        13
+      ],
+      "passage": "the2021\nConference of the North American Chapter of\nthe Association for Computational Linguistics:\nHuman Language Technologies. https://doi\n.org/10.18653/v1/2021.naacl-main.46\nPayal Bajaj, Daniel Campos, Nick Craswell,\nLi Deng, Jianfeng Gao, Xiaodong Liu, Rangan\nMajumder, Andrew McNamara, Bhaskar Mitra,\nTri Nguyen, et al. 2016. MS MARCO: A hu-\nman generated machine reading comprehen-\nsion dataset. arXiv preprint arXiv:1611.09268 .\nhttps://doi.org/10.48550/arXiv.1611\n.09268\nJonathan Berant, Andrew Chou, Roy Frostig,\nand Percy Liang. 2013. Semantic parsing on\nFreebase from question-answer pairs. In Pro-\nceedings of the ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_f97775969ddf7c068d2aa7d7f1a2953441f8411503b6634998e30ba6ac5f9573",
+      "paper_id": "2024.eacl-demo.16",
+      "paper_title": "RAGAs: Automated Evaluation of Retrieval Augmented Generation",
+      "source_sha256": "e2038b8cff7574bf5302e1ceb6bfbac6d2471c352073b27f21460910936febce",
+      "chunk_id": "ch_4dcf2f38b1790c8a44fb8708bec0c00c7195c56f13a1eb55c4c1136b8c3b2300",
+      "text_sha256": "c2b86b2f1c5a003b123a330056f3eddc008e3758bd68781529503c07a2b1f235",
+      "page_range": [
+        2,
+        2
+      ],
+      "passage": "in halluci-\nnated answers than in factual ones. For instance,\nBARTScore (Yuan et al., 2021) estimates factuality\nby looking at the conditional probability of the gen-\nerated text given the input. Kadavath et al. (2022)\nuse a variation of this idea. Starting from the ob-\nservation that LLMs provide well-calibrated proba-\nbilities when answering multiple-choice questions,\nthey essentially convert the problem of validating\nmodel generated answers into a multiple-choice\nquestion which asks whether the answer is true or\nfalse. Rather than looking at the output probabil-\nities, Azaria and Mitchell (2023) propose to ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_0f505f8ba6f4f925c7498773c26710633dae0daad28643bbe0c2237c9bbbac6a",
+      "paper_id": "2024.eacl-demo.16",
+      "paper_title": "RAGAs: Automated Evaluation of Retrieval Augmented Generation",
+      "source_sha256": "e2038b8cff7574bf5302e1ceb6bfbac6d2471c352073b27f21460910936febce",
+      "chunk_id": "ch_3966335c3ffd568455c5dd82c7a8c3a92996c9a5bb3de4bf83e4c752e4fef69f",
+      "text_sha256": "bc3e29799559d9ae5173a5a02a1c3ffbc0a3b8634a3fc42f41bf474b38efabfa",
+      "page_range": [
+        3,
+        3
+      ],
+      "passage": "statements, S(as(q)). The aim\nof this step is to decompose longer sentences into\nshorter and more focused assertions. We use the\nfollowing prompt for this step3:\nGiven a question and answer, create one\nor more statements from each sentence\nin the given answer.\nquestion: [question]\nanswer: [answer]\nwhere [question] and [answer] refer to the\ngiven question and answer. For each statementsi in\n2https://platform.openai.com\n3To help clarify the task, we include a demonstration as\npart of the prompt. This demonstration is not explicitly shown\nin the listing of the prompts throughout this ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_c93c0bdfe0f334a83d7c24ccb80f3c5bc2bce8f4711082dfb057e2ff405c9fcf",
+      "paper_id": "2024.eacl-demo.16",
+      "paper_title": "RAGAs: Automated Evaluation of Retrieval Augmented Generation",
+      "source_sha256": "e2038b8cff7574bf5302e1ceb6bfbac6d2471c352073b27f21460910936febce",
+      "chunk_id": "ch_9fdc4812cbfee6200edd63416f98046d9e0294cdd1095bba25d7f658ac87ab07",
+      "text_sha256": "7e37851874fa50eb6cc1ac7e2cdc34212b50e818dead655a7958b97f7bf12049",
+      "page_range": [
+        4,
+        4
+      ],
+      "passage": "answer relevance, they\nagreed in around 90% of the cases. Disagreements\nwere resolved after a discussion between the anno-\ntators. Tables 1, 2 and 3 show examples from the\nWikiEval dataset, focusing in particular on answers\nwith high and low faithfulness (Table 1), high and\nlow answer relevance (Table 2), and high and low\ncontext relevance (Table 3).\nFaithfulness To obtain human judgements about\nfaithfulness, we first used ChatGPT to answer the\nquestion without access to any additional context.\nWe then asked the annotators to judge which of the\ntwo answers was the most faithful (i.",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_5a1c3dd156a9466fc482ccda363b19d0fa8fef2349393d6b6ac51354821d134d",
+      "paper_id": "2024.eacl-demo.16",
+      "paper_title": "RAGAs: Automated Evaluation of Retrieval Augmented Generation",
+      "source_sha256": "e2038b8cff7574bf5302e1ceb6bfbac6d2471c352073b27f21460910936febce",
+      "chunk_id": "ch_7cfac6b568f26ec1b544e2ab123b488e216ef53fefd229ecd8dfcd4c7b947c65",
+      "text_sha256": "430610fca71b6920c3b08d9ec4fd4938c001903ca0037aad0286f00ccafe6e47",
+      "page_range": [
+        6,
+        6
+      ],
+      "passage": "Question Context\nWhen was the Chimnabai\nClock Tower completed,\nand who was it named af-\nter?\nHigh context relevance: The Chimnabai Clock Tower, also known as the Raopura Tower, is\na clock tower situated in the Raopura area of Vadodara, Gujarat, India. It was completed\nin 1896 and named in memory of Chimnabai I (1864–1885), a queen and the first wife of\nSayajirao Gaekwad III of Baroda State.\nLow context relevance: The Chimnabai Clock Tower, also known as the Raopura Tower, is\na clock tower situated in the Raopura area of Vadodara, Gujarat, India. It ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_f6e18a51859b95a1c7a2fab48b3b7a4e399da47e5264470b54c9a87dd84140c8",
+      "paper_id": "2024.eacl-demo.16",
+      "paper_title": "RAGAs: Automated Evaluation of Retrieval Augmented Generation",
+      "source_sha256": "e2038b8cff7574bf5302e1ceb6bfbac6d2471c352073b27f21460910936febce",
+      "chunk_id": "ch_e31812937ca708a4d658f3c7c930a3b2b650f7b9d89eee05f0a8d70e1365486e",
+      "text_sha256": "26ca2009dae4ece21f6ff6e53505e7831e63854be6a343d1dfcc3a7904709a62",
+      "page_range": [
+        7,
+        7
+      ],
+      "passage": "judgements, we acknowledge that relying on LLMs\ncomes with known limitations. Therefore, careful\nreviewing of the suitability of LLMs (ideally pri-\noritizing open models over full-fledged products\nbehind paid APIs) is critical for RAGA S, and other\ncontributions in this space, to nurture a healthy\nenvironment. We are also aware of the potential\nimplications of enabling large user bases into using\nmore accurate RAG systems, and therefore we will\ncontinue to encourage applications of fair systems\non top of RAGA S.\nReferences\nAmos Azaria and Tom M. Mitchell. 2023. The inter-\nnal state of an ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_d585fbaa9ba7a1e45917542e7ef41882cc86a62c82c0d22280ec82693a7ec8de",
+      "paper_id": "2024.findings-emnlp.449",
+      "paper_title": "BERGEN: A Benchmarking Library for Retrieval-Augmented Generation",
+      "source_sha256": "e94b9f862f921a41ccd346226d73663b8e417bead69cbab81820c2dbf8ff97fe",
+      "chunk_id": "ch_5f4f0fa189dafe458753654116c851af8ab8d38c34069616a8b1b889f36d2e5d",
+      "text_sha256": "54e7a9d8bd92af6a479d452ba478ce6362e689d45e8eef1c31a05497eeac642d",
+      "page_range": [
+        4,
+        4
+      ],
+      "passage": "resulting collection\nis in the Hugging Face Arrow dataset format to en-\nsure memory-efficient and performant loading. We\nimplement a dataset engine that allows for multi-\nthreaded end-to-end processing (downloading, pro-\ncessing, and saving datasets) making the addition\nof new datasets straightforward. To enable experi-\nments with a multilingual datastore, BERGEN also\nsupports multilingual Wikipedia5.\n4.6 Evaluation\nTo date, it remains unclear which metrics are ef-\nfective for evaluating open-ended generation. Typ-\nically, given a question, a reference answer, and\na generated candidate answer, the task is to evalu-\nate whether ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_56126cf765f6e557ddcf1e5f261895dc5374e36634db9e8575ff547db3729765",
+      "paper_id": "2024.findings-emnlp.449",
+      "paper_title": "BERGEN: A Benchmarking Library for Retrieval-Augmented Generation",
+      "source_sha256": "e94b9f862f921a41ccd346226d73663b8e417bead69cbab81820c2dbf8ff97fe",
+      "chunk_id": "ch_76f213dc375818388949fcda08f55e77803a0e887f9f0fa4d34b6dd9b542bad1",
+      "text_sha256": "85a4413e2726ec836da152e3469d0b75d471a88168e5322689bde5219e64b657",
+      "page_range": [
+        8,
+        8
+      ],
+      "passage": "1.1B-chat 0.56 (+0.13) 0.77 (+0.41)\nLlama-2-7B-chat 0.64 (+0.03) 0.82 (+0.24)\nLlama-3-8B-chat 0.66 (+0.02) 0.78 (+0.04)\nSOLAR-10.7B 0.67 (-0.03) 0.84 (+0.05)\nMixtral-8x7B-inst. 0.68 (+0.01) 0.84 (+0.05)\nLlama-2-70B-chat 0.69 (+0.04) 0.85 (+0.06)\nTable 3: LLMs fine-tuned on NQ, for retrieval with\nSPLADE-v3 and reranking with DeBERTa-v3. Perfor-\nmance gains in absolute points compared to zero-shot ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_828d54de2be7f8282e208cc214f005dee34632690e7c7f7c3cf5f66d943c1479",
+      "paper_id": "2024.findings-emnlp.449",
+      "paper_title": "BERGEN: A Benchmarking Library for Retrieval-Augmented Generation",
+      "source_sha256": "e94b9f862f921a41ccd346226d73663b8e417bead69cbab81820c2dbf8ff97fe",
+      "chunk_id": "ch_ca29a7746a07aa7fbe0c27b1cbc09f19c44f59158b99f2ed7e7f1c46bbae1f36",
+      "text_sha256": "0ef1579ed39de5831ab404a0527c23ed1099c8d2c7becb6b934d64a5d13b9fcf",
+      "page_range": [
+        12,
+        12
+      ],
+      "passage": "Alex Mallen, Akari Asai, Victor Zhong, Rajarshi Das,\nDaniel Khashabi, and Hannaneh Hajishirzi. 2023.\nWhen not to trust language models: Investigating\neffectiveness of parametric and non-parametric mem-\nories. In Proceedings of the 61st Annual Meeting of\nthe Association for Computational Linguistics (Vol-\nume 1: Long Papers) , pages 9802–9822, Toronto,\nCanada. Association for Computational Linguistics.\nLuke Merrick, Danmei Xu, Gaurav Nuti, and Daniel\nCampos. 2024. Arctic-embed: Scalable, efficient,\nand accurate text embedding models.\nPaulius Micikevicius, Sharan Narang, Jonah Alben, Gre-\ngory Diamos, Erich Elsen, David Garcia, Boris Gins-\nburg, Michael Houston, Oleksii Kuchaiev, Ganesh\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_e47b377c6e89505c6713832a898d6ca8ef12da4b2cd37a896533d6277209887e",
+      "paper_id": "2024.findings-emnlp.449",
+      "paper_title": "BERGEN: A Benchmarking Library for Retrieval-Augmented Generation",
+      "source_sha256": "e94b9f862f921a41ccd346226d73663b8e417bead69cbab81820c2dbf8ff97fe",
+      "chunk_id": "ch_ca95ceb761cfbc5139ac0fca56a93f46a7ef52dcfa1171da1b983e80a6fc6a45",
+      "text_sha256": "48dd9c0e0d50659fa2bbaf6717dd8ea7e2ea17d855d2a81f79e0f3ea1aa4615e",
+      "page_range": [
+        15,
+        15
+      ],
+      "passage": "LLM prompts\nWe opted to use a single general prompt, rather than dataset-specific ones, to minimize the impact of\nprompt variations and to simplify experimentation. When providing context in the form of retrieved\npassages to the model, we used the following prompt embedded into the chat-template of the respective\nmodel:\n7654",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_eec6d05cab32c0c530b0da2100f180753c72bc67fa0c53ba2304e82a17bc3ca5",
+      "paper_id": "2024.findings-emnlp.449",
+      "paper_title": "BERGEN: A Benchmarking Library for Retrieval-Augmented Generation",
+      "source_sha256": "e94b9f862f921a41ccd346226d73663b8e417bead69cbab81820c2dbf8ff97fe",
+      "chunk_id": "ch_e50dfcd7fdd269684f7d98f78ffafb65665ed061261715b2f55a6ae0b03baf78",
+      "text_sha256": "2eae4ccd80e36bfa4cb06d10b274195652a202fad3b4997c32ece760c28fbf8e",
+      "page_range": [
+        17,
+        17
+      ],
+      "passage": "is not “zero-shot”. ♣ indicates that\nmodels have been explicitly fine-tuned on NQ. Note that MXBAI Embed is excluding MTEB data from its training\nset – but relies on proprietary data†.\n\u0007 \u0004\nsystem : \" You are a helpful assistant . Your task is to extract relevant\ninformation from provided documents and to answer to questions as briefly as\npossible . \"\nuser : f \" Background :\\ n { docs }\\ n \\ nQuestion :\\ { question } \"\u0006 \u0005\nFor closed-book experiments, where no context is provided to the LLMs we used a simple prompt:\n\u0007 \u0004\nsystem : \" You are a helpful assistant . Answer the questions as briefly as\npossible . \"\nuser : f \" ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_25c11fb9d7ddc0b97b68a9015657b0d077e537b064c69b29b0dd6c1cd0d13e0f",
+      "paper_id": "2024.naacl-long.20",
+      "paper_title": "ARES: An Automated Evaluation Framework for Retrieval-Augmented Generation Systems",
+      "source_sha256": "5a585d88f7b63c06439a4ecb8fd3165615d637e2061f242bff3f6ec3a209bd34",
+      "chunk_id": "ch_9aea99aeafb2f6e6ca1199573227735eed381621728a8cbcd8950e1d479fa2b2",
+      "text_sha256": "05afadc971cad209341e6559e984440379ceddd0e6eaddb53ee5b9ccf830b9e4",
+      "page_range": [
+        3,
+        3
+      ],
+      "passage": "generation, the LLM uses our in-\nput set of few-shot examples with in-domain pas-\nsages mapped to in-domain queries and answers;\nthe model then generates a synthetic question and\nanswer from a given in-domain passage, allowing\nus to create both positive and negative training ex-\namples. We include example prompts for generat-\ning synthetic queries and answers in A.6.\nFor creating our synthetic data, we primarily use\non FLAN-T5 XXL (discussed in subsection 4.1).\nARES works well with this model (see section 5)\nbut our system can ultimately use ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_2b5d92ed837b32cf07fd427737f4dfebc9121be476669989a3f328657a13cfbc",
+      "paper_id": "2024.naacl-long.20",
+      "paper_title": "ARES: An Automated Evaluation Framework for Retrieval-Augmented Generation Systems",
+      "source_sha256": "5a585d88f7b63c06439a4ecb8fd3165615d637e2061f242bff3f6ec3a209bd34",
+      "chunk_id": "ch_9dd4b5a5299c0ebbc58859d62ecbbf5595057e968cc195d208c7f397c7a5cb1d",
+      "text_sha256": "a60292410b0a320e250700c3cee2e6f712bd5f6b95d811f55d61d47f499e6e0b",
+      "page_range": [
+        5,
+        5
+      ],
+      "passage": "LLM\njudges. To test the limits of ARES, we need to sim-\nulate the existence of many RAG systems that are\nseparated by small accuracy margins on our eval-\nuation metrics. For this, we create systems using\nartificial query-passage-answer triples, in which\nwe empirically know the positive and negative ex-\namples of the mock RAG system. We generate\nthese mock splits of the given datasets by select-\ning (1) The positive and negative query-passage\nmatches for context relevance, and (2) the positive\nand negative query-passage-answer matches for an-\nswer relevance. We ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_c8ec17261afe07455e09ab0353fdd2ff06cb55ed2955de6fda91130267f84792",
+      "paper_id": "2024.naacl-long.20",
+      "paper_title": "ARES: An Automated Evaluation Framework for Retrieval-Augmented Generation Systems",
+      "source_sha256": "5a585d88f7b63c06439a4ecb8fd3165615d637e2061f242bff3f6ec3a209bd34",
+      "chunk_id": "ch_383a18db89561abad6acc4fc5ec28015ed8b34cbbea0a80020f1c3761b8fd2e7",
+      "text_sha256": "da292de9b91fc099416065341bbf1500e3d5b6fdc02d2fbf7b0f4d186aa69d64",
+      "page_range": [
+        7,
+        7
+      ],
+      "passage": "478 0.835\nCorrect Positive/Negative Split 0.458 0.859\nARES Judge Accuracy 62.5% 84.0%\nEvaluation Set Size 707 510\nHuman Preference Data Size 200 200\nTable 2: ARES Results on the AIS benchmark\nTo evaluate whether ARES can effectively gauge\nanswer faithfulness in real RAG systems, we tested\nARES on the AIS attribution benchmark (Rashkin\net al., 2022). In AIS, we selected the Wizards\nof Wikipedia (WoW) and CNN/DM datasets; the\nother benchmark datasets involve either table rea-\nsoning (ToTTo) or focus on passage summariza-\ntion (QRECC) so we excluded them. ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_15c760ad10626945373981d7e64b648f8f3987507bb2072d2f329a2cf4324522",
+      "paper_id": "2024.naacl-long.20",
+      "paper_title": "ARES: An Automated Evaluation Framework for Retrieval-Augmented Generation Systems",
+      "source_sha256": "5a585d88f7b63c06439a4ecb8fd3165615d637e2061f242bff3f6ec3a209bd34",
+      "chunk_id": "ch_8aaa82911bfc50fcdeee89de6ba2d6bcaca11e9a5f812b76c97911a8ab3dc3de",
+      "text_sha256": "d85b929d5a830f67bdf269d827743ee98c78d62de04ffbfc39b91c7dd08faa21",
+      "page_range": [
+        9,
+        9
+      ],
+      "passage": "Guu, Kenton Lee, Zora Tung, Panupong Pasu-\npat, and Mingwei Chang. 2020. Retrieval augmented\nlanguage model pre-training. In International confer-\nence on machine learning, pages 3929–3938. PMLR.\nPengcheng He, Jianfeng Gao, and Weizhu Chen. 2021.\nDebertav3: Improving deberta using electra-style pre-\ntraining with gradient-disentangled embedding shar-\ning. arXiv preprint arXiv:2111.09543.\nJeremy Howard and Sebastian Ruder. 2018. Universal\nlanguage model fine-tuning for text classification.\nIn Proceedings of the 56th Annual Meeting of the\nAssociation for Computational Linguistics (Volume 1:\nLong Papers), pages 328–339, Melbourne, Australia.\nAssociation for Computational Linguistics.\n",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_5d1143f398dfb1123dd87497760d9757bd0ab31831c5b650129c82137f06ec6a",
+      "paper_id": "2024.naacl-long.20",
+      "paper_title": "ARES: An Automated Evaluation Framework for Retrieval-Augmented Generation Systems",
+      "source_sha256": "5a585d88f7b63c06439a4ecb8fd3165615d637e2061f242bff3f6ec3a209bd34",
+      "chunk_id": "ch_8a5db0a1f30e3b9d587ee0cc7528cf7e440d9348cf2379a651a65db3abc67098",
+      "text_sha256": "f859ffe5569a9f7702e5c0c15f3afec289ff7b15f47d202dcf7245de3e361c1f",
+      "page_range": [
+        12,
+        12
+      ],
+      "passage": "use 8 few-shot examples with the fol-\nlowing prompt to score answer faithfulness:\n• Given the following question, document, and\nanswer, you must analyze the provided answer\nand determine whether it is faithful to the con-\ntents of the document. The answer must not\noffer new information beyond the context pro-\nvided in the document. The answer also must\nnot contradict information provided in the doc-\nument. Output your final verdict by strictly\nfollowing this format: \"[[Yes]]\" if the answer\nis faithful to the document and \"[[No]]\" if the\nanswer is not faithful to the document. ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_dfbf7fbced159480472b32828918aa997d5eb4f1f5ec648f52f6a51db7da87e9",
+      "paper_id": "2025.bucc-1.5",
+      "paper_title": "BEIR-NL: Zero-shot Information Retrieval Benchmark for the Dutch Language",
+      "source_sha256": "0d188fa4a232ff9f92f499f3965a70dec1f5d8e6d20dc5745c99994c99644379",
+      "chunk_id": "ch_62f4b755916db399d501293f88bb7fd35af98b0c81caf54b8aeb592214f9a549",
+      "text_sha256": "b510c9a9f2ad19b137470c26978fc1be56ce9741559774cdcade9e4559bc5a96",
+      "page_range": [
+        2,
+        2
+      ],
+      "passage": "datasets in Russian,\nand with one translated using DeepL. SEB (Scandi-\nnavian Embedding Benchmark; Enevoldsen et al.,\n2024) represents 24 evaluation tasks for Scandina-\nvian languages, incorporating a portion of existing\ntranslated datasets from MTEB.\nFinally in IR, mMARCO (Bonifacio et al., 2021)\nextended the popular MSMARCO dataset (Bajaj\net al., 2016) to multiple languages by translating\nqueries and passages using Google Translate and\nHelsinki-NLP models (Tiedemann and Thottingal,\n2020). Most related to our work, BEIR-PL (Woj-\ntasik et al., 2024) translated a subset of the BEIR\nbenchmark to Polish using Google Translate.\nThese ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_74684509c5896ea9b2ecb4e291b4ee36a646074f5ca12d75616433dceba7014a",
+      "paper_id": "2025.bucc-1.5",
+      "paper_title": "BEIR-NL: Zero-shot Information Retrieval Benchmark for the Dutch Language",
+      "source_sha256": "0d188fa4a232ff9f92f499f3965a70dec1f5d8e6d20dc5745c99994c99644379",
+      "chunk_id": "ch_c87efdcd1415d896e06931511c746ddf8cdac4b4aa9b02f0b319ef5124ea0e96",
+      "text_sha256": "efe394c30682b9d328a595565f118b97cdecb2788f470ae5bc184ecfb37f825c",
+      "page_range": [
+        4,
+        4
+      ],
+      "passage": "base LaBSE (distilled) 107M 192 512 No\nLaBSE - 471M 768 512 No\nmContriever Bert-multilingual-base 179M 768 512 No\nbge-reranker-v2-m3 bge-m3 568M 1024 8192 Y es\njina-reranker-v2-base-multilingual XLMRoberta-base 278M 768 1024 Y es\ngte-multilingual-reranker-base gte-multilingual-base 305M 768 8192 Y es\nTable 2: Dense ranking (top) and reranking (bottom) models used in our experiments. ‘Dim’ is the dimension of the\noutput embedding vector. LaBSE and gte-multilingual-base are trained from scratch. LEALLA is distilled from\nLaBSE, and the rest are fine-",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_373fbba0142d5ad5d0c9d7afbd91847a99b9a15a0fcc01b497b8b32d9bcd8412",
+      "paper_id": "2025.bucc-1.5",
+      "paper_title": "BEIR-NL: Zero-shot Information Retrieval Benchmark for the Dutch Language",
+      "source_sha256": "0d188fa4a232ff9f92f499f3965a70dec1f5d8e6d20dc5745c99994c99644379",
+      "chunk_id": "ch_492d94e64a79f8d6c863891d957c635c3aa7c007a7e4ed2b3d03b74c9f0019c3",
+      "text_sha256": "0053309eaebe42025961e63e38e1f468d8d16e5424c6cf6d0269f654c9d790d4",
+      "page_range": [
+        5,
+        5
+      ],
+      "passage": "e5-small 74.63 † 7.89 23.56 60.70 † 69.45† 47.10 94.59 38.18 56.99 97.51 † 35.83 22.93 87.67 85.83 † 40.47\nmultilingual-e5-base 77.39 † 6.58 22.09 73.61 † 76.24† 55.02 95.59 32.96 60.65 97.93 † 39.40 29.78 91.00 89.98 † 42.69\nmultilingual-e5-large 82.71† 13.31 27.34 83.49 † 82.21† 61.81 96.37 43.65 63.30 98.66 † 47.26 30.42 92.27 93.08 † ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_3f2b1547d4ceca38982a201734a3f30fd110c9610e38c09642c68a48d7899225",
+      "paper_id": "2025.bucc-1.5",
+      "paper_title": "BEIR-NL: Zero-shot Information Retrieval Benchmark for the Dutch Language",
+      "source_sha256": "0d188fa4a232ff9f92f499f3965a70dec1f5d8e6d20dc5745c99994c99644379",
+      "chunk_id": "ch_35d3bbd2446d3090a62e17e47cec0ec94cd333b82c0ab0968c0ca6fdd2ae0780",
+      "text_sha256": "cc18f824a54654731b5be85cf5bd6b98b32db744b05f10b99b29ac33b60f7e71",
+      "page_range": [
+        6,
+        6
+      ],
+      "passage": "of Dutch\nIR, especially in domain-specific contexts with\nlocal terminology and knowledge.\nData Contamination. Many modern IR models\nare trained on massive corpora that might include\ncontent from BEIR. Table 3 indicates multiple\nmodels that have (or might have) been exposed\nto in-domain contamination for a given dataset.\nThis can result in inflated performance –as models\nmight have already seen the relevant data during",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_f38194a9b5a19a8eaeed656e79c9db8275332bcba8f53b3f51ea86543d53062f",
+      "paper_id": "2025.bucc-1.5",
+      "paper_title": "BEIR-NL: Zero-shot Information Retrieval Benchmark for the Dutch Language",
+      "source_sha256": "0d188fa4a232ff9f92f499f3965a70dec1f5d8e6d20dc5745c99994c99644379",
+      "chunk_id": "ch_2ee4052305a0caa6338c39980b066bafe4800a958d4fff03f6760b626667b527",
+      "text_sha256": "4c73f0be00aea700e0e67be6ab4b674aed1765ac1f122560adc2b31f93e56172",
+      "page_range": [
+        8,
+        8
+      ],
+      "passage": "Online. Association for Computational Linguistics.\nThomas Diggelmann, Jordan Boyd-Graber, Jannis Bu-\nlian, Massimiliano Ciaramita, and Markus Leip-\npold. 2020. Climate-fever: A dataset for verifica-\ntion of real-world climate claims. arXiv preprint\narXiv:2012.00614.\nKenneth Enevoldsen, Márton Kardos, Niklas Muen-\nnighoff, and Kristoffer Laigaard Nielbo. 2024. The\nscandinavian embedding benchmarks: Comprehen-\nsive assessment of multilingual and monolingual text\nembedding. arXiv preprint arXiv:2406.02396.\nLeon Engl ¨ander, Hannah Sterz, Clifton Poth, Jonas\nPfeiffer, Ilia Kuznetsov, and Iryna Gurevych. 2024.\nM2qa: Multi-domain multilingual question answer-\ning. arXiv preprint arXiv:2407.01091.\nFangxiaoyu Feng, ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_6b4b1b821ee5e2c8536408522e89e8cc6f9309a16ff4deb20496ff03faa31c2f",
+      "paper_id": "2025.naacl-long.220",
+      "paper_title": "Benchmarking and Building Zero-Shot Hindi Retrieval Model with Hindi-BEIR and NLLB-E5",
+      "source_sha256": "403284fa20a87a38c1bddd03cfb70a4d110bd93e2e8c8b0d2bd94152acf5922a",
+      "chunk_id": "ch_0032f940bdd01de6c2c6eccea87dcb180658dbb8867c030fab139508a8a3e186",
+      "text_sha256": "a32c85ad08493d3a6b6fa381ea041d4aa481ad8420b1016415baaa9a950c6b84",
+      "page_range": [
+        3,
+        3
+      ],
+      "passage": "equip\nexisting LLMs with multilingual capability with-\nout any multilingual supervised data. They ver-\ntically stack a multilingual encoder and an LLM,\nadding a projection/alignment layer between them.\nThe input first passes through the multilingual en-\ncoder, the representation from the multilingual\nencoder passes through the alignment layer and\nthen the output from the alignment layer is passed\nas input to the LLM. They use English-labeled\ndata to fine-tune the overall model and update\nonly the embedding layers and the alignment layer.\nThe model showed better multilingual capabilities.\n3https://fire.irsi.org.in/",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_f1c60f537cdab1968971e5bb89f02be0786a24f23d085a6db3358544d2398aa1",
+      "paper_id": "2025.naacl-long.220",
+      "paper_title": "Benchmarking and Building Zero-Shot Hindi Retrieval Model with Hindi-BEIR and NLLB-E5",
+      "source_sha256": "403284fa20a87a38c1bddd03cfb70a4d110bd93e2e8c8b0d2bd94152acf5922a",
+      "chunk_id": "ch_48bb13cc186ece9d86f17f71f7ec81e4b4319b9ccf3113ad25ddecaf2dfaebca",
+      "text_sha256": "af8ff714a6ae95d6bde53539fd555661d9ba60de2354150a489ee31f09a3bc23",
+      "page_range": [
+        5,
+        5
+      ],
+      "passage": "language, too.\nFigure 1 demonstrates how we follow the\nabove intuition in designing NLLB-E5. We use\nNLLB Team et al. (2022) as the strong multilin-\ngual encoder that produces robust multilingual em-\nbeddings owing to its translation capabilities for\nover 200 languages. To align these embeddings\n4332",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_d8607865ee422b905c6cee9ca608f4cb70c7b167a6b6dd41d5232788736862f9",
+      "paper_id": "2025.naacl-long.220",
+      "paper_title": "Benchmarking and Building Zero-Shot Hindi Retrieval Model with Hindi-BEIR and NLLB-E5",
+      "source_sha256": "403284fa20a87a38c1bddd03cfb70a4d110bd93e2e8c8b0d2bd94152acf5922a",
+      "chunk_id": "ch_37dab9c6f62624f096ad3278b880b02e881675ec104dd7093e0963960a52e0f9",
+      "text_sha256": "611c1fb0b075a5e5329c985673fe0eedd3804a1b3bed9c60ba018684f3c8d8f8",
+      "page_range": [
+        8,
+        8
+      ],
+      "passage": "MIRACL 59.34 58.11 59.24 0.69 13.76 40.98 53.56\nIndicQARetrieval 69.92 67.11 67.11 21.28 46.85 74.02 61.94\nmMARCO 29.49 29.94 30.92 0.48 6.98 16.53 33.03\nWikiPediaRetrieval 87.38 84.40 86.71 0.03 61.28 82.54 85.65\nAverage 46.18 40.57 44.37 3.44 19.66 35.65 48.57\nTable 2: NDCG@10 scores of the existing multilingual model and best-performing NLLB-E5 on Hindi-BEIR\ndatasets. The best-",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_fb1baaaa5f1c1979178016605478f61c19751bb911c3df82ce774328916ebe53",
+      "paper_id": "2025.naacl-long.220",
+      "paper_title": "Benchmarking and Building Zero-Shot Hindi Retrieval Model with Hindi-BEIR and NLLB-E5",
+      "source_sha256": "403284fa20a87a38c1bddd03cfb70a4d110bd93e2e8c8b0d2bd94152acf5922a",
+      "chunk_id": "ch_8d3798852a6ab10bf201d78c616beeb7fdb47c04274d0548b63af8493f21da96",
+      "text_sha256": "55f934f2b3b9f646c452e51c70c2d27d248eddbde9f3e0ec2cd4c64c7aeb3d23",
+      "page_range": [
+        10,
+        10
+      ],
+      "passage": "on Information\nRetrieval, pages 106–120. Springer.\nAkash Ghosh, Arkadeep Acharya, Sriparna Saha, Gau-\nrav Pandey, Dinesh Raghu, and Setu Sinha. 2024b.\nHealthAlignSumm : Utilizing alignment for multi-\nmodal summarization of code-mixed healthcare di-\nalogues. In Findings of the Association for Com-\nputational Linguistics: EMNLP 2024, pages 11546–\n11560, Miami, Florida, USA. Association for Com-\nputational Linguistics.\nSaiful Haq, Ashutosh Sharma, and Pushpak Bhat-\ntacharyya. 2023. Indicirsuite: Multilingual dataset\nand neural information models for indian languages.\nPreprint, arXiv:2312.09508.\nGeoffrey Hinton, Oriol Vinyals, and Jeff Dean. 2015.\nDistilling the knowledge in a neural network.\nPreprint, ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    },
+    {
+      "candidate_id": "pq_82da8b17cfe09904b145213655e1fff1dbbc6bad6a3edb171735e54d33290c6c",
+      "paper_id": "2025.naacl-long.220",
+      "paper_title": "Benchmarking and Building Zero-Shot Hindi Retrieval Model with Hindi-BEIR and NLLB-E5",
+      "source_sha256": "403284fa20a87a38c1bddd03cfb70a4d110bd93e2e8c8b0d2bd94152acf5922a",
+      "chunk_id": "ch_c95537c86a77ebf623c3776d8a490e98a767d593f659d726c1c42884c1d95fef",
+      "text_sha256": "858bb7ef7abf2f0c2f9917f3fcd1e38dc11acd4cf1f7ebf50ff24f343cc20d9e",
+      "page_range": [
+        14,
+        14
+      ],
+      "passage": "task involves the veri-\nfication of scientific claims given the abstract\nof scientific articles from recent literature. For\nthis task, the model is expected to retrieve\nrelevant abstracts with a given claim as input.\n2. Domain : Scientific\nAn example of query with its corresponding\ngolden corpus from the SciFact dataset has been\nprovided in Figure 14\nFigure 14: An example of a query with its corresponding\ngolden corpus from the SciFact Dataset\nDistribution of the number of words in the cor-\npus and queries in the SciFact dataset has been\nshown in Figure 16 and Figure ",
+      "question": "",
+      "expected_answer": "",
+      "review_status": "pending",
+      "reviewer": null,
+      "review_rationale": ""
+    }
+  ]
+}
