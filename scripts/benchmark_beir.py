@@ -30,6 +30,8 @@ def save(path, value):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--study", choices=("baseline", "phase3"), default="baseline")
+    parser.add_argument("--baseline-work", type=Path, default=ROOT / "artifacts/beir")
     parser.add_argument(
         "--phase", choices=("preflight", "prepare", "tune", "evaluate", "all"), default="all"
     )
@@ -47,6 +49,23 @@ def main():
     parser.add_argument("--queries", type=int, default=0, help="smoke subset only, 0 = complete")
     parser.add_argument("--embedding", choices=("minilm", "fixture"), default="minilm")
     args = parser.parse_args()
+    if args.study == "phase3":
+        from datetime import date
+
+        from retrievec.evaluation.beir_study import run
+
+        if args.protocol == ROOT / "experiments/beir-grid-v1.json":
+            args.protocol = ROOT / "experiments/beir-phase3-v1.json"
+        if args.work == ROOT / "artifacts/beir":
+            args.work = ROOT / "artifacts/beir-phase3"
+        if args.output == ROOT / "docs/results/benchmark-2026-10-01.json":
+            args.output = (
+                ROOT / "docs/results" / f"benchmark-{date.today().isoformat()}-phase3.json"
+            )
+        if args.queries < 0:
+            parser.error("query limit cannot be negative")
+        run(args, ROOT)
+        return
     if min(args.documents, args.queries) < 0 or bool(args.documents) != bool(args.queries):
         parser.error("subset requires both positive --documents and --queries")
     if args.embedding == "fixture" and not args.documents:

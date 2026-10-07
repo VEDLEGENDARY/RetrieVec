@@ -5,12 +5,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DECLARATION = re.compile(
-    r"(?:^|[;{])\s*(color|background-color|font-size|gap|(?:row|column)-gap|"
+    r"(?:^|[;{])\s*(color|background-color|font-size|border-radius|box-shadow|"
+    r"(?:animation|transition)-duration|gap|(?:row|column)-gap|"
     r"(?:margin|padding)(?:-[\w-]+)?)\s*:\s*([^;}]+)",
     re.M,
 )
 LITERAL = re.compile(r"#[0-9a-fA-F]{3,8}\b|\b(?:rgb|hsl)a?\(")
-MEASURE = re.compile(r"(?<![\w-])(?:\d*\.)?\d+(?:px|rem|em|vh|vw|%)\b")
+MEASURE = re.compile(r"(?<![\w-])(?:\d*\.)?\d+(?:px|rem|em|vh|vw|ms|s|%)\b")
 
 
 def violations(text: str, css: bool):
@@ -42,10 +43,17 @@ def violations(text: str, css: bool):
 
 def main():
     errors = []
+    tokens = (ROOT / "web/src/tokens.css").read_text(encoding="utf-8")
+    roles = set(re.findall(r"--type-([\w-]+)\s*:", tokens))
+    if roles != {"metadata", "supporting", "body", "subheading", "section-heading", "page-heading"}:
+        errors.append("tokens.css must define exactly the six approved type roles")
     for path in sorted((ROOT / "web/src").rglob("*")):
         if path.suffix not in (".css", ".ts", ".tsx") or path.name == "tokens.css":
             continue
         text = path.read_text(encoding="utf-8")
+        if path.suffix == ".tsx" and path.name != "ui.tsx":
+            if re.search(r"<(?:button|input|select|textarea|label|dialog|details)\b", text):
+                errors.append(f"{path.relative_to(ROOT)}: use shared UI primitives")
         for offset, reason in violations(text, path.suffix == ".css"):
             line = text[:offset].count("\n") + 1
             errors.append(f"{path.relative_to(ROOT)}:{line}: {reason}")

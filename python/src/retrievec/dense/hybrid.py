@@ -6,6 +6,7 @@ import uuid
 
 from retrievec.corpus.snapshot import load_snapshot
 from retrievec.dense.artifacts import load_embeddings
+from retrievec.dense.parallel import run_legs
 from retrievec.dense.search import exact_search
 
 
@@ -42,16 +43,19 @@ class PinnedClient:
         snapshot_id: str | None = None,
         candidates: int = 100,
         artifact_cache: dict | None = None,
+        concurrent_legs: bool = True,
     ):
         if (
             retrieval not in ("sparse", "dense", "hybrid")
             or type(candidates) is not int
             or not 1 <= candidates <= 1000
+            or type(concurrent_legs) is not bool
         ):
             raise ValueError("invalid retrieval mode or candidate count")
         self.registry, self.store, self.node = registry, store, node
         self.principal, self.collection = principal, collection
         self.retrieval, self.model, self.candidates = retrieval, model, candidates
+        self.concurrent_legs = concurrent_legs
         registered = registry.resolve(principal, collection, snapshot_id)
         self.snapshot_id = registered["snapshot_id"]
         self.manifest = store.manifest(self.snapshot_id)
@@ -67,6 +71,18 @@ class PinnedClient:
             )
         corpus, papers, chunks = cache[corpus_key]
         self.chunks = {chunk["chunk_id"]: chunk for chunk in chunks}
+        from retrievec.corpus.sections import PassageProvenance
+
+        self.passage_provenance = PassageProvenance(store.root, corpus)
+        from retrievec.corpus.pdf_locations import LocationIndex
+
+        self.pdf_locations = LocationIndex(store.root, corpus)
+        self.paper_metadata = None
+        self.papers = {paper["paper_version_id"]: paper for paper in papers}
+        if corpus["configuration"].get("paper_metadata_id"):
+            from retrievec.corpus.metadata import PaperMetadata
+
+            self.paper_metadata = PaperMetadata(store.root, corpus)
         self.evidence_index = None
         if corpus["configuration"].get("evidence_map_id"):
             from retrievec.extraction.indexing import EvidenceIndex
@@ -113,8 +129,18 @@ class PinnedClient:
         }
 
     def search(
-        self, query: str, mode: str = "free_text", top_k: int = 10, explain: bool = False
+        self,
+        query: str,
+        mode: str = "free_text",
+        top_k: int = 10,
+        explain: bool = False,
+        *,
+        section: str | None = None,
     ) -> dict:
+        from retrievec.corpus.sections import SECTIONS
+
+        if section is not None and section not in SECTIONS:
+            raise ValueError("unknown section")
         if (
             not isinstance(query, str)
             or not query.strip()
@@ -130,10 +156,32 @@ class PinnedClient:
         start = time.perf_counter()
         sparse, dense, timings = [], [], {}
         total = 0
-        if self.retrieval != "dense":
-            response = self.node.search(
+
+        def sparse_leg():
+            return self.node.search(
                 self.collection, self.snapshot_id, query, mode, self.candidates, explain
             )
+
+        def dense_leg():
+            dense_start = time.perf_counter()
+            vector = self.model.encode([self.model.config["query_prefix"] + query])[0]
+            hits = exact_search(
+                self.vectors,
+                [c["chunk_id"] for c in self.embedding["chunks"]],
+                vector,
+                self.candidates,
+            )
+            return hits, (time.perf_counter() - dense_start) * 1000
+
+        if self.retrieval == "hybrid":
+            response, (dense, timings["dense_ms"]) = run_legs(
+                sparse_leg, dense_leg, concurrent=self.concurrent_legs
+            )
+        elif self.retrieval == "sparse":
+            response = sparse_leg()
+        else:
+            dense, timings["dense_ms"] = dense_leg()
+        if self.retrieval != "dense":
             if response.corpus_snapshot_id != self.manifest["corpus_snapshot_id"]:
                 raise ValueError("cannot combine different corpus snapshots")
             sparse = [
@@ -150,15 +198,6 @@ class PinnedClient:
             timings["sparse_ms"] = response.search_ms
             total = response.total_matches
         if self.retrieval != "sparse":
-            dense_start = time.perf_counter()
-            vector = self.model.encode([self.model.config["query_prefix"] + query])[0]
-            dense = exact_search(
-                self.vectors,
-                [c["chunk_id"] for c in self.embedding["chunks"]],
-                vector,
-                self.candidates,
-            )
-            timings["dense_ms"] = (time.perf_counter() - dense_start) * 1000
             total = len(self.chunks)
         if self.retrieval == "hybrid":
             ranked = fuse([sparse, dense])
@@ -166,6 +205,14 @@ class PinnedClient:
         else:
             ranked = sparse if self.retrieval == "sparse" else dense
         sparse_scores = {item["chunk_id"]: item for item in sparse}
+        if section is not None:
+            ranked = [
+                item
+                for item in ranked
+                if self.passage_provenance.attributes(self.chunks[item["chunk_id"]])["section"]
+                == section
+            ]
+            total = len(ranked)
         dense_scores = {item["chunk_id"]: item["cosine_score"] for item in dense}
         hits = []
         for rank, item in enumerate(ranked[:top_k], 1):
@@ -198,9 +245,21 @@ class PinnedClient:
             else:
                 hit.update(evidence_type="prose", source_locator=None)
             hits.append(hit)
+            hit.update(self.passage_provenance.attributes(chunk))
+            if self.pdf_locations.mapping:
+                hit.update(
+                    self.pdf_locations.attributes(chunk, self.papers[chunk["paper_version_id"]])
+                )
+            if self.paper_metadata is not None:
+                hit.update(self.paper_metadata.attributes(self.papers[chunk["paper_version_id"]]))
         timings["search_ms"] = (time.perf_counter() - start) * 1000
         return {
             **self.stats(),
+            **(
+                {"section_filter": section, "section_filter_scope": "retrieved candidate pool"}
+                if section is not None
+                else {}
+            ),
             "request_id": uuid.uuid4().hex,
             "total_matches": total,
             "hits": hits,

@@ -1,5 +1,27 @@
 /* Single source of truth. Media-query breakpoints remain literal CSS conditions. */
 :root {
+  --radius-circle: 50%;
+  --border-width: 1px;
+  --focus-width: 2px;
+  --focus-offset: 3px;
+  --accent-width: 3px;
+  --control-size: 44px;
+  --icon-size: 20px;
+  --backdrop-blur: 20px;
+  --material-tint: #f2f5f9f5;
+  --material-rim: #ffffff;
+  --material-shadow: inset 0 1px 0 #ffffffb3, 0 12px 32px #1f365514;
+  --press-scale: 0.985;
+  --press-offset: 1px;
+  --light-x: 30%;
+  --light-y: 0%;
+  --material-light: radial-gradient(
+    ellipse at var(--light-x) var(--light-y),
+    var(--material-rim),
+    var(--transparent) 70%
+  );
+  --evidence-highlight: #972f25;
+  --evidence-highlight-halo: #ffffff;
   --dialog-offset: 12vh;
   --welcome-padding: 8vh max(6vw, var(--space-8));
   --welcome-logo-gap: clamp(var(--space-16), 10vh, var(--space-32));
@@ -7,19 +29,20 @@
   --panel-padding: clamp(var(--space-6), 4vw, var(--space-11));
   --research-padding: clamp(var(--space-5), 3vw, var(--space-8));
   font-family: var(--font-ui);
-  font-size: var(--text-base);
+  font-size: var(--type-body);
   font-synthesis: none;
   color: var(--ink);
   background: var(--canvas);
   line-height: var(--leading-normal);
   color-scheme: light;
-  --canvas: #f5f7f5;
-  --ink: #18221f;
-  --muted: #52635b;
-  --subtle: #edf2ef;
+  --canvas: #f2f5f9;
+  --ink: #182431;
+  --muted: #4c5e70;
+  --subtle: #e8eef4;
   --surface: #ffffff;
   --surface-solid: #ffffff;
-  --line: #c9d6cf;
+  --line: #a8b7c6;
+  --control-line: #7c8e9f;
   --brand: #076454;
   --brand-dark: #064f43;
   --brand-soft: #dff7ef;
@@ -30,19 +53,22 @@
   --action-background: #076454;
   --action-hover: #064f43;
   --on-action: #ffffff;
+  --disabled-ink: #4c5e70;
+  --disabled-surface: #e8eef4;
+  --disabled-line: #a8b7c6;
   --overlay: #10251f88;
   --transparent: transparent;
   --font-ui:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI",
+    system-ui, sans-serif;
   --font-evidence: Georgia, "Times New Roman", serif;
   --font-code: ui-monospace, Consolas, monospace;
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.75rem;
-  --text-display: clamp(2rem, 4vw, 3.5rem);
+  --type-metadata: 0.75rem;
+  --type-supporting: 0.875rem;
+  --type-body: 1rem;
+  --type-subheading: 1.25rem;
+  --type-section-heading: 1.75rem;
+  --type-page-heading: clamp(2rem, 3vw, 3rem);
   --leading-tight: 1.2;
   --leading-normal: 1.5;
   --leading-reading: 1.75;
@@ -51,13 +77,13 @@
   --weight-bold: 700;
   --tracking-tight: -0.025em;
   --tracking-normal: 0;
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-round: 999px;
-  --shadow-sm: 0 1px 2px #11231d0d;
-  --shadow: 0 8px 24px #203b3114;
-  --shadow-overlay: 0 16px 48px #0004;
+  --radius-control: 0.75rem;
+  --radius-card: 1.25rem;
+  --radius-overlay: 1.75rem;
+  --radius-pill: 999px;
+  --shadow-sm: 0 2px 6px #1f36550a;
+  --shadow: 0 8px 24px #1f365518;
+  --shadow-overlay: 0 24px 64px #0c1f3540;
   --ring: 0 0 0 4px #087f6a2b;
   --motion-fast: 150ms;
   --motion-normal: 200ms;
@@ -65,17 +91,26 @@
   --motion-reduced: 0.01ms;
   --ease-enter: cubic-bezier(0, 0, 0.2, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --canvas: #101713;
-    --ink: #e7eeea;
-    --muted: #b4c4bb;
-    --subtle: #22312b;
-    --surface: #1b2722;
-    --surface-solid: #1b2722;
-    --line: #53685f;
+    --evidence-highlight: #972f25; /* Original source images retain their own light surface. */
+    --canvas: #111923;
+    --ink: #edf3f8;
+    --muted: #b5c4d3;
+    --subtle: #273443;
+    --surface: #1b2734;
+    --surface-solid: #1b2734;
+    --line: #62788d;
+    --control-line: #758aa0;
+    --material-tint: #1b2734f5;
+    --material-rim: #96b7ce;
+    --material-shadow: inset 0 1px 0 #a0bed02b, 0 12px 32px #00000033;
+    --shadow-sm: 0 2px 6px #0000001f;
+    --shadow: 0 8px 24px #00000033;
+    --shadow-overlay: 0 24px 64px #00000080;
     --brand: #68dfc1;
     --brand-dark: #8be9d0;
     --brand-soft: #173f35;
@@ -83,6 +118,9 @@
     --violet-soft: #302946;
     --danger: #ffb1a5;
     --danger-soft: #482820;
+    --disabled-ink: #b5c4d3;
+    --disabled-surface: #273443;
+    --disabled-line: #62788d;
     --overlay: #0009;
     --ring: 0 0 0 4px #68dfc133;
   }
@@ -102,4 +140,45 @@
   --space-16: 4rem;
   --space-18: 4.5rem;
   --space-32: 8rem;
+}
+
+/* Unit-mass damped spring: zeta .8, omega 32/s, sampled over 250ms. */
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(
+      0,
+      0.02727,
+      0.0953,
+      0.18715,
+      0.29027,
+      0.39566,
+      0.49717,
+      0.59088,
+      0.67455,
+      0.74721,
+      0.80876,
+      0.85972,
+      0.90096,
+      0.93357,
+      0.95873,
+      0.97761,
+      0.9913,
+      1.00082,
+      1.00706,
+      1.01077,
+      1.0126,
+      1.01307,
+      1.01262,
+      1.01156,
+      1.01015,
+      1.00858,
+      1.00699,
+      1.00545,
+      1.00404,
+      1.00278,
+      1.00169,
+      1.00076,
+      1
+    );
+  }
 }

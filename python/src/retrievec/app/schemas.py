@@ -2,6 +2,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from retrievec.corpus.sections import Section
+
 
 class Resource(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
@@ -32,6 +34,7 @@ class SearchInput(Resource):
     snapshot_id: str | None = Field(default=None, pattern=r"^rs_[0-9a-f]{64}$")
     top_k: int = Field(default=10, ge=1, le=100)
     candidates: int = Field(default=100, ge=1, le=1000)
+    section: Section | None = None
 
     @model_validator(mode="after")
     def valid_combination(self):

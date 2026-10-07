@@ -1,5 +1,5 @@
+import { ActionLink, Notice, LoadingState, Disclosure } from "./ui";
 import { useEffect, useState } from "react";
-import { Skeleton } from "./ui";
 import { api } from "./api";
 
 type Cell = {
@@ -187,9 +187,9 @@ export function AdvancedEvidence({
   }, [path]);
   if (!value)
     return error ? (
-      <p role="alert">{error}</p>
+      <Notice error>{error}</Notice>
     ) : (
-      <Skeleton label="Loading retained source region…" />
+      <LoadingState label="Loading retained source region…" />
     );
   const [x0, y0, x1, y1] = value.locator.display_box;
   const [width, height] = value.locator.display_size;
@@ -220,23 +220,30 @@ export function AdvancedEvidence({
           aria-label="Highlighted evidence region"
         >
           <rect
+            className="evidence-region-halo"
             x={x0}
             y={y0}
             width={x1 - x0}
             height={y1 - y0}
             fill="none"
-            stroke="var(--brand)"
-            strokeWidth="2"
+          />
+          <rect
+            className="evidence-region"
+            x={x0}
+            y={y0}
+            width={x1 - x0}
+            height={y1 - y0}
+            fill="none"
           />
         </svg>
       </div>
-      <a
+      <ActionLink
         href={`${path}/original#page=${value.locator.page}`}
         target="_blank"
         rel="noreferrer"
       >
-        Compare original PDF page
-      </a>
+        Open original source
+      </ActionLink>
       <Structure content={value.content} />
       {value.warnings.length > 0 && (
         <ul>
@@ -245,10 +252,10 @@ export function AdvancedEvidence({
           ))}
         </ul>
       )}
-      <details>
+      <Disclosure>
         <summary>Raw extraction output</summary>
         <pre>{value.raw_output}</pre>
-      </details>
+      </Disclosure>
     </section>
   );
 }

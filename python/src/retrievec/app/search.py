@@ -73,7 +73,9 @@ def install_search(app):
                     value.candidates,
                     artifact_cache=artifact_cache,
                 )
-                results[mode] = client.search(value.query, value.mode, value.top_k, explain=True)
+                results[mode] = client.search(
+                    value.query, value.mode, value.top_k, explain=True, section=value.section
+                )
             with registry.connect() as db:
                 app.state.resources.collection(db, user, value.collection_id)
                 sources = db.execute(
