@@ -14,6 +14,7 @@ from retrievec.app.auth import principal
 from retrievec.app.errors import APIError
 from retrievec.app.generation import load_providers
 from retrievec.app.query_rewrite import rewrite_query
+from retrievec.corpus.sections import Section
 from retrievec.corpus.snapshot import canonical, digest
 from retrievec.observability import carrier as trace_carrier
 from retrievec.registry.artifacts import Store
@@ -35,6 +36,7 @@ class RunInput(BaseModel):
     parent_run: uuid.UUID | None = None
     retrieval: Literal["sparse", "dense", "hybrid"] = "hybrid"
     provider: str = Field(default="local", pattern=r"^[a-zA-Z0-9_-]{1,64}$")
+    section: Section | None = None
 
 
 def run_view(row):
@@ -257,7 +259,10 @@ def install_research(app):
         idempotency_key: str = Header(min_length=1, max_length=128),
     ):
         user = principal(request)
-        request_hash = digest(canonical(value.model_dump(mode="json")))
+        request_value = value.model_dump(mode="json")
+        if request_value["section"] is None:
+            request_value.pop("section")  # Preserve existing unfiltered retry request hashes.
+        request_hash = digest(canonical(request_value))
         with registry.connect() as db:
             conversation = policy.owned(db, user, "conversation", conversation_id)
             lock_admission(db, user)
@@ -317,6 +322,9 @@ def install_research(app):
                 "evidence_policy": "typed-evidence-grounding-v1",
                 "generation_transport": "llama-completion-sse-v1",
             }
+            if value.section is not None:
+                config["section"] = value.section
+                config["section_filter_scope"] = "retrieved candidate pool"
             provider = app.state.providers.get(value.provider)
             if provider is None:
                 raise APIError(

@@ -1,0 +1,92 @@
+# Research provenance extensions
+
+## Section-aware chunking
+
+Implemented as an explicit opt-in: `retrievec import --section-aware`, or
+`section_aware: true` in the existing extraction experiment configuration.
+The default paragraph packer, token budgets, overlap, and retrieval scoring remain
+unchanged. Recognized standalone headings create lossless boundaries; section
+context carries across pages. Unknown structure stays unclassified. The original
+heading and character offsets in extracted page text are retained in an immutable
+hash-bound sidecar referenced by the corpus snapshot. Existing snapshots remain
+readable and are never rewritten.
+
+Ask → More section filters exposes the passage-mode filter. Answer mode exposes
+it under More answer options. Both filter the bounded **retrieved candidate
+pool**, before selecting the final passages. This is not an exhaustive search of
+all passages in a section; the UI and result metadata disclose that scope.
+Unfiltered requests preserve existing saved-run idempotency hashes.
+
+The complete SciFact/SCIDOCS records were evaluated with the production paragraph
+packer at the web's 96-token budget, unchanged BM25 k1=1.2/b=0.75, 100 candidate
+chunks, and no wordpiece refinement. There was no tuning. All 300/1,000 test
+queries completed for both configurations.
+
+| Corpus | Plain nDCG@10 | Section-aware | Paired delta (95% bootstrap interval) |
+|---|---:|---:|---|
+| SciFact | 0.619029 | 0.619029 | 0.000000 [0.000000, 0.000000] |
+| SCIDOCS | 0.141991 | 0.141484 | −0.000507 [−0.001132, +0.000039] |
+
+SciFact had no recognized headings; SCIDOCS had 593 records with explicit
+headings. These are titles and abstracts, not full paper bodies. Dense/hybrid
+impact was not measured. The result does not support a default promotion.
+Full rankings, metrics and paired intervals:
+[sections-2026-10-05.json.gz](../results/sections-2026-10-05.json.gz).
+
+Verification: lossless boundaries, cross-page context, offsets, immutable
+provenance and tamper rejection passed unit tests. The section UI test and the
+complete 30-test UI suite passed with two browser workers. The web build passed.
+
+## Identifier imports and metadata
+
+`scripts/import_paper.py --arxiv ID --work artifacts/import --output artifacts/store/corpora`
+resolves official arXiv metadata and downloads the resolved PDF version. DOI
+imports use `--doi DOI --source LOCAL.pdf`: Crossref supplies metadata, while
+the explicit local source association is recorded as unverified. Arbitrary
+publisher URLs are never followed. Network responses and source sizes are bounded.
+
+Title, authors, publication year and DOI retain field paths, response hashes,
+lookup time and source hash in an immutable metadata sidecar. Unknown fields
+stay blank. Existing imports do not acquire metadata automatically. Original
+files and metadata responses remain in the requested work directory; offline
+imports do not create upload records or alter original-source access rules.
+Ask passage and answer inspectors show the retained metadata and provenance.
+
+Verification: parser/source-binding tests passed; the four workbench UI tests
+and web build passed. A real import of arXiv `2104.08663` resolved version v4,
+retained its PDF, title, five authors and publication year 2021, and produced
+an immutable sparse corpus. DOI import was checked with deterministic Crossref
+fixtures, not a live publisher PDF. Full repository checks passed with both
+PostgreSQL and pgvector integrations enabled (142 tests, no skips).
+
+## Ordinary PDF passage locations
+
+Ordinary PDF ingestion preserves its existing pypdf text and paragraph packing.
+A separate hash-bound locator records page-text character offsets and actual
+pdfplumber glyph boxes. The complete non-whitespace page text must match the
+glyph stream exactly, so repeated phrases map through their retained offsets.
+Page images are derived from retained source bytes and served only after the
+existing collection/snapshot authorization checks, repeated before response.
+Original source retention and access rules remain unchanged.
+
+The inspector overlays those boxes on the corresponding page image. Mismatched
+reading order, multi-character glyphs, rotation, cropping, unusual PDF units or
+extraction failure leave an explicit limitation instead of guessed coordinates.
+Older snapshots and text imports also explain when a PDF location is absent.
+Geometry is excluded from generation prompts. Exact-box, repeated-text,
+source/text binding and mismatch tests passed against the real extractor.
+
+## Cited comparison tables
+
+The collection's session shortlist groups passages by retained paper ID and
+compares title, reported metadata, section and exact passage text. Every data
+cell carries a citation to the retained passage, snapshot and question. Missing
+paper identities stay separate rather than being inferred from titles. Cited
+answer comparisons also use tables with citations in every value cell; model
+comparability notes and missing-field wording remain visible. No scientific
+winner is inferred from retrieval scores.
+
+Verification: the web build and five workbench/saved-research UI tests passed.
+Citation links move focus to their retained evidence; export, removal/Undo,
+collection cleanup and 390px dark-mode reflow remain covered. A mobile overflow
+failure was reproduced and fixed by constraining the table's layout.

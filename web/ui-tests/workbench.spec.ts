@@ -5,6 +5,7 @@ const hits = [
   {
     rank: 1,
     chunk_id: "passage-a",
+    paper_id: "paper-a",
     title: "Learning dense representations",
     text: "Dense retrieval learns semantic representations from paired questions and passages.",
     source_id: null,
@@ -16,7 +17,20 @@ const hits = [
   {
     rank: 2,
     chunk_id: "passage-b",
+    paper_id: "paper-b",
     title: "Lexical baselines",
+    authors: ["Synthetic Author"],
+    year: 2020,
+    doi: "10.1234/fixture",
+    metadata_provenance: { provider: "synthetic-test-fixture" },
+    pdf_locator: {
+      page: 7,
+      width: 612,
+      height: 792,
+      boxes: [[72, 62, 130, 74]],
+      coordinates: "PDF points; top-left page origin",
+      extractor: "synthetic-test-fixture",
+    },
     text: "Sparse retrieval uses exact term overlap. Hybrid retrieval combines lexical and dense evidence.",
     source_id: null,
     page_range: [7, 7],
@@ -28,6 +42,14 @@ const hits = [
 async function openWorkbench(page: Page, view: "Search" | "Sources") {
   await page.route("**/api/v1/**", (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/pdf-page"))
+      return route.fulfill({
+        contentType: "image/png",
+        body: Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=",
+          "base64",
+        ),
+      });
     let json: unknown = [];
     if (path.endsWith("/me"))
       json = { principal_id: "test", csrf_token: "test-token" };
@@ -74,9 +96,10 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     .getByLabel("Research question")
     .fill("Compare lexical and dense retrieval");
   await page
-    .getByRole("button", { name: "Search evidence →", exact: true })
+    .getByRole("button", { name: "Search evidence", exact: true })
     .click();
   await expect(page.getByText("2 unique passages")).toBeVisible();
+  await page.getByText("More result options", { exact: true }).click();
   await page.getByLabel("Show retrieval method").selectOption("hybrid");
   await page.getByLabel("Filter returned passages").fill("Lexical baselines");
   const ranking = page.getByRole("region", { name: "Hybrid · RRF" });
@@ -87,10 +110,31 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     name: "Evidence inspector",
   });
   await expect(inspector).toBeFocused();
+  await inspector
+    .getByText("Passage on original page 7", { exact: true })
+    .click();
+  const highlight = inspector.getByRole("img", {
+    name: "Verified passage highlight",
+  });
+  await expect(highlight).toHaveAttribute("viewBox", "0 0 612 792");
+  await expect(highlight.locator("rect")).toHaveAttribute("x", "72");
+  await inspector.getByText("Source metadata", { exact: true }).click();
+  await expect(
+    inspector.getByText("Synthetic Author", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    inspector.getByText("10.1234/fixture", { exact: true }),
+  ).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(hit).toBeFocused();
   await ranking.getByRole("button", { name: "Shortlist passage" }).click();
-  await page.getByText("Evidence shortlist", { exact: false }).first().click();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "Passage added to the evidence shortlist." }),
+  ).toBeVisible();
+  await page.getByText("More evidence options", { exact: true }).click();
+  await page.locator("#passage-shortlist > summary").click();
   await expect(page.locator(".passage-board article")).toHaveCount(1);
   const downloadEvent = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export evidence" }).click();
@@ -114,6 +158,20 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     .getByRole("button", { name: "Shortlist passage" })
     .first()
     .click();
+  const comparison = page.getByRole("table", {
+    name: /Compare selected papers/,
+  });
+  await expect(comparison.locator("tbody tr")).toHaveCount(2);
+  for (const cell of await comparison.locator("td").all()) {
+    await expect(
+      cell.getByRole("link", { name: /Inspect citation/ }).first(),
+    ).toBeVisible();
+  }
+  await comparison
+    .getByRole("link", { name: "Inspect citation 1" })
+    .first()
+    .click();
+  await expect(page.locator("#shortlist-citation-0")).toBeFocused();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "test-results/evidence-workbench.png",
@@ -163,8 +221,9 @@ test("shortlist enforces its comparison limit and frees slots on removal", async
   );
   await page.getByLabel("Research question").fill("Evidence");
   await page
-    .getByRole("button", { name: "Search evidence →", exact: true })
+    .getByRole("button", { name: "Search evidence", exact: true })
     .click();
+  await page.getByText("More evidence options", { exact: true }).click();
   const controls = page.getByRole("button", { name: "Shortlist passage" });
   for (let index = 0; index < 7; index++) await controls.nth(index).click();
   await expect(page.locator(".count-pill")).toHaveText("6/6");
@@ -184,7 +243,7 @@ test("recent searches restore drafts and collection changes clear the shortlist"
   await openWorkbench(page, "Search");
   await page.getByLabel("Research question").fill("Original question");
   await page
-    .getByRole("button", { name: "Search evidence →", exact: true })
+    .getByRole("button", { name: "Search evidence", exact: true })
     .click();
   await page
     .getByRole("region", { name: "Sparse · BM25" })
@@ -192,7 +251,8 @@ test("recent searches restore drafts and collection changes clear the shortlist"
     .first()
     .click();
   await page.getByLabel("Research question").fill("Unsaved draft");
-  await page.getByText("Recent searches in this collection").click();
+  await page.getByText("More evidence options", { exact: true }).click();
+  await page.locator("#recent-searches > summary").click();
   await page.getByRole("button", { name: /Original question/ }).click();
   await expect(page.getByLabel("Research question")).toHaveValue(
     "Original question",

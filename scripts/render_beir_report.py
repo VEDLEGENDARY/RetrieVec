@@ -4,6 +4,8 @@ import argparse
 import json
 from pathlib import Path
 
+from retrievec.evaluation.report_io import load_report
+
 ROOT = Path(__file__).resolve().parents[1]
 START, END = "<!-- BEIR RESULTS START -->", "<!-- BEIR RESULTS END -->"
 
@@ -34,19 +36,50 @@ def tables(report):
     return "\n".join(lines)
 
 
+def readme_summary(report):
+    tables(report)  # Reject incomplete or fabricated publication accounting first.
+    label = "concurrent_hybrid" if report.get("study") == "phase3" else "default_hybrid"
+    lines = ["| Corpus | Hybrid nDCG@10 | Warm retrieval p50 |", "|---|---:|---:|"]
+    for name, title in (("scifact", "SciFact"), ("scidocs", "SCIDOCS")):
+        run = report["datasets"][name]["runs"][label]
+        lines.append(
+            f"| {title} | {run['metrics']['ndcg']:.4f} | {run['latency_ms']['p50']:.2f} ms |"
+        )
+    return "\n".join(lines)
+
+
+def update_readme(root, report, relative):
+    section = (
+        f"{START}\n\n{readme_summary(report)}\n\n"
+        f"Source: [{relative}]({relative}). Warm local retrieval excludes HTTP, "
+        f"authorization and database work.\n\n{END}"
+    )
+    path = root / "README.md"
+    before, rest = path.read_text(encoding="utf-8").split(START, 1)
+    _, after = rest.split(END, 1)
+    path.write_text(before + section + after, encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", type=Path)
     args = parser.parse_args()
-    report = json.loads(args.report.read_bytes())
+    report = load_report(args.report)
     table = tables(report)
     relative = args.report.resolve().relative_to(ROOT).as_posix()
+    update_readme(ROOT, report, relative)
+    if report.get("study") == "phase3":
+        from render_beir_phase3 import render
+
+        render(ROOT, report, relative, table)
+        return
+    raw_relative = relative.removesuffix(".gz")
     command = (
         "python scripts/benchmark_beir.py --phase preflight\n"
         "python scripts/benchmark_beir.py --phase prepare\n"
         "python scripts/benchmark_beir.py --phase tune\n"
-        f"python scripts/benchmark_beir.py --phase evaluate --output {relative}\n"
-        f"python scripts/render_beir_report.py {relative}"
+        f"python scripts/benchmark_beir.py --phase evaluate --output {raw_relative}\n"
+        f"python scripts/render_beir_report.py {raw_relative}"
     )
     limitations = (
         "These are paper-level rankings collapsed from the production top-100 chunk pool, "
@@ -57,22 +90,6 @@ def main():
         "default PDF upload chunking and is recorded in snapshot provenance. "
         "This does not evaluate PDF extraction, answers, private-scope isolation, or concurrency."
     )
-    section = (
-        f"{START}\n\n## Measured retrieval results\n\n{table}\n\n"
-        f"Source: [{relative}]({relative}). [Protocol and limitations](BENCHMARKS.md).\n\n"
-        f"{limitations}\n\nAfter [native setup](#native-setup), replace `python` below with "
-        f"`.\\.venv\\Scripts\\python.exe` on Windows or `.venv/bin/python` on Linux:\n\n"
-        f"```sh\n{command}\n```\n{END}"
-    )
-    readme_path = ROOT / "README.md"
-    readme = readme_path.read_text(encoding="utf-8")
-    if START in readme:
-        before, remainder = readme.split(START, 1)
-        _, after = remainder.split(END, 1)
-        readme = before + section + after
-    else:
-        title, remainder = readme.split("\n", 1)
-        readme = title + "\n\n" + section + "\n" + remainder
     effects = {}
     for name in ("scifact", "scidocs"):
         effects[name] = report["datasets"][name]["paired_bootstrap"][
@@ -199,7 +216,8 @@ def main():
             "",
             "## Reproduce",
             "",
-            "Complete the README native setup first. Replace `python` with "
+            "Complete the [native setup](docs/DEVELOPMENT.md#native-setup) first. "
+            "Replace `python` with "
             "`.\\.venv\\Scripts\\python.exe` on Windows or `.venv/bin/python` on Linux.",
             "",
             "```sh",
@@ -229,7 +247,6 @@ def main():
         ]
     )
     (ROOT / "BENCHMARKS.md").write_text("\n".join(detail), encoding="utf-8")
-    readme_path.write_text(readme, encoding="utf-8")
 
 
 if __name__ == "__main__":

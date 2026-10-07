@@ -1,14 +1,35 @@
 import json
+import subprocess
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from retrievec.corpus.analyzer import GoAnalyzer
-from retrievec.corpus.snapshot import CorpusError
+from retrievec.corpus.snapshot import CorpusError, canonical
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 class AnalyzerTests(unittest.TestCase):
+    def test_external_offsets_must_align_to_utf8_boundaries(self):
+        for start, end, invalid in ((0, 2, False), (1, 2, True), (0, 1, True)):
+            with self.subTest(start=start, end=end):
+                response = canonical(
+                    {
+                        "analyzer_version": "analyzer-v1-unicode-fixture",
+                        "tokens": [[{"term": "é", "position": 0, "start": start, "end": end}]],
+                    }
+                )
+                result = subprocess.CompletedProcess(["fixture-engine", "analyze"], 0, response)
+                analyzer = GoAnalyzer("fixture-engine")
+                with patch("retrievec.corpus.analyzer.subprocess.run", return_value=result):
+                    if invalid:
+                        with self.assertRaisesRegex(CorpusError, "UTF-8 boundary"):
+                            analyzer.analyze(["é x"])
+                        self.assertEqual(analyzer.version, "")
+                    else:
+                        self.assertEqual(analyzer.analyze(["é x"])[0][0]["end"], 2)
+
     def test_shared_go_fixtures(self) -> None:
         fixtures = json.loads((ROOT / "datasets/fixtures/analyzer-v1.json").read_text("utf-8"))
         analyzer = GoAnalyzer()
