@@ -54,6 +54,68 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.client.cookies.clear()
         self.client.cookies.set(COOKIE, self.tokens[user])
 
+    def test_pdf_page_images_require_live_snapshot_scope_and_match_retained_hash(self):
+        from retrievec.corpus.importer import import_manifest
+        from retrievec.corpus.pdf_locations import LocationIndex
+        from retrievec.corpus.snapshot import canonical, digest, load_snapshot
+        from test_importer import pdf_bytes
+
+        root = self.app.state.settings.store
+        source = pdf_bytes(["Retained passage"])
+        (root / "paper.pdf").write_bytes(source)
+        manifest_path = root / "input.json"
+        manifest_path.write_bytes(
+            canonical(
+                {
+                    "schema_version": 1,
+                    "sources": [
+                        {
+                            "paper_id": "paper",
+                            "title": "Title",
+                            "authors": [],
+                            "path": "paper.pdf",
+                            "source_sha256": digest(source),
+                            "source_url": None,
+                            "license_note": "Fixture",
+                        }
+                    ],
+                }
+            )
+        )
+        collection = "pdf-images"
+        self.registry.create_collection(self.a, collection)
+        corpus_path = import_manifest(manifest_path, root, root / "corpora", collection)
+        corpus, papers, chunks = load_snapshot(corpus_path)
+        # Image resolution needs only a registered ready corpus; no RPC request participates.
+        snapshot = self.registry.register(
+            self.a,
+            {
+                "schema_version": 1,
+                "collection_id": collection,
+                "corpus_snapshot_id": corpus_path.name,
+                "capabilities": ["sparse"],
+            },
+        )
+        self.registry.ready(self.a, collection, snapshot)
+        self.registry.activate(self.a, collection, snapshot, None)
+        route = (
+            f"/api/v1/collections/{collection}/snapshots/{snapshot}"
+            f"/evidence/{chunks[0]['chunk_id']}/pdf-page"
+        )
+        self.user(self.b)
+        self.assertEqual(self.client.get(route).status_code, 404)
+        self.user(self.a)
+        response = self.client.get(route)
+        self.assertEqual(response.status_code, 200, response.text)
+        locator = LocationIndex(root, corpus).attributes(chunks[0], papers[0])["pdf_locator"]
+        self.assertEqual(digest(response.content), locator["image_sha256"])
+        self.assertEqual(response.headers["cache-control"], "no-store")
+        image = root / "pdf-pages" / (locator["image_sha256"] + ".png")
+        image.write_bytes(b"altered image")
+        self.assertEqual(self.client.get(route).status_code, 409)
+        self.client.delete("/api/v1/collections/" + collection, headers=self.headers)
+        self.assertEqual(self.client.get(route).status_code, 404)
+
     def test_private_curated_and_archive_policy(self):
         self.user(self.a)
         response = self.client.post(

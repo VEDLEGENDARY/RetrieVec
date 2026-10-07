@@ -1,4 +1,6 @@
 import { recordTiming } from "./performance";
+import type { PaperMetadata } from "./PaperDetails";
+import type { LocationMetadata } from "./PassageLocation";
 
 export type Session = { principal_id: string; csrf_token: string };
 export type Job = {
@@ -10,19 +12,30 @@ export type Job = {
   error_code: string | null;
   output_snapshot: string | null;
 };
-export type Hit = {
-  evidence_object_id?: string;
-  evidence_type?: "prose" | "table" | "equation" | "figure";
-  rank: number;
-  chunk_id: string;
-  title: string;
-  text: string;
-  source_id: string | null;
-  page_range: [number, number] | null;
-  bm25_score: number | null;
-  cosine_score: number | null;
-  rrf_score: number | null;
-};
+export type Hit = PaperMetadata &
+  LocationMetadata & {
+    paper_id?: string;
+    paper_version_id?: string;
+    section?: string;
+    section_heading?: string | null;
+    text_offsets?: {
+      unit: string;
+      page: number | null;
+      start: number;
+      end: number;
+    } | null;
+    evidence_object_id?: string;
+    evidence_type?: "prose" | "table" | "equation" | "figure";
+    rank: number;
+    chunk_id: string;
+    title: string;
+    text: string;
+    source_id: string | null;
+    page_range: [number, number] | null;
+    bm25_score: number | null;
+    cosine_score: number | null;
+    rrf_score: number | null;
+  };
 export type SearchResult = {
   snapshot_id: string;
   collection_id: string;

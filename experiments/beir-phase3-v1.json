@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "seed": 1729,
+  "base_protocol": "experiments/beir-grid-v1.json",
+  "base_selection": "artifacts/beir/selection.json",
+  "datasets": ["scifact", "scidocs"],
+  "development": "Reuse exactly the frozen SciFact development query IDs. Preserve prior selected BM25/RRF parameters as an untuned reference; new fusion controls use unchanged default sparse/dense legs and k=60. Never select or amend configurations using test judgments. Transfer unchanged to SCIDOCS.",
+  "candidate_chunks": 100,
+  "document_cutoff": 100,
+  "fusion_grid": {
+    "weighted_rrf": {"sparse_weights": [0.25, 0.5, 0.75], "k": 60},
+    "normalized_score": {"sparse_weights": [0.25, 0.5, 0.75], "normalization": "per-leg-minmax; missing=0; constant-present=1"},
+    "sparse_then_dense": {"candidate_chunks": 100, "scoring": "exact cosine on sparse candidates, no new embedding model"}
+  },
+  "selection": "For each fusion family maximize mean development document nDCG@10; break ties by ascending sparse weight. Record every development configuration including rejected alternatives. No product default promotion in this study.",
+  "document_controls": {
+    "title_abstract": "One Go BM25 document per complete BEIR title plus text record; no chunk collapse. These corpora provide abstracts, not full paper bodies.",
+    "whole_paper": {"status": "unavailable", "reason": "No matched full-text corpus. Owner approved complete BEIR records as the available document control."},
+    "analyzers": ["unicode", "english_stopwords", "snowball_english", "english_stopwords_snowball"],
+    "k1": 1.2,
+    "b": 0.75,
+    "normalization_note": "Experimental English controls isolate stopword/stemming effects; not a claim of byte-for-byte Elasticsearch or Lucene replication. Product analyzer unchanged."
+  },
+  "chunk_controls": {
+    "legacy": {"token_budget": 32, "wordpiece_refinement": true},
+    "web_default": {"token_budget": 96, "wordpiece_refinement": false},
+    "importer_default": {"token_budget": 256, "wordpiece_refinement": false},
+    "embedding_contract": "Run input-only preflight for exact product chunking. If any input exceeds the pinned encoder's 256 wordpieces, report dense/hybrid unavailable for that exact configuration; never truncate or silently change chunks. Evaluate sparse for both exact product budgets."
+  },
+  "reranker": {
+    "enabled_by_default": false,
+    "model": "cross-encoder/ms-marco-MiniLM-L6-v2",
+    "revision": "9cc09816f0a7a8aaceefa40a3cfbb843c1bfa579",
+    "tokenizer_revision": "9cc09816f0a7a8aaceefa40a3cfbb843c1bfa579",
+    "artifact": "onnx/model.onnx",
+    "max_tokens": 512,
+    "batch_size": 16,
+    "pair": "query, title plus retained passage text",
+    "truncation": "reject",
+    "pool": "Freeze first 50 chunks of unchanged default legacy hybrid, before scoring; record hashes and candidate IDs. Reorder only these 50 and append the unchanged remaining candidate tail, then collapse to papers.",
+    "report": "paired bootstrap versus plain hybrid; end-to-end and incremental rerank latency; no weights blended or selected on test queries"
+  },
+  "bootstrap_samples": 5000,
+  "latency": "One query at a time, warm loaded artifacts and models. Measure wall clock, not sum of overlapping leg durations. Alternate sequential/concurrent ordering by query index. Record leg timings and parity. Fusion and cross-encoder variants reuse the unchanged frozen candidate legs: their totals are measured shared-leg wall time plus separately measured fusion/reranking, labeled component sums rather than independent end-to-end measurements. Exclude HTTP/auth/database and model startup; report them as outside scope.",
+  "default_policy": "Keep retrieval, analyzer, chunking, candidate limits, fusion parameters and reranker defaults unchanged. Concurrent scheduling may replace sequential scheduling only with exact ranking/score parity tests and measured latency evidence."
+}

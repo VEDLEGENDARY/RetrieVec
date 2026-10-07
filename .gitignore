@@ -21,7 +21,9 @@ coverage.out
 node_modules/
 /web/dist/
 /web/test-results/
+/web/demo-test-results/
 /web/playwright-report/
+/test-results/
 
 # Private sources and credentials
 /private/

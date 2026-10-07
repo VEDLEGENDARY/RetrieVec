@@ -1,0 +1,14 @@
+import { defineConfig } from "@playwright/test";
+
+// Real Docker demo services, no synthetic routes or test identity provider.
+export default defineConfig({
+  testDir: "demo-tests",
+  outputDir: "demo-test-results",
+  workers: 1,
+  timeout: 60000,
+  use: {
+    baseURL: "http://127.0.0.1:8000",
+    viewport: { width: 1280, height: 1000 },
+    trace: "off",
+  },
+});

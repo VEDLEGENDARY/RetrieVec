@@ -4,6 +4,7 @@ go 1.26.8
 
 require (
 	github.com/jackc/pgx/v5 v5.11.0
+	github.com/kljensen/snowball v0.10.0
 	go.opentelemetry.io/otel v1.46.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.46.0
 	go.opentelemetry.io/otel/sdk v1.46.0

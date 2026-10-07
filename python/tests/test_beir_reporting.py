@@ -1,22 +1,28 @@
-import json
 import runpy
 import unittest
 from pathlib import Path
 
+from retrievec.evaluation.report_io import load_report
+
 TABLES = runpy.run_path(str(Path(__file__).resolve().parents[2] / "scripts/render_beir_report.py"))[
     "tables"
 ]
+SUMMARY = runpy.run_path(
+    str(Path(__file__).resolve().parents[2] / "scripts/render_beir_report.py")
+)["readme_summary"]
 
 
 class BeirReportingTests(unittest.TestCase):
     def test_published_tables_match_complete_json(self):
         root = Path(__file__).resolve().parents[2]
-        report = json.loads((root / "docs/results/benchmark-2026-10-01.json").read_bytes())
+        report = load_report(root / "docs/results/benchmark-2026-10-01.json.gz")
         expected = TABLES(report)
-        for path in (root / "README.md", root / "BENCHMARKS.md"):
-            published = path.read_text(encoding="utf-8")
-            self.assertIn(expected, published)
-            self.assertIn("differs from the product's default PDF upload chunking", published)
+        self.assertIn(expected, (root / "BENCHMARKS.md").read_text(encoding="utf-8"))
+        current = load_report(root / "docs/results/benchmark-2026-10-05-phase3.json.gz")
+        readme = (root / "README.md").read_text(encoding="utf-8")
+        self.assertIn(SUMMARY(current), readme)
+        self.assertLess(len(readme.splitlines()), 250)
+        self.assertIn("differs from the product's default PDF upload chunking", readme)
 
     def test_partial_and_subset_results_cannot_be_published_as_quality(self):
         for report in (

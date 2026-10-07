@@ -11,6 +11,7 @@ import (
 	"retrievec/engine/internal/index"
 	"retrievec/engine/internal/scoring"
 	"retrievec/engine/internal/search"
+	"strings"
 	"time"
 )
 
@@ -20,22 +21,35 @@ func benchmarkCommand(args []string, input io.Reader, output, stderr io.Writer) 
 	flags := flag.NewFlagSet("benchmark", flag.ContinueOnError)
 	flags.SetOutput(stderr)
 	directory := flags.String("corpus", "", "validated corpus snapshot")
-	if flags.Parse(args) != nil || *directory == "" || flags.NArg() != 0 {
+	documentsPath := flags.String("documents", "", "offline BEIR JSONL document control; title plus text")
+	analyzer := flags.String("analyzer", "unicode", "offline document analyzer ablation")
+	if flags.Parse(args) != nil || (*directory == "") == (*documentsPath == "") || flags.NArg() != 0 || (*directory != "" && *analyzer != "unicode") {
 		return 2
 	}
 	started := time.Now()
-	snapshot, err := corpus.Load(*directory)
+	var documents []corpus.Document
+	var identity string
+	var err error
+	if *documentsPath != "" {
+		documents, identity, err = benchmarkDocuments(*documentsPath, *analyzer)
+	} else {
+		var snapshot *corpus.Snapshot
+		snapshot, err = corpus.Load(*directory)
+		if err == nil {
+			documents, identity = snapshot.Documents, snapshot.Manifest.SnapshotID
+		}
+	}
 	if err != nil {
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
-	idx, err := index.Build(snapshot.Documents)
+	idx, err := index.Build(documents)
 	if err != nil {
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
 	encoder := json.NewEncoder(output)
-	if encoder.Encode(map[string]any{"snapshot_id": snapshot.Manifest.SnapshotID, "build_ms": float64(time.Since(started).Microseconds()) / 1000}) != nil {
+	if encoder.Encode(map[string]any{"snapshot_id": identity, "analyzer_control": *analyzer, "document_count": len(documents), "build_ms": float64(time.Since(started).Microseconds()) / 1000}) != nil {
 		return 1
 	}
 	scanner := bufio.NewScanner(input)
@@ -58,7 +72,16 @@ func benchmarkCommand(args []string, input io.Reader, output, stderr io.Writer) 
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		started := time.Now()
-		result, err := search.Execute(ctx, idx, search.Request{Query: request.Query, Mode: "free_text", TopK: request.TopK}, config)
+		query, err := normalizeBenchmarkText(request.Query, *analyzer)
+		if err != nil {
+			cancel()
+			fmt.Fprintln(stderr, err)
+			return 2
+		}
+		result := search.Result{}
+		if strings.TrimSpace(query) != "" {
+			result, err = search.Execute(ctx, idx, search.Request{Query: query, Mode: "free_text", TopK: request.TopK}, config)
+		}
 		cancel()
 		if err != nil {
 			fmt.Fprintln(stderr, err)
