@@ -23,6 +23,7 @@ node_modules/
 /web/test-results/
 /web/demo-test-results/
 /web/playwright-report/
+/test-results/
 
 # Private sources and credentials
 /private/

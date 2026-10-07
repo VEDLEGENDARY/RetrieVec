@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "encoding": "gzip",
+  "gzip_mtime": 0,
+  "raw_bytes_preserved": true,
+  "files": [
+    {
+      "file": "benchmark-2026-10-01.json.gz",
+      "uncompressed_sha256": "6a2996c5938eeaf837490adcb7df9f3fb54109824218d3443bbb1d7f251afa36",
+      "compressed_sha256": "8be8c5c175bf7c4b67919200beed353557c869aac8c50fcc324ff33d5ee24835",
+      "uncompressed_bytes": 17955716,
+      "compressed_bytes": 9364228
+    },
+    {
+      "file": "benchmark-2026-10-05-phase3.json.gz",
+      "uncompressed_sha256": "58d41e6c30e1df1aa5686812362c8dbc4626d605ebcfaa2e764e75baa8bbf566",
+      "compressed_sha256": "d0017ed5f5940599346290d899c877d5c45df5c77ae9c535f58710575d02bc5d",
+      "uncompressed_bytes": 63266842,
+      "compressed_bytes": 32946218
+    },
+    {
+      "file": "sections-2026-10-05.json.gz",
+      "uncompressed_sha256": "0f65f7cb40ccc1abe9c4d65725463dbb6293d1aeb294d78e6ef5c598809f8ad8",
+      "compressed_sha256": "3ee5a73dcc7896523030252ecdc17f8a2997d0093597630778e32bcf0907cd5a",
+      "uncompressed_bytes": 11843654,
+      "compressed_bytes": 4341053
+    }
+  ]
+}
