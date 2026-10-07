@@ -53,6 +53,12 @@ The check script formats and tests Python, builds and tests Go, validates fixtur
 
 ## Run the native workspace
 
+Run from the repository root with your Python virtual environment activated.
+Stop the Docker demo first if it occupies ports 8000/8080. Set a private
+`RETRIEVEC_DB_PASSWORD` in your shell before starting PostgreSQL; Compose requires
+it. A local `.env` can supply Compose values, but Python does not load that file
+automatically: also export the application settings in every service terminal.
+
 Start PostgreSQL:
 
 ```bash
@@ -67,12 +73,28 @@ $env:RETRIEVEC_PRINCIPAL = "*"
 .\.venv\Scripts\python.exe -m retrievec.registry.cli migrate
 ```
 
+On Linux/macOS, use:
+
+```bash
+export RETRIEVEC_DSN="postgresql://retrievec:${RETRIEVEC_DB_PASSWORD}@127.0.0.1:55432/retrievec"
+export RETRIEVEC_PRINCIPAL='*'
+python -m retrievec.registry.cli migrate
+```
+
+Use a URL-safe database password, or percent-encode it in the DSN if it contains
+URI-reserved characters. The decoded password must match PostgreSQL's password.
+
 Generate the development Keycloak realm and start it:
 
 ```bash
 python scripts/configure_identity.py
 docker compose -f compose.identity.yaml up -d
 ```
+
+The generated accounts are `researcher-a` and `researcher-b`; their random
+passwords are in ignored `artifacts/identity/local-passwords.json`. Registration
+is disabled for this native development realm. Keep those files private and
+reuse them on later starts; the configuration script refuses to overwrite them.
 
 Use the same environment in the API and worker terminals:
 
@@ -82,11 +104,18 @@ RETRIEVEC_ORIGIN=http://127.0.0.1:8000
 RETRIEVEC_OIDC_ISSUER=http://127.0.0.1:8080/realms/retrievec
 RETRIEVEC_OIDC_CLIENT=retrievec
 RETRIEVEC_STORE=artifacts/store
+RETRIEVEC_FRONTEND=web/dist
 RETRIEVEC_RPC=127.0.0.1:8092
 RETRIEVEC_PRINCIPAL=*
 ```
 
-Set distinct read/worker tokens and make `RETRIEVEC_ENGINE` the absolute engine path. Build the UI:
+Set `RETRIEVEC_READ_TOKEN` and `RETRIEVEC_WORKER_TOKEN` to distinct random strings
+of at least 24 characters and use the same values in all service terminals.
+Set `RETRIEVEC_ENGINE` to the absolute path of the engine built by
+`scripts/check.py`: `artifacts/bin/retrievald.exe` on Windows or
+`artifacts/bin/retrievald` on Linux. With `RETRIEVEC_FRONTEND=web/dist`, the API
+serves the built UI; without it, the API alone does not serve the workspace.
+Build the UI:
 
 ```bash
 cd web
@@ -98,7 +127,7 @@ cd ..
 Then run each service in its own terminal:
 
 ```bash
-retrievald rpc --store artifacts/store --listen 127.0.0.1:8092
+python -m retrievec.runtime rpc
 python -m retrievec.app.worker
 python -m retrievec.app.research_worker
 python -m retrievec.app.main
@@ -109,6 +138,8 @@ Open `http://127.0.0.1:8000`. Health is available at `/healthz`. Keep RPC, datab
 ## Corpus CLI
 
 Build the engine and set `RETRIEVEC_ENGINE` to its absolute path. Put sources in ignored storage such as `artifacts/papers`.
+For the bare `retrievald` commands below, add the absolute `artifacts/bin` directory
+to your shell's `PATH`, or replace `retrievald` with the executable's full path.
 
 ```bash
 python -m retrievec import --manifest datasets/manifests/seed-papers-v1.json --source-root artifacts/papers --output artifacts/snapshots
@@ -137,6 +168,35 @@ Evaluation data distinguishes draft, synthetic and human-reviewed judgments. Tra
 ## Optional generation
 
 Search works without a language model. Generation uses an operator-configured llama.cpp-compatible `/tokenize` and `/completion` service. Copy `configs/generation.local.example.json` into ignored storage, pin model/runtime revisions, verify artifact hashes, and expose the model only on loopback. Give the API and research worker the same `RETRIEVEC_GENERATION_CONFIG`; give only the worker the generation key.
+
+To enable it for the native workspace:
+
+1. Install a pinned llama.cpp server and obtain a compatible GGUF model in ignored
+   local storage. Neither the native setup nor the Docker demo downloads a
+   generation model. The example describes Qwen2.5 1.5B; it is a configuration
+   template, not a claim that its model file is present or accurate.
+2. Start the model server with its `/tokenize` and `/completion` endpoints on a
+   private address, and a context window matching `context_tokens` in the provider
+   configuration. Keep it running while generating answers.
+3. Copy `configs/generation.local.example.json` to
+   `artifacts/generation/providers.json` (create the directory first). Set
+   `endpoint`, `model`, `revision`, context/output limits and timeout to match the
+   actual server. Verify the GGUF hash; do not retain the example revision if you
+   use a different file. If the server needs an API key, keep its environment
+   variable name in `api_key_env` and supply the value only to the research worker.
+4. Set `RETRIEVEC_GENERATION_CONFIG` to the absolute path of that JSON file in both
+   the API and research-worker terminals, then restart those two services. Copying
+   the example alone does not enable generation.
+5. Sign in, select a searchable collection and choose **Answer** in Ask. Confirm
+   the provider/model shown beside the composer, submit a question and inspect
+   its citations. A cloud provider requires explicit collection consent first.
+
+For containers, the configuration file and model endpoint must be accessible
+inside the workspace container, and the configuration environment variable must
+be passed to its runtime. A host-only path or host `127.0.0.1:8095` cannot be copied
+unchanged into the container. The shipped demo Compose profile does not configure
+this wiring; use your deployment configuration rather than assuming answers are
+enabled by its startup command.
 
 The worker retrieves from a pinned snapshot, packs whole passages with the provider tokenizer, validates structured output, rechecks access, and atomically saves citations. Structural validation does not prove semantic quality; human answer review remains required.
 
