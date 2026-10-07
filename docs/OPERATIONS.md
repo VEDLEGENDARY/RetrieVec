@@ -193,8 +193,11 @@ To enable it for the native workspace:
 
 For containers, the configuration file and model endpoint must be accessible
 inside the workspace container, and the configuration environment variable must
-be passed to its runtime. A host-only path or host `127.0.0.1:8095` cannot be copied
-unchanged into the container. The shipped demo Compose profile does not configure
+be passed to its runtime. Local providers require loopback HTTP: run the model
+server in the worker's network namespace (for example, the same Kubernetes Pod),
+not at `host.docker.internal` or an arbitrary service hostname. A host-only path
+or host `127.0.0.1:8095` cannot be copied unchanged into the container.
+The shipped demo Compose profile does not configure
 this wiring; use your deployment configuration rather than assuming answers are
 enabled by its startup command.
 

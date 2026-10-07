@@ -85,8 +85,10 @@ Generation is optional. The demo does **not** download Qwen or start a language
 model server. Use the [generation setup](docs/OPERATIONS.md#optional-generation)
 to configure a pinned llama.cpp-compatible provider and give the API/research
 worker the same configuration. A server running on your host is not the
-container's `127.0.0.1`; its endpoint must be reachable from the worker. Do not
-paste the local example endpoint unchanged into a container deployment.
+container's `127.0.0.1`. Local providers require loopback HTTP, so the model server
+must share the worker's network namespace in a container deployment; simply using
+a host hostname is not supported. Do not paste the local example endpoint
+unchanged into a container deployment.
 Cloud providers require explicit consent for each collection. Once configured,
 select **Answer** in Ask and check its model/provider indicator before submitting.
 
