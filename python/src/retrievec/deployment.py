@@ -187,8 +187,8 @@ def render(*, image, origin, issuer, namespace="retrievec", storage_class="local
                                     },
                                 ],
                                 "resources": {
-                                    "requests": {"cpu": "250m", "memory": "256Mi"},
-                                    "limits": {"cpu": "1", "memory": "1Gi"},
+                                    "requests": {"cpu": "500m", "memory": "256Mi"},
+                                    "limits": {"memory": "1Gi"},
                                 },
                                 "readinessProbe": {
                                     "exec": {
