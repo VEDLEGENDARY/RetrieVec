@@ -30,6 +30,8 @@ export function Search({
   );
   const [mode, setMode] = useState("free_text");
   const [retrieval, setRetrieval] = useState("hybrid");
+  const [rerank, setRerank] = useState(false);
+  const canRerank = mode === "free_text" && retrieval === "hybrid";
   const [result, setResult] = useState<SearchResult | null>(null);
   const [selected, setSelected] = useState<Hit | null>(null);
   const [busy, setBusy] = useState(false);
@@ -53,7 +55,7 @@ export function Search({
   }
   const [notice, setNotice] = useState("");
   const [recent, setRecent] = useState<
-    { query: string; mode: string; retrieval: string }[]
+    { query: string; mode: string; retrieval: string; rerank: boolean }[]
   >([]);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const request = useRef<AbortController | null>(null);
@@ -65,10 +67,12 @@ export function Search({
   );
   async function submit(event: React.SubmitEvent) {
     event.preventDefault();
+    if (!query.trim() || !collection.active_snapshot) return;
     request.current?.abort();
     const controller = new AbortController();
     request.current = controller;
     setBusy(true);
+    setNotice("");
     try {
       const value = await api<SearchResult>(
         "/api/v1/search",
@@ -80,6 +84,7 @@ export function Search({
             query,
             mode,
             retrieval,
+            rerank: canRerank && rerank,
           }),
         },
         session.csrf_token,
@@ -92,12 +97,13 @@ export function Search({
         setMethod("all");
         setRecent((current) =>
           [
-            { query, mode, retrieval },
+            { query, mode, retrieval, rerank: canRerank && rerank },
             ...current.filter(
               (item) =>
                 item.query !== query ||
                 item.mode !== mode ||
-                item.retrieval !== retrieval,
+                item.retrieval !== retrieval ||
+                item.rerank !== (canRerank && rerank),
             ),
           ].slice(0, 5),
         );
@@ -161,6 +167,7 @@ export function Search({
         <Textarea
           id="question"
           rows={2}
+          aria-describedby="question-draft-note"
           maxLength={4096}
           required
           value={query}
@@ -178,7 +185,7 @@ export function Search({
           }}
           placeholder="How does dense retrieval compare with lexical matching?"
         />
-        <p className="muted">
+        <p className="muted" id="question-draft-note">
           {draftSaved
             ? "Draft saved on this device for 7 days. Cleared on sign out."
             : "Device storage is unavailable. Keep this tab open to retain your draft."}
@@ -191,6 +198,7 @@ export function Search({
               value={mode}
               onChange={(event) => {
                 setMode(event.target.value);
+                setRerank(false);
                 if (event.target.value === "structured") setRetrieval("sparse");
               }}
             >
@@ -201,7 +209,10 @@ export function Search({
             <Select
               id="retrieval"
               value={retrieval}
-              onChange={(event) => setRetrieval(event.target.value)}
+              onChange={(event) => {
+                setRetrieval(event.target.value);
+                setRerank(false);
+              }}
             >
               <option value="compare" disabled={mode === "structured"}>
                 Compare all three
@@ -214,13 +225,27 @@ export function Search({
                 Hybrid
               </option>
             </Select>
+            <label className="check-option">
+              <Input
+                type="checkbox"
+                checked={rerank}
+                disabled={!canRerank}
+                onChange={(event) => setRerank(event.target.checked)}
+                aria-describedby="rerank-help"
+              />
+              Experimental reranking
+            </label>
+            <p id="rerank-help" className="muted">
+              Optional second-pass ranking for hybrid search. Adds processing
+              time and may not improve results. Requires a locally cached model.
+            </p>
           </More>
           <Button
             type="submit"
             title="Search evidence (Ctrl or Command + Enter)"
             aria-keyshortcuts="Control+Enter Meta+Enter"
             className="primary"
-            disabled={busy || !collection.active_snapshot}
+            disabled={busy || !query.trim() || !collection.active_snapshot}
           >
             {busy ? "Searching…" : "Search evidence →"}
           </Button>
@@ -259,6 +284,7 @@ export function Search({
                   setQuery(item.query);
                   setMode(item.mode);
                   setRetrieval(item.retrieval);
+                  setRerank(item.rerank);
                   document.getElementById("question")?.focus();
                 }}
               >
@@ -308,6 +334,31 @@ export function Search({
         )}
       </p>
       {busy && <Skeleton label="Finding evidence in your collection…" />}
+      {!result && !busy && collection.active_snapshot && (
+        <div className="search-empty">
+          <SearchIcon size={24} aria-hidden="true" />
+          <div>
+            <h3>Start with a specific question</h3>
+            <p>
+              Search for a method, finding, or comparison. Open a returned
+              passage to check the source, then shortlist the evidence you want
+              to keep.
+            </p>
+          </div>
+        </div>
+      )}
+      {result?.results.hybrid?.reranker?.status === "fallback" && (
+        <p className="notice" role="status">
+          Experimental reranking was unavailable. These results use the original
+          hybrid order.
+        </p>
+      )}
+      {result?.results.hybrid?.reranker?.status === "applied" && (
+        <p className="notice" role="status">
+          Experimental reranking applied. Ranking scores are not a measure of
+          factual support.
+        </p>
+      )}
       <p role="status" aria-live="polite">
         {busy
           ? "Searching one pinned snapshot…"

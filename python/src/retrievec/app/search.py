@@ -17,6 +17,7 @@ from retrievec.client.rpc import RPCClient
 from retrievec.corpus.snapshot import load_snapshot
 from retrievec.dense.hybrid import PinnedClient
 from retrievec.dense.model import adapter
+from retrievec.experiments.reranker import OnnxCrossEncoder, pretrained_config, rerank
 from retrievec.registry.artifacts import Store
 
 
@@ -25,6 +26,8 @@ def install_search(app):
     capacity = threading.BoundedSemaphore(2)
     model_lock = threading.Lock()
     model = None
+    reranker = None
+    reranker_lock = threading.Lock()
 
     def encoder():
         nonlocal model
@@ -32,6 +35,13 @@ def install_search(app):
             if model is None:
                 model = adapter(settings.embedding)
         return model
+
+    def optional_reranker():
+        nonlocal reranker
+        with reranker_lock:
+            if reranker is None:
+                reranker = OnnxCrossEncoder(pretrained_config())
+        return reranker
 
     @app.post("/api/v1/search")
     def search(value: SearchInput, request: Request):
@@ -73,7 +83,43 @@ def install_search(app):
                     value.candidates,
                     artifact_cache=artifact_cache,
                 )
-                results[mode] = client.search(value.query, value.mode, value.top_k, explain=True)
+                results[mode] = client.search(
+                    value.query,
+                    value.mode,
+                    50 if value.rerank and mode == "hybrid" else value.top_k,
+                    explain=True,
+                )
+                if value.rerank and mode == "hybrid":
+                    result = results[mode]
+                    if not result["hits"]:
+                        result["reranker"] = {"status": "skipped_empty"}
+                    else:
+                        candidate_count = len(result["hits"])
+                        try:
+                            selected = optional_reranker()
+                            ranked, elapsed = rerank(
+                                value.query,
+                                result["hits"],
+                                selected,
+                                top_k=min(value.top_k, len(result["hits"])),
+                            )
+                        except (ValueError, OSError, RuntimeError):
+                            result["hits"] = result["hits"][: value.top_k]
+                            result["reranker"] = {
+                                "status": "fallback",
+                                "reason": "model_unavailable",
+                            }
+                        else:
+                            for rank, hit in enumerate(ranked, 1):
+                                hit["rank"] = rank
+                            result["hits"] = ranked
+                            result["reranker"] = {
+                                "status": "applied",
+                                "configuration_id": selected.config.config_id,
+                                "candidate_count": candidate_count,
+                                "enabled_by_default": False,
+                            }
+                            result["timings"]["rerank_ms"] = elapsed
             with registry.connect() as db:
                 app.state.resources.collection(db, user, value.collection_id)
                 sources = db.execute(

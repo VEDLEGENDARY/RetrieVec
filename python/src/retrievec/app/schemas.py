@@ -32,6 +32,7 @@ class SearchInput(Resource):
     snapshot_id: str | None = Field(default=None, pattern=r"^rs_[0-9a-f]{64}$")
     top_k: int = Field(default=10, ge=1, le=100)
     candidates: int = Field(default=100, ge=1, le=1000)
+    rerank: bool = False
 
     @model_validator(mode="after")
     def valid_combination(self):
@@ -39,6 +40,15 @@ class SearchInput(Resource):
             raise ValueError("structured queries require sparse retrieval")
         if self.top_k > self.candidates:
             raise ValueError("top_k exceeds candidate count")
+        if self.rerank and (
+            self.retrieval != "hybrid"
+            or self.mode != "free_text"
+            or self.candidates < 50
+            or self.top_k > 50
+        ):
+            raise ValueError(
+                "reranking requires hybrid free-text search with at least 50 candidates"
+            )
         return self
 
 
