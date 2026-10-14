@@ -2,20 +2,21 @@
 FROM node:24.14.0-bookworm-slim AS web
 WORKDIR /src/web
 COPY web/package.json web/package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci
 COPY web/ ./
 RUN npm run build
 
 FROM golang:1.26.8-bookworm AS engine
 WORKDIR /src/engine
 COPY engine/go.mod engine/go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod go mod download
 COPY engine/ ./
-RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/retrievald ./cmd/retrievald
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/retrievald ./cmd/retrievald
 
 FROM python:3.13.15-slim-bookworm AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
     RETRIEVEC_HOST=0.0.0.0 \
     RETRIEVEC_PORT=8000 \
     RETRIEVEC_STORE=/app/artifacts/store \
@@ -27,7 +28,7 @@ WORKDIR /app
 RUN groupadd --gid 10001 retrievec && useradd --uid 10001 --gid retrievec --home /app retrievec
 COPY python/pyproject.toml /tmp/retrievec/pyproject.toml
 COPY python/src /tmp/retrievec/src
-RUN pip install --no-cache-dir '/tmp/retrievec[app,telemetry]' && rm -rf /tmp/retrievec
+RUN --mount=type=cache,target=/root/.cache/pip pip install '/tmp/retrievec[app,telemetry]' && rm -rf /tmp/retrievec
 COPY --from=engine /out/retrievald /usr/local/bin/retrievald
 COPY --from=web /src/web/dist /app/web/dist
 COPY configs /app/configs

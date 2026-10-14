@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased — paper workspace polish
+
+- Paper-first welcome, clearer collection navigation, research-question starters,
+  and an in-app guide with keyboard shortcuts and PDF advice.
+- Browsable upload library with processing status, literal filename search,
+  cursor pagination, and snapshot-checked original-source links.
+- New collections open directly in Sources; finished uploads offer a search handoff.
+- Full local application in the default Compose stack, Windows and POSIX startup
+  launchers, workspace and identity readiness checks, and cached container builds.
+- New installation and first-use guide. Database-only native development moves
+  to `compose.database.yaml`; the starter stack keeps its existing volume names.
+- Updated the transitive source-map dependency for
+  [GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q).
+
 ## 0.1.0 — release candidate, 2026-10-05
 
 This is a prepared release note, not a published release or tag.
