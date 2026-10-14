@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -63,3 +64,17 @@ class Job(Resource):
     progress: dict
     error_code: str | None
     output_snapshot: str | None
+
+
+class PaperSource(Resource):
+    source_id: str
+    display_name: str
+    media_type: str
+    size_bytes: int
+    created_at: datetime
+    state: str
+
+
+class PaperSourcePage(Resource):
+    items: list[PaperSource]
+    next_cursor: str | None

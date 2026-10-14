@@ -4,15 +4,17 @@ import hashlib
 import os
 import re
 import uuid
+from datetime import datetime
+from typing import Annotated
 
 import psycopg
-from fastapi import Request
+from fastapi import Query, Request
 from starlette.concurrency import run_in_threadpool
 from starlette.datastructures import UploadFile
 
 from retrievec.app.auth import principal
 from retrievec.app.errors import APIError
-from retrievec.app.schemas import Job
+from retrievec.app.schemas import Job, PaperSourcePage
 from retrievec.corpus.snapshot import canonical, digest
 from retrievec.registry.jobs import Jobs
 from retrievec.registry.worker import publish_bytes
@@ -183,6 +185,50 @@ def install_uploads(app):
     app.add_middleware(
         UploadLimit, limit=settings.max_file_bytes * settings.max_files + 1024 * 1024
     )
+
+    @app.get("/api/v1/collections/{collection_id}/papers", response_model=PaperSourcePage)
+    def papers(
+        collection_id: str,
+        request: Request,
+        q: Annotated[str, Query(max_length=120)] = "",
+        after: Annotated[str | None, Query(max_length=96)] = None,
+        limit: Annotated[int, Query(ge=1, le=50)] = 25,
+    ):
+        user = principal(request)
+        cursor = None
+        if after is not None:
+            try:
+                stamp, identity = after.split("|")
+                timestamp = datetime.fromisoformat(stamp)
+                if timestamp.tzinfo is None:
+                    raise ValueError("cursor needs a timezone")
+                cursor = (timestamp, uuid.UUID(identity))
+            except ValueError:
+                raise APIError(
+                    422, "invalid_cursor", "Refresh the paper library to restart paging"
+                ) from None
+        with app.state.registry.connect() as db:
+            # Recheck live collection access before revealing even a filename.
+            app.state.resources.collection(db, user, collection_id)
+            where = "WHERE s.collection_id=%s AND strpos(lower(s.display_name),lower(%s))>0 "
+            parameters = (collection_id, q)
+            if cursor:
+                where += "AND (s.created_at,s.source_id)<(%s,%s) "
+                parameters += cursor
+            rows = db.execute(
+                "SELECT s.source_id,s.display_name,s.media_type,s.size_bytes,s.created_at,j.state "
+                "FROM upload_sources s JOIN ingestion_jobs j USING(job_id) "
+                + where
+                + "ORDER BY s.created_at DESC,s.source_id DESC LIMIT %s",
+                (*parameters, limit + 1),
+            ).fetchall()
+            items = rows[:limit]
+            return {
+                "items": [dict(row) | {"source_id": str(row["source_id"])} for row in items],
+                "next_cursor": f"{items[-1]['created_at'].isoformat()}|{items[-1]['source_id']}"
+                if len(rows) > limit
+                else None,
+            }
 
     @app.post("/api/v1/collections/{collection_id}/uploads", status_code=202, response_model=Job)
     async def upload(collection_id: str, request: Request):
