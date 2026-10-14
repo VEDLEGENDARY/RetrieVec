@@ -3,6 +3,10 @@ import { test, expect, type Page } from "@playwright/test";
 async function workspace(page: Page) {
   await page.route("**/api/v1/**", (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/papers"))
+      return route.fulfill({
+        json: { items: [], next_cursor: null },
+      });
     const json =
       path === "/api/v1/me"
         ? { principal_id: "fixture", csrf_token: "fixture-token" }
@@ -152,4 +156,5 @@ test("logout cancels collection refresh and discards private workspace state", a
   await expect(
     page.getByRole("heading", { name: "Retrieval methods", exact: true }),
   ).toHaveCount(0);
+  await expect(page).not.toHaveURL(/collection=new/);
 });

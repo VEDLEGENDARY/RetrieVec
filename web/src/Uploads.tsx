@@ -7,6 +7,7 @@ import {
   Disclosure,
   StatusBadge,
   Surface,
+  Notice,
 } from "./ui";
 import { useEffect, useRef, useState } from "react";
 import { api, type Collection, type Job, type Session } from "./api";
@@ -57,11 +58,13 @@ export function Uploads({
   session,
   refresh,
   fail,
+  onSearch,
 }: {
   collection: Collection;
   session: Session;
   refresh: () => Promise<void>;
   fail: (error: unknown) => void;
+  onSearch: () => void;
 }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [sending, setSending] = useState(false);
@@ -135,7 +138,7 @@ export function Uploads({
         ...current.filter((item) => item.job_id !== job.job_id),
       ]);
       setNotice(
-        "Accepted for processing. Documents become searchable after snapshot activation.",
+        "Upload received. Preparing your papers for search; you can follow progress below.",
       );
       if (input.current) input.current.value = "";
       setFiles([]);
@@ -174,8 +177,8 @@ export function Uploads({
       <div>
         <h2 id="upload-heading">Add to your sources</h2>
         <p>
-          Text PDFs, plain text or Markdown. Up to 10 files · 25 MiB each · 100
-          PDF pages.
+          Add research papers and notes to your collection. PDF, text or
+          Markdown; up to 10 files, 25 MiB each, and 100 pages per PDF.
         </p>
       </div>
       <form className="upload-composer" onSubmit={submit}>
@@ -193,10 +196,8 @@ export function Uploads({
           }}
         >
           <UploadCloud size={32} aria-hidden="true" />
-          <h3>Bring your research together</h3>
-          <p>
-            Drop documents here, or choose files to review before uploading.
-          </p>
+          <h3>Drop your papers here</h3>
+          <p>Or choose files, review your selection, and upload when ready.</p>
           <Field
             label="Choose documents"
             description="PDF with readable text, text, or Markdown. Up to 10 files; 25 MiB per file."
@@ -305,6 +306,24 @@ export function Uploads({
       <p role="status" aria-live="polite">
         {notice}
       </p>
+      {!pending &&
+        jobs.some((job) => job.state === "succeeded") &&
+        collection.active_snapshot && (
+          <Notice
+            action={<Button onClick={onSearch}>Search your papers</Button>}
+          >
+            Your papers are ready. Find a passage, explore a method, or follow a
+            research question.
+          </Notice>
+        )}
+      <Disclosure className="upload-help">
+        <summary>Which PDFs work best?</summary>
+        <p>
+          Use unencrypted PDFs with selectable text. Scanned papers need OCR
+          before uploading. Keep each PDF under 100 pages. Filenames become
+          paper titles, so use a recognizable name.
+        </p>
+      </Disclosure>
       {jobs.length > 0 && (
         <Disclosure open>
           <summary>Processing activity</summary>

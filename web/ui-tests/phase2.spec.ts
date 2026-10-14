@@ -49,6 +49,10 @@ async function workspace(
   await page.route("**/api/v1/**", async (route) => {
     const url = new URL(route.request().url()),
       path = url.pathname;
+    if (path.endsWith("/papers"))
+      return route.fulfill({
+        json: { items: [], next_cursor: null },
+      });
     requests.push({
       path,
       method: route.request().method(),

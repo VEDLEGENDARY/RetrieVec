@@ -5,6 +5,10 @@ test("command navigation keeps query drafts and collection filtering works", asy
 }) => {
   await page.route("**/api/**", (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/papers"))
+      return route.fulfill({
+        json: { items: [], next_cursor: null },
+      });
     const data = path.endsWith("/me")
       ? { principal_id: "demo", csrf_token: "test" }
       : path === "/api/v1/collections"

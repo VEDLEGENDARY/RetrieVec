@@ -2,7 +2,6 @@ import { focusAction } from "./focusAction";
 import { useProviders } from "./useProviders";
 import {
   Button,
-  ActionLink,
   IconButton,
   Field,
   Input,
@@ -11,11 +10,15 @@ import {
   Disclosure,
   EmptyState,
 } from "./ui";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { recordTiming } from "./performance";
 import { createRoot } from "react-dom/client";
 import { api, type Collection } from "./api";
 import "./style.css";
+import "./research.css";
+import { Welcome } from "./Welcome";
+import { CollectionJourney, ResearchGuide } from "./ResearchGuide";
+import { PaperLibrary } from "./PaperLibrary";
 import { Uploads } from "./Uploads";
 import { Search } from "./Search";
 import { Research } from "./Research";
@@ -24,7 +27,6 @@ import { useWorkspace } from "./useWorkspace";
 import { NavigationPanel } from "./NavigationPanel";
 import { navigate, readRoute, useWorkspaceRoute } from "./routing";
 import {
-  ArrowUpRight,
   BookOpenText,
   LogOut,
   Plus,
@@ -53,6 +55,8 @@ function App() {
     fail,
     logout,
   } = useWorkspace();
+  const currentPrincipal = useRef(session?.principal_id);
+  currentPrincipal.current = session?.principal_id;
   const [title, setTitle] = useState("");
   useEffect(() => {
     if (!loading) recordTiming("app.ready", performance.now());
@@ -369,8 +373,10 @@ function App() {
       );
       setTitle("");
       await refresh();
+      if (currentPrincipal.current !== session?.principal_id) return;
       setSelected(result.collection_id);
-      setView("ask");
+      navigate({ collection: result.collection_id, view: "sources", run: "" });
+      setNavigationOpen(false);
     } catch (error) {
       fail(error);
     } finally {
@@ -421,35 +427,7 @@ function App() {
         <LoadingState label="Opening your workspace…" />
       </main>
     );
-  if (!session)
-    return (
-      <main className="welcome">
-        <div className="wordmark">
-          <span className="logo-mark">
-            <BookOpenText size={19} aria-hidden="true" />
-          </span>{" "}
-          RetrieVec
-        </div>
-        <p className="eyebrow">Your papers. Traceable evidence.</p>
-        <h1>
-          Research begins
-          <br />
-          with the source.
-        </h1>
-        <p className="intro">
-          A private workspace to collect papers, compare retrieval methods, and
-          inspect the evidence behind every result.
-        </p>
-        <ActionLink variant="primary" href="/auth/login">
-          Sign in to your workspace{" "}
-          <ArrowUpRight size={17} aria-hidden="true" />
-        </ActionLink>
-        {error && <Notice error>{error}</Notice>}
-        <p className="muted">
-          Private collections · Snapshot-pinned search · Original sources
-        </p>
-      </main>
-    );
+  if (!session) return <Welcome error={error} />;
   return (
     <div className="workspace">
       <a className="skip" href="#research">
@@ -472,7 +450,13 @@ function App() {
             <X size={18} aria-hidden="true" />
           </IconButton>
         </div>
-        <p className="eyebrow">Collections</p>
+        <p className="sidebar-description">
+          A library for every research question.
+        </p>
+        <p className="eyebrow">
+          Collections{" "}
+          <span className="collection-count">{collections.length}</span>
+        </p>
         <Field className="collection-filter" label="Find a collection">
           <Input
             type="search"
@@ -525,7 +509,7 @@ function App() {
               onChange={(event) => setTitle(event.target.value)}
               maxLength={120}
               required
-              placeholder="e.g. Retrieval methods"
+              placeholder="e.g. My literature review"
             />
           </Field>
           <Button disabled={busy || !title.trim()} type="submit">
@@ -533,6 +517,7 @@ function App() {
           </Button>
         </form>
         <div className="account">
+          <ResearchGuide />
           <span>
             <ShieldCheck size={14} aria-hidden="true" /> Private workspace
           </span>
@@ -543,7 +528,10 @@ function App() {
       </NavigationPanel>
       <main id="research" className="research">
         <div className="workspace-toolbar">
-          <span>Collection / {viewLabels[view]}</span>
+          <span className="workspace-location">
+            <BookOpenText size={16} aria-hidden="true" /> Paper workspace{" "}
+            <span aria-hidden="true">/</span> {viewLabels[view]}
+          </span>
           <CommandMenu
             actions={[
               ...(active
@@ -622,6 +610,9 @@ function App() {
         )}
         {error && <Notice error>{error}</Notice>}
         {active && <WorkspaceDestinations selected={view} onSelect={setView} />}
+        {active && !active.active_snapshot && (
+          <CollectionJourney collection={active} onSelect={setView} />
+        )}
         {active && view === "sources" && (
           <Disclosure className="diagnostics">
             <summary>Collection details</summary>
@@ -651,8 +642,9 @@ function App() {
               </Button>
             }
           >
-            Your collection is ready for documents. Processing makes them
-            searchable.
+            Build your paper library with research PDFs or notes. Once
+            processing finishes, ask questions across the collection and inspect
+            the evidence.
           </EmptyState>
         )}
         {active && view === "ask" && (
@@ -688,7 +680,15 @@ function App() {
               session={session}
               refresh={refresh}
               fail={fail}
+              onSearch={() => setView("ask")}
             />
+            {view === "sources" && (
+              <PaperLibrary
+                key={`papers-${active.collection_id}`}
+                collection={active}
+                fail={fail}
+              />
+            )}
           </div>
         )}
         {active && (
@@ -719,7 +719,8 @@ function App() {
               </Button>
             }
           >
-            Create a collection for your research, then add your documents.
+            Give your literature review a home. Create a collection for a topic
+            or project, add your papers, and start finding evidence.
           </EmptyState>
         ) : null}
         {active && (
@@ -745,8 +746,8 @@ function App() {
           </div>
         )}
         <footer>
-          Paper evidence and RetrieVec measurements are distinct. Retrieval
-          scores measure ranking, not scientific validity.
+          Verify the passage. Check the paper. Retrieval scores describe
+          ranking, not scientific validity.
         </footer>
       </main>
     </div>

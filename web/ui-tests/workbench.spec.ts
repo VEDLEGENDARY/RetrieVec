@@ -42,6 +42,10 @@ const hits = [
 async function openWorkbench(page: Page, view: "Search" | "Sources") {
   await page.route("**/api/v1/**", (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/papers"))
+      return route.fulfill({
+        json: { items: [], next_cursor: null },
+      });
     if (path.endsWith("/pdf-page"))
       return route.fulfill({
         contentType: "image/png",
@@ -328,7 +332,7 @@ test("upload review rejects unsupported files and keeps the retry key for an unc
   ).toBeVisible();
   await upload.click();
   await expect(
-    page.getByText("Accepted for processing.", { exact: false }),
+    page.getByText("Upload received.", { exact: false }),
   ).toBeVisible();
   expect(keys).toHaveLength(2);
   expect(keys[0]).toBeTruthy();
