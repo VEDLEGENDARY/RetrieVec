@@ -23,7 +23,7 @@ The multi-stage `Dockerfile` builds React, Go and Python, then runs the workspac
 docker build -t retrievec:local .
 ```
 
-For Kubernetes, push the image to a registry and deploy it by immutable digest. `compose.yaml` remains available when native development only needs a local PostgreSQL container. `compose.identity.yaml` starts pinned local Keycloak after generating its ignored realm file.
+For Kubernetes, push the image to a registry and deploy it by immutable digest. The default `compose.yaml` runs the complete local paper workspace. Use `compose.database.yaml` when native development only needs PostgreSQL. `compose.identity.yaml` starts pinned local Keycloak after generating its ignored realm file. See the [getting started guide](GETTING_STARTED.md) for local installation and first use.
 
 ## Native setup
 
@@ -62,7 +62,7 @@ automatically: also export the application settings in every service terminal.
 Start PostgreSQL:
 
 ```bash
-docker compose up -d postgres
+docker compose -f compose.database.yaml up -d postgres
 ```
 
 Set `RETRIEVEC_DSN`, set `RETRIEVEC_PRINCIPAL=*`, and migrate:

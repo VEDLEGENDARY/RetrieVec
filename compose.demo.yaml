@@ -1,7 +1,6 @@
 name: retrievec-demo
 services:
   init:
-    profiles: [demo]
     image: python:3.13.15-slim-bookworm
     network_mode: none
     command: [python, /demo/init.py]
@@ -11,7 +10,6 @@ services:
       - store:/store
       - cache:/cache
   postgres:
-    profiles: [demo]
     image: postgres:18.3
     depends_on:
       init: {condition: service_completed_successfully}
@@ -28,7 +26,6 @@ services:
       timeout: 5s
       retries: 30
   workspace:
-    profiles: [demo]
     build: .
     depends_on:
       postgres: {condition: service_healthy}
@@ -45,8 +42,13 @@ services:
       - store:/app/artifacts/store
       - cache:/app/artifacts/cache
     stop_grace_period: 40s
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=4)"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15m
+      retries: 6
   identity:
-    profiles: [demo]
     image: quay.io/keycloak/keycloak:26.7.4
     depends_on:
       workspace: {condition: service_started}
@@ -54,6 +56,13 @@ services:
     command: [start-dev, --import-realm]
     environment:
       KC_HOSTNAME: http://127.0.0.1:8080
+      KC_HEALTH_ENABLED: "true"
+    healthcheck:
+      test: [CMD, bash, -ec, "exec 3<>/dev/tcp/127.0.0.1/9000; printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3; grep -q '200' <&3"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 30
     volumes:
       - ./demo/realm.json:/opt/keycloak/data/import/retrievec-realm.json:ro
       - identity:/opt/keycloak/data

@@ -5,99 +5,83 @@
 A private research workspace to **find passages, inspect sources, and save cited
 answers**—with the question, model and source snapshot kept together.
 
-![Real SciFact demo in RetrieVec](docs/images/workspace.png)
+![RetrieVec paper workspace welcome screen](docs/images/welcome.png)
 
-*The local demo searches retained SciFact abstracts. This screenshot shows real
-retrieval, not generated answers or a model-quality claim.*
+*A paper-first workspace for collecting sources, finding passages, and keeping citations.*
 
-## Try it in 2 minutes
+## Start your paper workspace
 
-**You need:** Git, Docker Desktop with Linux containers (or Docker Engine with
-the Compose plugin on Linux), an internet connection for the first build, and
-free local ports **8000** and **8080**. No host Python, Go, Node, database or
-language model setup is needed for this demo.
-
-Get the project, then check that Docker is running. Skip the clone if you already
-have this checkout; run the remaining commands from its root:
+**You need:** Git and Docker Desktop with Linux containers, or Docker Engine with
+Compose 2.20+ on Linux. No host Python, Go, Node, database, or language model setup
+is needed. The first build and retrieval model download need internet access and
+may take several minutes. Keep local ports **8000** and **8080** free.
 
 ```sh
 git clone https://github.com/VEDLEGENDARY/RetrieVec.git
 cd RetrieVec
-docker info
-docker compose version
 ```
 
-Start the app, database and local sign-in service:
+Start Docker, then run the launcher for your system:
 
-```sh
-docker compose -f compose.demo.yaml --profile demo up --build -d
-```
-
-Open **http://127.0.0.1:8000**, choose **Sign in**, then **Register** to create
-your local account. The **SciFact starter** collection is already loaded: ask
-about “cancer” in **Find passages**, then inspect a result or build a shortlist.
-
-The two-minute path assumes cached images and model files. The first run builds
-the app and downloads its pinned MiniLM retrieval model; allow additional time
-and an internet connection. Keycloak may need a few seconds after startup.
-Ports 8000 and 8080 must be free; use `127.0.0.1` consistently.
-
-The demo includes 24 title/abstract records, no paper PDFs and no generation
-provider. It generates credentials into local Docker volumes; no preset password
-or cloud consent is included. Create a private collection to upload your papers.
-In **Sources**, choose text or PDF files, submit the upload, and wait for processing
-to finish before searching. Scanned PDFs need a separate OCR/extraction workflow.
-
-### Check startup, stop and return later
-
-```sh
-docker compose -f compose.demo.yaml --profile demo ps
-docker compose -f compose.demo.yaml --profile demo logs --tail=100 workspace identity
-```
-
-Wait for the workspace to become healthy, then open the browser. The API health
-endpoint is **http://127.0.0.1:8000/healthz**; a successful health response does not
-replace the browser sign-in check.
-
-```sh
-docker compose -f compose.demo.yaml --profile demo down
-```
-
-Stopping keeps your volumes and account. Run the original `up --build -d` command
-to return later. Avoid `down --volumes` unless you intend to delete your local
-database, accounts, retained sources and model cache.
-
-| If you get stuck | What to do |
+| Windows PowerShell | macOS / Linux |
 |---|---|
-| Docker cannot connect | Start Docker Desktop/Engine; on Windows select Linux containers, then retry `docker info`. |
-| A port is already allocated | Stop the process using 8000/8080, then retry startup. Changing these ports also requires matching OIDC URLs. |
-| The app or sign-in is not ready | Check `ps` and the logs above. Allow the first model download and Keycloak startup to finish; retry the same `up` command if a download failed. |
-| Sign-in redirects fail | Open `http://127.0.0.1:8000` consistently, including registration; do not switch between `localhost` and `127.0.0.1`. |
-| Answer mode is unavailable | This demo has no generation provider. Passage search works immediately; configure generation separately as described below. |
+| `.\start.ps1` | `sh start.sh` |
 
-For deployment, identity configuration,
-backups, tracing, pgvector, Kubernetes, OpenTofu and mTLS, see
-[operations](docs/OPERATIONS.md).
+Or use Docker directly:
 
-### Want generated cited answers?
+```sh
+docker compose up --build --wait --wait-timeout 900
+```
 
-Generation is optional. The demo does **not** download Qwen or start a language
-model server. Use the [generation setup](docs/OPERATIONS.md#optional-generation)
-to configure a pinned llama.cpp-compatible provider and give the API/research
-worker the same configuration. A server running on your host is not the
-container's `127.0.0.1`. Local providers require loopback HTTP, so the model server
-must share the worker's network namespace in a container deployment; simply using
-a host hostname is not supported. Do not paste the local example endpoint
-unchanged into a container deployment.
-Cloud providers require explicit consent for each collection. Once configured,
-select **Answer** in Ask and check its model/provider indicator before submitting.
+The default stack builds the app, creates local credentials, starts the database
+and sign-in service, and preloads **24 SciFact abstracts**. The launcher checks
+prerequisites and waits for services to be ready. It preserves the existing
+starter volumes when upgrading.
+
+Open [**your workspace**](http://127.0.0.1:8000), choose **Sign in**, then
+**Register** to create your local account. Use `127.0.0.1` consistently.
+
+1. Try **SciFact starter → Ask → Find passages** with `cancer`.
+2. Create a private collection for your literature review. It opens **Sources**.
+3. Drop in your research PDFs or notes, review the selection, then upload.
+4. After processing, choose **Search your papers**. Inspect passages, open
+   originals, and build an evidence shortlist for export.
+
+Use **Research guide** in the sidebar for workflow help and shortcuts. Upload
+unencrypted PDFs with selectable text, plain text, or Markdown: up to 10 files,
+25 MiB each, and 100 pages per PDF. Apply OCR to scanned papers first. The starter
+collection contains abstracts, with no full-paper PDFs or generation provider.
+
+| Task | Windows PowerShell | macOS / Linux |
+|---|---|---|
+| Check setup | `.\start.ps1 doctor` | `sh start.sh doctor` |
+| See status | `.\start.ps1 status` | `sh start.sh status` |
+| Read logs | `.\start.ps1 logs` | `sh start.sh logs` |
+| Stop and keep data | `.\start.ps1 stop` | `sh start.sh stop` |
+
+Run the start command again to resume. Stopping preserves papers, accounts, and
+model cache. Avoid `docker compose down --volumes` unless you intend to delete
+them. For setup failures, slow downloads, PowerShell policy restrictions, and
+first-use instructions, see [the getting started guide](docs/GETTING_STARTED.md).
+
+### Optional generated answers
+
+Passage search works without an answer provider. For cited generation, follow
+[the generation setup](docs/OPERATIONS.md#optional-generation), then choose
+**Answer** in Ask. Cloud providers require explicit consent per collection.
+Local providers in Docker must share the worker's network namespace; a host
+server's loopback address is not the container's loopback address.
+
+For native development, deployment, backups, and identity configuration, see
+[operations](docs/OPERATIONS.md). Native developers now use
+`compose.database.yaml` for the database-only stack.
 
 ## A workspace built around evidence
 
 | Destination | What you can do |
 |---|---|
 | **Ask** | Switch between cited answers and passage search; inspect what each answer used. |
-| **Sources** | Upload text/PDFs, track ingestion, retain source hashes and provenance. |
+| **Sources** | Upload papers, browse and filter your library, track processing, and open originals. |
 | **Saved research** | Return to a run, its model and immutable snapshot; export cited results. |
 
 - **Verify before trusting.** Inspect retained passages, source metadata and

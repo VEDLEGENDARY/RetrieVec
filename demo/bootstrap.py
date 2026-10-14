@@ -17,6 +17,10 @@ from retrievec.dense.model import adapter
 from retrievec.registry.artifacts import Store, publish
 from retrievec.registry.database import Registry
 
+print(
+    "Starting your local research workspace. Credentials and papers stay in Docker volumes.",
+    flush=True,
+)
 private = json.loads(Path("/settings/credentials.json").read_text())
 os.environ.update(
     RETRIEVEC_DSN=make_conninfo(
@@ -40,6 +44,10 @@ try:
 except ValueError:
     registered = None
 if registered is None or "hybrid" not in registered["capabilities"]:
+    print(
+        "Preparing the SciFact starter library (24 abstracts). First run downloads the retrieval model; later starts reuse the cache.",
+        flush=True,
+    )
     store = Store(Path(os.environ["RETRIEVEC_STORE"]))
     engine = Path(os.environ["RETRIEVEC_ENGINE"])
     dataset = Path("/app/datasets/answer_quality")
@@ -51,6 +59,7 @@ if registered is None or "hybrid" not in registered["capabilities"]:
         96,
         GoAnalyzer(engine),
     )
+    print("Loading MiniLM and preparing searchable passages…", flush=True)
     embedding = build_embeddings(store, corpus, adapter("minilm"))
     snapshot = store.build(engine, corpus, embedding)
     rpc = subprocess.Popen(
@@ -77,5 +86,8 @@ if registered is None or "hybrid" not in registered["capabilities"]:
         node.close()
         rpc.terminate()
         rpc.wait(timeout=10)
-print("SciFact starter ready. Sign in through local Keycloak; generation is unconfigured.")
+print(
+    "Paper workspace ready at http://127.0.0.1:8000. Choose Sign in, then Register. Passage search is available; cited generation is optional.",
+    flush=True,
+)
 os.execv(sys.executable, [sys.executable, "-m", "retrievec.runtime", "workspace"])

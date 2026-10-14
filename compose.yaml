@@ -1,18 +1,5 @@
-services:
-  postgres:
-    image: postgres:18.3
-    environment:
-      POSTGRES_DB: retrievec
-      POSTGRES_USER: retrievec
-      POSTGRES_PASSWORD: ${RETRIEVEC_DB_PASSWORD:?Set a local database password}
-    ports:
-      - "127.0.0.1:55432:5432"
-    volumes:
-      - registry-data:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U retrievec -d retrievec"]
-      interval: 2s
-      timeout: 5s
-      retries: 30
-volumes:
-  registry-data:
+# Start the complete paper workspace with: docker compose up --build --wait
+# Keep the existing starter project name and volumes across upgrades.
+name: retrievec-demo
+include:
+  - compose.demo.yaml
