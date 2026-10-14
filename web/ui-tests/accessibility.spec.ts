@@ -6,6 +6,10 @@ test("main views and command dialog have no serious automated accessibility viol
 }) => {
   await page.route("**/api/**", (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/papers"))
+      return route.fulfill({
+        json: { items: [], next_cursor: null },
+      });
     return route.fulfill({
       json: path.endsWith("/me")
         ? { principal_id: "owner", csrf_token: "token" }

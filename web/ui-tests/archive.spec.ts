@@ -17,6 +17,10 @@ test("archive can be undone without a confirmation dialog", async ({
   });
   await page.route("**/api/**", (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/papers"))
+      return route.fulfill({
+        json: { items: [], next_cursor: null },
+      });
     if (route.request().method() === "DELETE") {
       archived = true;
       return route.fulfill({ status: 204 });

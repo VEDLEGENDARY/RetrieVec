@@ -35,13 +35,13 @@
   background: var(--canvas);
   line-height: var(--leading-normal);
   color-scheme: light;
-  --canvas: #f2f5f9;
+  --canvas: #f4f6fa;
   --ink: #182431;
   --muted: #4c5e70;
   --subtle: #e8eef4;
   --surface: #ffffff;
   --surface-solid: #ffffff;
-  --line: #a8b7c6;
+  --line: #cbd5e1;
   --control-line: #7c8e9f;
   --brand: #076454;
   --brand-dark: #064f43;
@@ -77,9 +77,9 @@
   --weight-bold: 700;
   --tracking-tight: -0.025em;
   --tracking-normal: 0;
-  --radius-control: 0.75rem;
-  --radius-card: 1.25rem;
-  --radius-overlay: 1.75rem;
+  --radius-control: 0.5rem;
+  --radius-card: 1rem;
+  --radius-overlay: 1.25rem;
   --radius-pill: 999px;
   --shadow-sm: 0 2px 6px #1f36550a;
   --shadow: 0 8px 24px #1f365518;
@@ -103,7 +103,7 @@
     --subtle: #273443;
     --surface: #1b2734;
     --surface-solid: #1b2734;
-    --line: #62788d;
+    --line: #52697f;
     --control-line: #758aa0;
     --material-tint: #1b2734f5;
     --material-rim: #96b7ce;
