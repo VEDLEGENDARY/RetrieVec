@@ -11,6 +11,9 @@
     "test:ui": "playwright test --config playwright.ui.config.ts"
   },
   "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "@fontsource-variable/newsreader": "^5.3.0",
     "@tailwindcss/vite": "4.3.3",
     "lucide-react": "1.47.0",
     "react": "19.3.0",

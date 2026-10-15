@@ -97,6 +97,15 @@ test("saved research opens directly and citations share the evidence pane", asyn
   await citation.click();
   const pane = page.getByRole("complementary", { name: "Evidence inspector" });
   await expect(pane).toBeFocused();
+  await page.mouse.move(0, 0);
+  await citation.hover();
+  await expect(pane).toHaveClass(/passage-highlighted/);
+  await expect(pane.locator("blockquote")).toHaveCSS("font-size", "18px");
+  await expect(page.locator(".claim > p")).toHaveCSS("line-height", "29.7px");
+  await citation.focus();
+  await page.keyboard.press("Escape");
+  await expect(pane).not.toHaveClass(/passage-highlighted/);
+  await expect(pane).toBeVisible();
   const scan = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
     .analyze();

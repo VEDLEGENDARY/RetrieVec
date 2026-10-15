@@ -24,7 +24,7 @@ export function CollectionHeader({
   onArchive: () => void;
 }) {
   return (
-    <Surface as="header" material="glass" className="collection-header">
+    <Surface as="header" className="collection-header">
       <div className="collection-header-content">
         <div className="collection-heading">
           <IconButton

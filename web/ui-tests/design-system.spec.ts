@@ -415,18 +415,14 @@ for (const width of [1280, 390])
       const nativeTheme = await page
         .locator("html")
         .evaluate((node) => getComputedStyle(node).colorScheme);
-      expect(nativeTheme).toBe(colorScheme);
+      expect(nativeTheme).toBe("light dark");
       const meta = await page
-        .locator(
-          `meta[name="theme-color"][media="(prefers-color-scheme: ${colorScheme})"]`,
-        )
+        .locator('meta[name="theme-color"]')
         .getAttribute("content");
       expect(
         await page
           .locator("html")
-          .evaluate((node) =>
-            getComputedStyle(node).getPropertyValue("--canvas").trim(),
-          ),
+          .evaluate((node) => getComputedStyle(node).backgroundColor),
       ).toBe(meta);
       await question.fill("Synthetic question");
       await page

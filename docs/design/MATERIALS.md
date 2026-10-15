@@ -1,5 +1,9 @@
 # Research workspace materials
 
+> Historical direction, superseded by [Reading Room with an Atlas](READING_ROOM.md).
+> The current interface uses opaque surfaces, self-hosted Newsreader and Geist,
+> and the teal/plum retrieval palette. Reflective materials are retired.
+
 The visual brief draws on Apple desktop and mobile conventions: quiet chrome,
 tactile controls, clear depth and adaptable text. This is a design direction,
 not an Apple endorsement, award claim or accessibility certification.
