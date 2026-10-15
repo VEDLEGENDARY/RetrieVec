@@ -1,4 +1,5 @@
 import { Button } from "./ui";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { BookmarkCheck, BookmarkPlus } from "lucide-react";
 import type { Hit, SearchResult } from "./api";
 import type { SavedPassage } from "./EvidenceTray";
@@ -26,13 +27,82 @@ export function SearchRankings({
   inspect: (hit: Hit, trigger: HTMLButtonElement) => void;
   save: (hit: Hit) => void;
 }) {
+  const rankings = useRef<HTMLDivElement>(null);
+  const previous = useRef({
+    method,
+    positions: new Map<string, { left: number; top: number }>(),
+  });
+  const animations = useRef<Animation[]>([]);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const stop = () => {
+      if (media.matches)
+        animations.current.forEach((animation) => animation.cancel());
+    };
+    media.addEventListener("change", stop);
+    return () => media.removeEventListener("change", stop);
+  }, []);
+  useLayoutEffect(() => {
+    animations.current.forEach((animation) => animation.cancel());
+    animations.current = [];
+    const positions = new Map<string, { left: number; top: number }>();
+    const changed = previous.current.method !== method;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const duration = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue(
+        "--motion-normal",
+      ),
+    );
+    rankings.current
+      ?.querySelectorAll<HTMLElement>("[data-passage]")
+      .forEach((card) => {
+        const key = card.dataset.passage!;
+        const bounds = card.getBoundingClientRect();
+        // Document coordinates keep scrolling out of the method-change motion.
+        const rect = {
+          left: bounds.left + window.scrollX,
+          top: bounds.top + window.scrollY,
+        };
+        const before = previous.current.positions.get(key);
+        if (changed && before && !reduced) {
+          const x = before.left - rect.left,
+            y = before.top - rect.top;
+          if (x || y)
+            animations.current.push(
+              card.animate(
+                [
+                  { transform: `translate(${x}px, ${y}px)` },
+                  { transform: "none" },
+                ],
+                { duration, easing: "ease-out" },
+              ),
+            );
+        }
+        if (!positions.has(key)) positions.set(key, rect);
+      });
+    previous.current = { method, positions };
+  }, [method, result, filter, compact]);
+  useLayoutEffect(
+    () => () => animations.current.forEach((animation) => animation.cancel()),
+    [],
+  );
   return (
-    <div className={compact ? "rankings compact" : "rankings"}>
+    <div ref={rankings} className={compact ? "rankings compact" : "rankings"}>
       {Object.entries(result.results)
         .filter(([name]) => method === "all" || name === method)
         .map(([mode, value]) => (
-          <section key={mode} className="ranking" aria-label={labels[mode]}>
-            <h3>{labels[mode]}</h3>
+          <section
+            key={mode}
+            className="ranking"
+            data-method={mode}
+            aria-label={labels[mode] ?? mode}
+          >
+            <h3>
+              <span className="retrieval-mark" aria-hidden="true" />
+              {labels[mode] ?? mode}
+            </h3>
             <small>
               {
                 value.hits.filter((hit) =>
@@ -65,6 +135,7 @@ export function SearchRankings({
                 .map((hit) => (
                   <li key={hit.chunk_id} value={hit.rank}>
                     <Button
+                      data-passage={hit.chunk_id}
                       className={
                         selected?.chunk_id === hit.chunk_id
                           ? "hit active"
@@ -72,21 +143,26 @@ export function SearchRankings({
                       }
                       onClick={(event) => inspect(hit, event.currentTarget)}
                     >
-                      <span className="hit-title">{hit.title}</span>
+                      <span className="hit-title">
+                        <span className="retrieval-mark" aria-hidden="true" />
+                        {hit.title}
+                      </span>
                       <span className="excerpt">{hit.text}</span>
                       <small>
                         {hit.page_range
                           ? `Page ${hit.page_range[0]}`
                           : "Page unavailable"}{" "}
                         ·{" "}
-                        {value.reranker?.status === "applied" &&
-                        hit.reranker_score !== undefined
-                          ? `Reranker ${hit.reranker_score.toFixed(3)}`
-                          : mode === "sparse"
-                            ? `BM25 ${hit.bm25_score?.toFixed(3)}`
-                            : mode === "dense"
-                              ? `Cosine ${hit.cosine_score?.toFixed(3)}`
-                              : `RRF ${hit.rrf_score?.toFixed(5)}`}
+                        <span className="metric">
+                          {value.reranker?.status === "applied" &&
+                          hit.reranker_score !== undefined
+                            ? `Reranker ${hit.reranker_score.toFixed(3)}`
+                            : mode === "sparse"
+                              ? `BM25 ${hit.bm25_score?.toFixed(3)}`
+                              : mode === "dense"
+                                ? `Cosine ${hit.cosine_score?.toFixed(3)}`
+                                : `RRF ${hit.rrf_score?.toFixed(5)}`}
+                        </span>
                       </small>
                     </Button>
                     <Button

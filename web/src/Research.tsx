@@ -157,6 +157,9 @@ export function Research({
     "connected" | "retrying" | "offline"
   >("connected");
   const [evidence, setEvidence] = useState<Evidence | null>(null);
+  const [highlightedEvidence, setHighlightedEvidence] = useState<string | null>(
+    null,
+  );
   const citationTrigger = useRef<HTMLButtonElement | null>(null);
   const inspectionVersion = useRef(0);
   useEffect(
@@ -427,7 +430,14 @@ export function Research({
       const item = run?.result?.evidence.find(
         (value) => value.evidence_id === id,
       );
-      return item ? <Citation key={id} item={item} inspect={inspect} /> : null;
+      return item ? (
+        <Citation
+          key={id}
+          item={item}
+          inspect={inspect}
+          highlight={setHighlightedEvidence}
+        />
+      ) : null;
     });
   return (
     <section className="saved-research" aria-labelledby="saved-title">
@@ -789,7 +799,14 @@ export function Research({
                   ),
                 ]}
               />
-              <StatusBadge className="answer-status">
+              <StatusBadge
+                className={
+                  run.result.answer.status === "partial" ||
+                  run.result.answer.status === "insufficient_evidence"
+                    ? "answer-status low-confidence"
+                    : "answer-status"
+                }
+              >
                 {run.result.answer.status === "insufficient_evidence"
                   ? "I could not find this in your papers."
                   : run.result.answer.status === "partial"
@@ -833,7 +850,9 @@ export function Research({
               </ul>
               <p className="muted">
                 Structurally checked · Human review pending ·{" "}
-                {Math.round(run.result.elapsed_ms)} ms
+                <span className="metric">
+                  {Math.round(run.result.elapsed_ms)} ms
+                </span>
               </p>
               <More label="Export answer">
                 <div className="export-actions">
@@ -886,6 +905,7 @@ export function Research({
       {evidence && (
         <EvidencePanel
           title={evidence.title}
+          highlighted={highlightedEvidence === evidence.evidence_id}
           text={evidence.text}
           pages={evidence.page_range}
           snapshot={evidence.snapshot_id ?? run?.snapshot_id ?? "Unavailable"}

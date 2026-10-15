@@ -105,45 +105,16 @@ export function Field({
 }
 export function Surface({
   as: Tag = "section",
-  material = "solid",
   className = "",
   ...props
 }: Omit<ComponentProps<"div">, "ref"> & {
   as?: "section" | "article" | "div" | "header";
-  material?: "solid" | "glass";
 }) {
   return (
     <Tag
       {...props}
-      data-material={material}
+      data-material="solid"
       className={`surface ${className}`.trim()}
-      onPointerMove={(event) => {
-        props.onPointerMove?.(event);
-        if (
-          material !== "glass" ||
-          event.pointerType !== "mouse" ||
-          window.matchMedia(
-            "(prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce), (forced-colors: active)",
-          ).matches
-        )
-          return;
-        const bounds = event.currentTarget.getBoundingClientRect();
-        if (!bounds.width || !bounds.height) return;
-        const clamp = (value: number) => Math.max(0, Math.min(100, value));
-        event.currentTarget.style.setProperty(
-          "--light-x",
-          `${clamp(((event.clientX - bounds.left) / bounds.width) * 100)}%`,
-        );
-        event.currentTarget.style.setProperty(
-          "--light-y",
-          `${clamp(((event.clientY - bounds.top) / bounds.height) * 100)}%`,
-        );
-      }}
-      onPointerLeave={(event) => {
-        props.onPointerLeave?.(event);
-        event.currentTarget.style.removeProperty("--light-x");
-        event.currentTarget.style.removeProperty("--light-y");
-      }}
     />
   );
 }
