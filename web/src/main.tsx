@@ -14,8 +14,13 @@ import { useEffect, useRef, useState } from "react";
 import { recordTiming } from "./performance";
 import { createRoot } from "react-dom/client";
 import { api, type Collection } from "./api";
+import "@fontsource-variable/newsreader/standard.css";
+import "@fontsource-variable/newsreader/standard-italic.css";
+import "@fontsource-variable/geist";
+import "@fontsource-variable/geist-mono";
 import "./style.css";
 import "./research.css";
+import { ThemeControl } from "./ThemeControl";
 import { Welcome } from "./Welcome";
 import { CollectionJourney, ResearchGuide } from "./ResearchGuide";
 import { PaperLibrary } from "./PaperLibrary";
@@ -517,6 +522,7 @@ function App() {
           </Button>
         </form>
         <div className="account">
+          <ThemeControl />
           <ResearchGuide />
           <span>
             <ShieldCheck size={14} aria-hidden="true" /> Private workspace

@@ -35,6 +35,7 @@
   font-weight: var(--weight-medium);
 }
 .welcome-copy h1 {
+  font-size: var(--t-6);
   font-family: var(--font-evidence);
   line-height: var(--leading-tight);
   font-weight: var(--weight-normal);
@@ -123,8 +124,8 @@
 .preview-highlight {
   display: flex;
   gap: var(--space-3);
-  background: var(--brand-soft);
-  color: var(--brand);
+  background: var(--violet-soft);
+  color: var(--violet);
   border-radius: var(--radius-control);
   padding: var(--space-4);
   margin-block: var(--space-5);

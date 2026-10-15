@@ -1,132 +1,69 @@
-/* Single source of truth. Media-query breakpoints remain literal CSS conditions. */
+/* Reading Room with an Atlas. All authored visual values live here. */
 :root {
-  --radius-circle: 50%;
-  --border-width: 1px;
-  --focus-width: 2px;
-  --focus-offset: 3px;
-  --accent-width: 3px;
-  --control-size: 44px;
-  --icon-size: 20px;
-  --backdrop-blur: 20px;
-  --material-tint: #f2f5f9f5;
-  --material-rim: #ffffff;
-  --material-shadow: inset 0 1px 0 #ffffffb3, 0 12px 32px #1f365514;
-  --press-scale: 0.985;
-  --press-offset: 1px;
-  --light-x: 30%;
-  --light-y: 0%;
-  --material-light: radial-gradient(
-    ellipse at var(--light-x) var(--light-y),
-    var(--material-rim),
-    var(--transparent) 70%
-  );
-  --evidence-highlight: #972f25;
+  color-scheme: light dark;
+  --canvas: light-dark(#e9ede8, #0d1a1c); /* Vellum / Deep Basin */
+  --ink: light-dark(#1b2926, #e4ece8); /* Ink Moss / Mist */
+  --brand: light-dark(#0b6b6a, #46c2bf); /* Lens Teal: sparse + actions */
+  --violet: light-dark(#7a3e9d, #c79bea); /* Citation Plum: dense + citations */
+  --danger: light-dark(
+    #b93a20,
+    #ff8a6b
+  ); /* Flag Coral: errors + low confidence */
+  --muted: light-dark(#4c6057, #a8bcb3);
+  --surface: light-dark(#f6f8f4, #132427);
+  --surface-solid: var(--surface);
+  --subtle: light-dark(#e2e8e2, #1b3032);
+  --brand-soft: light-dark(#dcebe5, #173134);
+  --violet-soft: light-dark(#ede3f1, #2a2534);
+  --danger-soft: light-dark(#f3e4df, #362523);
+  --brand-dark: light-dark(#085a59, #6bd2cf);
+  --line: light-dark(#bcc9c0, #3f5655);
+  --control-line: light-dark(#71857a, #718b83);
+  --action-background: var(--brand);
+  --action-hover: var(--brand-dark);
+  --on-action: light-dark(#f6f8f4, #0d1a1c);
+  --disabled-ink: var(--muted);
+  --disabled-surface: var(--subtle);
+  --disabled-line: var(--line);
+  --overlay: light-dark(#0d1a1c80, #00000099);
+  --transparent: transparent;
+  /* Source images retain light paper independently of app appearance. */
+  --evidence-highlight: #7a3e9d;
   --evidence-highlight-halo: #ffffff;
-  --dialog-offset: 12vh;
-  --welcome-padding: 8vh max(6vw, var(--space-8));
-  --welcome-logo-gap: clamp(var(--space-16), 10vh, var(--space-32));
-  --workspace-inline-padding: clamp(var(--space-5), 4vw, var(--space-18));
-  --panel-padding: clamp(var(--space-6), 4vw, var(--space-11));
-  --research-padding: clamp(var(--space-5), 3vw, var(--space-8));
+  --ring: 0 0 0 4px light-dark(#0b6b6a24, #46c2bf33);
+  --font-ui: "Geist Variable", system-ui, sans-serif;
+  --font-evidence: "Newsreader Variable", Georgia, serif;
+  --font-code: "Geist Mono Variable", ui-monospace, monospace;
+  --t-0: clamp(0.75rem, 0.72rem + 0.12vw, 0.8rem);
+  --t-1: clamp(0.875rem, 0.85rem + 0.1vw, 0.925rem);
+  --t-2: clamp(1rem, 0.98rem + 0.08vw, 1.05rem);
+  --t-3: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+  --t-4: clamp(1.75rem, 1.45rem + 1.2vw, 2.25rem);
+  --t-5: clamp(2.25rem, 1.75rem + 2vw, 3.25rem);
+  --t-6: clamp(2.75rem, 2rem + 3vw, 4.5rem);
+  /* Compatibility aliases into the named fluid scale. */
+  --type-metadata: var(--t-0);
+  --type-supporting: var(--t-1);
+  --type-body: var(--t-2);
+  --type-subheading: var(--t-3);
+  --type-section-heading: var(--t-4);
+  --type-page-heading: var(--t-5);
+  --reading-size: 1.125rem;
+  --reading-measure: 65ch;
+  --leading-tight: 1.15;
+  --leading-normal: 1.5;
+  --leading-reading: 1.65;
+  --weight-normal: 400;
+  --weight-medium: 550;
+  --weight-bold: 650;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
   font-family: var(--font-ui);
-  font-size: var(--type-body);
+  font-size: 16px;
   font-synthesis: none;
   color: var(--ink);
   background: var(--canvas);
   line-height: var(--leading-normal);
-  color-scheme: light;
-  --canvas: #f4f6fa;
-  --ink: #182431;
-  --muted: #4c5e70;
-  --subtle: #e8eef4;
-  --surface: #ffffff;
-  --surface-solid: #ffffff;
-  --line: #cbd5e1;
-  --control-line: #7c8e9f;
-  --brand: #076454;
-  --brand-dark: #064f43;
-  --brand-soft: #dff7ef;
-  --violet: #5846ae;
-  --violet-soft: #eeeafa;
-  --danger: #972f25;
-  --danger-soft: #fcece9;
-  --action-background: #076454;
-  --action-hover: #064f43;
-  --on-action: #ffffff;
-  --disabled-ink: #4c5e70;
-  --disabled-surface: #e8eef4;
-  --disabled-line: #a8b7c6;
-  --overlay: #10251f88;
-  --transparent: transparent;
-  --font-ui:
-    -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI",
-    system-ui, sans-serif;
-  --font-evidence: Georgia, "Times New Roman", serif;
-  --font-code: ui-monospace, Consolas, monospace;
-  --type-metadata: 0.75rem;
-  --type-supporting: 0.875rem;
-  --type-body: 1rem;
-  --type-subheading: 1.25rem;
-  --type-section-heading: 1.75rem;
-  --type-page-heading: clamp(2rem, 3vw, 3rem);
-  --leading-tight: 1.2;
-  --leading-normal: 1.5;
-  --leading-reading: 1.75;
-  --weight-normal: 400;
-  --weight-medium: 600;
-  --weight-bold: 700;
-  --tracking-tight: -0.025em;
-  --tracking-normal: 0;
-  --radius-control: 0.5rem;
-  --radius-card: 1rem;
-  --radius-overlay: 1.25rem;
-  --radius-pill: 999px;
-  --shadow-sm: 0 2px 6px #1f36550a;
-  --shadow: 0 8px 24px #1f365518;
-  --shadow-overlay: 0 24px 64px #0c1f3540;
-  --ring: 0 0 0 4px #087f6a2b;
-  --motion-fast: 150ms;
-  --motion-normal: 200ms;
-  --motion-slow: 250ms;
-  --motion-reduced: 0.01ms;
-  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
-  --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --evidence-highlight: #972f25; /* Original source images retain their own light surface. */
-    --canvas: #111923;
-    --ink: #edf3f8;
-    --muted: #b5c4d3;
-    --subtle: #273443;
-    --surface: #1b2734;
-    --surface-solid: #1b2734;
-    --line: #52697f;
-    --control-line: #758aa0;
-    --material-tint: #1b2734f5;
-    --material-rim: #96b7ce;
-    --material-shadow: inset 0 1px 0 #a0bed02b, 0 12px 32px #00000033;
-    --shadow-sm: 0 2px 6px #0000001f;
-    --shadow: 0 8px 24px #00000033;
-    --shadow-overlay: 0 24px 64px #00000080;
-    --brand: #68dfc1;
-    --brand-dark: #8be9d0;
-    --brand-soft: #173f35;
-    --violet: #c8baff;
-    --violet-soft: #302946;
-    --danger: #ffb1a5;
-    --danger-soft: #482820;
-    --disabled-ink: #b5c4d3;
-    --disabled-surface: #273443;
-    --disabled-line: #62788d;
-    --overlay: #0009;
-    --ring: 0 0 0 4px #68dfc133;
-  }
-}
-
-:root {
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -140,45 +77,41 @@
   --space-16: 4rem;
   --space-18: 4.5rem;
   --space-32: 8rem;
+  --radius-circle: 50%;
+  --radius-control: 0.375rem;
+  --radius-card: 0.625rem;
+  --radius-overlay: 0.75rem;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --focus-width: 2px;
+  --focus-offset: 3px;
+  --accent-width: 3px;
+  --control-size: 44px;
+  --icon-size: 20px;
+  --backdrop-blur: 0px;
+  --shadow-sm: none;
+  --shadow: none;
+  --shadow-overlay: 0 16px 48px light-dark(#1b292624, #00000066);
+  --press-scale: 1;
+  --press-offset: 1px;
+  --dialog-offset: 12vh;
+  --welcome-padding: 8vh max(6vw, var(--space-8));
+  --welcome-logo-gap: clamp(var(--space-16), 10vh, var(--space-32));
+  --workspace-inline-padding: clamp(var(--space-5), 4vw, var(--space-18));
+  --panel-padding: clamp(var(--space-6), 4vw, var(--space-11));
+  --research-padding: clamp(var(--space-5), 3vw, var(--space-8));
+  --motion-fast: 150ms;
+  --motion-normal: 200ms;
+  --motion-slow: 250ms;
+  --motion-atlas-settle: 1600ms;
+  --motion-reduced: 0.01ms;
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-
-/* Unit-mass damped spring: zeta .8, omega 32/s, sampled over 250ms. */
-@supports (transition-timing-function: linear(0, 1)) {
-  :root {
-    --ease-spring: linear(
-      0,
-      0.02727,
-      0.0953,
-      0.18715,
-      0.29027,
-      0.39566,
-      0.49717,
-      0.59088,
-      0.67455,
-      0.74721,
-      0.80876,
-      0.85972,
-      0.90096,
-      0.93357,
-      0.95873,
-      0.97761,
-      0.9913,
-      1.00082,
-      1.00706,
-      1.01077,
-      1.0126,
-      1.01307,
-      1.01262,
-      1.01156,
-      1.01015,
-      1.00858,
-      1.00699,
-      1.00545,
-      1.00404,
-      1.00278,
-      1.00169,
-      1.00076,
-      1
-    );
-  }
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }

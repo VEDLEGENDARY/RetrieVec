@@ -30,6 +30,7 @@ export function EvidenceTray({
   const reference = (index: number) => (
     <ActionLink
       variant="quiet"
+      className="citation"
       href={`#shortlist-citation-${index}`}
       aria-label={`Inspect citation ${index + 1}`}
     >
@@ -166,8 +167,9 @@ export function EvidenceTray({
                   </p>
                   <blockquote>{item.hit.text}</blockquote>
                   <p>
-                    Citation [{index + 1}] · Passage {item.hit.chunk_id} ·
-                    Snapshot {item.snapshot_id}
+                    Citation [{index + 1}] · Passage{" "}
+                    <code>{item.hit.chunk_id}</code> · Snapshot{" "}
+                    <code>{item.snapshot_id}</code>
                   </p>
                   <Disclosure>
                     <summary>Evidence provenance</summary>
@@ -175,9 +177,13 @@ export function EvidenceTray({
                       <dt>Question</dt>
                       <dd>{item.query}</dd>
                       <dt>Snapshot</dt>
-                      <dd>{item.snapshot_id}</dd>
+                      <dd>
+                        <code>{item.snapshot_id}</code>
+                      </dd>
                       <dt>Passage</dt>
-                      <dd>{item.hit.chunk_id}</dd>
+                      <dd>
+                        <code>{item.hit.chunk_id}</code>
+                      </dd>
                     </dl>
                   </Disclosure>
                 </article>

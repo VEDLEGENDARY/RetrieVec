@@ -9,6 +9,7 @@ export function EvidencePanel({
   snapshot,
   onClose,
   children,
+  highlighted = false,
 }: {
   title: string;
   text: string;
@@ -16,6 +17,7 @@ export function EvidencePanel({
   snapshot: string;
   onClose: () => void;
   children?: ReactNode;
+  highlighted?: boolean;
 }) {
   const panel = useRef<HTMLElement>(null);
   const [notice, setNotice] = useState("");
@@ -37,7 +39,7 @@ export function EvidencePanel({
     <aside
       ref={panel}
       tabIndex={-1}
-      className="inspector"
+      className={highlighted ? "inspector passage-highlighted" : "inspector"}
       aria-label="Evidence inspector"
       onKeyDown={(event) => {
         if (event.key === "Escape") {

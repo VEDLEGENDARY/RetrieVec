@@ -32,7 +32,7 @@ async function workspace(page: import("@playwright/test").Page) {
   ).toBeVisible();
 }
 
-test("material rim responds to pointer input while evidence surfaces stay solid", async ({
+test("reading room surfaces stay quiet and opaque under pointer input", async ({
   page,
 }) => {
   await page.emulateMedia({
@@ -50,19 +50,10 @@ test("material rim responds to pointer input while evidence surfaces stay solid"
   const header = page.locator(".collection-header");
   const rect = (await header.boundingBox())!;
   await page.mouse.move(rect.x + rect.width * 0.75, rect.y + rect.height * 0.5);
-  const light = await header.evaluate((node) =>
-    node.style.getPropertyValue("--light-x"),
-  );
+  await expect(header).toHaveAttribute("data-material", "solid");
   expect(
-    parseFloat(light),
-    JSON.stringify(
-      await page.evaluate(() => ({
-        motion: matchMedia("(prefers-reduced-motion: reduce)").matches,
-        transparency: matchMedia("(prefers-reduced-transparency: reduce)")
-          .matches,
-      })),
-    ),
-  ).toBeCloseTo(75, 0);
+    await header.evaluate((node) => getComputedStyle(node).backdropFilter),
+  ).toBe("none");
   await expect(
     page.getByRole("heading", { name: "Research materials", exact: true }),
   ).toBeVisible();
@@ -81,7 +72,7 @@ test("material rim responds to pointer input while evidence surfaces stay solid"
   ).toBe("");
 });
 
-test("materials flatten for transparency and contrast preferences", async ({
+test("solid surfaces and focus survive transparency and contrast preferences", async ({
   page,
 }) => {
   await workspace(page);
@@ -99,7 +90,7 @@ test("materials flatten for transparency and contrast preferences", async ({
     expect(
       await page
         .locator(".collection-header")
-        .evaluate((node) => getComputedStyle(node, "::before").display),
+        .evaluate((node) => getComputedStyle(node, "::before").content),
     ).toBe("none");
     await page.getByRole("button", { name: "Sources", exact: true }).focus();
     const focus = await page

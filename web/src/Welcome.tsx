@@ -1,5 +1,6 @@
 import { BookOpenText, Files, Search, Quote, ShieldCheck } from "lucide-react";
 import { ActionLink, Notice } from "./ui";
+import { ThemeControl } from "./ThemeControl";
 
 export function Welcome({ error }: { error: string }) {
   return (
@@ -9,7 +10,10 @@ export function Welcome({ error }: { error: string }) {
           <BookOpenText size={20} aria-hidden="true" />
         </span>
         RetrieVec
-        <span className="welcome-caption">Your research, connected.</span>
+        <span className="welcome-caption">
+          Your papers. Traceable evidence.
+        </span>
+        <ThemeControl />
       </div>
       <div className="welcome-layout">
         <div className="welcome-copy">
@@ -18,14 +22,14 @@ export function Welcome({ error }: { error: string }) {
             papers
           </p>
           <h1>
-            From a stack of papers
+            A reading room
             <br />
-            to evidence you can use.
+            for traceable evidence.
           </h1>
           <p className="intro">
-            Bring your papers together. Find the passages that answer your
-            question, compare sources, and keep every citation close to the
-            original.
+            Search your papers, read the evidence, and save cited answers. Every
+            answer traces to a passage; every passage stays tied to a source
+            hash and an immutable snapshot.
           </p>
           <ActionLink variant="primary" href="/auth/login">
             Sign in to your workspace
