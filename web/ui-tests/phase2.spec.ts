@@ -290,7 +290,7 @@ for (const width of [1280, 390])
       ["Focus question composer", "research-question"],
       ["Compare retrieval methods", "compare-methods"],
       ["Boolean syntax and retrieval method", "parser"],
-      ["Evidence shortlist", "passage-shortlist > summary"],
+      ["Evidence shortlist", "passage-shortlist"],
       ["Answer provider and consent", "generation-provider"],
       ["Standalone follow-up query", "effective-query"],
       ["Find saved research", "saved-search"],
@@ -351,15 +351,15 @@ test("search commands disclose comparison, filters, diagnostics and missing prer
   await command(page, "Compare retrieval methods");
   await page.locator("#compare-methods").click();
   await expect(
-    page.getByLabel("Retrieval method", { exact: true }),
-  ).toHaveValue("compare");
+    page.getByText("All three methods will run on the next search."),
+  ).toBeVisible();
   await page.getByLabel("Research question").fill("Fixture question");
   await page
-    .getByRole("button", { name: "Search evidence", exact: true })
+    .getByRole("button", { name: "Search collection", exact: true })
     .click();
   await expect(page.getByText("2 unique passages")).toBeVisible();
   for (const [label, target] of [
-    ["Restore a recent query", "recent-searches > summary"],
+    ["Restore a recent query", "recent-searches"],
     ["Compact or full excerpts", "excerpt-display"],
     ["Inspect passages and original sources", "search-based-on > summary"],
   ]) {

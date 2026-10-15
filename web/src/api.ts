@@ -16,6 +16,8 @@ export type Hit = PaperMetadata &
   LocationMetadata & {
     paper_id?: string;
     paper_version_id?: string;
+    source_sha256?: string | null;
+    source_hash?: string | null;
     section?: string;
     section_heading?: string | null;
     text_offsets?: {

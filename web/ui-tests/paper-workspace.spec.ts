@@ -98,6 +98,7 @@ test("question starters only populate the composer and focus it", async ({
   page.on("request", (request) => {
     if (request.url().endsWith("/search")) submitted = true;
   });
+  await page.getByText("Question suggestions", { exact: true }).click();
   await page
     .getByRole("button", {
       name: "What limitations do the authors report?",

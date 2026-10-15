@@ -426,22 +426,23 @@ for (const width of [1280, 390])
       ).toBe(meta);
       await question.fill("Synthetic question");
       await page
-        .getByRole("button", { name: "Search evidence", exact: true })
+        .getByRole("button", { name: "Search collection", exact: true })
         .click();
       await expect(page.getByText("2 unique passages")).toBeVisible();
       await capture("search-results");
       await page.locator("#search-based-on > summary").click();
       await capture("search-based-on");
       await page.locator("#search-based-on > summary").click();
-      await page.getByText("More evidence options", { exact: true }).click();
-      await page.locator(".recent-searches > summary").click();
+      await page.locator("#recent-searches").click();
       await capture("recent-searches");
+      await page.keyboard.press("Escape");
       await page
         .getByRole("button", { name: "Shortlist passage", exact: true })
         .first()
         .click();
-      await page.locator(".evidence-tray > summary").click();
+      await page.locator("#passage-shortlist").click();
       await capture("evidence-shortlist");
+      await page.keyboard.press("Escape");
       const structuredHit = page
         .getByRole("button", { name: /^Synthetic source/ })
         .first();

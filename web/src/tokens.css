@@ -104,6 +104,9 @@
   --motion-normal: 200ms;
   --motion-slow: 250ms;
   --motion-atlas-settle: 1600ms;
+  --passage-card-height: 28rem;
+  --workbench-result-tools-height: 12rem;
+  --workbench-feedback-height: 6rem;
   --motion-reduced: 0.01ms;
   --ease-enter: cubic-bezier(0, 0, 0.2, 1);
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);

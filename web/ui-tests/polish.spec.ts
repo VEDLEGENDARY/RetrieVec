@@ -28,27 +28,24 @@ test("reranking is explicit, resets across methods, and explains fallback", asyn
   page,
 }) => {
   await workspace(page);
-  const submit = page.getByRole("button", { name: /Search evidence/ });
+  const submit = page.getByRole("button", { name: /Search collection/ });
   await expect(submit).toBeDisabled();
   await page.getByLabel("Research question").fill("Compare the methods");
   await page.getByText("More search options", { exact: true }).click();
   const rerank = page.getByRole("checkbox", { name: "Experimental reranking" });
   await expect(rerank).not.toBeChecked();
   await rerank.check();
-  await page
-    .getByLabel("Retrieval method", { exact: true })
-    .selectOption("dense");
+  await page.getByRole("radio", { name: "Dense", exact: true }).check();
   await expect(rerank).not.toBeChecked();
   await expect(rerank).toBeDisabled();
-  await page
-    .getByLabel("Retrieval method", { exact: true })
-    .selectOption("hybrid");
+  await page.getByRole("radio", { name: "Hybrid", exact: true }).check();
   await rerank.check();
   await page.route("**/api/v1/search", (route) => {
     expect(route.request().postDataJSON().rerank).toBe(true);
     expect(route.request().postDataJSON().section).toBe("methods");
     return route.fulfill({
       json: {
+        collection_id: "papers",
         snapshot_id: "snapshot",
         query: "Compare the methods",
         results: {

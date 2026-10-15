@@ -31,7 +31,7 @@ test("section filter is explicit, opt-in, and sent with passage searches", async
   await page.goto("/");
   await page.getByLabel("Research question").fill("A question");
   await page
-    .getByRole("button", { name: "Search evidence", exact: true })
+    .getByRole("button", { name: "Search collection", exact: true })
     .click();
   await expect.poll(() => submitted.length).toBe(1);
   expect(submitted[0]).not.toHaveProperty("section");
@@ -45,7 +45,7 @@ test("section filter is explicit, opt-in, and sent with passage searches", async
     .getByRole("combobox", { name: "Paper section" })
     .selectOption("methods");
   await page
-    .getByRole("button", { name: "Search evidence", exact: true })
+    .getByRole("button", { name: "Search collection", exact: true })
     .click();
   await expect.poll(() => submitted.length).toBe(2);
   expect(submitted[1].section).toBe("methods");

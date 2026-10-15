@@ -37,6 +37,52 @@ export function Select(props: ComponentProps<"select">) {
 export function Textarea(props: ComponentProps<"textarea">) {
   return <textarea {...props} />;
 }
+export function RadioGroup({
+  legend,
+  value,
+  options,
+  onChange,
+}: {
+  legend: string;
+  value: string;
+  options: {
+    value: string;
+    label: ReactNode;
+    accessibleLabel: string;
+    disabled?: boolean;
+  }[];
+  onChange: (value: string) => void;
+}) {
+  const name = useId();
+  return (
+    <fieldset className="method-switch" role="radiogroup">
+      <legend>{legend}</legend>
+      <div className="method-switch-options">
+        {options.map((option) => (
+          <label
+            key={option.value}
+            className={
+              value === option.value
+                ? "method-option selected"
+                : "method-option"
+            }
+          >
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              disabled={option.disabled}
+              aria-label={option.accessibleLabel}
+              onChange={() => onChange(option.value)}
+            />
+            {option.label}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
 
 export function ActionLink({
   className = "",

@@ -43,10 +43,10 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
     .press("Enter");
   await page.getByLabel("Research question").fill("retrieval evidence");
   await page
-    .getByRole("button", { name: "Search evidence", exact: true })
+    .getByRole("button", { name: "Search collection", exact: true })
     .press("Enter");
   await expect(
-    page.getByRole("heading", { name: "Hybrid · RRF" }),
+    page.getByRole("region", { name: "Hybrid · RRF" }),
   ).toBeVisible();
   await page
     .getByRole("region", { name: "Hybrid · RRF" })

@@ -127,11 +127,11 @@ test("reading typography and method marks use local fonts with no third-party re
   await workspace(page);
   await page.getByLabel("Research question").fill("Synthetic query");
   await page
-    .getByRole("button", { name: "Search evidence", exact: true })
+    .getByRole("button", { name: "Search collection", exact: true })
     .click();
-  await expect(page.locator(".ranking")).toHaveCount(3);
+  await expect(page.locator(".passage-card")).toHaveCount(2);
   await page.evaluate(() => document.fonts.ready);
-  const excerpt = page.locator(".excerpt").first();
+  const excerpt = page.locator(".passage-text > p").first();
   await expect(excerpt).toHaveCSS("font-size", "18px");
   await expect(excerpt).toHaveCSS("line-height", "29.7px");
   await expect(excerpt).toHaveCSS("text-wrap-mode", "wrap");
@@ -163,7 +163,7 @@ test("reading typography and method marks use local fonts with no third-party re
     ["dense", "rgb(122, 62, 157)"],
   ]) {
     await expect(
-      page.locator(`[data-method="${method}"] .retrieval-mark`).first(),
+      page.locator(`[data-retrieval="${method}"]`).first(),
     ).toHaveCSS("background-color", color);
   }
   const split = await page
@@ -172,7 +172,7 @@ test("reading typography and method marks use local fonts with no third-party re
     .evaluate((node) => getComputedStyle(node).backgroundImage);
   expect(split).toContain("rgb(11, 107, 106) 50%");
   expect(split).toContain("rgb(122, 62, 157) 50%");
-  const inspectorHit = page.locator('[data-method="hybrid"] .hit').first();
+  const inspectorHit = page.locator(".passage-select").first();
   await inspectorHit.click();
   await expect(page.locator(".inspector blockquote")).toHaveCSS(
     "font-size",
@@ -187,20 +187,19 @@ test("reading typography and method marks use local fonts with no third-party re
       fullPage: true,
     });
   }
-  await page.getByText("More result options", { exact: true }).click();
-  await page.getByLabel("Show retrieval method").selectOption("dense");
-  await expect(page.locator(".ranking")).toHaveCount(1);
-  await expect(page.locator(".hit-title").first()).toHaveText(
+  await page.getByRole("radio", { name: "Dense", exact: true }).check();
+  await expect(page.locator(".passage-card")).toHaveCount(2);
+  await expect(page.locator(".passage-select").first()).toHaveText(
     "Synthetic paper b",
   );
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.getByLabel("Show retrieval method").selectOption("sparse");
-  await expect(page.locator(".hit-title").first()).toHaveText(
+  await page.getByRole("radio", { name: "Sparse", exact: true }).check();
+  await expect(page.locator(".passage-select").first()).toHaveText(
     "Synthetic paper a",
   );
   expect(
     await page
-      .locator(".rankings")
+      .locator(".passage-list")
       .evaluate((node) => node.getAnimations({ subtree: true }).length),
   ).toBe(0);
   expect(external).toEqual([]);
