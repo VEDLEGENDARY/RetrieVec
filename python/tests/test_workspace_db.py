@@ -54,6 +54,45 @@ class WorkspaceDatabaseTests(unittest.TestCase):
         self.client.cookies.clear()
         self.client.cookies.set(COOKIE, self.tokens[user])
 
+    def test_paper_library_upload_pagination_literal_filter_and_live_scope(self):
+        self.user(self.a)
+        collection = self.client.post(
+            "/api/v1/collections", json={"title": "Paper library"}, headers=self.headers
+        ).json()["collection_id"]
+        route = f"/api/v1/collections/{collection}/papers"
+        response = self.client.post(
+            f"/api/v1/collections/{collection}/uploads",
+            files=[
+                ("files", ("method_100%.txt", b"Methods from a research paper")),
+                ("files", ("findings.txt", b"Findings from a research paper")),
+            ],
+            headers=self.headers | {"Idempotency-Key": "library-test"},
+        )
+        self.assertEqual(response.status_code, 202, response.text)
+        first = self.client.get(route, params={"limit": 1}).json()
+        second = self.client.get(route, params={"limit": 1, "after": first["next_cursor"]}).json()
+        self.assertIsNotNone(first["next_cursor"])
+        self.assertIsNone(second["next_cursor"])
+        self.assertNotEqual(first["items"][0]["source_id"], second["items"][0]["source_id"])
+        self.assertEqual(first["items"][0]["state"], "queued")
+        self.assertNotIn("storage_key", first["items"][0])
+        for query in ("%", "_", "METHOD"):
+            filtered = self.client.get(route, params={"q": query}).json()
+            self.assertEqual(len(filtered["items"]), 1)
+            self.assertEqual(filtered["items"][0]["display_name"], "method_100%.txt")
+        self.user(self.b)
+        self.assertEqual(self.client.get(route).status_code, 404)
+        with self.registry.connect() as db:
+            db.execute(
+                "UPDATE collections SET visibility='curated' WHERE collection_id=%s", (collection,)
+            )
+        self.assertEqual(len(self.client.get(route).json()["items"]), 2)
+        self.user(self.a)
+        self.client.delete(f"/api/v1/collections/{collection}", headers=self.headers)
+        for user in (self.a, self.b):
+            self.user(user)
+            self.assertEqual(self.client.get(route).status_code, 404)
+
     def test_pdf_page_images_require_live_snapshot_scope_and_match_retained_hash(self):
         from retrievec.corpus.importer import import_manifest
         from retrievec.corpus.pdf_locations import LocationIndex

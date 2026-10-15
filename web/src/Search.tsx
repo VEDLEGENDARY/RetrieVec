@@ -169,7 +169,7 @@ export function Search({
     <section aria-labelledby="search-heading">
       <div className="section-heading">
         <div>
-          <p className="section-kicker">Evidence workbench</p>
+          <p className="section-kicker">Explore your paper library</p>
           <h2 id="search-heading">Ask your sources</h2>
           <p>
             Follow an idea across your papers, then compare the passages that
@@ -199,9 +199,35 @@ export function Search({
                 event.currentTarget.form?.requestSubmit();
               }
             }}
-            placeholder="How does dense retrieval compare with lexical matching?"
+            placeholder="Ask about a finding, method, or limitation in your papers…"
           />
         </Field>
+        {!result && collection.active_snapshot && (
+          <div
+            className="question-starters"
+            role="group"
+            aria-label="Question suggestions"
+          >
+            <span>Start with a question</span>
+            {[
+              "What methods do these papers use?",
+              "What are the main findings?",
+              "What limitations do the authors report?",
+            ].map((question) => (
+              <Button
+                key={question}
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setQuery(question);
+                  document.getElementById("question")?.focus();
+                }}
+              >
+                {question}
+              </Button>
+            ))}
+          </div>
+        )}
         <p className="muted">
           {draftSaved
             ? "Draft saved on this device for 7 days. Cleared on sign out."

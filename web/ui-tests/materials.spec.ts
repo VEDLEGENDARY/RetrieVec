@@ -4,6 +4,10 @@ import AxeBuilder from "@axe-core/playwright";
 async function workspace(page: import("@playwright/test").Page) {
   await page.route("**/api/v1/**", (route) => {
     const path = new URL(route.request().url()).pathname;
+    if (path.endsWith("/papers"))
+      return route.fulfill({
+        json: { items: [], next_cursor: null },
+      });
     return route.fulfill({
       json: path.endsWith("/me")
         ? { principal_id: "material-fixture", csrf_token: "fixture" }

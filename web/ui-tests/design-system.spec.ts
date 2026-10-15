@@ -109,6 +109,10 @@ for (const width of [1280, 390])
       });
       await page.route("**/api/v1/**", async (route) => {
         const path = new URL(route.request().url()).pathname;
+        if (path.endsWith("/papers"))
+          return route.fulfill({
+            json: { items: [], next_cursor: null },
+          });
         let json: unknown = [];
         if (path.endsWith("/me")) {
           await sessionGate;
