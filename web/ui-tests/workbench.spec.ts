@@ -100,7 +100,7 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
     .getByLabel("Research question")
     .fill("Compare lexical and dense retrieval");
   await page
-    .getByRole("button", { name: "Search evidence", exact: true })
+    .getByRole("button", { name: "Search collection", exact: true })
     .click();
   await expect(page.getByText("2 unique passages")).toBeVisible();
   await page.getByText("More result options", { exact: true }).click();
@@ -137,11 +137,13 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
       .getByRole("status")
       .filter({ hasText: "Passage added to the evidence shortlist." }),
   ).toBeVisible();
-  await page.getByText("More evidence options", { exact: true }).click();
-  await page.locator("#passage-shortlist > summary").click();
-  await expect(page.locator(".passage-board article")).toHaveCount(1);
+  await page.locator("#passage-shortlist").click();
+  await expect(page.locator(".comparison-passage")).toHaveCount(1);
   const downloadEvent = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export evidence" }).click();
+  await page
+    .getByRole("dialog", { name: "Compare shortlisted passages" })
+    .getByRole("button", { name: "Export shortlist", exact: true })
+    .click();
   const download = await downloadEvent;
   const exported = JSON.parse(await readFile((await download.path())!, "utf8"));
   expect(exported.collection_id).toBe("collection-0");
@@ -154,28 +156,25 @@ test("filter, inspect, shortlist and export preserve evidence provenance", async
   await page
     .getByRole("button", { name: "Remove Lexical baselines from shortlist" })
     .click();
-  await expect(page.locator(".passage-board article")).toHaveCount(0);
+  await expect(page.locator(".comparison-passage")).toHaveCount(0);
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Undo remove passage" }).click();
-  await expect(page.locator(".passage-board article")).toHaveCount(1);
+  await expect(page.locator(".count-pill")).toHaveText("1/6");
   await page.getByLabel("Filter returned passages").fill("");
   await ranking
     .getByRole("button", { name: "Shortlist passage" })
     .first()
     .click();
-  const comparison = page.getByRole("table", {
-    name: /Compare selected papers/,
+  await page.locator("#passage-shortlist").click();
+  const comparison = page.getByRole("dialog", {
+    name: "Compare shortlisted passages",
   });
-  await expect(comparison.locator("tbody tr")).toHaveCount(2);
-  for (const cell of await comparison.locator("td").all()) {
-    await expect(
-      cell.getByRole("link", { name: /Inspect citation/ }).first(),
-    ).toBeVisible();
-  }
-  await comparison
-    .getByRole("link", { name: "Inspect citation 1" })
-    .first()
-    .click();
-  await expect(page.locator("#shortlist-citation-0")).toBeFocused();
+  await expect(comparison.locator(".comparison-passage")).toHaveCount(2);
+  await expect(comparison).toContainText("Synthetic Author");
+  await expect(comparison).toContainText("10.1234/fixture");
+  await expect(comparison).toContainText("snapshot-a");
+  for (const card of await comparison.locator(".comparison-passage").all())
+    await expect(card.locator("blockquote")).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
     path: "test-results/evidence-workbench.png",
@@ -225,9 +224,8 @@ test("shortlist enforces its comparison limit and frees slots on removal", async
   );
   await page.getByLabel("Research question").fill("Evidence");
   await page
-    .getByRole("button", { name: "Search evidence", exact: true })
+    .getByRole("button", { name: "Search collection", exact: true })
     .click();
-  await page.getByText("More evidence options", { exact: true }).click();
   const controls = page.getByRole("button", { name: "Shortlist passage" });
   for (let index = 0; index < 7; index++) await controls.nth(index).click();
   await expect(page.locator(".count-pill")).toHaveText("6/6");
@@ -247,17 +245,16 @@ test("recent searches restore drafts and collection changes clear the shortlist"
   await openWorkbench(page, "Search");
   await page.getByLabel("Research question").fill("Original question");
   await page
-    .getByRole("button", { name: "Search evidence", exact: true })
+    .getByRole("button", { name: "Search collection", exact: true })
     .click();
   await page
-    .getByRole("region", { name: "Sparse · BM25" })
+    .getByRole("region", { name: "Hybrid · RRF" })
     .getByRole("button", { name: "Shortlist passage" })
     .first()
     .click();
   await page.getByLabel("Research question").fill("Unsaved draft");
-  await page.getByText("More evidence options", { exact: true }).click();
-  await page.locator("#recent-searches > summary").click();
-  await page.getByRole("button", { name: /Original question/ }).click();
+  await page.locator("#recent-searches").click();
+  await page.getByRole("menuitem", { name: /Original question/ }).click();
   await expect(page.getByLabel("Research question")).toHaveValue(
     "Original question",
   );
