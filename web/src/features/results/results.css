@@ -1,0 +1,185 @@
+.results-page {
+  max-width: 100rem;
+  margin: 0 auto;
+  padding: var(--panel-padding);
+}
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-12);
+}
+.results-home {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.results-intro {
+  max-width: var(--reading-measure);
+  margin-bottom: var(--space-9);
+}
+.results-intro > p {
+  font-family: var(--font-evidence);
+  font-size: var(--reading-size);
+  line-height: var(--leading-reading);
+}
+.results-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 0.35fr);
+  gap: var(--space-8);
+  align-items: start;
+}
+.results-layout > section {
+  min-width: 0;
+}
+.benchmark-scroll,
+.scatter-scroll {
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+.benchmark-scroll {
+  max-height: 36rem;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface-solid);
+}
+.benchmark-scroll:focus-visible,
+.scatter-scroll:focus-visible {
+  outline: var(--focus-width) solid var(--brand);
+  outline-offset: var(--focus-offset);
+}
+.benchmark-scroll table {
+  width: 100%;
+  min-width: 49rem;
+  font-variant-numeric: tabular-nums;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.benchmark-scroll caption {
+  padding: var(--space-4);
+  text-align: left;
+  color: var(--muted);
+  font-size: var(--type-supporting);
+  background: var(--surface-solid);
+}
+.benchmark-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--subtle);
+  padding: var(--space-1);
+}
+.benchmark-scroll th,
+.benchmark-scroll td {
+  border-bottom: var(--border-width) solid var(--line);
+  padding: var(--space-3);
+  text-align: left;
+  font-size: var(--type-supporting);
+  white-space: nowrap;
+}
+.benchmark-scroll thead button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--type-supporting);
+  border: 0;
+  background: var(--transparent);
+  padding: var(--space-2);
+}
+.benchmark-scroll thead svg {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+.benchmark-scroll .metric {
+  text-align: right;
+}
+.results-sort-state {
+  font-size: var(--type-metadata);
+  color: var(--muted);
+  margin-top: var(--space-2);
+}
+.benchmark-limitations {
+  padding: var(--space-6);
+  background: var(--subtle);
+  border-radius: var(--radius-card);
+  border: var(--border-width) solid var(--line);
+}
+.benchmark-limitations h2 {
+  font-size: var(--type-subheading);
+}
+.benchmark-limitations li {
+  margin-bottom: var(--space-4);
+}
+.benchmark-limitations p,
+.benchmark-limitations li {
+  font-size: var(--type-supporting);
+}
+.benchmark-limitations code {
+  overflow-wrap: anywhere;
+}
+.benchmark-figure {
+  margin: var(--space-9) 0 0;
+}
+.benchmark-figure figcaption {
+  font-family: var(--font-evidence);
+  font-size: var(--type-subheading);
+}
+.benchmark-figure > p {
+  font-size: var(--type-supporting);
+  color: var(--muted);
+}
+.scatter-scroll svg {
+  display: block;
+  min-width: 60rem;
+  width: 100%;
+  font-family: var(--font-ui);
+  font-size: var(--type-supporting);
+  fill: var(--ink);
+}
+.scatter-metric {
+  font-family: var(--font-code);
+  font-variant-numeric: tabular-nums;
+}
+.scatter-grid {
+  stroke: var(--line);
+  stroke-width: var(--border-width);
+}
+.dataset-scifact {
+  color: var(--dataset-scifact);
+}
+.dataset-scidocs {
+  color: var(--dataset-scidocs);
+}
+.scatter-point {
+  fill: currentColor;
+  stroke: var(--canvas);
+  stroke-width: var(--border-width);
+}
+.scatter-connector {
+  stroke: currentColor;
+  stroke-width: var(--border-width);
+  fill: none;
+}
+.scatter-label {
+  fill: currentColor;
+}
+@media (max-width: 1100px) {
+  .results-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .benchmark-limitations {
+    max-width: var(--reading-measure);
+  }
+}
+@media (max-width: 720px) {
+  .results-header {
+    flex-wrap: wrap;
+  }
+  .results-page {
+    padding: var(--space-5);
+  }
+  .benchmark-limitations {
+    padding: var(--space-4);
+  }
+}

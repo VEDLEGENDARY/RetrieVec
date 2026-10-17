@@ -12,6 +12,8 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { api, type Collection, type Job, type Session } from "./api";
 import { FileText, UploadCloud, X, CheckCircle2 } from "lucide-react";
+import { UploadProgress } from "./features/uploads/UploadProgress";
+import "./features/uploads/uploads.css";
 
 function fileProblem(file: File) {
   if (!/\.(pdf|txt|md)$/i.test(file.name))
@@ -75,6 +77,9 @@ export function Uploads({
     index: number;
   } | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [unconfirmed, setUnconfirmed] = useState(false),
+    [jobsRefresh, setJobsRefresh] = useState(0);
+  const form = useRef<HTMLFormElement>(null);
   const requestKey = useRef(crypto.randomUUID());
   const input = useRef<HTMLInputElement>(null);
   const observed = useRef(new Set<string>());
@@ -111,7 +116,13 @@ export function Uploads({
       controller.abort();
       clearTimeout(timer);
     };
-  }, [collection.collection_id, collection.can_manage, refresh, fail]);
+  }, [
+    collection.collection_id,
+    collection.can_manage,
+    refresh,
+    fail,
+    jobsRefresh,
+  ]);
   async function submit(event: React.SubmitEvent) {
     event.preventDefault();
     if (!files.length) return;
@@ -120,6 +131,7 @@ export function Uploads({
       return;
     }
     setSending(true);
+    setUnconfirmed(false);
     setNotice("Sending original files…");
     const body = new FormData();
     files.forEach((file) => body.append("files", file));
@@ -145,6 +157,7 @@ export function Uploads({
       setRemovedFile(null);
       requestKey.current = crypto.randomUUID();
     } catch (error) {
+      setUnconfirmed(true);
       fail(error);
       setNotice(
         "Upload was not confirmed. Refresh job status before resubmitting.",
@@ -170,6 +183,7 @@ export function Uploads({
     }
     setFiles((current) => [...current, ...selected]);
     requestKey.current = crypto.randomUUID();
+    setUnconfirmed(false);
     setNotice("");
   }
   return (
@@ -181,7 +195,7 @@ export function Uploads({
           Markdown; up to 10 files, 25 MiB each, and 100 pages per PDF.
         </p>
       </div>
-      <form className="upload-composer" onSubmit={submit}>
+      <form ref={form} className="upload-composer" onSubmit={submit}>
         <div
           className={dragging ? "upload-dropzone dragging" : "upload-dropzone"}
           onDragOver={(event) => {
@@ -236,8 +250,13 @@ export function Uploads({
                   <FileText size={19} aria-hidden="true" />
                   <div>
                     <strong>{file.name}</strong>
+                    <small>
+                      <span className="metric">{fileSize(file.size)}</span> ·{" "}
+                      {file.type ||
+                        `.${file.name.split(".").at(-1)?.toLowerCase() ?? "unknown"}`}
+                    </small>
                     <small className={fileProblem(file) ? "file-error" : ""}>
-                      {fileProblem(file) ?? fileSize(file.size)}
+                      {fileProblem(file) ?? "Passes local file checks"}
                     </small>
                   </div>
                   <IconButton
@@ -250,6 +269,7 @@ export function Uploads({
                         current.filter((_, position) => position !== index),
                       );
                       requestKey.current = crypto.randomUUID();
+                      setUnconfirmed(false);
                     }}
                   >
                     <X size={17} aria-hidden="true" />
@@ -297,6 +317,7 @@ export function Uploads({
               return next;
             });
             requestKey.current = crypto.randomUUID();
+            setUnconfirmed(false);
             setRemovedFile(null);
           }}
         >
@@ -306,6 +327,24 @@ export function Uploads({
       <p role="status" aria-live="polite">
         {notice}
       </p>
+      {unconfirmed && (
+        <div className="upload-recovery-actions">
+          <Button
+            disabled={
+              sending ||
+              pending ||
+              !files.length ||
+              files.some((file) => Boolean(fileProblem(file)))
+            }
+            onClick={() => form.current?.requestSubmit()}
+          >
+            Retry upload
+          </Button>
+          <Button onClick={() => setJobsRefresh((value) => value + 1)}>
+            Refresh upload status
+          </Button>
+        </div>
+      )}
       {!pending &&
         jobs.some((job) => job.state === "succeeded") &&
         collection.active_snapshot && (
@@ -359,6 +398,7 @@ export function Uploads({
                   {job.output_snapshot &&
                     ` · Snapshot ${job.output_snapshot.slice(0, 15)}…`}
                 </small>
+                <UploadProgress job={job} />
               </li>
             ))}
           </ul>

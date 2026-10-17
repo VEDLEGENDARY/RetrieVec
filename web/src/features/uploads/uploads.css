@@ -1,0 +1,65 @@
+.upload-queue li small {
+  display: block;
+}
+.upload-queue .file-check-valid {
+  color: var(--brand);
+}
+.ingestion-files {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+}
+.jobs > li {
+  flex-wrap: wrap;
+}
+.jobs .ingestion-file {
+  display: block;
+  border: var(--border-width) solid var(--line);
+  border-radius: var(--radius-control);
+  padding: var(--space-4);
+  background: var(--surface-solid);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ingestion-file small {
+  display: block;
+  color: var(--muted);
+  font-size: var(--type-metadata);
+}
+.ingestion-file p {
+  font-size: var(--type-supporting);
+  margin: var(--space-2) 0;
+}
+.ingestion-file progress {
+  display: block;
+  width: 100%;
+  height: var(--space-2);
+  accent-color: var(--brand);
+}
+.ingestion-file dl {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.25fr) minmax(0, 1fr);
+  gap: var(--space-2);
+  font-size: var(--type-supporting);
+}
+.ingestion-file dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.upload-recovery-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+@media (max-width: 720px) {
+  .ingestion-file dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ingestion-file dt {
+    font-weight: var(--weight-medium);
+  }
+}

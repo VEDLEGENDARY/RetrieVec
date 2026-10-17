@@ -150,7 +150,14 @@ class Jobs:
             if row is None:
                 raise LeaseLost("job lease is no longer current")
 
-    def complete(self, job: dict, snapshot_id: str, *, papers: list[dict] | None = None) -> None:
+    def complete(
+        self,
+        job: dict,
+        snapshot_id: str,
+        *,
+        papers: list[dict] | None = None,
+        extraction: dict | None = None,
+    ) -> None:
         with self.registry.connect() as connection:
             # Every path takes the collection lock before a job lock, including archive.
             collection = self.registry.authorize(
@@ -208,6 +215,19 @@ class Jobs:
                 "UPDATE collections SET active_snapshot=%s WHERE collection_id=%s",
                 (snapshot_id, current["collection_id"]),
             )
+            if extraction is not None:
+                sources = connection.execute(
+                    "SELECT source_hash FROM upload_sources WHERE job_id=%s", (current["job_id"],)
+                ).fetchall()
+                retained = {
+                    row["source_hash"]: extraction[row["source_hash"]]
+                    for row in sources
+                    if row["source_hash"] in extraction
+                }
+                connection.execute(
+                    "UPDATE ingestion_jobs SET progress=progress || %s WHERE job_id=%s",
+                    (Jsonb({"extraction": retained}), current["job_id"]),
+                )
             connection.execute(
                 (
                     "UPDATE ingestion_jobs SET "

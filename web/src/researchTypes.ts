@@ -1,7 +1,12 @@
 import type { PaperMetadata } from "./PaperDetails";
 import type { LocationMetadata } from "./PassageLocation";
 
-export type Conversation = { conversation_id: string; title: string };
+export type Conversation = {
+  conversation_id: string;
+  title: string;
+  created_at?: string;
+  preview?: string;
+};
 export type SavedRun = {
   run_id: string;
   conversation_id: string;

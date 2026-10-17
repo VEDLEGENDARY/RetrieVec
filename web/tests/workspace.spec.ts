@@ -35,6 +35,45 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   await expect(
     page.getByText("Snapshot activated. Ready to search."),
   ).toBeVisible({ timeout: 90000 });
+  const provenance = page.getByText(
+    "Extraction provenance for private-evidence.txt",
+    { exact: true },
+  );
+  await expect(provenance).toBeVisible();
+  await expect(page.locator(".ingestion-file")).toContainText(
+    "UTF-8 text reader (v1)",
+  );
+  await expect(page.locator(".ingestion-file")).toContainText("Not used");
+  const uploadJob = await page.evaluate(async () => {
+    const collections = await (await fetch("/api/v1/collections")).json();
+    const jobs = await (
+      await fetch(`/api/v1/collections/${collections[0].collection_id}/jobs`)
+    ).json();
+    return jobs[0];
+  });
+  expect(uploadJob.progress.files).toHaveLength(1);
+  expect(uploadJob.progress.files[0].stage_scope).toBe("batch");
+  expect(uploadJob.progress.files[0].provenance).toMatchObject({
+    extraction_version: "utf8-text-v1",
+    ocr_used: false,
+    extractors: [{ name: "UTF-8 text reader", revision: "v1" }],
+  });
+  expect(uploadJob.progress.files[0].provenance.source_sha256).toMatch(
+    /^[a-f0-9]{64}$/,
+  );
+  expect(uploadJob.progress.extraction).toBeUndefined();
+  const resultsPage = await page.context().newPage();
+  await resultsPage.goto("/results");
+  await expect(
+    resultsPage.getByRole("heading", {
+      name: "Retrieval results",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(resultsPage.getByRole("table").locator("tbody tr")).toHaveCount(
+    10,
+  );
+  await resultsPage.close();
   await sections
     .getByRole("button", { name: "Ask", exact: true })
     .press("Enter");
@@ -287,6 +326,8 @@ test("OIDC, private upload, three-mode evidence, source access and second-user i
   ).toBeVisible();
   expect((await page.request.get(source!)).status()).toBe(404);
   for (const path of [
+    `/api/v1/jobs/${uploadJob.job_id}`,
+    `/api/v1/collections/${saved.run.collection_id}/jobs`,
     `/api/v1/runs/${saved.run.run_id}`,
     `/api/v1/runs/${saved.run.run_id}/events`,
     `/api/v1/citations/${saved.run.result.evidence[0].citation_id}`,

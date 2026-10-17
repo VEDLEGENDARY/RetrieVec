@@ -2,6 +2,7 @@ import { focusAction } from "./focusAction";
 import { useProviders } from "./useProviders";
 import {
   Button,
+  ActionLink,
   IconButton,
   Field,
   Input,
@@ -21,6 +22,7 @@ import "@fontsource-variable/geist-mono";
 import "./style.css";
 import "./research.css";
 import { ThemeControl } from "./ThemeControl";
+import { ResultsPage } from "./features/results/ResultsPage";
 import { Welcome } from "./Welcome";
 import { CollectionJourney, ResearchGuide } from "./ResearchGuide";
 import { PaperLibrary } from "./PaperLibrary";
@@ -524,6 +526,7 @@ function App() {
         <div className="account">
           <ThemeControl />
           <ResearchGuide />
+          <ActionLink href="/results">Retrieval results</ActionLink>
           <span>
             <ShieldCheck size={14} aria-hidden="true" /> Private workspace
           </span>
@@ -760,4 +763,10 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  location.pathname.replace(/\/$/, "") === "/results" ? (
+    <ResultsPage />
+  ) : (
+    <App />
+  ),
+);
