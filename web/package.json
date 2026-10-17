@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "prebuild": "node scripts/sync-brand.mjs --check",
+    "prebuild": "node scripts/sync-brand.mjs --check && node scripts/sync-results.mjs --check",
     "dev": "vite --host 127.0.0.1",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node scripts/check-bundle.mjs",
     "test": "playwright test",
     "pretest:ui": "npm run test:unit",
     "test:ui": "playwright test --config playwright.ui.config.ts",

@@ -25,10 +25,41 @@ def display_name(name):
     return value[:180].strip(" .") or "document"
 
 
-def job_view(job):
+def job_view(job, sources=()):
     result = {key: job[key] for key in Job.model_fields}
     result["job_id"] = str(result["job_id"])
+    result["progress"] = dict(result["progress"])
+    provenance = result["progress"].pop("extraction", {})
+    result["progress"]["files"] = [
+        {
+            "source_id": str(source["source_id"]),
+            "name": source["display_name"],
+            "size_bytes": source["size_bytes"],
+            "media_type": source["media_type"],
+            "state": job["state"],
+            "stage": job["stage"],
+            "stage_scope": "batch",
+            "provenance": provenance.get(source["source_hash"])
+            if job["state"] == "succeeded"
+            else None,
+        }
+        for source in sources
+    ]
     return result
+
+
+def job_views(db, jobs):
+    if not jobs:
+        return []
+    sources = db.execute(
+        "SELECT source_id,job_id,display_name,size_bytes,media_type,source_hash "
+        "FROM upload_sources WHERE job_id=ANY(%s) ORDER BY created_at,source_id",
+        ([row["job_id"] for row in jobs],),
+    ).fetchall()
+    grouped = {}
+    for source in sources:
+        grouped.setdefault(str(source["job_id"]), []).append(source)
+    return [job_view(job, grouped.get(str(job["job_id"]), ())) for job in jobs]
 
 
 class UploadLimit:
@@ -177,7 +208,7 @@ def enqueue_uploads(app, user, collection, key, staged):
                     job["job_id"],
                 ),
             )
-        return job_view(job)
+        return job_view(job, staged)
 
 
 def install_uploads(app):
@@ -272,7 +303,7 @@ def install_uploads(app):
     def job(job_id: uuid.UUID, request: Request):
         user = principal(request)
         with app.state.registry.connect() as db:
-            return job_view(app.state.resources.owned(db, user, "job", job_id))
+            return job_views(db, [app.state.resources.owned(db, user, "job", job_id)])[0]
 
     @app.get("/api/v1/collections/{collection_id}/jobs", response_model=list[Job])
     def jobs(collection_id: str, request: Request):
@@ -284,4 +315,4 @@ def install_uploads(app):
                 "ORDER BY available_at DESC LIMIT 50",
                 (collection_id,),
             ).fetchall()
-            return [job_view(row) for row in rows]
+            return job_views(db, rows)

@@ -211,7 +211,10 @@ class Worker:
             if lost.is_set():
                 raise LeaseLost("heartbeat failed")
             _, papers, _ = load_snapshot(corpus)
-            self.jobs.complete(job, snapshot_id, papers=papers)
+            from retrievec.registry.extraction_provenance import extraction_provenance
+
+            provenance = extraction_provenance(self.store.root, papers)
+            self.jobs.complete(job, snapshot_id, papers=papers, extraction=provenance)
             return {"job_id": str(job["job_id"]), "state": "succeeded", "snapshot_id": snapshot_id}
         except LeaseLost:
             return {"job_id": str(job["job_id"]), "state": "lease_lost"}
