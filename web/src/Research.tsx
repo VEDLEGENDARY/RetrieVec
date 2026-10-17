@@ -31,6 +31,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api, APIError, type Collection, type Session } from "./api";
 import { AdvancedEvidence } from "./AdvancedEvidence";
 import { navigate } from "./routing";
+import { ConversationRail } from "./features/research/ConversationRail";
+import { RunStatus } from "./features/research/RunStatus";
+import "./features/research/conversations.css";
 
 const activeStates = new Set([
   "queued",
@@ -75,6 +78,11 @@ export function Research({
   fail: (error: unknown) => void;
 }) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [railRuns, setRailRuns] = useState<SavedRun[]>([]);
+  const [railLoading, setRailLoading] = useState(false),
+    [railError, setRailError] = useState("");
+  const [railRefresh, setRailRefresh] = useState(0);
+  const pendingConversation = useRef("");
   const [conversation, setConversation] = useState("");
   const [history, setHistory] = useState<Run[]>([]);
   const [saved, setSaved] = useState<SavedRun[]>([]);
@@ -218,27 +226,93 @@ export function Research({
   ]);
   useEffect(() => {
     const controller = new AbortController();
-    api<Conversation[]>(
-      `/api/v1/collections/${collection.collection_id}/conversations`,
-      { signal: controller.signal },
-    )
-      .then(setConversations)
+    setRailLoading(true);
+    setRailError("");
+    Promise.all([
+      api<Conversation[]>(
+        `/api/v1/collections/${collection.collection_id}/conversations`,
+        { signal: controller.signal },
+      ),
+      api<{ items: SavedRun[] }>(
+        `/api/v1/collections/${collection.collection_id}/runs?limit=100`,
+        { signal: controller.signal },
+      ),
+    ])
+      .then(([items, summaries]) => {
+        if (controller.signal.aborted) return;
+        if (!Array.isArray(items))
+          throw Error("Conversation list was incomplete.");
+        setConversations(items);
+        const recent = Array.isArray(summaries.items) ? summaries.items : [];
+        setRailRuns((current) => [
+          ...recent,
+          ...current.filter(
+            (item) =>
+              !recent.some(
+                (value) => value.conversation_id === item.conversation_id,
+              ),
+          ),
+        ]);
+      })
       .catch((error) => {
-        if (error.name !== "AbortError") fail(error);
+        if (!controller.signal.aborted) {
+          setRailError(
+            "Conversations could not be loaded. Reload the conversation list to retry.",
+          );
+          fail(error);
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setRailLoading(false);
       });
     return () => controller.abort();
-  }, [collection.collection_id, fail]);
+  }, [collection.collection_id, fail, railRefresh, run?.state]);
   useEffect(() => {
     if (!conversation) {
       setHistory([]);
       return;
     }
     const controller = new AbortController();
-    api<Run[]>(`/api/v1/conversations/${conversation}/runs`, {
-      signal: controller.signal,
-    })
+    api<(Run & { created_at?: string })[]>(
+      `/api/v1/conversations/${conversation}/runs`,
+      {
+        signal: controller.signal,
+      },
+    )
       .then((rows) => {
-        if (!controller.signal.aborted) setHistory(rows);
+        if (!controller.signal.aborted) {
+          setHistory(rows);
+          setConversations((current) =>
+            current.map((item) =>
+              item.conversation_id === conversation
+                ? {
+                    ...item,
+                    preview:
+                      rows[0]?.original_question ?? "No saved question yet",
+                  }
+                : item,
+            ),
+          );
+          if (rows[0]) {
+            const latest = rows[0];
+            setRailRuns((current) => [
+              {
+                run_id: latest.run_id,
+                conversation_id: latest.conversation_id,
+                original_question: latest.original_question,
+                state: latest.state,
+                created_at: latest.created_at ?? "",
+              },
+              ...current.filter(
+                (item) => item.conversation_id !== conversation,
+              ),
+            ]);
+          }
+          if (pendingConversation.current === conversation) {
+            pendingConversation.current = "";
+            if (rows[0]) setSelectedRunId(rows[0].run_id);
+          }
+        }
       })
       .catch((error) => {
         if (error.name !== "AbortError") fail(error);
@@ -434,10 +508,21 @@ export function Research({
         <Citation
           key={id}
           item={item}
+          number={
+            (run?.result?.evidence.findIndex(
+              (value) => value.evidence_id === id,
+            ) ?? 0) + 1
+          }
+          snapshot={run?.snapshot_id ?? "Unavailable"}
           inspect={inspect}
           highlight={setHighlightedEvidence}
         />
-      ) : null;
+      ) : (
+        <span key={id} className="citation-warning" role="note" tabIndex={0}>
+          Unresolved citation: <code>{id}</code>. No retrieved passage matches
+          this reference.
+        </span>
+      );
     });
   return (
     <section className="saved-research" aria-labelledby="saved-title">
@@ -448,460 +533,561 @@ export function Research({
         Answers stay tied to their sources. Structural checks do not establish
         scientific or semantic correctness.
       </p>
-      <div hidden={!showHistory}>
-        <Field label="Find saved research">
-          <Input
-            id="saved-search"
-            type="search"
-            maxLength={256}
-            value={savedQuery}
-            onChange={(event) => {
-              setSavedQuery(event.target.value);
-              setSavedPage(null);
-              setSaved([]);
-            }}
-          />
-        </Field>
-        {savedLoading ? (
-          <LoadingState label="Loading saved research…" />
-        ) : savedError ? (
-          <Notice error>{savedError}</Notice>
-        ) : (
-          <nav aria-label="All saved research">
-            {saved.map((item) => (
+      <div className="conversation-workspace">
+        <ConversationRail
+          items={conversations}
+          runs={railRuns}
+          selected={conversation}
+          loading={railLoading}
+          busy={busy}
+          error={railError}
+          onRetry={() => setRailRefresh((value) => value + 1)}
+          onNew={() => {
+            inspectionVersion.current += 1;
+            pendingConversation.current = "";
+            setConversation("");
+            setRun(null);
+            setSelectedRunId(null);
+            setHistory([]);
+            setEvidence(null);
+            setEffective("");
+            setNotice("");
+            setRequestKey(crypto.randomUUID());
+          }}
+          onSelect={(id) => {
+            inspectionVersion.current += 1;
+            pendingConversation.current = id;
+            setConversation(id);
+            setRun(null);
+            setSelectedRunId(null);
+            setEvidence(null);
+            setNotice("");
+            setRequestKey(crypto.randomUUID());
+            if (id === conversation) {
+              pendingConversation.current = "";
+              const latest =
+                railRuns.find((item) => item.conversation_id === id) ??
+                history[0];
+              if (latest) setSelectedRunId(latest.run_id);
+            }
+          }}
+        />
+        <div className="conversation-main">
+          <div hidden={!showHistory}>
+            <Field label="Find saved research">
+              <Input
+                id="saved-search"
+                type="search"
+                maxLength={256}
+                value={savedQuery}
+                onChange={(event) => {
+                  setSavedQuery(event.target.value);
+                  setSavedPage(null);
+                  setSaved([]);
+                }}
+              />
+            </Field>
+            {savedLoading ? (
+              <LoadingState label="Loading saved research…" />
+            ) : savedError ? (
+              <Notice error>{savedError}</Notice>
+            ) : (
+              <nav aria-label="All saved research">
+                {saved.map((item) => (
+                  <Button
+                    key={item.run_id}
+                    disabled={busy}
+                    onClick={() => {
+                      setConversation(item.conversation_id);
+                      setRun(null);
+                      setEvidence(null);
+                      inspectionVersion.current += 1;
+                      setSelectedRunId(item.run_id);
+                      setRunRefresh((value) => value + 1);
+                    }}
+                  >
+                    {item.original_question}
+                    <small>
+                      {stateLabel(item.state)} ·{" "}
+                      {new Date(item.created_at).toLocaleDateString()}
+                    </small>
+                  </Button>
+                ))}
+                {saved.length === 0 && (
+                  <p>
+                    No saved research matches. Ask a question to start a saved
+                    run.
+                  </p>
+                )}
+              </nav>
+            )}
+            {savedPage && (
+              <Button onClick={() => setSavedPage(null)}>
+                Newest research
+              </Button>
+            )}
+            {savedCursor && (
               <Button
-                key={item.run_id}
+                disabled={savedLoading}
+                onClick={() => setSavedPage(savedCursor)}
+              >
+                Older research
+              </Button>
+            )}
+            <More label="Browse conversations">
+              <Field label="Conversation">
+                <Select
+                  id="conversation"
+                  disabled={busy}
+                  value={conversation}
+                  onChange={(event) => {
+                    inspectionVersion.current += 1;
+                    setConversation(event.target.value);
+                    setRun(null);
+                    setSelectedRunId(null);
+                    setRunConnection("connected");
+                    setEvidence(null);
+                    setRequestKey(crypto.randomUUID());
+                  }}
+                >
+                  <option value="">New conversation</option>
+                  {conversations.map((item) => (
+                    <option
+                      key={item.conversation_id}
+                      value={item.conversation_id}
+                    >
+                      {item.title}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </More>
+          </div>
+          <form
+            hidden={showHistory}
+            onSubmit={(event) => {
+              event.preventDefault();
+              void submit();
+            }}
+          >
+            <Field label="Question for cited answer">
+              <Textarea
+                id="research-question"
+                disabled={busy}
+                value={question}
+                maxLength={4096}
+                required
+                rows={3}
+                onKeyDown={(event) => {
+                  if (
+                    (event.ctrlKey || event.metaKey) &&
+                    event.key === "Enter" &&
+                    !event.nativeEvent.isComposing
+                  ) {
+                    event.preventDefault();
+                    event.currentTarget.form?.requestSubmit();
+                  }
+                }}
+                onChange={(event) => {
+                  setQuestion(event.target.value);
+                  setRequestKey(crypto.randomUUID());
+                }}
+              />
+            </Field>
+            <p className="muted">
+              {draftSaved
+                ? "Draft saved on this device for 7 days. Cleared on sign out."
+                : "Device storage is unavailable. Keep this tab open to retain your draft."}
+            </p>
+            <p>
+              Searching for:{" "}
+              {effective || rewritePreview || question || "Enter a question"}
+              <Button
+                type="button"
+                className="quiet"
                 onClick={() => {
-                  setConversation(item.conversation_id);
-                  setRun(null);
-                  setEvidence(null);
-                  inspectionVersion.current += 1;
-                  setSelectedRunId(item.run_id);
-                  setRunRefresh((value) => value + 1);
+                  setEffective(effective || rewritePreview || question);
+                  const input = document.getElementById(
+                    "effective-query",
+                  ) as HTMLInputElement | null;
+                  const details = input?.closest("details");
+                  if (details) details.open = true;
+                  input?.focus();
                 }}
               >
-                {item.original_question}
-                <small>
-                  {stateLabel(item.state)} ·{" "}
-                  {new Date(item.created_at).toLocaleDateString()}
-                </small>
+                Edit search query
               </Button>
-            ))}
-            {saved.length === 0 && (
-              <p>
-                No saved research matches. Ask a question to start a saved run.
-              </p>
-            )}
-          </nav>
-        )}
-        {savedPage && (
-          <Button onClick={() => setSavedPage(null)}>Newest research</Button>
-        )}
-        {savedCursor && (
-          <Button
-            disabled={savedLoading}
-            onClick={() => setSavedPage(savedCursor)}
-          >
-            Older research
-          </Button>
-        )}
-        <More label="Browse conversations">
-          <Field label="Conversation">
-            <Select
-              id="conversation"
-              disabled={busy}
-              value={conversation}
-              onChange={(event) => {
-                inspectionVersion.current += 1;
-                setConversation(event.target.value);
-                setRun(null);
-                setSelectedRunId(null);
-                setRunConnection("connected");
-                setEvidence(null);
-                setRequestKey(crypto.randomUUID());
-              }}
-            >
-              <option value="">New conversation</option>
-              {conversations.map((item) => (
-                <option key={item.conversation_id} value={item.conversation_id}>
-                  {item.title}
-                </option>
-              ))}
-            </Select>
-          </Field>
-        </More>
-      </div>
-      <form
-        hidden={showHistory}
-        onSubmit={(event) => {
-          event.preventDefault();
-          void submit();
-        }}
-      >
-        <Field label="Question for cited answer">
-          <Textarea
-            id="research-question"
-            disabled={busy}
-            value={question}
-            maxLength={4096}
-            required
-            rows={3}
-            onKeyDown={(event) => {
-              if (
-                (event.ctrlKey || event.metaKey) &&
-                event.key === "Enter" &&
-                !event.nativeEvent.isComposing
-              ) {
-                event.preventDefault();
-                event.currentTarget.form?.requestSubmit();
-              }
-            }}
-            onChange={(event) => {
-              setQuestion(event.target.value);
-              setRequestKey(crypto.randomUUID());
-            }}
-          />
-        </Field>
-        <p className="muted">
-          {draftSaved
-            ? "Draft saved on this device for 7 days. Cleared on sign out."
-            : "Device storage is unavailable. Keep this tab open to retain your draft."}
-        </p>
-        <p>
-          Searching for:{" "}
-          {effective || rewritePreview || question || "Enter a question"}
-          <Button
-            type="button"
-            className="quiet"
-            onClick={() => {
-              setEffective(effective || rewritePreview || question);
-              const input = document.getElementById(
-                "effective-query",
-              ) as HTMLInputElement | null;
-              const details = input?.closest("details");
-              if (details) details.open = true;
-              input?.focus();
-            }}
-          >
-            Edit search query
-          </Button>
-        </p>
-        {rewriteError && <Notice error>{rewriteError}</Notice>}
-        <More label="More answer options">
-          <SectionField
-            value={section}
-            disabled={busy}
-            onChange={(value) => {
-              setSection(value);
-              setRequestKey(crypto.randomUUID());
-            }}
-          />
-          <Field label="Standalone query for a follow-up (optional)">
-            <Input
-              id="effective-query"
-              disabled={busy}
-              value={effective}
-              maxLength={4096}
-              onChange={(event) => {
-                setEffective(event.target.value);
-                setRequestKey(crypto.randomUUID());
-              }}
-              placeholder="Include the method or paper your follow-up refers to"
-            />
-          </Field>
-          <Field label="Generation provider">
-            <Select
-              id="generation-provider"
-              disabled={busy}
-              value={provider}
-              onChange={(event) => {
-                setProvider(event.target.value);
-                setRequestKey(crypto.randomUUID());
-              }}
-            >
-              {!providers.length && (
-                <option value="">No provider configured</option>
-              )}
-              {providers.map((item) => (
-                <option key={item.name} value={item.name}>
-                  {item.model} · {item.cloud ? "Cloud" : "Local"}
-                </option>
-              ))}
-            </Select>
-          </Field>
-        </More>
-        <p className="muted">
-          {selectedProvider
-            ? `${selectedProvider.model} · ${selectedProvider.cloud ? "Cloud" : "Local"}`
-            : "No answer provider configured. Use Find passages to search your sources."}
-        </p>
-        <Button
-          className="primary"
-          title="Generate cited answer (Ctrl or Command + Enter)"
-          aria-keyshortcuts="Control+Enter Meta+Enter"
-          disabled={
-            busy ||
-            !question.trim() ||
-            !collection.active_snapshot ||
-            !selectedProvider?.consented
-          }
-        >
-          Generate cited answer
-        </Button>
-      </form>
-      {!collection.active_snapshot && (
-        <p>Upload and process a source before creating a research run.</p>
-      )}
-      {!providers.length && (
-        <p>
-          Generation is not configured. You can continue searching and
-          inspecting sources in Find passages.
-        </p>
-      )}
-      {selectedProvider?.cloud && (
-        <div className="consent">
-          <p>
-            Using this cloud provider sends the question and selected passages
-            outside this computer. Consent applies to this collection and
-            provider configuration.
-          </p>
-          {collection.can_manage ? (
-            <Button onClick={() => consent(!selectedProvider.consented)}>
-              {selectedProvider.consented
-                ? "Revoke cloud consent"
-                : "Allow this cloud provider"}
-            </Button>
-          ) : (
-            <p>The collection owner manages cloud consent.</p>
-          )}
-        </div>
-      )}
-      {showHistory && !!history.length && (
-        <nav aria-label="Saved research runs" className="run-history">
-          {history.map((item) => (
-            <Button
-              key={item.run_id}
-              disabled={busy}
-              aria-pressed={selectedRunId === item.run_id}
-              onClick={() => {
-                inspectionVersion.current += 1;
-                // Reauthorize history before showing a cached answer or enabling exports.
-                setRun(null);
-                setSelectedRunId(item.run_id);
-                setRunRefresh((value) => value + 1);
-                setRunConnection("retrying");
-                setEvidence(null);
-              }}
-            >
-              {item.original_question} · {stateLabel(item.state)}
-            </Button>
-          ))}
-        </nav>
-      )}
-      {selectedRunId && runConnection !== "connected" && (
-        <div role="status">
-          <p>
-            {runConnection === "retrying"
-              ? "Reconnecting to the saved run. Evidence is hidden until access is confirmed."
-              : "The saved run is unavailable right now. Retry when the service is available."}
-          </p>
-          {runConnection === "offline" && (
-            <Button
-              type="button"
-              onClick={() => {
-                setRunConnection("retrying");
-                setRunRefresh((value) => value + 1);
-              }}
-            >
-              Reconnect to saved run
-            </Button>
-          )}
-        </div>
-      )}
-      {run && (
-        <article className="answer">
-          <h3>{run.original_question}</h3>
-          <p role="status">Research run: {stateLabel(run.state)}</p>
-          {activeStates.has(run.state) && (
-            <LoadingState
-              label={
-                run.state === "retrieving"
-                  ? "Finding relevant passages…"
-                  : run.state === "validating"
-                    ? "Checking citations and source integrity…"
-                    : run.state === "queued"
-                      ? "Waiting for the research worker…"
-                      : "Preparing your answer…"
-              }
-            />
-          )}
-          {activeStates.has(run.state) && progress.sources.length > 0 && (
-            <More label={`${progress.sources.length} sources retrieved`} open>
-              <p>
-                Evidence selected from the pinned snapshot. The answer is still
-                being generated and checked.
-              </p>
-              {progress.sources.map((source) => (
-                <article key={source.evidence_id}>
-                  <h4>{source.title}</h4>
-                  <blockquote>{source.text}</blockquote>
-                </article>
-              ))}
-            </More>
-          )}
-          {activeStates.has(run.state) && (
-            <Button
-              disabled={busy}
-              onClick={async () => {
-                try {
-                  await api(
-                    `/api/v1/runs/${run.run_id}/cancel`,
-                    { method: "POST" },
-                    session.csrf_token,
-                  );
-                } catch (error) {
-                  fail(error);
-                }
-              }}
-            >
-              Cancel run
-            </Button>
-          )}
-          {run.state === "failed" && (
-            <Notice error>
-              {failure[run.error_code ?? ""] ??
-                "Run failed. Check the services and retry."}
-            </Notice>
-          )}
-          {run.state === "cancelled" && (
-            <p>This run was cancelled. No late answer will be published.</p>
-          )}
-          {run.result && (
-            <>
-              <BasedOn
-                kind="answer"
-                snapshot={run.snapshot_id}
-                model={
-                  run.configuration.generation.model +
-                  " · " +
-                  run.configuration.generation.revision
-                }
-                candidates={run.result.evidence.map((item) => ({
-                  id: item.evidence_id,
-                  content: cite([item.evidence_id]),
-                }))}
-                usedIds={[
-                  ...run.result.answer.claims.flatMap(
-                    (claim) => claim.evidence_ids,
-                  ),
-                  ...run.result.answer.comparisons.flatMap(
-                    (row) => row.evidence_ids,
-                  ),
-                ]}
+            </p>
+            {rewriteError && <Notice error>{rewriteError}</Notice>}
+            <More label="More answer options">
+              <SectionField
+                value={section}
+                disabled={busy}
+                onChange={(value) => {
+                  setSection(value);
+                  setRequestKey(crypto.randomUUID());
+                }}
               />
-              <StatusBadge
-                className={
-                  run.result.answer.status === "partial" ||
-                  run.result.answer.status === "insufficient_evidence"
-                    ? "answer-status low-confidence"
-                    : "answer-status"
-                }
-              >
-                {run.result.answer.status === "insufficient_evidence"
-                  ? "I could not find this in your papers."
-                  : run.result.answer.status === "partial"
-                    ? "The sources support only part of this answer."
-                    : "Answer with cited evidence"}
-              </StatusBadge>
-              {run.result.answer.claims.map((claim) => (
-                <div className="claim" key={claim.id}>
-                  <p>{claim.text}</p>
-                  <div>{cite(claim.evidence_ids)}</div>
-                </div>
-              ))}
-              {run.result.answer.comparisons.map((row, index) => (
-                <div key={index} className="advanced-table comparison">
-                  <table>
-                    <caption>Cited paper comparison {index + 1}</caption>
-                    <tbody>
-                      {[
-                        ["Method", row.method],
-                        ["Dataset / metric", `${row.dataset} / ${row.metric}`],
-                        ["Paper-reported value", row.reported_value],
-                        ["Conditions", row.experimental_conditions],
-                        ["Comparability", row.comparability_note],
-                        ["Limitations", row.limitations],
-                      ].map(([label, value]) => (
-                        <tr key={label}>
-                          <th scope="row">{label}</th>
-                          <td>
-                            {value} {cite(row.evidence_ids)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ))}
-              <ul>
-                {run.result.answer.limitations.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ul>
-              <p className="muted">
-                Structurally checked · Human review pending ·{" "}
-                <span className="metric">
-                  {Math.round(run.result.elapsed_ms)} ms
-                </span>
-              </p>
-              <More label="Export answer">
-                <div className="export-actions">
-                  {["markdown", "bibtex", "json", "csv"].map((format) => (
-                    <Button
-                      id={`run-export-${format}`}
-                      key={format}
-                      onClick={() => exportRun(format)}
-                    >
-                      Export {exportLabels[format] ?? format}
-                    </Button>
+              <Field label="Standalone query for a follow-up (optional)">
+                <Input
+                  id="effective-query"
+                  disabled={busy}
+                  value={effective}
+                  maxLength={4096}
+                  onChange={(event) => {
+                    setEffective(event.target.value);
+                    setRequestKey(crypto.randomUUID());
+                  }}
+                  placeholder="Include the method or paper your follow-up refers to"
+                />
+              </Field>
+              <Field label="Generation provider">
+                <Select
+                  id="generation-provider"
+                  disabled={busy}
+                  value={provider}
+                  onChange={(event) => {
+                    setProvider(event.target.value);
+                    setRequestKey(crypto.randomUUID());
+                  }}
+                >
+                  {!providers.length && (
+                    <option value="">No provider configured</option>
+                  )}
+                  {providers.map((item) => (
+                    <option key={item.name} value={item.name}>
+                      {item.model} · {item.cloud ? "Cloud" : "Local"}
+                    </option>
                   ))}
-                </div>
-              </More>
-            </>
+                </Select>
+              </Field>
+            </More>
+            <p className="muted">
+              {selectedProvider
+                ? `${selectedProvider.model} · ${selectedProvider.cloud ? "Cloud" : "Local"}`
+                : "No answer provider configured. Use Find passages to search your sources."}
+            </p>
+            <Button
+              className="primary"
+              title="Generate cited answer (Ctrl or Command + Enter)"
+              aria-keyshortcuts="Control+Enter Meta+Enter"
+              disabled={
+                busy ||
+                !question.trim() ||
+                !collection.active_snapshot ||
+                !selectedProvider?.consented
+              }
+            >
+              Generate cited answer
+            </Button>
+          </form>
+          {!collection.active_snapshot && (
+            <p>Upload and process a source before creating a research run.</p>
           )}
-          <More label="More run options">
-            {!activeStates.has(run.state) && (
-              <div className="replay-actions">
-                <Button
-                  id="replay-pinned"
-                  disabled={busy}
-                  onClick={() => submit("historical", true)}
-                >
-                  Replay pinned snapshot
+          {!providers.length && (
+            <p>
+              Generation is not configured. You can continue searching and
+              inspecting sources in Find passages.
+            </p>
+          )}
+          {selectedProvider?.cloud && (
+            <div className="consent">
+              <p>
+                Using this cloud provider sends the question and selected
+                passages outside this computer. Consent applies to this
+                collection and provider configuration.
+              </p>
+              {collection.can_manage ? (
+                <Button onClick={() => consent(!selectedProvider.consented)}>
+                  {selectedProvider.consented
+                    ? "Revoke cloud consent"
+                    : "Allow this cloud provider"}
                 </Button>
+              ) : (
+                <p>The collection owner manages cloud consent.</p>
+              )}
+            </div>
+          )}
+          {showHistory && !!history.length && (
+            <nav aria-label="Saved research runs" className="run-history">
+              {history.map((item) => (
                 <Button
-                  id="replay-current"
+                  key={item.run_id}
                   disabled={busy}
-                  onClick={() => submit("current", true)}
+                  aria-pressed={selectedRunId === item.run_id}
+                  onClick={() => {
+                    inspectionVersion.current += 1;
+                    // Reauthorize history before showing a cached answer or enabling exports.
+                    setRun(null);
+                    setSelectedRunId(item.run_id);
+                    setRunRefresh((value) => value + 1);
+                    setRunConnection("retrying");
+                    setEvidence(null);
+                  }}
                 >
-                  Replay current snapshot
+                  {item.original_question} · {stateLabel(item.state)}
                 </Button>
-              </div>
-            )}
-            <Disclosure id="run-provenance">
-              <summary>Run provenance</summary>
-              <dl>
-                <dt>Effective query</dt>
-                <dd>{run.effective_query}</dd>
-                <dt>Snapshot</dt>
-                <dd>{run.snapshot_id}</dd>
-                <dt>Model revision</dt>
-                <dd>{run.configuration.generation.revision}</dd>
-              </dl>
-            </Disclosure>
-          </More>
-        </article>
-      )}
+              ))}
+            </nav>
+          )}
+          {selectedRunId && runConnection !== "connected" && (
+            <div role="status">
+              <p>
+                {runConnection === "retrying"
+                  ? "Reconnecting to the saved run. Evidence is hidden until access is confirmed."
+                  : "The saved run is unavailable right now. Retry when the service is available."}
+              </p>
+              {runConnection === "offline" && (
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setRunConnection("retrying");
+                    setRunRefresh((value) => value + 1);
+                  }}
+                >
+                  Reconnect to saved run
+                </Button>
+              )}
+            </div>
+          )}
+          {run && (
+            <article className="answer">
+              <h3>{run.original_question}</h3>
+              <p role="status">Research run: {stateLabel(run.state)}</p>
+              <RunStatus state={run.state} errorCode={run.error_code} />
+              {activeStates.has(run.state) && (
+                <LoadingState
+                  label={
+                    run.state === "retrieving"
+                      ? "Finding relevant passages…"
+                      : run.state === "validating"
+                        ? "Checking citations and source integrity…"
+                        : run.state === "queued"
+                          ? "Waiting for the research worker…"
+                          : "Preparing your answer…"
+                  }
+                />
+              )}
+              {activeStates.has(run.state) && progress.sources.length > 0 && (
+                <More
+                  label={`${progress.sources.length} sources retrieved`}
+                  open
+                >
+                  <p>
+                    Evidence selected from the pinned snapshot. The answer is
+                    still being generated and checked.
+                  </p>
+                  {progress.sources.map((source) => (
+                    <article key={source.evidence_id}>
+                      <h4>{source.title}</h4>
+                      <blockquote>{source.text}</blockquote>
+                    </article>
+                  ))}
+                </More>
+              )}
+              {activeStates.has(run.state) && (
+                <Button
+                  disabled={busy}
+                  onClick={async () => {
+                    try {
+                      await api(
+                        `/api/v1/runs/${run.run_id}/cancel`,
+                        { method: "POST" },
+                        session.csrf_token,
+                      );
+                    } catch (error) {
+                      fail(error);
+                    }
+                  }}
+                >
+                  Cancel run
+                </Button>
+              )}
+              {run.state === "failed" && (
+                <>
+                  <Notice error>
+                    {failure[run.error_code ?? ""] ??
+                      "Run failed. Check the services and retry."}
+                  </Notice>
+                  <div className="run-failure-actions">
+                    <Button
+                      disabled={busy}
+                      onClick={() => void submit("historical", true)}
+                    >
+                      Retry research run
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(
+                            JSON.stringify(
+                              {
+                                run_id: run.run_id,
+                                state: run.state,
+                                error_code: run.error_code,
+                                snapshot_id: run.snapshot_id,
+                                provider: run.configuration.provider,
+                              },
+                              null,
+                              2,
+                            ),
+                          );
+                          setNotice("Run details copied.");
+                        } catch {
+                          setNotice(
+                            "Copy failed. Open Run provenance to select and copy the details.",
+                          );
+                        }
+                      }}
+                    >
+                      Copy run details
+                    </Button>
+                  </div>
+                </>
+              )}
+              {run.state === "cancelled" && (
+                <p>This run was cancelled. No late answer will be published.</p>
+              )}
+              {run.result && (
+                <>
+                  <BasedOn
+                    kind="answer"
+                    snapshot={run.snapshot_id}
+                    model={
+                      run.configuration.generation.model +
+                      " · " +
+                      run.configuration.generation.revision
+                    }
+                    candidates={run.result.evidence.map((item) => ({
+                      id: item.evidence_id,
+                      content: (
+                        <span>
+                          {cite([item.evidence_id])} {item.title}
+                        </span>
+                      ),
+                    }))}
+                    usedIds={[
+                      ...run.result.answer.claims.flatMap(
+                        (claim) => claim.evidence_ids,
+                      ),
+                      ...run.result.answer.comparisons.flatMap(
+                        (row) => row.evidence_ids,
+                      ),
+                    ]}
+                  />
+                  <StatusBadge
+                    className={
+                      run.result.answer.status === "partial" ||
+                      run.result.answer.status === "insufficient_evidence"
+                        ? "answer-status low-confidence"
+                        : "answer-status"
+                    }
+                  >
+                    {run.result.answer.status === "insufficient_evidence"
+                      ? "I could not find this in your papers."
+                      : run.result.answer.status === "partial"
+                        ? "The sources support only part of this answer."
+                        : "Answer with cited evidence"}
+                  </StatusBadge>
+                  {run.result.answer.claims.map((claim) => (
+                    <div className="claim" key={claim.id}>
+                      <p>{claim.text}</p>
+                      <div
+                        className="claim-citations"
+                        aria-label="Paragraph citations"
+                      >
+                        {cite(claim.evidence_ids)}
+                      </div>
+                    </div>
+                  ))}
+                  {run.result.answer.comparisons.map((row, index) => (
+                    <div key={index} className="advanced-table comparison">
+                      <table>
+                        <caption>Cited paper comparison {index + 1}</caption>
+                        <tbody>
+                          {[
+                            ["Method", row.method],
+                            [
+                              "Dataset / metric",
+                              `${row.dataset} / ${row.metric}`,
+                            ],
+                            ["Paper-reported value", row.reported_value],
+                            ["Conditions", row.experimental_conditions],
+                            ["Comparability", row.comparability_note],
+                            ["Limitations", row.limitations],
+                          ].map(([label, value]) => (
+                            <tr key={label}>
+                              <th scope="row">{label}</th>
+                              <td>
+                                {value} {cite(row.evidence_ids)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ))}
+                  <ul>
+                    {run.result.answer.limitations.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                  <p className="muted">
+                    Structurally checked · Human review pending ·{" "}
+                    <span className="metric">
+                      {Math.round(run.result.elapsed_ms)} ms
+                    </span>
+                  </p>
+                  <More label="Export answer">
+                    <div className="export-actions">
+                      {["markdown", "bibtex", "json", "csv"].map((format) => (
+                        <Button
+                          id={`run-export-${format}`}
+                          key={format}
+                          onClick={() => exportRun(format)}
+                        >
+                          Export {exportLabels[format] ?? format}
+                        </Button>
+                      ))}
+                    </div>
+                  </More>
+                </>
+              )}
+              <More label="More run options">
+                {!activeStates.has(run.state) && (
+                  <div className="replay-actions">
+                    <Button
+                      id="replay-pinned"
+                      disabled={busy}
+                      onClick={() => submit("historical", true)}
+                    >
+                      Replay pinned snapshot
+                    </Button>
+                    <Button
+                      id="replay-current"
+                      disabled={busy}
+                      onClick={() => submit("current", true)}
+                    >
+                      Replay current snapshot
+                    </Button>
+                  </div>
+                )}
+                <Disclosure id="run-provenance">
+                  <summary>Run provenance</summary>
+                  <dl>
+                    <dt>Effective query</dt>
+                    <dd>{run.effective_query}</dd>
+                    <dt>Snapshot</dt>
+                    <dd>{run.snapshot_id}</dd>
+                    <dt>Model revision</dt>
+                    <dd>{run.configuration.generation.revision}</dd>
+                  </dl>
+                </Disclosure>
+              </More>
+            </article>
+          )}
+        </div>
+      </div>
       {evidence && (
         <EvidencePanel
           title={evidence.title}

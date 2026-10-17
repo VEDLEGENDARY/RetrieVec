@@ -16,6 +16,8 @@
   --brand-soft: light-dark(#dcebe5, #173134);
   --violet-soft: light-dark(#ede3f1, #2a2534);
   --danger-soft: light-dark(#f3e4df, #362523);
+  --dataset-scifact: light-dark(#355f93, #a9c4f0);
+  --dataset-scidocs: light-dark(#6c531f, #dfc681);
   --brand-dark: light-dark(#085a59, #6bd2cf);
   --line: light-dark(#bcc9c0, #3f5655);
   --control-line: light-dark(#71857a, #718b83);
